@@ -1,23 +1,14 @@
-﻿using System.Diagnostics;
-
-using Microsoft.Extensions.Configuration;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace AutoCore.Sector;
 
-using AutoCore.Auth.Config;
 using AutoCore.Auth.Network;
-using AutoCore.Database.Auth;
-using AutoCore.Database.Char;
-using AutoCore.Database.World;
-using AutoCore.Game.Constants;
-using AutoCore.Game.Managers;
-using AutoCore.Global.Config;
 using AutoCore.Global.Network;
-using AutoCore.Sector.Config;
+using AutoCore.Launcher.Bootstrap;
 using AutoCore.Sector.Network;
 using AutoCore.Utils;
 using AutoCore.Utils.Commands;
-using AutoCore.Utils.Server;
 
 public class Program : ExitableProgram
 {
@@ -25,75 +16,50 @@ public class Program : ExitableProgram
     private static GlobalServer GlobalServer { get; } = new();
     private static SectorServer SectorServer { get; } = new();
 
+    private static ILauncherServerHost? AuthHost { get; set; }
+    private static ILauncherServerHost? GlobalHost { get; set; }
+    private static ILauncherServerHost? SectorHost { get; set; }
+
+    /// <summary>
+    /// Process host entry: loads configs and starts Auth/Global/Sector. Config validation is
+    /// covered by LauncherConfigValidator unit tests; live Main is a deliberate §4 exclusion.
+    /// </summary>
+    [ExcludeFromCodeCoverage(Justification = "Process host entry — binds shared ports/DB; validated via LauncherConfigValidator.")]
     public static void Main()
     {
         // Disable scope trimming so commands remain scoped (auth.exit, global.exit, sector.exit)
         CommandProcessor.UseScopes();
-        
+
         Initialize(ExitHandlerProc);
 
-        var authConfig = GetAuthConfig();
-        var globalConfig = GetGlobalConfig();
-        var sectorConfig = GetSectorConfig();
+        var authConfig = LauncherConfigLoader.LoadAuthConfig();
+        var globalConfig = LauncherConfigLoader.LoadGlobalConfig();
+        var sectorConfig = LauncherConfigLoader.LoadSectorConfig();
 
-        AuthContext.InitializeConnectionString(authConfig.AuthDatabaseConnectionString);
-        CharContext.InitializeConnectionString(globalConfig.CharDatabaseConnectionString);
-        WorldContext.InitializeConnectionString(globalConfig.WorldDatabaseConnectionString);
+        LauncherConfigValidator.ValidateOrThrow(authConfig, globalConfig, sectorConfig);
 
-        AuthContext.EnsureCreated();
-        CharContext.EnsureCreated();
-        WorldContext.EnsureCreated();
+        AuthHost = new AuthLauncherServerHost(AuthServer, authConfig);
+        GlobalHost = new GlobalLauncherServerHost(GlobalServer, globalConfig);
+        SectorHost = new SectorLauncherServerHost(SectorServer, sectorConfig);
 
-        if (!AssetManager.Instance.Initialize(globalConfig.GamePath, ServerType.Both, globalConfig.GameConfig.AllowMissingCBID))
+        var initResult = LauncherInitOrchestrator.Run(
+            authConfig,
+            globalConfig,
+            sectorConfig,
+            new DefaultLauncherGameBootstrap(),
+            AuthHost,
+            GlobalHost,
+            SectorHost);
+
+        if (!initResult.Success)
         {
-            Logger.WriteLog(LogType.Error, "Unable to initialize Asset Manager! Check the GamePath configuration.");
-            throw new Exception("Unable to initialize Asset Manager!");
-        }
+            Logger.WriteLog(LogType.Error, initResult.ErrorMessage ?? "Launcher initialization failed.");
 
-        if (!AssetManager.Instance.LoadAllData())
-        {
-            Logger.WriteLog(LogType.Error, "Critical asset loading failed! Cannot continue without WAD or GLM files.");
-            throw new Exception("Critical asset loading failed!");
-        }
-
-        // Loot rate from loot.tuning.json (1.0 = retail; higher = more drops).
-        AutoCore.Game.Diagnostics.LootTuning.ApplyFromConfigFiles();
-
-        // Server tuning from serverConfig.yaml (NPC vehicle physics, etc.).
-        AutoCore.Game.Diagnostics.ServerConfig.ApplyFromConfigFiles();
-
-        // Initialize the loot manager (builds item index from CloneBase data)
-        LootManager.Instance.Initialize();
-
-        if (!MapManager.Instance.Initialize())
-        {
-            Logger.WriteLog(LogType.Error, "MapManager initialization failed. Continuing anyway.");
-        }
-
-        AutoCore.Game.Diagnostics.WireIsolationLevers.ApplyFromEnvironmentAndConfigFiles();
-        // After wire levers so log.filters.json can quiet WireDiag / GhostObjectDiag without rebuild.
-        AutoCore.Game.Diagnostics.LogFilters.ApplyFromConfigFiles();
-
-        AuthServer.Setup(authConfig);
-        if (!AuthServer.Start())
-        {
-            Logger.WriteLog(LogType.Error, "Unable to start the Auth server!");
-
-            return;
-        }
-
-        GlobalServer.Setup(globalConfig);
-        if (!GlobalServer.Start())
-        {
-            Logger.WriteLog(LogType.Error, "Unable to start the Global server!");
-
-            return;
-        }
-
-        SectorServer.Setup(sectorConfig);
-        if (!SectorServer.Start())
-        {
-            Logger.WriteLog(LogType.Error, "Unable to start the Sector server!");
+            if (initResult.FailedStep is LauncherInitStep.InitializeAssets
+                or LauncherInitStep.LoadAssets)
+            {
+                throw new Exception(initResult.ErrorMessage);
+            }
 
             return;
         }
@@ -105,52 +71,21 @@ public class Program : ExitableProgram
         Process.GetCurrentProcess().WaitForExit();
     }
 
-    private static AuthConfig GetAuthConfig()
-    {
-        var builder = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.auth.json")
-            .AddJsonFile("appsettings.auth.env.json", true);
-
-        var config = new AuthConfig();
-        var configRoot = builder.Build();
-        configRoot.Bind(config);
-
-        return config;
-    }
-
-    private static GlobalConfig GetGlobalConfig()
-    {
-        var builder = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.global.json")
-            .AddJsonFile("appsettings.global.env.json", true);
-
-        var config = new GlobalConfig();
-        var configRoot = builder.Build();
-        configRoot.Bind(config);
-
-        return config;
-    }
-
-    private static SectorConfig GetSectorConfig()
-    {
-        var builder = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.sector.json")
-            .AddJsonFile("appsettings.sector.env.json", true);
-
-        var config = new SectorConfig();
-        var configRoot = builder.Build();
-        configRoot.Bind(config);
-
-        return config;
-    }
-
+    [ExcludeFromCodeCoverage(Justification = "Process-exit handler tied to live server hosts.")]
     private static bool ExitHandlerProc(byte sig)
     {
         Logger.WriteLog(LogType.Error, "Shutting down the servers...");
 
-        SectorServer.Shutdown();
-        GlobalServer.Shutdown();
-        AuthServer.Shutdown();
+        if (SectorHost is not null && GlobalHost is not null && AuthHost is not null)
+        {
+            LauncherShutdownCoordinator.Shutdown(SectorHost, GlobalHost, AuthHost);
+        }
+        else
+        {
+            SectorServer.Shutdown();
+            GlobalServer.Shutdown();
+            AuthServer.Shutdown();
+        }
 
         Logger.WriteLog(LogType.Error, "Server shutdowns completed!");
 

@@ -7,16 +7,14 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="AutoCore.Game.Tests" />
+    <InternalsVisibleTo Include="AutoCore.Sector.Tests" />
+    <InternalsVisibleTo Include="AutoCore.Launcher.Tests" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="Packets\Arena\**" />
     <EmbeddedResource Remove="Packets\Arena\**" />
     <None Remove="Packets\Arena\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <InternalsVisibleTo Include="AutoCore.Game.Tests" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,4 +1,6 @@
-﻿namespace AutoCore.Game.Managers.Asset;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace AutoCore.Game.Managers.Asset;
 
 using AutoCore.Database.World;
 using AutoCore.Database.World.Models;
@@ -24,6 +26,11 @@ public class WorldDBLoader
     public IDictionary<int, IReadOnlyList<LootWeight>> LootWeights { get; set; }
     public IReadOnlyList<ConsumableLootEntry> Consumables { get; set; }
 
+    /// <summary>
+    /// World EF load + optional wad.xml bootstrap. Tables are unit-tested via
+    /// <see cref="WadXmlWorldDataLoader"/>; this method is live server asset/DB I/O.
+    /// </summary>
+    [ExcludeFromCodeCoverage(Justification = "World EF + live GamePath wad.xml bootstrap I/O; WadXmlWorldDataLoader unit-tested.")]
     public bool Load()
     {
         using var worldContext = new WorldContext();
@@ -150,6 +157,7 @@ public class WorldDBLoader
         return true;
     }
 
+    [ExcludeFromCodeCoverage(Justification = "Depends on live GLM asset presence via AssetManager.HasFileInGLMs.")]
     private static bool ContinentObjectValidator(ContinentObject continentObject)
     {
         if (continentObject == null)

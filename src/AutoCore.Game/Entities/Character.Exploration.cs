@@ -1,5 +1,6 @@
 namespace AutoCore.Game.Entities;
 
+using System.Diagnostics.CodeAnalysis;
 using AutoCore.Database.Char;
 using AutoCore.Database.Char.Models;
 using AutoCore.Game.Map;
@@ -15,6 +16,7 @@ public partial class Character
     private int _lastExplorationCellZ = int.MinValue;
 
     /// <summary>Load exploration rows for this character from the char DB context.</summary>
+    [ExcludeFromCodeCoverage(Justification = "EF CharContext I/O; SetExplorationsForTests/pure unlock paths unit-tested.")]
     internal void LoadExplorations(CharContext context)
     {
         _exploredByContinent.Clear();

@@ -33,10 +33,20 @@ public static class AssetManagerTestHelper
 {
     private static readonly Dictionary<int, CloneBase> Registered = new();
 
-    public static void RegisterCloneBase(int cbid, CloneBaseObjectType type)
+    /// <summary>
+    /// Registers a fake <see cref="CloneBaseObject"/> for the CBID.
+    /// Defaults to a 1×1 inventory footprint so cargo claim / auto-loot paths resolve
+    /// (<see cref="Inventory.InventoryFootprintPolicy"/> requires InvSizeX/Y ≥ 1).
+    /// </summary>
+    public static void RegisterCloneBase(int cbid, CloneBaseObjectType type, byte invSizeX = 1, byte invSizeY = 1)
     {
         var clone = (CloneBaseObject)RuntimeHelpers.GetUninitializedObject(typeof(CloneBaseObject));
         clone.CloneBaseSpecific = new CloneBaseSpecific { Type = (int)type, CloneBaseId = cbid };
+        clone.SimpleObjectSpecific = new SimpleObjectSpecific
+        {
+            InvSizeX = invSizeX,
+            InvSizeY = invSizeY,
+        };
         Registered[cbid] = clone;
         GetCloneBasesDictionary()[cbid] = clone;
     }

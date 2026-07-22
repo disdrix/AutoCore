@@ -1,4 +1,5 @@
 using System.Buffers;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 using TNL.Data;
@@ -532,6 +533,16 @@ public partial class TNLConnection : GhostConnection
             return;
         }
 
+        SendGamePacketLive(packet, type, skipOpcode);
+    }
+
+    /// <summary>
+    /// Live TNL serialize + RPC/fragment send. Unit tests always set <see cref="TestPacketSink"/>
+    /// so this path is integration-only.
+    /// </summary>
+    [ExcludeFromCodeCoverage(Justification = "Live TNL RPC serialize/fragment send; unit tests use TestPacketSink.")]
+    private void SendGamePacketLive(BasePacket packet, RPCGuaranteeType type, bool skipOpcode)
+    {
         byte[] arr;
 
         using (var stream = new MemoryStream(0x4000))
@@ -704,6 +715,11 @@ public partial class TNLConnection : GhostConnection
     }
     #region Handler
 
+    /// <summary>
+    /// Live inbound TNL dispatch switch. Individual handlers are unit-tested via reflection
+    /// + <see cref="TestPacketSink"/> without going through this RPC entrypoint.
+    /// </summary>
+    [ExcludeFromCodeCoverage(Justification = "Live TNL inbound dispatch; handlers unit-tested via InvokeHandler + TestPacketSink.")]
     private void HandlePacket(ByteBuffer buffer)
     {
         var rawBytes = new byte[buffer.GetBufferSize()];

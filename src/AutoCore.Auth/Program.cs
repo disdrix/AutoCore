@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.Extensions.Configuration;
 
@@ -13,6 +14,11 @@ public class Program : ExitableProgram
 {
     private static AuthServer? Server { get; set; }
 
+    /// <summary>
+    /// Process host entry: binds ports and MySQL. Config validation is covered by
+    /// <see cref="AuthServer.ValidateConfig"/> unit tests; live Main is a deliberate exclusion.
+    /// </summary>
+    [ExcludeFromCodeCoverage(Justification = "Process host entry — live ports/DB; config validated via AuthServer.ValidateConfig tests.")]
     public static void Main()
     {
         Initialize(ExitHandlerProc);
@@ -48,6 +54,7 @@ public class Program : ExitableProgram
         Process.GetCurrentProcess().WaitForExit();
     }
 
+    [ExcludeFromCodeCoverage(Justification = "Process-exit handler tied to live Server singleton.")]
     private static bool ExitHandlerProc(byte sig)
     {
         Logger.WriteLog(LogType.Error, "Shutting down the server...");

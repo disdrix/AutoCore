@@ -11,7 +11,14 @@ public static class CommandProcessor
 
     public static void ProcessCommand()
     {
-        var command = ReadCommand();
+        Execute(ReadCommand());
+    }
+
+    /// <summary>
+    /// Dispatch a command line without reading the console (unit-test and scripted use).
+    /// </summary>
+    public static void Execute(string command)
+    {
         if (string.IsNullOrWhiteSpace(command))
             return;
 

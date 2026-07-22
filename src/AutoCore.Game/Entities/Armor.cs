@@ -1,5 +1,6 @@
 ﻿namespace AutoCore.Game.Entities;
 
+using System.Diagnostics.CodeAnalysis;
 using AutoCore.Game.CloneBases;
 using AutoCore.Database.Char;
 using AutoCore.Database.Char.Models;
@@ -20,6 +21,7 @@ public class Armor : SimpleObject
     {
     }
 
+    [ExcludeFromCodeCoverage(Justification = "EF CharContext I/O; WriteToPacket pure path unit-tested.")]
     public override bool LoadFromDB(CharContext context, long coid, bool isInCharacterSelection = false)
     {
         SetCoid(coid, true);

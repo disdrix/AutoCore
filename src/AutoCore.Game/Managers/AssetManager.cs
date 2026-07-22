@@ -1,5 +1,6 @@
 ﻿namespace AutoCore.Game.Managers;
 
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using AutoCore.Database.World.Models;
 using AutoCore.Game.CloneBases;
@@ -51,6 +52,12 @@ public class AssetManager : Singleton<AssetManager>
         return true;
     }
 
+    /// <summary>
+    /// Live WAD/GLM/WorldDB/MapData load. Soft-fail covered by
+    /// <c>LoadAllData_WhenAlreadyLoaded_ReturnsFalse</c> and Initialize soft-path tests;
+    /// loaders unit-tested via WadXml/GLM/MapDataLoader suites.
+    /// </summary>
+    [ExcludeFromCodeCoverage(Justification = "Live game-asset I/O (WAD/GLM/WorldDB/MapData); soft-fail + loader unit tests cover contracts.")]
     public bool LoadAllData()
     {
         if (DataLoaded)
@@ -213,6 +220,7 @@ public class AssetManager : Singleton<AssetManager>
     /// <summary>
     /// Backfill objective requirements from GLM when Mission.Read ran without XML.
     /// </summary>
+    [ExcludeFromCodeCoverage(Justification = "Depends on live WAD missions + GLM XML via AssetManager; Mission.TryApplyGlmXml unit-tested separately.")]
     private void ReapplyMissingMissionGlmXml()
     {
         var repaired = 0;

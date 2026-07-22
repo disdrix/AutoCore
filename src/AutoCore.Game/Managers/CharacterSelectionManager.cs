@@ -1,6 +1,7 @@
 namespace AutoCore.Game.Managers;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using AutoCore.Database.Char;
 using AutoCore.Database.Char.Models;
@@ -16,6 +17,14 @@ using AutoCore.Utils.Memory;
 
 public class CharacterSelectionManager : Singleton<CharacterSelectionManager>
 {
+    private static readonly Func<CharContext> DefaultCreateContext = static () => new CharContext();
+
+    /// <summary>Factory for <see cref="CharContext"/>; overridable in unit tests (InMemory).</summary>
+    internal static Func<CharContext> CreateContext { get; set; } = DefaultCreateContext;
+
+    /// <summary>Restores the production CharContext factory.</summary>
+    internal static void ResetForTests() => CreateContext = DefaultCreateContext;
+
     /// <summary>Chassis <c>InventorySlots</c> → retail cargo UI page count (min 1).</summary>
     internal static int ResolveChassisCargoPages(int vehicleCbid)
     {
@@ -24,9 +33,15 @@ public class CharacterSelectionManager : Singleton<CharacterSelectionManager>
         return VehicleCargoCapacity.ClampPageCount(slots);
     }
 
+    /// <summary>
+    /// Character creation (validation + MySQL FK transaction). Soft-fail branches unit-tested
+    /// (duplicate name/vehicle, invalid CBID); success path requires live MySQL
+    /// <c>SET FOREIGN_KEY_CHECKS</c> and full starter config/map assets.
+    /// </summary>
+    [ExcludeFromCodeCoverage(Justification = "EF CharContext + MySQL FK transaction I/O; soft-fail validation unit-tested.")]
     public static (bool, long) CreateNewCharacter(TNLConnection client, LoginNewCharacterPacket packet)
     {
-        using var context = new CharContext();
+        using var context = CreateContext();
 
         // Normalize the input names (trim and convert to lowercase for comparison)
         var normalizedCharacterName = packet.CharacterName?.Trim().ToLowerInvariant() ?? string.Empty;
@@ -325,7 +340,7 @@ public class CharacterSelectionManager : Singleton<CharacterSelectionManager>
 
     public static void DeleteCharacter(TNLConnection client, long coid)
     {
-        using var context = new CharContext();
+        using var context = CreateContext();
 
         var characterData = context.Characters.FirstOrDefault(c => c.AccountId == client.Account.Id && c.Coid == coid && c.Deleted == false);
         if (characterData != null)
@@ -337,7 +352,7 @@ public class CharacterSelectionManager : Singleton<CharacterSelectionManager>
 
     public static void SendCharacterList(TNLConnection client)
     {
-        using var context = new CharContext();
+        using var context = CreateContext();
 
         var coids = context.Characters.Where(c => c.AccountId == client.Account.Id && c.Deleted == false).Select(c => c.Coid).ToList();
 
@@ -347,7 +362,7 @@ public class CharacterSelectionManager : Singleton<CharacterSelectionManager>
 
     public static void ExtendCharacterList(TNLConnection client, long coid)
     {
-        using var context = new CharContext();
+        using var context = CreateContext();
 
         SendCharacter(client, context, coid);
     }

@@ -35,6 +35,18 @@ public class TNLInterface : NetInterface
         ConnectionId = 0;
     }
 
+    /// <summary>
+    /// Constructs interface configuration without opening a UDP listen socket (unit tests).
+    /// </summary>
+    internal TNLInterface(bool doGhosting, bool skipNetworkBind)
+        : base(unbound: true)
+    {
+        _ = skipNetworkBind;
+        DoGhosting = doGhosting;
+        FragmentSize = 220;
+        ConnectionId = 0;
+    }
+
     public void Pulse()
     {
         CheckIncomingPackets();

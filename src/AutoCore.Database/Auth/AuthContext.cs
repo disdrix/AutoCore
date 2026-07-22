@@ -43,6 +43,14 @@ public class AuthContext : DbContext
         SeedDefaultAccount(context);
     }
 
+    /// <summary>Options-based EnsureCreated for unit tests without MySQL.</summary>
+    public static void EnsureCreated(DbContextOptions<AuthContext> options)
+    {
+        using var context = new AuthContext(options);
+        context.Database.EnsureCreated();
+        SeedDefaultAccount(context);
+    }
+
     private static void SeedDefaultAccount(AuthContext context)
     {
         // Only create default account if no accounts exist

@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace AutoCore.Game.Inventory;
 
 using AutoCore.Database.Char;
@@ -9,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 /// <summary>
 /// EF-backed inventory persistence. Opens a short-lived <see cref="CharContext"/> per call.
 /// </summary>
+[ExcludeFromCodeCoverage(Justification = "EF CharContext I/O; unit tests inject IInventoryPersistence fakes (RecordingInventoryPersistence).")]
 public sealed class InventoryPersistence : IInventoryPersistence
 {
     public static InventoryPersistence Instance { get; } = new();

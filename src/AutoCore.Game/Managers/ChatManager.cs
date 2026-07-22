@@ -225,7 +225,7 @@ public class ChatManager : Singleton<ChatManager>
                 respPacket.Message = equippedList.ToString();
                 break;
 
-            case "/getNearbyCBIDs":
+            case "/getnearbycbids":
                 if (character?.CurrentVehicle == null)
                 {
                     respPacket.Message = "You are not in a vehicle!";

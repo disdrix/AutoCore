@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
 namespace AutoCore.Game.Entities;
@@ -338,6 +339,7 @@ public partial class Character : Creature
     public override Character GetAsCharacter() => this;
     public override Character GetSuperCharacter(bool includeSummons) => this;
 
+    [ExcludeFromCodeCoverage(Justification = "EF CharContext I/O; pure accessors/setters/WriteToPacket covered by unit tests.")]
     public override bool LoadFromDB(CharContext context, long coid, bool isInCharacterSelection = false)
     {
         SetCoid(coid, true);
@@ -372,6 +374,7 @@ public partial class Character : Creature
         return true;
     }
 
+    [ExcludeFromCodeCoverage(Justification = "EF CharContext + InventoryPersistence I/O; cargo capacity pure path unit-tested.")]
     public bool LoadCurrentVehicle(CharContext context, bool isInCharacterSelection = false)
     {
         CurrentVehicle = new();
@@ -503,6 +506,7 @@ public partial class Character : Creature
         }
     }
 
+    [ExcludeFromCodeCoverage(Justification = "EF CharContext I/O for skills/quickbar rows.")]
     private void LoadSkills(CharContext context)
     {
         LearnedSkills.Clear();
@@ -517,6 +521,11 @@ public partial class Character : Creature
         }
     }
 
+    /// <summary>
+    /// Writes LastTown/pose into attached Char DB rows and vehicle pose. Chains to
+    /// <see cref="Vehicle.EnterMap"/> (already EF/DB glue excluded). Pure map presence uses SetMap.
+    /// </summary>
+    [ExcludeFromCodeCoverage(Justification = "DBData pose write + Vehicle.EnterMap EF glue; SetMap/presence unit-tested.")]
     public void EnterMap(SectorMap map, Vector3? position = null)
     {
         position ??= map.MapData.EntryPoint.ToVector3();

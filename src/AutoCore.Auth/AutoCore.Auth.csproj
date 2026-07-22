@@ -24,4 +24,9 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="AutoCore.Auth.Tests" />
+    <InternalsVisibleTo Include="AutoCore.Launcher.Tests" />
+  </ItemGroup>
+
 </Project>

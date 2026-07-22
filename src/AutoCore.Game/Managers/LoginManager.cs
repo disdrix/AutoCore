@@ -11,8 +11,12 @@ public class LoginManager : Singleton<LoginManager>
 {
     private const int SessionTimeoutCheck = 5000;
     private const int LoginTimoutInMs = 10000;
+    private static readonly Func<CharContext> DefaultCreateContext = static () => new CharContext();
     private Dictionary<uint, GlobalLoginEntry> GlobalLogins { get; } = new();
     private Timer Timer { get; } = new();
+
+    /// <summary>Factory for <see cref="CharContext"/>; overridable in unit tests (InMemory).</summary>
+    internal Func<CharContext> CreateContext { get; set; } = DefaultCreateContext;
 
     public LoginManager()
     {
@@ -28,6 +32,32 @@ public class LoginManager : Singleton<LoginManager>
                     GlobalLogins.Remove(rem);
             }
         });
+    }
+
+    /// <summary>Clears pending logins and restores the production CharContext factory.</summary>
+    internal void ResetForTests()
+    {
+        lock (GlobalLogins)
+            GlobalLogins.Clear();
+
+        CreateContext = DefaultCreateContext;
+    }
+
+    /// <summary>Marks all pending global logins as expired so the next session-timeout tick removes them.</summary>
+    internal void ExpireAllPendingLoginsForTests()
+    {
+        lock (GlobalLogins)
+        {
+            foreach (var entry in GlobalLogins.Values)
+                entry.ExpireTime = DateTime.Now - TimeSpan.FromMilliseconds(1);
+        }
+    }
+
+    /// <summary>True when a pending global login entry exists for the account (unit tests).</summary>
+    internal bool HasPendingLoginForTests(uint accountId)
+    {
+        lock (GlobalLogins)
+            return GlobalLogins.ContainsKey(accountId);
     }
 
     public bool ExpectLoginToGlobal(uint accountId, string username, uint authKey)
@@ -91,7 +121,7 @@ public class LoginManager : Singleton<LoginManager>
             GlobalLogins.Remove(packet.UserId);
         }
 
-        using var context = new CharContext();
+        using var context = CreateContext();
         var account = context.Accounts.FirstOrDefault(a => a.Id == packet.UserId);
         if (account == null)
         {
@@ -121,7 +151,7 @@ public class LoginManager : Singleton<LoginManager>
         // TODO: have some communicator register logins that will be incoming
         // and validate the current login against it
 
-        using var context = new CharContext();
+        using var context = CreateContext();
         var account = context.Accounts.FirstOrDefault(a => a.Id == accountId);
         if (account == null)
         {

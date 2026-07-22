@@ -51,6 +51,7 @@ Each script reads a Cobertura coverage file (default: newest under `TestResults/
 | [`measure-player-pose-coverage.ps1`](scripts/measure-player-pose-coverage.ps1) | Line-range coverage gate for remote player pose smoothness (`Vehicle` network pose + sector pose tick). Accepts one or more coverage files. |
 | [`measure-quickbar-coverage.ps1`](scripts/measure-quickbar-coverage.ps1) | Scoped coverage gate for QuickBarUpdate persistence (packet + service + sector handler slice). |
 | [`measure-scoped-coverage.ps1`](scripts/measure-scoped-coverage.ps1) | Scoped coverage gate for inventory modules, related sector inventory/item-drop packets, and Vehicle inventory-adjacent surface. Default minimum 90%. |
+| [`measure-solution-coverage.ps1`](scripts/measure-solution-coverage.ps1) | Solution-wide first-party assembly coverage gate (de-duped Cobertura). Collects all test projects, reports per-assembly line %, fails below 80%. TNL.NET reported separately. |
 | [`measure-skills-hp-power-coverage.ps1`](scripts/measure-skills-hp-power-coverage.ps1) | Scoped coverage gate for skills, HP, and power modules. Default minimum 90%. |
 | [`measure-town-pose-coverage.ps1`](scripts/measure-town-pose-coverage.ps1) | Scoped coverage gate for town on-foot logout/resume pose capture and disconnect teardown races. Default minimum 95%. |
 | [`measure-world-state-coverage.ps1`](scripts/measure-world-state-coverage.ps1) | Method-focused coverage gate for character/vehicle world-state persistence surface. Default minimum 90%. |

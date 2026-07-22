@@ -327,13 +327,34 @@ public sealed class AsyncLengthedSocket : IDisposable
         }
     }
 
+    private int _closed;
+
     public void Close()
     {
+        // Idempotent: peer disconnect, Dispose, and error paths may all call Close.
+        if (Interlocked.Exchange(ref _closed, 1) != 0)
+            return;
+
         Running = false;
-        CloseCancellationTokenSource.Cancel();
+
+        try
+        {
+            CloseCancellationTokenSource.Cancel();
+        }
+        catch (ObjectDisposedException)
+        {
+        }
+
         CloseCancellationTokenSource.Dispose();
 
-        Socket.Close();
+        try
+        {
+            Socket.Close();
+        }
+        catch (Exception)
+        {
+        }
+
         ReceiveStream?.Dispose();
         SendStream?.Dispose();
     }

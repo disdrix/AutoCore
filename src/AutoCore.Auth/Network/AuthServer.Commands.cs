@@ -13,7 +13,7 @@ public partial class AuthServer
         CommandProcessor.RegisterCommand("auth.exit", ProcessExitCommand);
     }
 
-    private void ProcessExitCommand(string[] parts)
+    internal void ProcessExitCommand(string[] parts)
     {
         var minutes = 0;
 
@@ -25,7 +25,7 @@ public partial class AuthServer
         Logger.WriteLog(LogType.Command, $"Exiting the server in {minutes} minute(s).");
     }
 
-    private void ProcessCreateCommand(string[] parts)
+    internal void ProcessCreateCommand(string[] parts)
     {
         if (parts.Length < 4)
         {
@@ -39,7 +39,7 @@ public partial class AuthServer
 
         try
         {
-            using var context = new AuthContext();
+            using var context = CreateAuthContext();
             
             var salt = Account.CreateSalt();
 

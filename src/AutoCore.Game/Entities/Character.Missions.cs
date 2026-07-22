@@ -1,5 +1,6 @@
 namespace AutoCore.Game.Entities;
 
+using System.Diagnostics.CodeAnalysis;
 using AutoCore.Database.Char;
 using AutoCore.Database.Char.Models;
 using AutoCore.Game.Managers;
@@ -10,8 +11,9 @@ public partial class Character
     /// <summary>
     /// Load persisted quest + completed-mission rows into <see cref="CurrentQuests"/> /
     /// <see cref="CompletedMissionIds"/>. Objective max counts are re-derived from mission templates;
-    /// only stored progress is overlaid.
+    /// only stored progress is overlaid. Pure overlay covered by <see cref="SetMissionsForTests"/>.
     /// </summary>
+    [ExcludeFromCodeCoverage(Justification = "EF CharContext I/O; ApplyMissionRows/SetMissionsForTests unit-tested.")]
     internal void LoadMissions(CharContext context)
     {
         CurrentQuests.Clear();

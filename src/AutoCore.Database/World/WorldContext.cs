@@ -17,6 +17,12 @@ public class WorldContext : DbContext
     {
     }
 
+    /// <summary>Options-based constructor for unit tests (InMemory / SQLite) without MySQL.</summary>
+    public WorldContext(DbContextOptions<WorldContext> options)
+        : base(options)
+    {
+    }
+
     public static void InitializeConnectionString(string connectionString)
     {
         if (string.IsNullOrEmpty(connectionString))
@@ -34,7 +40,21 @@ public class WorldContext : DbContext
         context.Database.EnsureCreated();
     }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder options) => options.UseMySql(ConnectionString, ServerVersion.AutoDetect(ConnectionString));
+    /// <summary>Options-based EnsureCreated for unit tests without MySQL.</summary>
+    public static void EnsureCreated(DbContextOptions<WorldContext> options)
+    {
+        using var context = new WorldContext(options);
+        context.Database.EnsureCreated();
+    }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder options)
+    {
+        // Skip when constructed with DbContextOptions (unit tests inject InMemory/SQLite).
+        if (options.IsConfigured)
+            return;
+
+        options.UseMySql(ConnectionString, ServerVersion.AutoDetect(ConnectionString));
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

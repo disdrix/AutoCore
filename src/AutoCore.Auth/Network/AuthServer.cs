@@ -53,10 +53,14 @@ public partial class AuthServer : BaseServer, ILoopable
         SetupServerList();
     }
 
+    /// <summary>Validates port configuration without binding sockets (unit-testable).</summary>
+    public static bool ValidateConfig(AuthConfig config) =>
+        config.AuthSocketPort != 0 && config.CommunicatorPort != 0;
+
     public bool Start()
     {
         // Check the configuration
-        if (Config.AuthSocketPort == 0 || Config.CommunicatorPort == 0)
+        if (!ValidateConfig(Config))
         {
             Logger.WriteLog(LogType.Error, "Invalid config values!");
             return false;
@@ -79,9 +83,12 @@ public partial class AuthServer : BaseServer, ILoopable
             ClientsToRemove.Add(client);
     }
 
-    private void SetupServerList()
+    /// <summary>Factory for Auth DB access during Setup; override in unit tests.</summary>
+    internal static Func<AuthContext> CreateAuthContext { get; set; } = static () => new AuthContext();
+
+    internal void SetupServerList()
     {
-        using var context = new AuthContext();
+        using var context = CreateAuthContext();
 
         // If no servers exist in the database, create a default server slot
         if (!context.GlobalServers.Any())
@@ -124,7 +131,8 @@ public partial class AuthServer : BaseServer, ILoopable
     {
         ListenerSocket.Close();
 
-        Loop.Stop();
+        if (Loop.Running)
+            Loop.Stop();
     }
 
     public void MainLoop(long delta)

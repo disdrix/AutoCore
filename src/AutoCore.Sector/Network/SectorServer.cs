@@ -215,11 +215,16 @@ public partial class SectorServer : BaseServer, ILoopable
 
         lock (_interfaceLock)
         {
-            Interface.Close();
-            Interface = null;
+            if (Interface != null)
+            {
+                Interface.Close();
+                Interface.Socket?.Stop();
+                Interface = null;
+            }
         }
 
-        Loop.Stop();
+        if (Loop != null && Loop.Running)
+            Loop.Stop();
 
         Logger.WriteLog(LogType.None, "The server was shut down!");
     }

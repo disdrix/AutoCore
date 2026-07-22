@@ -1,5 +1,6 @@
 ﻿namespace AutoCore.Game.Map;
 
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using global::TNL.Entities;
 using AutoCore.Database.World.Models;
@@ -55,6 +56,8 @@ public class SectorMap
     /// <summary>XZ spatial index of the map's entities, maintained by EnterMap/LeaveMap.</summary>
     public SpatialHashGrid Grid { get; private set; } = new();
 
+    /// <summary>Production map bootstrap from live AssetManager map data (GLM/WAD templates).</summary>
+    [ExcludeFromCodeCoverage(Justification = "Live map asset I/O; unit tests use CreateForTests.")]
     public SectorMap(int continentId)
     {
         ContinentId = continentId;

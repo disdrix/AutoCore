@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Net;
 
 namespace AutoCore.Auth.Network;
 
@@ -8,6 +9,8 @@ using AutoCore.Utils;
 
 public partial class AuthServer
 {
+    /// <summary>Binds communicator port and wires live callbacks; auth/redirect/info handlers are unit-tested directly.</summary>
+    [ExcludeFromCodeCoverage(Justification = "Live communicator bind + timer wiring; Authenticate/Redirect/UpdateServerInfo covered by unit tests.")]
     private void StartCommunicator()
     {
         Communicator.OnLoginRequest += AuthenticateGameServer;

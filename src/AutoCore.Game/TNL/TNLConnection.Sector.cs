@@ -1,5 +1,6 @@
 namespace AutoCore.Game.TNL;
 
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using AutoCore.Database.Char;
 using AutoCore.Game.Constants;
@@ -132,6 +133,11 @@ public partial class TNLConnection
                 packet.Slot, packet.IsItem, packet.SkillId, packet.ItemCoid);
     }
 
+    /// <summary>
+    /// Stage-1 sector transfer: live CharContext load + map fill. Soft-fail Disconnect on
+    /// missing character. Stage2 soft-fails covered by handler unit tests with TestPacketSink.
+    /// </summary>
+    [ExcludeFromCodeCoverage(Justification = "Live CharContext EF I/O for GetOrLoadCharacter; Stage2 soft-fail unit-tested.")]
     private void HandleTransferFromGlobalPacket(BinaryReader reader)
     {
         var packet = new TransferFromGlobalPacket();
@@ -192,6 +198,12 @@ public partial class TNLConnection
         });
     }
 
+    /// <summary>
+    /// Stage-3 ghost activation + local create packets. Soft-fail missing character is
+    /// trivial Disconnect; success path needs live ghosting/create clonebases.
+    /// Stage2 soft-fail covered by unit tests.
+    /// </summary>
+    [ExcludeFromCodeCoverage(Justification = "Live sector ghosting + create-packet path; Stage2 soft-fail unit-tested.")]
     private void HandleTransferFromGlobalStage3Packet(BinaryReader reader)
     {
         var packet = new TransferFromGlobalStage3Packet();

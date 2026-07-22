@@ -32,6 +32,12 @@ public class Communicator
     public const int SendBufferSize = 512;
     public const double ServerInfoUpdateIntervalMs = 30000.0d;
 
+    /// <summary>
+    /// Optional factory used by the Server/Client constructor to create the backing socket.
+    /// Tests can inject this to avoid real I/O while still exercising Communicator wiring.
+    /// </summary>
+    public static Func<AsyncLengthedSocket>? SocketFactory { get; set; }
+
     public CommunicatorType Type { get; }
     public AsyncLengthedSocket Socket { get; private set; }
     public List<Communicator> AuthenticatingChildren { get; } = new();
@@ -52,14 +58,27 @@ public class Communicator
     public Action<ServerInfo>? OnServerInfoRequest { get; set; }
     public Action<Communicator, ServerInfo>? OnServerInfo { get; set; }
 
+    /// <summary>
+    /// When set, <see cref="SendPacket"/> writes here instead of calling <see cref="AsyncLengthedSocket.Send"/>.
+    /// Used by unit tests so handlers can be exercised without starting real socket I/O loops.
+    /// </summary>
+    internal Action<byte[], int, int>? TestSendOverride { get; set; }
+
     public Communicator(CommunicatorType type)
+        : this(type, socket: null)
+    {
+    }
+
+    public Communicator(CommunicatorType type, AsyncLengthedSocket? socket)
     {
         if (type == CommunicatorType.ServerClient)
             throw new ArgumentOutOfRangeException(nameof(type));
 
         Type = type;
 
-        Socket = new AsyncLengthedSocket(AsyncLengthedSocket.HeaderSizeType.Word);
+        Socket = socket
+            ?? SocketFactory?.Invoke()
+            ?? new AsyncLengthedSocket(AsyncLengthedSocket.HeaderSizeType.Word);
         Socket.OnError += OnSocketError;
 
         switch (Type)
@@ -76,6 +95,15 @@ public class Communicator
     }
 
     public Communicator(AsyncLengthedSocket socket, Communicator server)
+        : this(socket, server, autoStart: true)
+    {
+    }
+
+    /// <param name="autoStart">
+    /// When false, the socket is not started. Tests use this with <see cref="TestSendOverride"/>
+    /// and <see cref="ProcessReceivedPacket"/> to avoid real TCP I/O.
+    /// </param>
+    public Communicator(AsyncLengthedSocket socket, Communicator server, bool autoStart)
     {
         Type = CommunicatorType.ServerClient;
         Server = server;
@@ -83,8 +111,22 @@ public class Communicator
         Socket = socket;
         Socket.OnReceive += OnSocketReceive;
 
-        Socket.Start();
+        if (autoStart)
+            Socket.Start();
     }
+
+    /// <summary>
+    /// Feeds a framed packet body into the receive pipeline (test seam).
+    /// <paramref name="length"/> is the payload length reported by the length-prefix framer.
+    /// </summary>
+    internal void ProcessReceivedPacket(NonContiguousMemoryStream incomingStream, int length)
+        => OnSocketReceive(incomingStream, length);
+
+    internal void ProcessSocketError() => OnSocketError();
+
+    internal void ProcessSocketAccept(AsyncLengthedSocket socket) => OnSocketAccept(socket);
+
+    internal void ProcessSocketConnect() => OnSocketConnect();
 
     public void Start(IPAddress address, int port, int backlog = int.MaxValue)
     {
@@ -223,7 +265,11 @@ public class Communicator
 
         packet.Write(writer);
 
-        Socket.Send(buffer, 0, (int)writer.BaseStream.Position);
+        var length = (int)writer.BaseStream.Position;
+        if (TestSendOverride != null)
+            TestSendOverride(buffer, 0, length);
+        else
+            Socket.Send(buffer, 0, length);
 
         ArrayPool<byte>.Shared.Return(buffer);
     }

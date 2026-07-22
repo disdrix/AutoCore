@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace AutoCore.Global;
 
@@ -15,6 +16,11 @@ public class Program : ExitableProgram
 {
     private static GlobalServer Server { get; } = new();
 
+    /// <summary>
+    /// Process host entry: binds ports, MySQL, and assets. Config validation is covered by
+    /// <see cref="GlobalConfigValidator"/> unit tests; live Main is a deliberate §4 exclusion.
+    /// </summary>
+    [ExcludeFromCodeCoverage(Justification = "Process host entry — DB/ports/assets; validated via GlobalConfigValidator.")]
     public static void Main()
     {
         Initialize(ExitHandlerProc);
@@ -26,6 +32,14 @@ public class Program : ExitableProgram
         var config = new GlobalConfig();
         var configRoot = builder.Build();
         configRoot.Bind(config);
+
+        if (!GlobalConfigValidator.TryValidate(config, out var configErrors))
+        {
+            foreach (var error in configErrors)
+                Logger.WriteLog(LogType.Error, error);
+
+            throw new InvalidOperationException("Invalid Global configuration.");
+        }
 
         CharContext.InitializeConnectionString(config.CharDatabaseConnectionString);
         WorldContext.InitializeConnectionString(config.WorldDatabaseConnectionString);
@@ -67,6 +81,7 @@ public class Program : ExitableProgram
         Process.GetCurrentProcess().WaitForExit();
     }
 
+    [ExcludeFromCodeCoverage(Justification = "Process-exit handler tied to live Server singleton.")]
     private static bool ExitHandlerProc(byte sig)
     {
         Logger.WriteLog(LogType.Error, "Shutting down the server...");

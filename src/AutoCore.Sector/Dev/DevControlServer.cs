@@ -37,13 +37,14 @@ public sealed class DevControlServer
         if (IsRunning)
             return;
 
-        Port = port;
         _cts = new CancellationTokenSource();
+        // Port 0 = OS-assigned ephemeral (tests / avoid fixed 27999 conflicts).
         _listener = new TcpListener(IPAddress.Loopback, port);
         _listener.Start();
+        Port = ((IPEndPoint)_listener.LocalEndpoint).Port;
         _loopTask = Task.Run(() => AcceptLoop(_cts.Token));
 
-        Logger.WriteLog(LogType.Network, "Dev control API listening on http://127.0.0.1:{0}", port);
+        Logger.WriteLog(LogType.Network, "Dev control API listening on http://127.0.0.1:{0}", Port);
     }
 
     public void Stop()
@@ -122,7 +123,8 @@ public sealed class DevControlServer
         }
     }
 
-    private DevHttpResponse HandleRequest(DevHttpRequest request)
+    /// <summary>Request routing (unit-testable without TCP accept).</summary>
+    internal DevHttpResponse HandleRequest(DevHttpRequest request)
     {
         var path = request.Path;
 
@@ -166,6 +168,23 @@ public sealed class DevControlServer
         {
             return DevHttpResponse.Json(400, new { error = ex.Message });
         }
+    }
+
+    /// <summary>Build a request for pure handler unit tests (no socket I/O).</summary>
+    internal static DevHttpRequest CreateRequestForTests(string method, string path, string body = null, string query = null)
+    {
+        var queryMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        if (!string.IsNullOrEmpty(query))
+        {
+            foreach (var part in query.TrimStart('?').Split('&', StringSplitOptions.RemoveEmptyEntries))
+            {
+                var kv = part.Split('=', 2);
+                queryMap[WebUtility.UrlDecode(kv[0])] =
+                    kv.Length == 2 ? WebUtility.UrlDecode(kv[1]) : string.Empty;
+            }
+        }
+
+        return new DevHttpRequest(method.ToUpperInvariant(), path, queryMap, body ?? string.Empty);
     }
 
     private object CreateHealthResponse()
@@ -278,11 +297,11 @@ public sealed class DevControlServer
         public string Command { get; set; }
     }
 
-    private sealed class DevHttpRequest
+    internal sealed class DevHttpRequest
     {
         private readonly Dictionary<string, string> _query;
 
-        private DevHttpRequest(string method, string path, Dictionary<string, string> query, string body)
+        internal DevHttpRequest(string method, string path, Dictionary<string, string> query, string body)
         {
             Method = method;
             Path = path;
@@ -360,7 +379,7 @@ public sealed class DevControlServer
         }
     }
 
-    private sealed class DevHttpResponse
+    internal sealed class DevHttpResponse
     {
         private readonly int _statusCode;
         private readonly string _body;
@@ -370,6 +389,9 @@ public sealed class DevControlServer
             _statusCode = statusCode;
             _body = body;
         }
+
+        public int StatusCode => _statusCode;
+        public string Body => _body;
 
         public static DevHttpResponse Json(int statusCode, object body)
         {

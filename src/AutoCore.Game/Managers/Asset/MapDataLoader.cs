@@ -1,4 +1,6 @@
-﻿namespace AutoCore.Game.Managers.Asset;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace AutoCore.Game.Managers.Asset;
 
 using AutoCore.Game.Map;
 using AutoCore.Utils;
@@ -7,6 +9,8 @@ public class MapDataLoader
 {
     public Dictionary<int, MapData> MapDatas { get; } = new();
 
+    /// <summary>Loads all continent .fam + heightfield TGAs from live GLM packs.</summary>
+    [ExcludeFromCodeCoverage(Justification = "Live game asset I/O / WAD disk; soft-fail covered by GLM/TGA unit tests.")]
     public bool Load()
     {
         var heightOk = 0;
@@ -35,6 +39,7 @@ public class MapDataLoader
     /// Extract continuous terrain height from the map TGA at load time (same encoding as the
     /// level viewer / CVOGTerrain::LoadMapImage). File lives in the maps GLM pack next to the .fam.
     /// </summary>
+    [ExcludeFromCodeCoverage(Justification = "Live GLM TGA heightfield I/O; MapTerrainHeightfield unit-tested separately.")]
     private static void TryLoadHeightfield(MapData mapData, string mapFileName, ref int heightOk, ref int heightMiss)
     {
         if (string.IsNullOrEmpty(mapFileName) || mapData.TerrainWidth <= 1 || mapData.TerrainHeight <= 1

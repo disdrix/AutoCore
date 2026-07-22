@@ -227,6 +227,52 @@ public class CompositeVehicleCollisionQueryTests
         Assert.AreEqual(0f, nz, 1e-3f);
     }
 
+    [TestMethod]
+    public void TryIntersectAabbSegment_OriginInside_NearestFaceX()
+    {
+        // Origin near +X face of unit box at origin.
+        Assert.IsTrue(CompositeVehicleCollisionQuery.TryIntersectAabbSegment(
+            originX: 0.9f, originY: 0f, originZ: 0f,
+            deltaX: 0f, deltaY: 0f, deltaZ: 0f,
+            centerX: 0f, centerY: 0f, centerZ: 0f,
+            halfX: 1f, halfY: 1f, halfZ: 1f,
+            out var t, out var nx, out var ny, out var nz));
+        Assert.AreEqual(0f, t, Tol);
+        Assert.AreEqual(1f, nx, 1e-3f);
+        Assert.AreEqual(0f, ny, 1e-3f);
+        Assert.AreEqual(0f, nz, 1e-3f);
+    }
+
+    [TestMethod]
+    public void TryIntersectAabbSegment_OriginInside_NearestFaceY()
+    {
+        Assert.IsTrue(CompositeVehicleCollisionQuery.TryIntersectAabbSegment(
+            originX: 0f, originY: -0.95f, originZ: 0f,
+            deltaX: 0f, deltaY: 0f, deltaZ: 0f,
+            centerX: 0f, centerY: 0f, centerZ: 0f,
+            halfX: 1f, halfY: 1f, halfZ: 1f,
+            out var t, out var nx, out var ny, out var nz));
+        Assert.AreEqual(0f, t, Tol);
+        Assert.AreEqual(0f, nx, 1e-3f);
+        Assert.AreEqual(-1f, ny, 1e-3f);
+        Assert.AreEqual(0f, nz, 1e-3f);
+    }
+
+    [TestMethod]
+    public void TryIntersectAabbSegment_OriginInside_NearestFaceZ()
+    {
+        Assert.IsTrue(CompositeVehicleCollisionQuery.TryIntersectAabbSegment(
+            originX: 0f, originY: 0f, originZ: 0.8f,
+            deltaX: 0f, deltaY: 0f, deltaZ: 0f,
+            centerX: 0f, centerY: 0f, centerZ: 0f,
+            halfX: 1f, halfY: 1f, halfZ: 1f,
+            out var t, out var nx, out var ny, out var nz));
+        Assert.AreEqual(0f, t, Tol);
+        Assert.AreEqual(0f, nx, 1e-3f);
+        Assert.AreEqual(0f, ny, 1e-3f);
+        Assert.AreEqual(1f, nz, 1e-3f);
+    }
+
     // --- helpers ---
 
     private static TerrainHeightfieldCollisionQuery Flat(float y)

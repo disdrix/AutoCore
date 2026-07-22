@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace AutoCore.Sector;
 
@@ -17,6 +18,11 @@ public class Program : ExitableProgram
 {
     private static SectorServer Server { get; } = new();
 
+    /// <summary>
+    /// Process host entry: binds ports, MySQL, and assets. Config validation is covered by
+    /// <see cref="SectorConfigValidation"/> unit tests; live Main is a deliberate §4 exclusion.
+    /// </summary>
+    [ExcludeFromCodeCoverage(Justification = "Process host entry — binds shared ports/DB; validated via SectorConfigValidation.")]
     public static void Main()
     {
         Initialize(ExitHandlerProc);
@@ -25,9 +31,9 @@ public class Program : ExitableProgram
             .AddJsonFile("appsettings.sector.json")
             .AddJsonFile("appsettings.sector.env.json", true);
 
-        var config = new SectorConfig();
         var configRoot = builder.Build();
-        configRoot.Bind(config);
+        var config = SectorConfigValidation.Bind(configRoot);
+        SectorConfigValidation.Validate(config);
 
         CharContext.InitializeConnectionString(config.CharDatabaseConnectionString);
         WorldContext.InitializeConnectionString(config.WorldDatabaseConnectionString);
@@ -83,6 +89,7 @@ public class Program : ExitableProgram
         Process.GetCurrentProcess().WaitForExit();
     }
 
+    [ExcludeFromCodeCoverage(Justification = "Process-exit handler tied to live Server singleton.")]
     private static bool ExitHandlerProc(byte sig)
     {
         Logger.WriteLog(LogType.Error, "Shutting down the server...");

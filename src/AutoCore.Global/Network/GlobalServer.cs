@@ -105,11 +105,12 @@ public partial class GlobalServer : BaseServer, ILoopable
 
         lock (_interfaceLock)
         {
-            Interface.Close();
+            Interface?.Close();
             Interface = null;
         }
 
-        Loop.Stop();
+        if (Loop.Running)
+            Loop.Stop();
 
         Logger.WriteLog(LogType.None, "The server was shut down!");
     }

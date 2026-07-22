@@ -11,7 +11,7 @@ using AutoCore.Utils.Packets;
 
 public partial class AuthClient
 {
-    private void HandlePacket(IBasePacket packet)
+    internal void HandlePacket(IBasePacket packet)
     {
         if (packet is not IOpcodedPacket<ClientOpcode> authPacket)
             return;
@@ -38,7 +38,7 @@ public partial class AuthClient
 
     private void MsgLogin(LoginPacket packet)
     {
-        using (var context = new AuthContext())
+        using (var context = CreateAuthContext())
         {
             var account = context.Accounts.FirstOrDefault(a => a.Username == packet.UserName);
             if (account == null || !account.CheckPassword(packet.Password))
@@ -59,7 +59,16 @@ public partial class AuthClient
                 return;
             }
 
-            account.LastIP = Socket.RemoteAddress.ToString();
+            // RemoteAddress may be null for test clients without a connected socket.
+            try
+            {
+                account.LastIP = Socket.RemoteAddress?.ToString();
+            }
+            catch (ObjectDisposedException)
+            {
+                account.LastIP = null;
+            }
+
             account.LastLogin = DateTime.Now;
 
             context.SaveChanges();
@@ -75,7 +84,14 @@ public partial class AuthClient
             SessionId2 = SessionId2
         });
 
-        Logger.WriteLog(LogType.Network, "*** Client logged in from {0}", Socket.RemoteAddress);
+        try
+        {
+            Logger.WriteLog(LogType.Network, "*** Client logged in from {0}", Socket.RemoteAddress);
+        }
+        catch (ObjectDisposedException)
+        {
+            Logger.WriteLog(LogType.Network, "*** Client logged in");
+        }
     }
 
     private void MsgLogout(LogoutPacket packet)

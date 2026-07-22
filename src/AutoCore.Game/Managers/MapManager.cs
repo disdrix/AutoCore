@@ -1,5 +1,6 @@
 ﻿namespace AutoCore.Game.Managers;
 
+using System.Diagnostics.CodeAnalysis;
 using AutoCore.Game.Entities;
 using AutoCore.Game.Map;
 using AutoCore.Game.Packets.Sector;
@@ -24,6 +25,21 @@ public class MapManager : Singleton<MapManager>
     /// </summary>
     internal bool SuppressCreatePacketsForTests { get; set; }
 
+    /// <summary>Test seam: inject a pre-built <see cref="SectorMap"/> without GLM/fam load.</summary>
+    internal void RegisterMapForTests(SectorMap map)
+    {
+        ArgumentNullException.ThrowIfNull(map);
+        SectorMaps[map.ContinentId] = map;
+    }
+
+    /// <summary>Test seam: drop all registered maps (including ones injected by tests).</summary>
+    internal void ClearMapsForTests() => SectorMaps.Clear();
+
+    /// <summary>
+    /// Loads all continent maps via live <see cref="SetupMap"/>. Empty-catalog soft-fail is
+    /// unit-tested; per-map load uses excluded SetupMap asset I/O.
+    /// </summary>
+    [ExcludeFromCodeCoverage(Justification = "Live map bootstrap loop via SetupMap; empty-catalog soft-fail unit-tested.")]
     public bool Initialize()
     {
         var continentObjects = AssetManager.Instance.GetContinentObjects().ToList();
@@ -130,6 +146,8 @@ public class MapManager : Singleton<MapManager>
         return n;
     }
 
+    /// <summary>Live SectorMap(continentId) bootstrap from AssetManager map data / GLM.</summary>
+    [ExcludeFromCodeCoverage(Justification = "Live map asset I/O via SectorMap(int); tests use RegisterMapForTests/CreateForTests.")]
     private void SetupMap(int continentId)
     {
         if (SectorMaps.ContainsKey(continentId))

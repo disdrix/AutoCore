@@ -81,6 +81,19 @@ public class CharContext : DbContext
         context.EnsureVehicleCombatStateSchema();
     }
 
+    /// <summary>Options-based EnsureCreated for unit tests without MySQL.</summary>
+    public static void EnsureCreated(DbContextOptions<CharContext> options)
+    {
+        using var context = new CharContext(options);
+        context.Database.EnsureCreated();
+        context.EnsureInventorySchema();
+        context.EnsureCharacterEconomySchema();
+        context.EnsureCharacterProgressSchema();
+        context.EnsureMissionSchema();
+        context.EnsureSkillSchema();
+        context.EnsureVehicleCombatStateSchema();
+    }
+
     /// <summary>
     /// Adds vehicle combat-pool columns for logout/login restore (HP/shield/power/heat).
     /// -1 means never saved → login keeps full-fill behavior. Safe to call repeatedly.

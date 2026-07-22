@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using System.Linq;
 
 namespace AutoCore.Game.TNL;
@@ -21,6 +22,12 @@ public partial class TNLConnection
         SendGamePacket(new NewsPacket(news, packet.Language));
     }
 
+    /// <summary>
+    /// Global-sector handoff: loads character via live <see cref="CharContext"/> and transfers
+    /// to sector. Soft-fail Disconnect paths require live EF; Login/News/Disconnect handlers
+    /// covered via TestPacketSink unit tests.
+    /// </summary>
+    [ExcludeFromCodeCoverage(Justification = "Live CharContext EF I/O for GetOrLoadCharacter; Global news/disconnect unit-tested.")]
     private void HandleLoginPacket(BinaryReader reader)
     {
         var packet = new LoginPacket();

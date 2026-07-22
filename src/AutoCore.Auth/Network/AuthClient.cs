@@ -24,11 +24,17 @@ public partial class AuthClient
     public uint OneTimeKey { get; }
     public uint SessionId1 { get; }
     public uint SessionId2 { get; }
-    public Account? Account { get; private set; }
-    public ClientState State { get; private set; }
+    public Account? Account { get; internal set; }
+    public ClientState State { get; internal set; }
     public Timer Timer { get; }
 
     private readonly PacketQueue _packetQueue = new();
+
+    /// <summary>When set, <see cref="SendPacket"/> records packets here instead of writing to the socket (unit tests).</summary>
+    internal Action<IBasePacket>? TestSendHook { get; set; }
+
+    /// <summary>Factory for Auth DB access; override in unit tests to use InMemory.</summary>
+    internal static Func<AuthContext> CreateAuthContext { get; set; } = static () => new AuthContext();
 
     public AuthClient(AsyncLengthedSocket socket, AuthServer server)
     {
@@ -62,6 +68,18 @@ public partial class AuthClient
         });
 
         Logger.WriteLog(LogType.Network, "*** Client connected from {0}", Socket.RemoteAddress);
+    }
+
+    /// <summary>Test seam: builds a client without starting socket I/O or sending ProtocolVersion.</summary>
+    internal AuthClient(AuthServer server, uint oneTimeKey, uint sessionId1, uint sessionId2)
+    {
+        Socket = new AsyncLengthedSocket(AsyncLengthedSocket.HeaderSizeType.Word);
+        Server = server;
+        State = ClientState.Connected;
+        Timer = new Timer();
+        OneTimeKey = oneTimeKey;
+        SessionId1 = sessionId1;
+        SessionId2 = sessionId2;
     }
 
     public void Update(long delta)
@@ -122,7 +140,7 @@ public partial class AuthClient
             UserId = Account!.Id
         });
 
-        using (var context = new AuthContext())
+        using (var context = CreateAuthContext())
         {
             var account = context.Accounts.Where(a => a.Id == Account.Id).First();
 
