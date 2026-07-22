@@ -49,7 +49,7 @@ Reports land under `StrykerOutput/<timestamp>/reports/`.
 
 **Subsystem:** `MissionPersistence`, `MissionPersistenceQueue`, `CharacterQuest`  
 **Config:** `stryker-mission-critical-config.json`  
-**Commit:** *(see git log: test: harden mission-critical mutation resistance)*
+**Commit:** `d69259c2`
 
 ### Baseline → Final
 
@@ -96,8 +96,77 @@ Reports land under `StrykerOutput/<timestamp>/reports/`.
 
 **`MissionPersistenceTests`:** fresh manager defaults AutoFlush=true + constructor seams; AutoFlush background change/complete/fail/remove; DeleteActive upsert purge keeps Complete; concurrent re-chain; failed persist does not spin; Reset clears background flag; pack edge ints.
 
-### Remaining risks / next slice
+### Remaining residuals (cataloged)
 
-1. **Next:** broader mission handlers — `stryker-mission-config.json` (NpcInteract, MissionKillProgress; expect Safe Mode CompileError on some methods).
-2. Then inventory footprint (`stryker-inventory-footprint-config.json`) for economy/placement critical bar.
-3. Residual near-equivalents above are cataloged; none silently ignored.
+| Survivor | Proof / next action |
+| -------- | ------------------- |
+| maxSeq `>`→`>=`, ResolveObjectiveMax `>`→`>=` | Equivalent max-fold / equal reassignment |
+| Reset Interlocked / CAS return / PendingCount `>=0` | Near-equivalent / test-only; optional schedule-count instrumentation |
+| Queue TryRemove continue | Concurrency race NoCoverage |
+
+---
+
+## Slice: inventory footprint — **DONE**
+
+**Subsystem:** `InventoryFootprintPolicy`, `InventoryGridPlacement`  
+**Config:** `stryker-inventory-footprint-config.json`  
+**Commit:** *(filled on commit)*
+
+### Baseline → Final
+
+| Metric | Baseline | Final |
+| ------ | -------- | ----- |
+| Mutation score | **89.90%** | **90.91%** |
+| Killed / Survived / Timeout | 87 / 10 / 2 | **88 / 9 / 2** |
+| Focused inventory filter tests | 57 pass | 57+ new placement tests pass |
+| Report | `StrykerOutput/2026-07-21.22-44-49` | `StrykerOutput/2026-07-21.22-47-41` |
+
+**Acceptance:** ≥90% for placement/ownership-adjacent critical path ✅. Footprint policy **100%** killed (15/15). No high-risk placement false-accept survivors uncataloged.
+
+### Survivor triage (final)
+
+| Mutant | Classification | Disposition |
+| ------ | -------------- | ----------- |
+| EnumerateCells `sizeX<1 \|\| sizeY<1` → `&&`; yield break removal | **Equivalent** | When either dim is 0, nested loops yield zero cells either way |
+| CanPlace grid dim `\|\|` → `&&` (width/height) | **Equivalent** for observable place | Zero width still fails later bounds (`x+sizeX > 0`) for size≥1 |
+| TryFindFirstFree compound `\|\|`→`&&` on size/grid | residual | Partial rewrites; invalid size still fails other clauses or CanPlace. Next: property over random invalid tuples if score pressure |
+| maxY/maxX `height-size` → `height+size` | **Near-equivalent** | CanPlace rejects OOB y/x; wrong max only extends scan. Timeouts on `ty--`/`tx--` already kill infinite-loop direction |
+| origin-occupied `continue` removal | **Equivalent** | Full CanPlace also fails when origin cell occupied |
+| height bound `y+sizeY` (killed by new test) | missing assertion | **Killed** |
+
+### Tests added
+
+`InventoryGridPlacementTests`: height bound with lax pageHeight; width bound edges; zero width/height/page alone; TryFindFirstFree zero/oversized independent fails; Y-then-X scan after origin occupied; 3×3 subtraction max bounds.
+
+---
+
+## Slice: broader mission handlers — **IN PROGRESS / HANDOFF**
+
+**Config:** `stryker-mission-config.json`  
+**Baseline (2026-07-21.22-41-34):** score **60.64%**, 1314 mutants tested, K≈877 S≈436 N≈134.
+
+| File | Score (approx) | Survived | Notes |
+| ---- | -------------- | -------- | ----- |
+| NpcInteractHandler.cs | ~56% | ~388 + 114 NC | Dominant mass; dialog delay, grant/complete multipaths |
+| MissionKillProgress.cs | ~56% | ~40 + 19 NC | Safe Mode CompileError on `NotifyObjectKilled` body drops many mutants; unit helpers still mutable |
+| CharacterQuest / MissionPersistence | ~94% | residual as critical slice | Already hardened |
+
+### Next actions for another agent (broader mission)
+
+1. Expand `MissionKillProgressUnitTests` for `IsKillOnlyObjective` / `HasNonKillRequirement` / `ResolveKillerCharacter` player-vehicle map walk (L138–210 survivors).
+2. Targeted NpcInteract: soft-pedal delayMs bounds, null conn/character short-circuit, objectiveId≥0, dialog follow-up cancel/remove.
+3. Do **not** lower break thresholds; prefer new focused mutate globs only if splitting NpcInteract into a dedicated config without ignoring survivors.
+4. Re-run `stryker-mission-config.json` until ≥80% or catalog every residual with proof.
+
+---
+
+## Campaign status / next uncompleted subsystem
+
+| Slice | Status | Score |
+| ----- | ------ | ----- |
+| Mission-critical | **Done** | 94.48% |
+| Inventory footprint | **Done** | 90.91% |
+| Broader mission | Handoff @ 60.64% | need ≥80% |
+| Tac-arc / NPC drive / networking / auth / utils | Not started | use existing configs |
+
+**Immediate next:** broader mission handlers (NpcInteract + KillProgress unit paths), then `stryker-tacarc-config.json` / `stryker-npc-drive-config.json`.

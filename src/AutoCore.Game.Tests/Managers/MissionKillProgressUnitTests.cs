@@ -359,6 +359,57 @@ public class MissionKillProgressUnitTests
             "Final kill-only waits for giver turn-in");
     }
 
+    [TestMethod]
+    public void IsKillOnlyObjective_EmptyNullOrMixed_False_KillOnly_True()
+    {
+        Assert.IsFalse(MissionKillProgress.IsKillOnlyObjective(null));
+        var empty = MissionObjective.CreateForTests(1, 0, 1);
+        Assert.IsFalse(MissionKillProgress.IsKillOnlyObjective(empty));
+
+        var killOnly = MissionObjective.CreateForTests(2, 0, 1);
+        killOnly.Requirements.Add(new ObjectiveRequirementKill(killOnly) { TargetCBID = 1, NumToKill = 1 });
+        Assert.IsTrue(MissionKillProgress.IsKillOnlyObjective(killOnly));
+
+        var mixed = MissionObjective.CreateForTests(3, 0, 1);
+        mixed.Requirements.Add(new ObjectiveRequirementKill(mixed) { TargetCBID = 1, NumToKill = 1 });
+        mixed.Requirements.Add(new ObjectiveRequirementCollect(mixed) { NumToCollect = 1 });
+        Assert.IsFalse(MissionKillProgress.IsKillOnlyObjective(mixed));
+        Assert.IsTrue(MissionKillProgress.HasNonKillRequirement(mixed));
+        Assert.IsFalse(MissionKillProgress.HasNonKillRequirement(killOnly));
+        Assert.IsFalse(MissionKillProgress.HasNonKillRequirement(null));
+        Assert.IsFalse(MissionKillProgress.HasNonKillRequirement(empty));
+    }
+
+    [TestMethod]
+    public void ResolveKiller_MurdererCoidNonPositive_ReturnsNull()
+    {
+        var map = CreateMapBare();
+        var prop = new GraphicsObject(GraphicsObjectType.Graphics);
+        prop.InitializeHealthForTests(1);
+        prop.SetCoid(9101, false);
+        prop.SetMap(map);
+        prop.SetMurderer(new TFID { Coid = 0, Global = true });
+        Assert.IsNull(MissionKillProgress.ResolveKillerCharacter(prop));
+
+        prop.SetMurderer(new TFID { Coid = -5, Global = true });
+        Assert.IsNull(MissionKillProgress.ResolveKillerCharacter(prop));
+    }
+
+    [TestMethod]
+    public void ResolveKiller_ViaMapPlayerCurrentVehicleCoid()
+    {
+        var (conn, character, map) = CreatePlayer();
+        var prop = new GraphicsObject(GraphicsObjectType.Graphics);
+        prop.InitializeHealthForTests(1);
+        prop.SetCoid(9201, false);
+        prop.SetMap(map);
+        // Murderer points at vehicle coid; map may not index vehicle under GetObject.
+        prop.SetMurderer(character.CurrentVehicle.ObjectId);
+        var resolved = MissionKillProgress.ResolveKillerCharacter(prop);
+        Assert.IsNotNull(resolved);
+        Assert.AreEqual(character.ObjectId.Coid, resolved.ObjectId.Coid);
+    }
+
     private void SeedKillCbid(int cbid)
     {
         var obj = MissionObjective.CreateForTests(ObjectiveId, 0, MissionId, 1);

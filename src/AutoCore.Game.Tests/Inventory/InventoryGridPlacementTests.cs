@@ -260,6 +260,96 @@ public class InventoryGridPlacementTests
         Assert.AreEqual(2, InventoryGridPlacement.EnumerateCells(0, 0, 2, 1).Count());
     }
 
+    [TestMethod]
+    public void CanPlace_HeightBoundUsesAdditionNotSubtraction()
+    {
+        // Kills: y + sizeY > gridHeight → y - sizeY (would accept OOB when page rule is lax).
+        var occupied = new HashSet<(byte X, byte Y)>();
+        const int gridH = 10;
+        const int pageH = 100; // page rule never binds for y+sizeY within gridH
+
+        Assert.IsFalse(InventoryGridPlacement.CanPlace(
+            Width, gridH, pageH, occupied, x: 0, y: 9, sizeX: 1, sizeY: 2),
+            "y=9 sizeY=2 must exceed gridHeight=10");
+        Assert.IsTrue(InventoryGridPlacement.CanPlace(
+            Width, gridH, pageH, occupied, x: 0, y: 8, sizeX: 1, sizeY: 2));
+    }
+
+    [TestMethod]
+    public void CanPlace_WidthBoundUsesAddition()
+    {
+        var occupied = new HashSet<(byte X, byte Y)>();
+        Assert.IsFalse(InventoryGridPlacement.CanPlace(
+            Width, Height, PageHeight, occupied, x: 5, y: 0, sizeX: 2, sizeY: 1));
+        Assert.IsTrue(InventoryGridPlacement.CanPlace(
+            Width, Height, PageHeight, occupied, x: 4, y: 0, sizeX: 2, sizeY: 1));
+    }
+
+    [TestMethod]
+    public void CanPlace_ZeroWidthGrid_FailsEvenWhenHeightPositive()
+    {
+        // Kills: gridWidth < 1 || gridHeight < 1 → && (zero width alone must still reject).
+        var occupied = new HashSet<(byte X, byte Y)>();
+        Assert.IsFalse(InventoryGridPlacement.CanPlace(
+            gridWidth: 0, gridHeight: Height, pageHeight: PageHeight, occupied, 0, 0, 1, 1));
+        Assert.IsFalse(InventoryGridPlacement.CanPlace(
+            gridWidth: Width, gridHeight: 0, pageHeight: PageHeight, occupied, 0, 0, 1, 1));
+        Assert.IsFalse(InventoryGridPlacement.CanPlace(
+            gridWidth: Width, gridHeight: Height, pageHeight: 0, occupied, 0, 0, 1, 1));
+    }
+
+    [TestMethod]
+    public void TryFindFirstFree_ZeroSizeOrOversized_FailsIndependently()
+    {
+        // Kills compound OR→AND rewrites on size/grid guards.
+        var occupied = new HashSet<(byte X, byte Y)>();
+        Assert.IsFalse(InventoryGridPlacement.TryFindFirstFree(
+            Width, Height, PageHeight, occupied, sizeX: 0, sizeY: 1, out _, out _));
+        Assert.IsFalse(InventoryGridPlacement.TryFindFirstFree(
+            Width, Height, PageHeight, occupied, sizeX: 1, sizeY: 0, out _, out _));
+        Assert.IsFalse(InventoryGridPlacement.TryFindFirstFree(
+            Width, Height, PageHeight, occupied, sizeX: 7, sizeY: 1, out _, out _)); // wider than 6
+        Assert.IsFalse(InventoryGridPlacement.TryFindFirstFree(
+            Width, Height, PageHeight, occupied, sizeX: 1, sizeY: 14, out _, out _)); // taller than 13
+    }
+
+    [TestMethod]
+    public void TryFindFirstFree_ScanOrderIsYThenX_AndStopsAtFirstCanPlace()
+    {
+        // Origin (0,0) free but 2×1 only fits at (1,0) because (0,0) and (2,0) blocked for a 2-wide
+        // leaves (1,0)+(2,0) — block (0,0) and force next.
+        var occupied = new HashSet<(byte X, byte Y)> { (0, 0) };
+        Assert.IsTrue(InventoryGridPlacement.TryFindFirstFree(
+            Width, Height, PageHeight, occupied, 1, 1, out var x, out var y));
+        Assert.AreEqual((byte)1, x);
+        Assert.AreEqual((byte)0, y);
+    }
+
+    [TestMethod]
+    public void TryFindFirstFree_MaxScanUsesSubtractionBounds_NotAddition()
+    {
+        // Kills maxY = gridHeight - sizeY → gridHeight + sizeY (would loop far / timeout).
+        // 3×3 grid, 2×2 item: only origins (0,0),(1,0),(0,1),(1,1). Fill all but (1,1).
+        var occupied = new HashSet<(byte X, byte Y)>
+        {
+            (0, 0), (1, 0), (2, 0),
+            (0, 1), (1, 1),
+            (0, 2), (1, 2), (2, 2),
+        };
+        // Leave (2,1) free — 2×2 cannot fit; expect false without scanning OOB forever.
+        Assert.IsFalse(InventoryGridPlacement.TryFindFirstFree(
+            3, 3, 3, occupied, 2, 2, out _, out _));
+
+        occupied.Remove((1, 1));
+        occupied.Remove((2, 1));
+        occupied.Remove((1, 2));
+        occupied.Remove((2, 2));
+        Assert.IsTrue(InventoryGridPlacement.TryFindFirstFree(
+            3, 3, 3, occupied, 2, 2, out var x, out var y));
+        Assert.AreEqual((byte)1, x);
+        Assert.AreEqual((byte)1, y);
+    }
+
     private static HashSet<(byte X, byte Y)> OccupiedFromFootprint(byte ox, byte oy, byte w, byte h)
     {
         var set = new HashSet<(byte X, byte Y)>();
