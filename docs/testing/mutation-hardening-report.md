@@ -110,7 +110,7 @@ Reports land under `StrykerOutput/<timestamp>/reports/`.
 
 **Subsystem:** `InventoryFootprintPolicy`, `InventoryGridPlacement`  
 **Config:** `stryker-inventory-footprint-config.json`  
-**Commit:** *(filled on commit)*
+**Commit:** `d30b217c`
 
 ### Baseline → Final
 
@@ -160,13 +160,39 @@ Reports land under `StrykerOutput/<timestamp>/reports/`.
 
 ---
 
+## Slice: combat tac-arc — baseline meets ≥80%
+
+**Config:** `stryker-tacarc-config.json`  
+**Baseline:** **81.75%** (K=112 S=25 N=0), report `StrykerOutput/2026-07-21.22-49-51`  
+**Tests green:** filter `TacArcGeometry|WeaponFireTarget|VehicleMapPropRam|VehicleWeaponCombatant`
+
+| File | K | S | Notes |
+| ---- | - | - | ----- |
+| TacArcGeometry.cs | 48 | 20 | float epsilon, forward/cross math |
+| WeaponFireTargetAcquisition.cs | 58 | 4 | maxTargets, explosion radius |
+| WeaponFireTargetLimits.cs | 6 | 1 | sprayTargets ternary |
+
+**High-risk residual next actions:** kill acquisition `result.Count > maxTargets` boundary and `explosionRadius < 0` with observable target lists; geometry float survivors need property tests vs known client angles (many may be FP-equivalent within epsilon).
+
+---
+
+## Slice: NPC drive — baseline meets ≥80%
+
+**Config:** `stryker-npc-drive-config.json`  
+**Baseline:** **84.62%** (442 mutants tested), report under latest `StrykerOutput/` after npc run  
+**Next:** triage PathCurvature / TerrainContactPlane / NpcVehicleDriveController survivors for steering sign flips and contact-plane normal equality; raise toward 90% if combat-adjacent pathing is prioritized.
+
+---
+
 ## Campaign status / next uncompleted subsystem
 
 | Slice | Status | Score |
 | ----- | ------ | ----- |
-| Mission-critical | **Done** | 94.48% |
-| Inventory footprint | **Done** | 90.91% |
-| Broader mission | Handoff @ 60.64% | need ≥80% |
-| Tac-arc / NPC drive / networking / auth / utils | Not started | use existing configs |
+| Mission-critical | **Done** | 94.48% (`d69259c2`) |
+| Inventory footprint | **Done** | 90.91% (`d30b217c`) |
+| Tac-arc combat | Baseline ≥80% | 81.75% (raise optional) |
+| NPC drive | Baseline ≥80% | 84.62% (raise optional) |
+| Broader mission | **Incomplete handoff** | 60.64% — **primary next** |
+| Networking / auth / utils | Not started | new focused configs as needed |
 
-**Immediate next:** broader mission handlers (NpcInteract + KillProgress unit paths), then `stryker-tacarc-config.json` / `stryker-npc-drive-config.json`.
+**Immediate next for another agent:** broader mission (`stryker-mission-config.json`) — NpcInteractHandler multipath + MissionKillProgress unit helpers (partial tests already added in `MissionKillProgressUnitTests`). Do not lower Stryker thresholds.
