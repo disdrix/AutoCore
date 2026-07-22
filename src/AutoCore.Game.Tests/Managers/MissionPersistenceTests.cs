@@ -796,6 +796,280 @@ public class MissionPersistenceTests
         Assert.AreEqual("No character loaded.", noChar.Message);
     }
 
+    // ---- Auto-flush / background path (kills MaybeFlush + ScheduleBackgroundFlush survivors) ----
+
+    [TestMethod]
+    public void FreshManager_DefaultsAutoFlushOnEnqueueToTrue()
+    {
+        // Field initializer defaults to true so production enqueues schedule ThreadPool flush.
+        // Unit fixtures force false for determinism; a new instance proves the production default.
+        var fresh = new MissionPersistence();
+        Assert.IsTrue(fresh.AutoFlushOnEnqueue);
+        Assert.IsNotNull(fresh.PersistQuestRow, "constructor wires EF persist seam");
+        Assert.IsNotNull(fresh.DeleteAllRows);
+        Assert.IsNotNull(fresh.DeleteActiveRows);
+    }
+
+    [TestMethod]
+    public void OnQuestChanged_WithAutoFlush_BackgroundFlushPersistsWithoutManualFlush()
+    {
+        var manager = MissionPersistence.Instance;
+        manager.ResetPersistenceForTests();
+        var writes = 0;
+        var gate = new ManualResetEventSlim(false);
+        manager.PersistQuestRow = (_, _, _) =>
+        {
+            Interlocked.Increment(ref writes);
+            gate.Set();
+        };
+        manager.AutoFlushOnEnqueue = true;
+
+        try
+        {
+            var character = new Character();
+            character.SetCoid(8101, true);
+            manager.OnQuestChanged(character, new CharacterQuest(501, 0));
+
+            Assert.IsTrue(gate.Wait(TimeSpan.FromSeconds(3)), "background flush must run after enqueue");
+            Assert.IsTrue(writes >= 1, "PersistQuestRow must be invoked by background flush");
+            // Allow a brief settle; pending should drain after successful write.
+            var deadline = DateTime.UtcNow.AddSeconds(2);
+            while (manager.PendingPersistCount > 0 && DateTime.UtcNow < deadline)
+                Thread.Sleep(10);
+            Assert.AreEqual(0, manager.PendingPersistCount);
+        }
+        finally
+        {
+            manager.ResetPersistenceForTests();
+        }
+    }
+
+    [TestMethod]
+    public void OnMissionCompleted_WithAutoFlush_BackgroundFlushPersists()
+    {
+        var manager = MissionPersistence.Instance;
+        manager.ResetPersistenceForTests();
+        QuestPersistKind? kind = null;
+        var gate = new ManualResetEventSlim(false);
+        manager.PersistQuestRow = (_, _, op) =>
+        {
+            kind = op.Kind;
+            gate.Set();
+        };
+        manager.AutoFlushOnEnqueue = true;
+
+        try
+        {
+            manager.OnMissionCompleted(8102, 502);
+            Assert.IsTrue(gate.Wait(TimeSpan.FromSeconds(3)));
+            Assert.AreEqual(QuestPersistKind.Complete, kind);
+        }
+        finally
+        {
+            manager.ResetPersistenceForTests();
+        }
+    }
+
+    [TestMethod]
+    public void OnMissionFailed_WithAutoFlush_BackgroundFlushPersistsRemove()
+    {
+        var manager = MissionPersistence.Instance;
+        manager.ResetPersistenceForTests();
+        QuestPersistKind? kind = null;
+        var gate = new ManualResetEventSlim(false);
+        manager.PersistQuestRow = (_, _, op) =>
+        {
+            kind = op.Kind;
+            gate.Set();
+        };
+        manager.AutoFlushOnEnqueue = true;
+
+        try
+        {
+            manager.OnMissionFailed(8103, 503);
+            Assert.IsTrue(gate.Wait(TimeSpan.FromSeconds(3)));
+            Assert.AreEqual(QuestPersistKind.Remove, kind);
+        }
+        finally
+        {
+            manager.ResetPersistenceForTests();
+        }
+    }
+
+    [TestMethod]
+    public void OnMissionRemoved_WithAutoFlush_BackgroundFlushPersistsRemove()
+    {
+        var manager = MissionPersistence.Instance;
+        manager.ResetPersistenceForTests();
+        QuestPersistKind? kind = null;
+        var gate = new ManualResetEventSlim(false);
+        manager.PersistQuestRow = (_, _, op) =>
+        {
+            kind = op.Kind;
+            gate.Set();
+        };
+        manager.AutoFlushOnEnqueue = true;
+
+        try
+        {
+            manager.OnMissionRemoved(8104, 504);
+            Assert.IsTrue(gate.Wait(TimeSpan.FromSeconds(3)));
+            Assert.AreEqual(QuestPersistKind.Remove, kind);
+        }
+        finally
+        {
+            manager.ResetPersistenceForTests();
+        }
+    }
+
+    [TestMethod]
+    public void DeleteActiveForCharacter_DropsPendingUpsertsButKeepsComplete()
+    {
+        // Kills: RemoveUpsertsForCharacter statement removal and DeleteActiveRows null-op.
+        var manager = MissionPersistence.Instance;
+        manager.ResetPersistenceForTests();
+        long? deleted = null;
+        manager.DeleteActiveRows = c => deleted = c;
+
+        var character = new Character();
+        character.SetCoid(8201, true);
+        manager.OnQuestChanged(character, new CharacterQuest(601, 0));
+        manager.OnMissionCompleted(8201, 602);
+        Assert.AreEqual(2, manager.PendingPersistCount);
+
+        manager.DeleteActiveForCharacter(8201);
+
+        Assert.AreEqual(8201L, deleted, "active-row DB delete must be invoked");
+        var kinds = new List<QuestPersistKind>();
+        manager.PersistQuestRow = (_, _, op) => kinds.Add(op.Kind);
+        Assert.AreEqual(1, manager.FlushPending(), "only Complete remains after upsert purge");
+        CollectionAssert.AreEqual(new[] { QuestPersistKind.Complete }, kinds);
+        manager.ResetPersistenceForTests();
+    }
+
+    [TestMethod]
+    public void BackgroundFlush_RechainsWhenNewItemsArriveDuringFlush()
+    {
+        // Kills: re-schedule condition mutants (persisted > 0 && PendingCount > 0).
+        var manager = MissionPersistence.Instance;
+        manager.ResetPersistenceForTests();
+        var writes = 0;
+        var firstEntered = new ManualResetEventSlim(false);
+        var releaseFirst = new ManualResetEventSlim(false);
+        var secondDone = new ManualResetEventSlim(false);
+
+        manager.PersistQuestRow = (coid, missionId, _) =>
+        {
+            var n = Interlocked.Increment(ref writes);
+            if (n == 1)
+            {
+                firstEntered.Set();
+                Assert.IsTrue(releaseFirst.Wait(TimeSpan.FromSeconds(3)));
+            }
+            else
+            {
+                secondDone.Set();
+            }
+        };
+        manager.AutoFlushOnEnqueue = true;
+
+        try
+        {
+            var character = new Character();
+            character.SetCoid(8301, true);
+            manager.OnQuestChanged(character, new CharacterQuest(701, 0));
+            Assert.IsTrue(firstEntered.Wait(TimeSpan.FromSeconds(3)), "first background write must start");
+
+            // Enqueue while first flush is in-flight so re-chain path observes PendingCount > 0.
+            manager.OnQuestChanged(character, new CharacterQuest(702, 0));
+            releaseFirst.Set();
+
+            Assert.IsTrue(secondDone.Wait(TimeSpan.FromSeconds(3)), "re-chained flush must persist the second op");
+            Assert.IsTrue(writes >= 2);
+        }
+        finally
+        {
+            releaseFirst.Set();
+            manager.ResetPersistenceForTests();
+        }
+    }
+
+    [TestMethod]
+    public void PackProgress_PreservesNegativeAndMaxIntSlots()
+    {
+        var progress = new[] { int.MinValue, -1, 0, int.MaxValue };
+        var restored = MissionPersistence.UnpackProgress(MissionPersistence.PackProgress(progress));
+        CollectionAssert.AreEqual(progress, restored);
+    }
+
+    [TestMethod]
+    public void BackgroundFlush_FailedPersist_DoesNotSpinRechainLoop()
+    {
+        // Kills: re-chain condition `persisted > 0` → `>= 0` / `||` which would retry forever on failure.
+        var manager = MissionPersistence.Instance;
+        manager.ResetPersistenceForTests();
+        var attempts = 0;
+        manager.PersistQuestRow = (_, _, _) =>
+        {
+            Interlocked.Increment(ref attempts);
+            throw new InvalidOperationException("db down");
+        };
+        manager.AutoFlushOnEnqueue = true;
+
+        try
+        {
+            var character = new Character();
+            character.SetCoid(8401, true);
+            manager.OnQuestChanged(character, new CharacterQuest(801, 0));
+
+            // Allow a couple of ThreadPool turns; must not flood attempts.
+            Thread.Sleep(200);
+            var first = Volatile.Read(ref attempts);
+            Thread.Sleep(300);
+            var second = Volatile.Read(ref attempts);
+
+            Assert.IsTrue(first >= 1, "background flush must attempt once");
+            Assert.IsTrue(second - first <= 1,
+                $"failed persist must not spin re-chain (attempts grew {first}→{second})");
+            Assert.AreEqual(1, manager.PendingPersistCount, "failed op remains pending for later mutation/disconnect flush");
+        }
+        finally
+        {
+            manager.ResetPersistenceForTests();
+        }
+    }
+
+    [TestMethod]
+    public void ResetPersistenceForTests_ClearsBackgroundFlushFlagSoAutoFlushWorksAgain()
+    {
+        // Kills: Interlocked.Exchange(_backgroundFlushScheduled, 0) removal in Reset.
+        var manager = MissionPersistence.Instance;
+        manager.ResetPersistenceForTests();
+        var gate = new ManualResetEventSlim(false);
+        manager.PersistQuestRow = (_, _, _) => gate.Set();
+        manager.AutoFlushOnEnqueue = true;
+
+        try
+        {
+            var character = new Character();
+            character.SetCoid(8501, true);
+            manager.OnQuestChanged(character, new CharacterQuest(901, 0));
+            Assert.IsTrue(gate.Wait(TimeSpan.FromSeconds(3)));
+
+            manager.ResetPersistenceForTests();
+            gate.Reset();
+            manager.PersistQuestRow = (_, _, _) => gate.Set();
+            manager.AutoFlushOnEnqueue = true;
+            manager.OnQuestChanged(character, new CharacterQuest(902, 0));
+            Assert.IsTrue(gate.Wait(TimeSpan.FromSeconds(3)),
+                "after Reset, background flush must schedule again");
+        }
+        finally
+        {
+            manager.ResetPersistenceForTests();
+        }
+    }
+
     // ---- helpers ----
 
     private static void SeedMission(int missionId, byte repeatable, params (int ObjectiveId, byte Sequence, int CompleteCount)[] objectives)
