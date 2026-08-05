@@ -1,0 +1,200 @@
+# Annotated low-level: Client_SendInventoryUnequip
+
+| Field | Value |
+|---|---|
+| **Stable ID** | `aa_00862c00` |
+| **VA** | `0x00862c00` |
+| **Module** | `autoassault.exe` @ image base `0x400000` |
+| **System** | inventory-transfer |
+| **Source raw** | `aa_00862c00_Client_SendInventoryUnequip.md` |
+| **Refine** | Human pass 2026-07-23 (named_hl keyword wave) |
+
+This file is the **annotated** layer: packet/UI offsets, branch order, and decompiler corrections.
+
+---
+
+## 1. Purpose
+
+C2S InventoryUnequip (0x203E, size 0x30). Builds packet with item TFID and free-slot destination X/Y; rejects when inventory has no space.
+
+## 2. Corrected signature
+
+```c
+uint32_t Client_SendInventoryUnequip(void);  /* item object in EAX */
+```
+
+## 3. Key offsets / packet fields
+
+| Offset / symbol | Role |
+|---|---|
+| `opcode` | 0x203E |
+| `size` | 0x30 |
+| `pkt+0x08/+0x10` | item TFID |
+| `pkt+0x28/+0x29` | dest grid X/Y |
+| `item.vtbl+0x3ac` | inventory/equip query |
+
+## 4. Machine-level notes
+
+- Requires DAT_00d1b6d8 and char+0x250.
+- Item vtable+0x3ac → inventory root; FUN_004f6a80 may force FUN_00931db0 path.
+- FUN_005714e0 free-slot search writes dest X/Y; town fallback FUN_004ce5c0.
+- Fail toast: 'There is not enough space in your inventory for this equipment.'
+- Vehicle TFID fields not filled by this builder (raw plate).
+
+## 5. Pseudocode (authoritative raw, retained)
+
+```c
+/* C2S InventoryUnequip request 0x203E size 0x30. item TFID@+8/+10, dest grid X/Y@+0x28/+0x29 from
+
+   free-slot search. Vehicle TFID fields not filled by this builder. */
+
+
+
+undefined4 Client_SendInventoryUnequip(void)
+
+
+
+{
+
+  char cVar1;
+
+  int *in_EAX;
+
+  int iVar2;
+
+  undefined4 uVar3;
+
+  undefined1 *puVar4;
+
+  undefined1 *puVar5;
+
+  undefined4 uVar6;
+
+  undefined4 uVar7;
+
+  undefined4 uVar8;
+
+  undefined1 uStack_32;
+
+  undefined1 uStack_31;
+
+  undefined4 auStack_30 [2];
+
+  undefined4 uStack_28;
+
+  undefined4 uStack_24;
+
+  undefined1 uStack_20;
+
+  undefined1 uStack_8;
+
+  undefined1 uStack_7;
+
+  
+
+  if ((DAT_00d1b6d8 != 0) && (*(int *)(DAT_00d1b6d8 + 0x250) != 0)) {
+
+    iVar2 = (**(code **)(*in_EAX + 0x3ac))();
+
+    if (iVar2 != 0) {
+
+      uVar3 = (**(code **)(*in_EAX + 0x3ac))();
+
+      iVar2 = FUN_004f6a80(uVar3);
+
+      if (iVar2 != 0) {
+
+        FUN_00931db0();
+
+        return 0;
+
+      }
+
+      uVar7 = 0xffffffff;
+
+      uVar6 = 1;
+
+      puVar5 = &uStack_31;
+
+      puVar4 = &uStack_32;
+
+      uVar3 = (**(code **)(*in_EAX + 0x3ac))(puVar4,puVar5,1,0xffffffff);
+
+      cVar1 = FUN_005714e0(uVar3,puVar4,puVar5,uVar6,uVar7);
+
+      if (cVar1 == '\0') {
+
+        cVar1 = FUN_004ce5c0(DAT_00d1b6d8);
+
+        if (cVar1 != '\0') {
+
+          uVar7 = 0xffffffff;
+
+          uVar6 = 1;
+
+          puVar5 = &uStack_31;
+
+          puVar4 = &uStack_32;
+
+          uVar3 = (**(code **)(*in_EAX + 0x3ac))(puVar4,puVar5,1,0xffffffff);
+
+          cVar1 = FUN_005714e0(uVar3,puVar4,puVar5,uVar6,uVar7);
+
+          if (cVar1 != '\0') goto LAB_00862d14;
+
+        }
+
+        FUN_007a69d0();
+
+        uVar8 = 0;
+
+        uVar7 = 1;
+
+        uVar6 = 0xffffffff;
+
+        uVar3 = FUN_007a6de0("There is not enough space in your inventory for this equipment.",
+
+                             0xffffffff);
+
+        FUN_007fdfb0(&DAT_00d1a840,uVar3,uVar6,uVar7,uVar8);
+
+        return 0;
+
+      }
+
+LAB_00862d14:
+
+      (**(code **)(*in_EAX + 0x34c))();
+
+      auStack_30[0] = 0x203e;
+
+      iVar2 = (**(code **)(*in_EAX + 0x3ac))();
+
+      uStack_20 = *(undefined1 *)(iVar2 + 0x168);
+
+      iVar2 = (**(code **)(*in_EAX + 0x3ac))();
+
+      uStack_28 = *(undefined4 *)(iVar2 + 0x160);
+
+      uStack_24 = *(undefined4 *)(iVar2 + 0x164);
+
+      uStack_8 = uStack_32;
+
+      uStack_7 = uStack_31;
+
+      Client_SendSectorPacket(&DAT_00d1a840,0x30,auStack_30);
+
+      return 1;
+
+    }
+
+  }
+
+  return 0;
+
+}
+```
+
+## 6. Open questions
+
+- Confirm exact packet field layout vs server InventoryUnequip handler.

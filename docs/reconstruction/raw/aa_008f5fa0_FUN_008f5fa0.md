@@ -1,0 +1,32 @@
+# Raw capture: FUN_008f5fa0
+
+| Field | Value |
+|---|---|
+| **Stable ID** | `aa_008f5fa0` |
+| **Module** | `autoassault.exe` |
+| **Image base** | `0x400000` |
+| **VA** | `0x008f5fa0` |
+| **Canonical name** | `FUN_008f5fa0` |
+| **System** | unknown |
+| **Capture timestamp** | `2026-07-23` |
+| **Tool** | Ghidra MCP `batch_decompile` |
+| **Integrity** | Do not overwrite this raw body; append versioned sections only |
+
+---
+
+## Raw pseudocode (authoritative decompile)
+
+```c
+void __thiscall FUN_008f5fa0(int *param_1,undefined4 param_2)
+
+{
+  char cVar1;
+  
+  cVar1 = (**(code **)(*param_1 + 0xd0))();
+  if (cVar1 != (char)param_2) {
+    (**(code **)(*param_1 + 0xcc))(param_2);
+    (**(code **)(*param_1 + 0x34c))();
+  }
+  return;
+}
+```

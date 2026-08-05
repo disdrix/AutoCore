@@ -1,0 +1,128 @@
+// =============================================================================
+// FUN_0080a410
+// -----------------------------------------------------------------------------
+// Stable ID: aa_0080a410
+// Address:   0x0080a410  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_0080a410 @ 0x0080a410
+// Stable ID: aa_0080a410
+// Embedded strings (evidence for future rename):
+//   - "Failed adding item to Refinery (object doesn\'t exist in inventory)."
+//   - "Failed adding item to Refinery: Object found in inventory but couldnt be added to."
+//   - "Failed adding item to Refinery."
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~44 non-empty decompiler lines.
+//  - Control keywords: if×5, return×3, goto×1.
+//  - Notable callees: FUN_007a69d0, FUN_007a6de0, FUN_007fdfb0, FUN_0080a410, Refinery.
+//  - Strings: "Failed adding item to Refinery.".
+//  - Return sites: 3.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+void FUN_0080a410(void)
+
+
+
+{
+
+  int iVar1;
+
+  int iVar2;
+
+  char cVar3;
+
+  uint32_t /* width from decompiler */ uVar4;
+
+  int unaff_ESI;
+
+  int unaff_EDI;
+
+  char *pcVar5;
+
+  uint32_t /* width from decompiler */ uVar6;
+
+  uint32_t /* width from decompiler */ uVar7;
+
+  uint32_t /* width from decompiler */ uVar8;
+
+  
+
+  FUN_007a69d0();
+
+  if (*(char *)(unaff_EDI + 0x1c) != '\0') {
+
+    iVar1 = *(int *)(unaff_ESI + 0xe98);
+
+    iVar2 = *(int *)(*(int *)(iVar1 + 4) + 4);
+
+    if ((*(int *)(unaff_EDI + 8) == *(int *)(iVar2 + 0x164 + iVar1)) &&
+
+       (*(int *)(unaff_EDI + 0xc) == *(int *)(iVar2 + 0x168 + iVar1))) {
+
+      if (*(int *)(iVar1 + 0xcd0) == 0) {
+
+        pcVar5 = "Failed adding item to Refinery (object doesn\'t exist in inventory).";
+
+      }
+
+      else {
+
+        if (*(int **)(unaff_ESI + 0x1054) == (int *)0x0) {
+
+          return;
+
+        }
+
+        cVar3 = (**(code **)(**(int **)(unaff_ESI + 0x1054) + 0x3d8))();
+
+        if (cVar3 == '\0') {
+
+          return;
+
+        }
+
+        pcVar5 = 
+
+        "Failed adding item to Refinery: Object found in inventory but couldnt be added to.";
+
+      }
+
+      goto LAB_0080a48c;
+
+    }
+
+  }
+
+  pcVar5 = "Failed adding item to Refinery.";
+
+LAB_0080a48c:
+
+  uVar8 = 0;
+
+  uVar7 = 1;
+
+  uVar6 = 0xffffffff;
+
+  uVar4 = FUN_007a6de0(pcVar5,0xffffffff);
+
+  FUN_007fdfb0(unaff_ESI,uVar4,uVar6,uVar7,uVar8);
+
+  return;
+
+}

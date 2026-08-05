@@ -1,0 +1,168 @@
+// =============================================================================
+// Named_CalleeOf_Client_InteractClickPickTarget_00938670
+// -----------------------------------------------------------------------------
+// Stable ID: aa_00938670
+// Callee of Client_InteractClickPickTarget
+// Address:   0x00938670  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Called from Client_InteractClickPickTarget: callee helper with no high-value strings in clean/raw. Role inferred from parent name only; refine when decompile strings or xrefs improve.
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~65 non-empty decompiler lines.
+//  - Control keywords: if×8, return×4, goto×1.
+//  - Notable callees: FUN_007fef20, FUN_00938670, Object_ResolveFromTFID, VehicleEntity_SetFlag_109, VehicleEntity_SetHandbrake, VehicleEntity_SetLongitudinalInput, __RTDynamicCast.
+//  - Return sites: 4.
+
+/*
+ * Behavioral notes:
+ * Callee of Client_InteractClickPickTarget
+ * Xref/callee-driven rename (parent seed scan)
+ *
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+void Named_CalleeOf_Client_InteractClickPickTarget_00938670(uint param_1,uint param_2,uint param_3,uint param_4)
+
+
+
+{
+
+  char cVar1;
+
+  void *pvVar2;
+
+  int iVar3;
+
+  uint *puVar4;
+
+  int unaff_ESI;
+
+  uint32_t /* width from decompiler */ uVar5;
+
+  TypeDescriptor *pTVar6;
+
+  TypeDescriptor *pTVar7;
+
+  uint32_t /* width from decompiler */ uVar8;
+
+  uint32_t /* width from decompiler */ auStack_18 [2];
+
+  uint uStack_10;
+
+  uint uStack_c;
+
+  uint uStack_8;
+
+  uint uStack_4;
+
+  
+
+  if (*(int *)(*(int *)(unaff_ESI + 0xe98) + 0x250) != 0) {
+
+    VehicleEntity_SetFlag_109(1);
+
+    VehicleEntity_SetHandbrake(1);
+
+    VehicleEntity_SetLongitudinalInput(0);
+
+  }
+
+  uVar8 = 0;
+
+  pTVar7 = &CVOGStore::RTTI_Type_Descriptor;
+
+  pTVar6 = &CVOGClonedObjectBase::RTTI_Type_Descriptor;
+
+  uVar5 = 0;
+
+  pvVar2 = Object_ResolveFromTFID((TFID_16 *)&param_1);
+
+  iVar3 = __RTDynamicCast(pvVar2,uVar5,pTVar6,pTVar7,uVar8);
+
+  if (iVar3 == 0) {
+
+    return;
+
+  }
+
+  if (*(char *)(iVar3 + 0x4e5) == '\0') {
+
+    cVar1 = (**(code **)(**(int **)(unaff_ESI + 0x105c) + 0x3d8))();
+
+    if ((cVar1 != '\0') && (*(int *)(*(int *)(unaff_ESI + 0x105c) + 0x588) == iVar3)) {
+
+      return;
+
+    }
+
+    if (*(char *)(iVar3 + 0x4e5) == '\0') goto LAB_00938742;
+
+  }
+
+  cVar1 = (**(code **)(**(int **)(unaff_ESI + 0x1060) + 0x3d8))();
+
+  if ((cVar1 != '\0') && (*(int *)(*(int *)(unaff_ESI + 0x1060) + 0x5a0) == iVar3)) {
+
+    return;
+
+  }
+
+LAB_00938742:
+
+  auStack_18[0] = 0x2024;
+
+  uStack_10 = param_1;
+
+  uStack_c = param_2;
+
+  uStack_8 = param_3;
+
+  uStack_4 = param_4;
+
+  if (*(int *)(unaff_ESI + 0xc78) != 0) {
+
+    (**(code **)(**(int **)(unaff_ESI + 0xc78) + 0x18))(0xffffffff,auStack_18,0x18,0);
+
+  }
+
+  if (*(char *)(iVar3 + 0x4e5) == '\0') {
+
+    puVar4 = (uint *)(*(int *)(unaff_ESI + 0x105c) + 0x528);
+
+    uVar5 = 0xb;
+
+  }
+
+  else {
+
+    puVar4 = (uint *)(*(int *)(unaff_ESI + 0x1060) + 0x548);
+
+    uVar5 = 0xc;
+
+  }
+
+  *puVar4 = param_1;
+
+  puVar4[1] = param_2;
+
+  puVar4[2] = param_3;
+
+  puVar4[3] = param_4;
+
+  FUN_007fef20(uVar5,1,0);
+
+  return;
+
+}

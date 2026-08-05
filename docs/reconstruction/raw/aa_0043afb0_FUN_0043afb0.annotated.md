@@ -1,0 +1,46 @@
+# Annotated low-level: FUN_0043afb0
+
+| Field | Value |
+|---|---|
+| Stable ID | `aa_0043afb0` |
+| VA | `0x0043afb0` |
+| System | unknown |
+| Date | 2026-07-23 |
+
+## Machine-level notes
+
+- Source: raw capture for `aa_0043afb0`.
+- Prefer assembly when decompiler conflicts.
+- Recover types for still-generic parameters via callers/xrefs.
+- Map DAT_* globals and FUN_* callees in follow-up waves.
+
+## Pseudocode (annotated copy of raw)
+
+```c
+void FUN_0043afb0(void)
+
+{
+  int unaff_ESI;
+  
+  if (*(void **)(unaff_ESI + 0x14) != (void *)0x0) {
+                    /* WARNING: Subroutine does not return */
+    operator_delete(*(void **)(unaff_ESI + 0x14));
+  }
+  *(undefined4 *)(unaff_ESI + 0x14) = 0;
+  *(undefined4 *)(unaff_ESI + 0x18) = 0;
+  *(undefined4 *)(unaff_ESI + 0x1c) = 0;
+  if (*(void **)(unaff_ESI + 4) != (void *)0x0) {
+                    /* WARNING: Subroutine does not return */
+    operator_delete(*(void **)(unaff_ESI + 4));
+  }
+  *(undefined4 *)(unaff_ESI + 4) = 0;
+  *(undefined4 *)(unaff_ESI + 8) = 0;
+  *(undefined4 *)(unaff_ESI + 0xc) = 0;
+  return;
+}
+```
+
+## Open questions
+
+- Confirm calling convention and full signature against callers.
+- Recover meaningful types for still-generic parameters.

@@ -1,0 +1,342 @@
+// =============================================================================
+// FUN_00607be0
+// -----------------------------------------------------------------------------
+// Stable ID: aa_00607be0
+// Address:   0x00607be0  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_00607be0 @ 0x00607be0
+// Stable ID: aa_00607be0
+// No high-value strings recovered; name via xrefs/callers in follow-up.
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~152 non-empty decompiler lines.
+//  - Control keywords: if×14, do×6, while×6, return×2.
+//  - Notable callees: FUN_00418e60×3, FUN_005b04b0×2, FUN_00607be0, FUN_00608720, FUN_00608760.
+//  - Return sites: 2.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+/* WARNING: Type propagation algorithm not settling */
+
+
+
+uint32_t /* width from decompiler */ __thiscall FUN_00607be0(int param_1,int *param_2)
+
+
+
+{
+
+  int iVar1;
+
+  int unaff_EBX;
+
+  int iVar2;
+
+  int unaff_EBP;
+
+  int *piVar3;
+
+  uint32_t /* width from decompiler */ *puVar4;
+
+  int *piVar5;
+
+  int aiStack_6c [3];
+
+  int iStack_60;
+
+  int iStack_5c;
+
+  uint32_t /* width from decompiler */ uStack_58;
+
+  int iStack_54;
+
+  int iStack_50;
+
+  uint32_t /* width from decompiler */ uStack_38;
+
+  uint32_t /* width from decompiler */ uStack_34;
+
+  uint8_t auStack_30 [4];
+
+  int local_2c;
+
+  int *piStack_1c;
+
+  int iStack_18;
+
+  
+
+  if (param_2 == (int *)0x0) {
+
+    return 0;
+
+  }
+
+  iStack_54 = *(int *)(*(int *)(param_1 + -0x25c) + 4) + -0x1dc + param_1;
+
+  iStack_50 = 0x10;
+
+  uStack_58 = 0x607c18;
+
+  local_2c = param_1;
+
+  (**(code **)(*param_2 + 0x14))();
+
+  iStack_5c = *(int *)(*(int *)(param_1 + -0x25c) + 4) + -0x1a0 + param_1;
+
+  uStack_58 = 4;
+
+  iStack_60 = 0x607c32;
+
+  (**(code **)(*param_2 + 0x14))();
+
+  iStack_60 = 0x41;
+
+  aiStack_6c[2] = param_1 + -0x8c;
+
+  aiStack_6c[1] = 0x607c42;
+
+  (**(code **)(*param_2 + 0x14))();
+
+  aiStack_6c[1] = 4;
+
+  aiStack_6c[0] = param_1 + -0x44;
+
+  (**(code **)(*param_2 + 0x14))();
+
+  iVar2 = iStack_18;
+
+  if (0x37 < iStack_18) {
+
+    (**(code **)(*param_2 + 0x14))(param_1 + -0x48,4);
+
+    (**(code **)(*param_2 + 0x14))(param_1 + -0x90,4);
+
+  }
+
+  if (0x3a < iVar2) {
+
+    (**(code **)(*param_2 + 0x14))(param_1 + -0x40,1);
+
+  }
+
+  piVar3 = (int *)(param_1 + -0x19c);
+
+  iStack_60 = 0;
+
+  do {
+
+    piStack_1c = piVar3;
+
+    (**(code **)(*param_2 + 0x14))(piVar3 + 0xb,4);
+
+    (**(code **)(*param_2 + 0x14))(aiStack_6c + 2,4);
+
+    iVar2 = 0;
+
+    if (0 < aiStack_6c[0]) {
+
+      do {
+
+        (**(code **)(*param_2 + 0x14))(&uStack_58,8);
+
+        iVar1 = piVar3[-4];
+
+        if ((iVar1 == 0) || ((uint)(piVar3[-2] - iVar1 >> 3) <= (uint)(piVar3[-3] - iVar1 >> 3))) {
+
+          FUN_00418e60(piVar3[-3],1,&uStack_58);
+
+        }
+
+        else {
+
+          puVar4 = (uint32_t /* width from decompiler */ *)piVar3[-3];
+
+          *puVar4 = uStack_58;
+
+          puVar4[1] = iStack_54;
+
+          piVar3[-3] = (int)(puVar4 + 2);
+
+        }
+
+        iVar2 = iVar2 + 1;
+
+      } while (iVar2 < aiStack_6c[0]);
+
+    }
+
+    (**(code **)(*param_2 + 0x14))(aiStack_6c + 1,4);
+
+    iVar2 = 0;
+
+    if (0 < unaff_EBP) {
+
+      do {
+
+        (**(code **)(*param_2 + 0x14))(&uStack_58,8);
+
+        iVar1 = *piVar3;
+
+        if ((iVar1 == 0) || ((uint)(piVar3[2] - iVar1 >> 3) <= (uint)(piVar3[1] - iVar1 >> 3))) {
+
+          FUN_00418e60(piVar3[1],1,&uStack_58);
+
+        }
+
+        else {
+
+          puVar4 = (uint32_t /* width from decompiler */ *)piVar3[1];
+
+          *puVar4 = uStack_58;
+
+          puVar4[1] = iStack_54;
+
+          piVar3[1] = (int)(puVar4 + 2);
+
+        }
+
+        iVar2 = iVar2 + 1;
+
+      } while (iVar2 < unaff_EBP);
+
+    }
+
+    (**(code **)(*param_2 + 0x14))(aiStack_6c,4);
+
+    piVar3 = piStack_1c;
+
+    iVar2 = 0;
+
+    if (0 < iStack_54) {
+
+      piVar5 = piStack_1c + 3;
+
+      do {
+
+        (**(code **)(*param_2 + 0x14))(auStack_30,0x10);
+
+        iVar1 = piStack_1c[4];
+
+        if ((iVar1 == 0) || ((uint)(piVar3[6] - iVar1 >> 4) <= (uint)(piVar3[5] - iVar1 >> 4))) {
+
+          FUN_00608760(piVar3[5],1,auStack_30);
+
+        }
+
+        else {
+
+          iVar1 = piVar3[5];
+
+          FUN_00608720(iVar1,1,auStack_30,piVar5,iStack_18);
+
+          piVar3[5] = iVar1 + 0x10;
+
+        }
+
+        iVar2 = iVar2 + 1;
+
+      } while (iVar2 < iStack_54);
+
+    }
+
+    if (0x39 < iStack_18) {
+
+      (**(code **)(*param_2 + 0x14))(&iStack_50,4);
+
+      piVar3 = piStack_1c;
+
+      iVar2 = 0;
+
+      if (0 < iStack_50) {
+
+        do {
+
+          (**(code **)(*param_2 + 0x14))(&uStack_38,8);
+
+          iVar1 = piVar3[8];
+
+          if ((iVar1 == 0) || ((uint)(piVar3[10] - iVar1 >> 3) <= (uint)(piVar3[9] - iVar1 >> 3))) {
+
+            FUN_00418e60(piVar3[9],1,&uStack_38);
+
+          }
+
+          else {
+
+            puVar4 = (uint32_t /* width from decompiler */ *)piVar3[9];
+
+            *puVar4 = uStack_38;
+
+            puVar4[1] = uStack_34;
+
+            piVar3[9] = (int)(puVar4 + 2);
+
+          }
+
+          iVar2 = iVar2 + 1;
+
+        } while (iVar2 < iStack_50);
+
+      }
+
+    }
+
+    if ((iStack_18 < 0x39) && (1 < iStack_60)) break;
+
+    piVar3 = piStack_1c + 0x12;
+
+    iStack_60 = iStack_60 + 1;
+
+    piStack_1c = piVar3;
+
+  } while (iStack_60 < 4);
+
+  if (*(char *)(*(int *)(*(int *)(*(int *)(unaff_EBX + -0x25c) + 4) + -0x1b8 + unaff_EBX) + 0x7e) !=
+
+      '\0') {
+
+    iVar2 = *(int *)(*(int *)(unaff_EBX + -0x25c) + 4);
+
+    FUN_005b04b0(*(uint32_t /* width from decompiler */ *)(unaff_EBX + -0x90),*(uint32_t /* width from decompiler */ *)(iVar2 + -0xfc + unaff_EBX),
+
+                 *(uint32_t /* width from decompiler */ *)(iVar2 + -0xf8 + unaff_EBX));
+
+    puVar4 = (uint32_t /* width from decompiler */ *)(unaff_EBX + -0x170);
+
+    iVar2 = 4;
+
+    do {
+
+      iVar1 = *(int *)(*(int *)(unaff_EBX + -0x25c) + 4);
+
+      FUN_005b04b0(*puVar4,*(uint32_t /* width from decompiler */ *)(iVar1 + unaff_EBX + -0xfc),
+
+                   *(uint32_t /* width from decompiler */ *)(iVar1 + -0xf8 + unaff_EBX));
+
+      puVar4 = puVar4 + 0x12;
+
+      iVar2 = iVar2 + -1;
+
+    } while (iVar2 != 0);
+
+  }
+
+  return 1;
+
+}

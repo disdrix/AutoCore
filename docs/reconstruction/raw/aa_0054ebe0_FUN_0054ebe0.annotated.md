@@ -1,0 +1,49 @@
+# Annotated low-level: FUN_0054ebe0
+
+| Field | Value |
+|---|---|
+| Stable ID | `aa_0054ebe0` |
+| VA | `0x0054ebe0` |
+| System | unknown |
+| Date | 2026-07-23 |
+
+## Machine-level notes
+
+- Source: raw capture for `aa_0054ebe0`.
+- Prefer assembly when decompiler conflicts.
+- Recover types for still-generic parameters via callers/xrefs.
+- Map DAT_* globals and FUN_* callees in follow-up waves.
+
+## Pseudocode (annotated copy of raw)
+
+```c
+void __thiscall FUN_0054ebe0(int param_1,undefined4 *param_2,int *param_3,int *param_4)
+
+{
+  int *piVar1;
+  int *piVar2;
+  
+  piVar2 = param_4;
+  piVar1 = *(int **)(param_1 + 4);
+  if ((param_3 == (int *)*piVar1) && (param_4 == piVar1)) {
+    FUN_0054d920(piVar1[1]);
+    *(int *)(*(int *)(param_1 + 4) + 4) = *(int *)(param_1 + 4);
+    *(undefined4 *)(param_1 + 8) = 0;
+    *(undefined4 *)*(undefined4 *)(param_1 + 4) = *(undefined4 *)(param_1 + 4);
+    *(int *)(*(int *)(param_1 + 4) + 8) = *(int *)(param_1 + 4);
+    *param_2 = **(undefined4 **)(param_1 + 4);
+    return;
+  }
+  while (param_3 != piVar2) {
+    FUN_0054c6a0();
+    FUN_0054e040(&param_4,param_3);
+  }
+  *param_2 = param_3;
+  return;
+}
+```
+
+## Open questions
+
+- Confirm calling convention and full signature against callers.
+- Recover meaningful types for still-generic parameters.

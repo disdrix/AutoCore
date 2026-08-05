@@ -1,0 +1,45 @@
+# Raw capture: FUN_0040bbe0
+
+| Field | Value |
+|---|---|
+| **Stable ID** | `aa_0040bbe0` |
+| **Module** | `autoassault.exe` |
+| **Image base** | `0x400000` |
+| **VA** | `0x0040bbe0` |
+| **Canonical name** | `FUN_0040bbe0` |
+| **System** | unknown |
+| **Capture timestamp** | `2026-07-23` |
+| **Tool** | Ghidra MCP `batch_decompile` |
+| **Integrity** | Do not overwrite this raw body; append versioned sections only |
+
+---
+
+## Raw pseudocode (authoritative decompile)
+
+```c
+undefined4 * __thiscall FUN_0040bbe0(int param_1,int *param_2)
+
+{
+  undefined4 *puVar1;
+  undefined4 *puVar2;
+  undefined4 *puVar3;
+  
+  puVar2 = *(undefined4 **)(param_1 + 4);
+  if (*(char *)((int)puVar2[1] + 0x191) == '\0') {
+    puVar1 = puVar2;
+    puVar3 = (undefined4 *)puVar2[1];
+    do {
+      puVar2 = puVar3;
+      if ((int)puVar2[3] < *param_2) {
+        puVar3 = (undefined4 *)puVar2[2];
+        puVar2 = puVar1;
+      }
+      else {
+        puVar3 = (undefined4 *)*puVar2;
+      }
+      puVar1 = puVar2;
+    } while (*(char *)((int)puVar3 + 0x191) == '\0');
+  }
+  return puVar2;
+}
+```

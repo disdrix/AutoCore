@@ -1,0 +1,56 @@
+# Annotated low-level: FUN_0069fcb0
+
+| Field | Value |
+|---|---|
+| Stable ID | `aa_0069fcb0` |
+| VA | `0x0069fcb0` |
+| System | unknown |
+| Date | 2026-07-23 |
+
+## Machine-level notes
+
+- Source: raw capture for `aa_0069fcb0`.
+- Prefer assembly when decompiler conflicts.
+- Recover types for still-generic parameters via callers/xrefs.
+- Map DAT_* globals and FUN_* callees in follow-up waves.
+
+## Pseudocode (annotated copy of raw)
+
+```c
+undefined4 * __thiscall
+FUN_0069fcb0(int param_1,
+            basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> *param_2)
+
+{
+  char cVar1;
+  undefined4 *puVar2;
+  bool bVar3;
+  undefined4 *puVar4;
+  undefined4 *puVar5;
+  
+  puVar5 = (undefined4 *)(*(undefined4 **)(param_1 + 4))[1];
+  cVar1 = *(char *)((int)puVar5 + 0x2d);
+  puVar2 = *(undefined4 **)(param_1 + 4);
+  while (cVar1 == '\0') {
+    bVar3 = std::operator<<char,struct_std::char_traits<char>,class_std::allocator<char>_>
+                      ((basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>
+                        *)(puVar5 + 3),param_2);
+    if (bVar3) {
+      puVar4 = (undefined4 *)puVar5[2];
+      puVar5 = puVar2;
+    }
+    else {
+      puVar4 = (undefined4 *)*puVar5;
+    }
+    puVar2 = puVar5;
+    puVar5 = puVar4;
+    cVar1 = *(char *)((int)puVar4 + 0x2d);
+  }
+  return puVar2;
+}
+```
+
+## Open questions
+
+- Confirm calling convention and full signature against callers.
+- Recover meaningful types for still-generic parameters.

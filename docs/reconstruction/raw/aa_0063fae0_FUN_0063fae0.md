@@ -1,0 +1,38 @@
+# Raw capture: FUN_0063fae0
+
+| Field | Value |
+|---|---|
+| **Stable ID** | `aa_0063fae0` |
+| **Module** | `autoassault.exe` |
+| **Image base** | `0x400000` |
+| **VA** | `0x0063fae0` |
+| **Canonical name** | `FUN_0063fae0` |
+| **System** | unknown |
+| **Capture timestamp** | `2026-07-23` |
+| **Tool** | Ghidra MCP `batch_decompile` |
+| **Integrity** | Do not overwrite this raw body; append versioned sections only |
+
+---
+
+## Raw pseudocode (authoritative decompile)
+
+```c
+int __thiscall FUN_0063fae0(int param_1,int param_2,int param_3)
+
+{
+  int iVar1;
+  int iVar2;
+  
+  iVar2 = 0;
+  if (0 < param_3) {
+    do {
+      iVar1 = (**(code **)(**(int **)(param_1 + 8) + 0xc))(iVar2 + param_2,param_3 - iVar2);
+      iVar2 = iVar2 + iVar1;
+      if (iVar1 == 0) {
+        return iVar2;
+      }
+    } while (iVar2 < param_3);
+  }
+  return param_3;
+}
+```

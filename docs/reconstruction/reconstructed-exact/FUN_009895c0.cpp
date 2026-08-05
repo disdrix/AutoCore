@@ -1,0 +1,414 @@
+// =============================================================================
+// FUN_009895c0
+// -----------------------------------------------------------------------------
+// Stable ID: aa_009895c0
+// Address:   0x009895c0  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_009895c0 @ 0x009895c0
+// Stable ID: aa_009895c0
+// Embedded strings (evidence for future rename):
+//   - "C:\\vog\\1_code\\palantir\\palantir\\physics\\phyCPDefinition.cpp"
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~188 non-empty decompiler lines.
+//  - Control keywords: if×17, return×2, do×1, while×1.
+//  - Notable callees: FUN_00435fe0×7, FUN_00767fd0×7, FUN_00437050×3, FUN_00768760×3, FUN_00436f10×2, FUN_00769e40×2, FUN_0076a200×2, FUN_00437e40.
+//  - Strings: "C:\\vog\\1_code\\palantir\\palantir\\physics\\phyCPDefinition.cpp".
+//  - Return sites: 2.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+uint __fastcall FUN_009895c0(int param_1,int param_2)
+
+
+
+{
+
+  uint uVar1;
+
+  uint uVar2;
+
+  uint uVar3;
+
+  uint uVar4;
+
+  uint uVar5;
+
+  uint uVar6;
+
+  uint uVar7;
+
+  uint uVar8;
+
+  uint uVar9;
+
+  uint uVar10;
+
+  int iVar11;
+
+  uint8_t auStack_74 [36];
+
+  uint32_t /* width from decompiler */ uStack_50;
+
+  char *pcStack_4c;
+
+  uint32_t /* width from decompiler */ uStack_48;
+
+  uint32_t /* width from decompiler */ uStack_44;
+
+  int *piStack_40;
+
+  int local_28;
+
+  uint8_t *local_24;
+
+  char local_18;
+
+  int local_14;
+
+  int local_10;
+
+  void *local_c;
+
+  uint8_t *puStack_8;
+
+  uint32_t /* width from decompiler */ local_4;
+
+  
+
+  local_4 = 0xffffffff;
+
+  puStack_8 = &LAB_009b1ac5;
+
+  local_c = ExceptionList;
+
+  uStack_44 = 0x9895ea;
+
+  ExceptionList = &local_c;
+
+  piStack_40 = (int *)param_1;
+
+  stoChunkReader_EnterChunkScope();
+
+  local_4 = 0;
+
+  if (local_14 == 0x43504446) {
+
+    if (local_10 == 1) {
+
+      piStack_40 = (int *)(param_2 + 8);
+
+      if (*(int *)(param_1 + 0x4044) == 0) {
+
+        uStack_44 = 0x98966b;
+
+        uVar1 = FUN_00437050();
+
+      }
+
+      else {
+
+        uStack_44 = 0x989674;
+
+        uVar1 = FUN_00768760();
+
+      }
+
+      piStack_40 = (int *)(param_2 + 0xc);
+
+      if (*(int *)(param_1 + 0x4044) == 0) {
+
+        uStack_44 = 0x98968a;
+
+        uVar2 = FUN_00437050();
+
+      }
+
+      else {
+
+        uStack_44 = 0x989693;
+
+        uVar2 = FUN_00768760();
+
+      }
+
+      piStack_40 = (int *)(param_2 + 0x10);
+
+      if (*(int *)(param_1 + 0x4044) == 0) {
+
+        uStack_44 = 0x9896a9;
+
+        uVar3 = FUN_00435fe0();
+
+      }
+
+      else {
+
+        uStack_44 = 0x9896b0;
+
+        uVar3 = FUN_00767fd0();
+
+      }
+
+      piStack_40 = (int *)(param_2 + 0x14);
+
+      if (*(int *)(param_1 + 0x4044) == 0) {
+
+        uStack_44 = 0x9896c6;
+
+        uVar4 = FUN_00435fe0();
+
+      }
+
+      else {
+
+        uStack_44 = 0x9896cd;
+
+        uVar4 = FUN_00767fd0();
+
+      }
+
+      piStack_40 = (int *)(param_2 + 0x18);
+
+      if (*(int *)(param_1 + 0x4044) == 0) {
+
+        uStack_44 = 0x9896e3;
+
+        uVar5 = FUN_00435fe0();
+
+      }
+
+      else {
+
+        uStack_44 = 0x9896ea;
+
+        uVar5 = FUN_00767fd0();
+
+      }
+
+      piStack_40 = (int *)(param_2 + 0x1c);
+
+      if (*(int *)(param_1 + 0x4044) == 0) {
+
+        uStack_44 = 0x989700;
+
+        uVar6 = FUN_00435fe0();
+
+      }
+
+      else {
+
+        uStack_44 = 0x989707;
+
+        uVar6 = FUN_00767fd0();
+
+      }
+
+      piStack_40 = (int *)(param_2 + 0x20);
+
+      if (*(int *)(param_1 + 0x4044) == 0) {
+
+        uStack_44 = 0x98971d;
+
+        uVar7 = FUN_00435fe0();
+
+      }
+
+      else {
+
+        uStack_44 = 0x989724;
+
+        uVar7 = FUN_00767fd0();
+
+      }
+
+      piStack_40 = (int *)(param_2 + 0x24);
+
+      if (*(int *)(param_1 + 0x4044) == 0) {
+
+        uStack_44 = 0x98973a;
+
+        uVar8 = FUN_00435fe0();
+
+      }
+
+      else {
+
+        uStack_44 = 0x989741;
+
+        uVar8 = FUN_00767fd0();
+
+      }
+
+      piStack_40 = (int *)(param_2 + 0x28);
+
+      if (*(int *)(param_1 + 0x4044) == 0) {
+
+        uStack_44 = 0x989757;
+
+        uVar9 = FUN_00435fe0();
+
+      }
+
+      else {
+
+        uStack_44 = 0x98975e;
+
+        uVar9 = FUN_00767fd0();
+
+      }
+
+      if (*(int *)(param_1 + 0x4044) == 0) {
+
+        piStack_40 = &local_28;
+
+        uStack_44 = 0x989775;
+
+        uVar10 = FUN_00437050();
+
+      }
+
+      else {
+
+        piStack_40 = &local_28;
+
+        uStack_44 = 0x989783;
+
+        uVar10 = FUN_00768760();
+
+      }
+
+      local_24 = auStack_74;
+
+      uVar10 = uVar1 | uVar2 | uVar3 | uVar4 | uVar5 | uVar6 | uVar7 | uVar8 | uVar9 | uVar10;
+
+      FUN_004382c0(auStack_74);
+
+      FUN_00437e40();
+
+      iVar11 = *(int *)(param_2 + 0x30);
+
+      local_24 = *(uint8_t **)(param_2 + 0x34);
+
+      local_28 = iVar11;
+
+      if ((uint8_t *)iVar11 != local_24) {
+
+        do {
+
+          local_28 = iVar11;
+
+          if (*(int *)(param_1 + 0x4044) == 0) {
+
+            piStack_40 = (int *)0x9897d1;
+
+            uVar1 = FUN_00436f10();
+
+            iVar11 = local_28;
+
+          }
+
+          else {
+
+            piStack_40 = (int *)0x9897de;
+
+            uVar1 = FUN_0076a200();
+
+          }
+
+          if (*(int *)(param_1 + 0x4044) == 0) {
+
+            piStack_40 = (int *)0x9897f5;
+
+            uVar2 = FUN_00436f10();
+
+            iVar11 = local_28;
+
+          }
+
+          else {
+
+            piStack_40 = (int *)0x989804;
+
+            uVar2 = FUN_0076a200();
+
+          }
+
+          iVar11 = iVar11 + 0x38;
+
+          uVar10 = uVar10 | uVar1 | uVar2;
+
+          local_28 = iVar11;
+
+        } while ((uint8_t *)iVar11 != local_24);
+
+      }
+
+      local_4 = 0xffffffff;
+
+      if (local_18 != '\0') {
+
+        piStack_40 = (int *)0x989830;
+
+        FUN_00769e40();
+
+      }
+
+      ExceptionList = local_c;
+
+      return uVar10;
+
+    }
+
+    piStack_40 = (int *)0xaa096c;
+
+    uStack_48 = 0x84;
+
+  }
+
+  else {
+
+    piStack_40 = (int *)0xaa09dc;
+
+    uStack_48 = 0x61;
+
+  }
+
+  uStack_44 = 3;
+
+  pcStack_4c = "C:\\vog\\1_code\\palantir\\palantir\\physics\\phyCPDefinition.cpp";
+
+  uStack_50 = 0x989626;
+
+  vog_LogMessage();
+
+  local_4 = 0xffffffff;
+
+  if (local_18 != '\0') {
+
+    piStack_40 = (int *)0x989641;
+
+    FUN_00769e40();
+
+  }
+
+  ExceptionList = local_c;
+
+  return 0xffffffff;
+
+}

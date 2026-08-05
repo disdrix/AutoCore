@@ -1,0 +1,87 @@
+// =============================================================================
+// UI_controls
+// -----------------------------------------------------------------------------
+// Stable ID: aa_0081f2f0
+// Address:   0x0081f2f0  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for UI_controls @ 0x0081f2f0
+// Stable ID: aa_0081f2f0
+// Embedded strings (evidence for future rename):
+//   - "i_o_controls.xml"
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~23 non-empty decompiler lines.
+//  - Control keywords: return×1.
+//  - Notable callees: FUN_00818790, FUN_0081e5f0, UI_controls, NDUIWindow_ReloadInterface.
+//  - Strings: "i_o_controls.xml".
+//  - Return sites: 1.
+
+/*
+ * Behavioral notes:
+ * Plate-driven rename evidence: "i_o_controls.xml"
+ * Domain alias of FUN_0081f2f0 (FUN_* retained)
+ *
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+uint32_t /* width from decompiler */ * UI_controls(uint32_t /* width from decompiler */ *param_1)
+
+
+
+{
+
+  void *local_c;
+
+  uint8_t *puStack_8;
+
+  uint32_t /* width from decompiler */ local_4;
+
+  
+
+  local_4 = 0xffffffff;
+
+  puStack_8 = &LAB_009b8431;
+
+  local_c = ExceptionList;
+
+  ExceptionList = &local_c;
+
+  FUN_00818790(param_1);
+
+  local_4 = 0;
+
+  *param_1 = &PTR_FUN_00a770f4;
+
+  param_1[0x13f] = 0xf;
+
+  param_1[0x140] = 1;
+
+  param_1[0x420] = 0xffffffff;
+
+  *(uint8_t *)(param_1 + 0x421) = 0;
+
+  param_1[0x435] = 0xffffffff;
+
+  *(uint8_t *)(param_1 + 0x436) = 0;
+
+  FUN_0081e5f0();
+
+  NDUIWindow_ReloadInterface("i_o_controls.xml");
+
+  ExceptionList = local_c;
+
+  return param_1;
+
+}

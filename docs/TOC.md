@@ -20,3 +20,4 @@
 ## Tools
 
 - [Inventory catalog](../tools/inventory-catalog/README.md) — exported item definitions
+- [Mission viewer](../tools/mission-viewer/README.md) — offline mission browser (GLM + WAD export)

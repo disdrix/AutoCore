@@ -1,0 +1,315 @@
+// READABILITY (auto CF):
+//  - Body size: ~265 non-empty decompiler lines.
+//  - Control keywords: if×30, return×3, goto×3, for×2, do×1, while×1.
+//  - Notable callees: CVOGReaction_RandomUnitScalar×5, ABS×3, CVOGHBBase_RescheduleAfterFire×2, FUN_005cc680×2, FUN_005cd220×2, FUN_0076cef0×2, state×2, AI_CheckSlotTimerReady.
+//  - Strings: "CVOGHBAICreatureBase::OnHeartBeat()".
+//  - Return sites: 3.
+
+// =============================================================================
+// CVOGHBAICreatureBase_OnHeartBeat
+// -----------------------------------------------------------------------------
+// Purpose:  Periodic AI heartbeat for creature-base HBAI. State machine on owner+0x26c
+//           (0 idle/patrol, 1 engage, 2 combat): leash home, transition timers,
+//           random weapon/pursue pulses, skill-slot timer gate.
+//
+// Address:  0x005d0310  (autoassault.exe, image base 0x400000)
+// Stable:   aa_005d0310
+// System:   npc-ai / HBAI
+//
+// Convention: __thiscall; pResult / next-delay out via HB status path.
+// Scoped string: "CVOGHBAICreatureBase::OnHeartBeat()".
+// Caller context: Client_LocalDiscoveryTick / HB list TryFire chain.
+//
+// Control flow summary:
+//   1) Bail if owner this+0x18 null -> default status DAT_00af41b0
+//   2) Timer this+0x34 vs thresholds; clear idle flags owner+0x305..0x307
+//   3) No target and no vehicle -> RescheduleAfterFire; exit
+//   4) State owner+0x26c:
+//        idle  -> ReturnToNormalLocation / patrol FUN_005cd220; sample random
+//        engage-> timer to combat; skill/set helpers FUN_005cc*
+//        combat-> random fire chance; AI_CheckSlotTimerReady; pursue helpers
+//   5) Snapshot position via owner vtbl+0x1a0 into this+0x50..0x5c
+//   6) RescheduleAfterFire
+//
+// Key this offsets: +0x18 owner, +0x24/+0x28 random period bases, +0x50 pos,
+//   +0x6d combat latch, +0x1e timer array (shared with CheckSlotTimerReady).
+// Owner: +0x26c state, +0x278 death, +0x250 vehicle, +0x279 at-dest.
+// Dual-reviewed (A reconstruction + B skeptical).
+//
+// Exactness: CF mirrors raw; names cleaned; no invented clamps.
+// Bit-for-bit / runtime / differential: DEFERRED / OPEN.
+// Human-refined plate: 2026-07-23 (AI managers readability)
+// Dual reviews:
+//   reviews/A_aa_005d0310_CVOGHBAICreatureBase_OnHeartBeat.md
+//   reviews/B_aa_005d0310_CVOGHBAICreatureBase_OnHeartBeat.md
+// =============================================================================
+
+/* WARNING: Removing unreachable block (ram,0x005d07cd) */
+/* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* AI heartbeat tick for creature base behavior. Called every tick from Client_LocalDiscoveryTick.
+   
+   State machine via owner+0x26c (0=idle/patrol, 1=engage, 2=combat).
+   Idle: Returns to normal location via ReturnToNormalLocation.
+   Engage: Timed transition to combat with speed check.
+   Combat: Random chance to fire weapons and pursue target.
+   
+   Key offsets on this:
+   +0x6: Owner creature pointer
+   +0x9: Min combat range
+   +0xa: Max combat range
+   +0xc: Current distance to target
+   +0xd: Timer (compared to DAT_00a0f518 threshold)
+   +0xe: Distance offset for combat range check
+   +0x14-0x17: Current position (xyz)
+   +0x18: State flag 1 (char)
+   +0x19: Owner creature struct pointer
+   +0x1a: Secondary state flag
+   +0x1e-0x26: Timers array (3 entries, step 3)
+   +0x2e: Combat counter (byte)
+   
+   Owner offsets (this+0x19):
+   +0x10: Flag (char, 0=active)
+   +0x26c: Behavior state (char, 0=idle, 1=engage, 2=combat)
+   +0x278: Death state (char, 0=alive, 1=dying, 2=dead, 3=respawn)
+   +0x279: At destination flag
+   +0x26c: Behavior state
+   +0x250: Vehicle reference pointer
+   +0x305: Idle flag
+   +0x306: Secondary idle flag
+   +0x307: Tertiary idle flag */
+void __thiscall CVOGHBAICreatureBase_OnHeartBeat(void *this,uint32_t /* width from decompiler */ *pResult)
+{
+  int *piVar1;
+  int iVar2;
+  float fVar3;
+  char cVar4;
+  uint8_t uVar5;
+  int iVar6;
+  uint32_t /* width from decompiler */ uVar7;
+  float *pfVar8;
+  uint32_t /* width from decompiler */ *puVar9;
+  uint uVar10;
+  char *pcVar11;
+  ushort uVar12;
+  uint *pOutNextDelayMs;
+  uint *extraout_EDX;
+  uint *extraout_EDX_00;
+  uint *pOutNextDelayMs_00;
+  uint unaff_EDI;
+  void *local_1c;
+  uint8_t *puStack_18;
+  uint32_t /* width from decompiler */ local_14;
+  
+  local_14 = 0xffffffff;
+  puStack_18 = &LAB_009a6fce;
+  local_1c = ExceptionList;
+  ExceptionList = &local_1c;
+  FUN_0076cf00("CVOGHBAICreatureBase::OnHeartBeat()");
+  local_14 = 0;
+                    /* // Bail if owner (this+0x6) is null */
+  if (*(int *)((int)this + 0x18) == 0) {
+    *pResult = DAT_00af41b0;
+    local_14 = 0xffffffff;
+    FUN_0076cef0();
+    ExceptionList = local_1c;
+    return;
+  }
+                    /* // Check timer (this+0xd) against threshold DAT_00a0f518 */
+  if (*(float *)((int)this + 0x34) == g_flZero) {
+LAB_005d03c1:
+                    /* // Timer expired or in combat range: enter main behavior state machine */
+    *(uint8_t *)(*(int *)((int)this + 100) + 0x307) = 0;
+    iVar6 = *(int *)((int)this + 100);
+                    /* // If no active target and no vehicle: set idle state and bail */
+    if ((*(int *)(iVar6 + 8) == 0) && (*(int *)(iVar6 + 0x250) == 0)) {
+      *(uint32_t /* width from decompiler */ *)((int)this + 8) = 0xffffffff;
+      CVOGHBBase_RescheduleAfterFire(this,pOutNextDelayMs);
+      goto LAB_005d081c;
+    }
+                    /* // Check distance to target against combat range */
+    fVar3 = (float)(int)g_dwClientTickMs;
+    if ((int)g_dwClientTickMs < 0) {
+      fVar3 = fVar3 + _DAT_00aaa5dc;
+    }
+    if (*(float *)((int)this + 0x30) < fVar3 * g_flMsToSeconds_Inferred) {
+      *(uint8_t *)(iVar6 + 0x305) = 0;
+                    /* // Check behavior state at owner+0x26c (0=idle, 1=engage, 2=combat) */
+      *(uint8_t *)(*(int *)((int)this + 100) + 0x306) = 0;
+    }
+    iVar6 = *(int *)((int)this + 100);
+    if (*(char *)(iVar6 + 0x207) == '\0') {
+      if (*(char *)((int)this + 0x6d) != '\0') {
+        if (*(int *)(iVar6 + 0x250) == 0) {
+          piVar1 = (int *)(*(int *)(*(int *)((int)this + 0x18) + 0xa4) + 0x20);
+          *piVar1 = *piVar1 + -1;
+        }
+        else {
+          piVar1 = (int *)(*(int *)(*(int *)((int)this + 0x18) + 0xa4) + 0x24);
+          *piVar1 = *piVar1 + -1;
+        }
+        *(uint8_t *)((int)this + 0x6d) = 0;
+        *(uint32_t /* width from decompiler */ *)((int)this + 0x68) = 0;
+      }
+      iVar2 = *(int *)((int)this + 100);
+      iVar6 = *(int *)(*(int *)(iVar2 + 4) + 4) + iVar2;
+      if (*(char *)(*(int *)(iVar6 + 0xa8) + 0x7e) == '\0') {
+        if ((*(int *)(iVar6 + 0x18) == 0) && (*(char *)(iVar2 + 0x10) == '\0')) {
+          FUN_005cedf0();
+          if (*(char *)((int)this + 0x60) == '\0') {
+            cVar4 = (**(code **)(*(int *)this + 0x54))();
+            if (cVar4 == '\0') {
+              iVar6 = *(int *)this;
+              uVar7 = (**(code **)(*(int *)(*(int *)(*(int *)(*(int *)((int)this + 100) + 4) + 4) +
+                                            4 + *(int *)((int)this + 100)) + 0x1a0))(0);
+              (**(code **)(iVar6 + 0x4c))(uVar7);
+            }
+          }
+          else {
+            (**(code **)(*(int *)this + 0x4c))((int)this + 0x40,1);
+          }
+          iVar6 = CVOGReaction_RandomUnitScalar();
+          if (0xfffff < *(int *)(iVar6 + 0xc)) {
+            *(uint32_t /* width from decompiler */ *)(iVar6 + 0xc) = 0;
+          }
+          uVar12 = *(ushort *)(*(int *)(iVar6 + 8) + *(int *)(iVar6 + 0xc) * 2);
+          *(int *)(iVar6 + 0xc) = *(int *)(iVar6 + 0xc) + 1;
+          iVar6 = *(int *)((int)this + 0x24);
+        }
+        else {
+                    /* // Idle state: return to normal patrol location */
+          if (*(char *)(iVar2 + 0x279) == '\0') {
+            if ((*(char *)(iVar2 + 0x26c) != '\0') ||
+               (pfVar8 = (float *)(**(code **)(*(int *)(*(int *)(*(int *)(iVar2 + 4) + 4) + 4 +
+                                                       iVar2) + 0x1a0))(),
+               (g_flMsToSeconds_Inferred < ABS(*(float *)((int)this + 0x58) - pfVar8[2]) ||
+               g_flMsToSeconds_Inferred < ABS(*(float *)((int)this + 0x54) - pfVar8[1])) ||
+               g_flMsToSeconds_Inferred < ABS(*(float *)((int)this + 0x50) - *pfVar8))) {
+              uVar5 = 0;
+            }
+            else {
+              uVar5 = 1;
+            }
+            *(uint8_t *)(*(int *)((int)this + 100) + 0x279) = uVar5;
+          }
+          FUN_005cd220();
+          iVar6 = CVOGReaction_RandomUnitScalar();
+          if (0xfffff < *(int *)(iVar6 + 0xc)) {
+            *(uint32_t /* width from decompiler */ *)(iVar6 + 0xc) = 0;
+          }
+          uVar12 = *(ushort *)(*(int *)(iVar6 + 8) + *(int *)(iVar6 + 0xc) * 2);
+          *(int *)(iVar6 + 0xc) = *(int *)(iVar6 + 0xc) + 1;
+          iVar6 = *(int *)((int)this + 0x28);
+        }
+        *(int *)((int)this + 8) = (int)((longlong)(ulonglong)uVar12 % (longlong)iVar6) / 2 + iVar6;
+        puVar9 = (uint32_t /* width from decompiler */ *)
+                 (**(code **)(*(int *)(*(int *)(*(int *)(*(int *)((int)this + 100) + 4) + 4) + 4 +
+                                      *(int *)((int)this + 100)) + 0x1a0))();
+        *(uint32_t /* width from decompiler */ *)((int)this + 0x50) = *puVar9;
+        *(uint32_t /* width from decompiler */ *)((int)this + 0x54) = puVar9[1];
+        *(uint32_t /* width from decompiler */ *)((int)this + 0x58) = puVar9[2];
+        pOutNextDelayMs_00 = (uint *)puVar9[3];
+        *(uint **)((int)this + 0x5c) = pOutNextDelayMs_00;
+        goto LAB_005d0809;
+      }
+      if (*(char *)(iVar2 + 0x278) == '\x02') {
+        (**(code **)(*(int *)this + 0x20))();
+      }
+      else {
+        (**(code **)(*(int *)this + 0x28))();
+        FUN_005cc680();
+                    /* // Engage state: timer-based transition to combat */
+        if ((*(int *)(*(int *)((int)this + 0x18) + 0xa0) == 0) ||
+           (*(char *)(*(int *)((int)this + 100) + 0x278) == '\x01')) {
+          FUN_005ccff0();
+        }
+        FUN_005cc680();
+      }
+      (**(code **)(*(int *)this + 0x50))();
+      if (*(int *)(*(int *)(*(int *)(*(int *)((int)this + 100) + 4) + 4) + 0xa4 +
+                  *(int *)((int)this + 100)) != 0) {
+        iVar6 = CVOGReaction_RandomUnitScalar();
+        if (0xfffff < *(int *)(iVar6 + 0xc)) {
+          *(uint32_t /* width from decompiler */ *)(iVar6 + 0xc) = 0;
+        }
+        uVar12 = *(ushort *)(*(int *)(iVar6 + 8) + *(int *)(iVar6 + 0xc) * 2);
+        *(int *)(iVar6 + 0xc) = *(int *)(iVar6 + 0xc) + 1;
+                    /* // Combat state: random chance to fire and pursue */
+        *(int *)((int)this + 8) =
+             (int)((longlong)(ulonglong)uVar12 % (longlong)*(int *)((int)this + 0x24)) / 2 +
+             *(int *)((int)this + 0x24);
+      }
+      FUN_005cd220();
+      puVar9 = (uint32_t /* width from decompiler */ *)
+               (**(code **)(*(int *)(*(int *)(*(int *)(*(int *)((int)this + 100) + 4) + 4) + 4 +
+                                    *(int *)((int)this + 100)) + 0x1a0))();
+      *(uint32_t /* width from decompiler */ *)((int)this + 0x50) = *puVar9;
+      *(uint32_t /* width from decompiler */ *)((int)this + 0x54) = puVar9[1];
+      *(uint32_t /* width from decompiler */ *)((int)this + 0x58) = puVar9[2];
+      *(uint32_t /* width from decompiler */ *)((int)this + 0x5c) = puVar9[3];
+      uVar10 = AI_CheckSlotTimerReady(this,(void *)0x0,unaff_EDI);
+      if ((char)uVar10 != '\0') {
+        iVar6 = CVOGReaction_RandomUnitScalar();
+        if (0xfffff < *(int *)(iVar6 + 0xc)) {
+          *(uint32_t /* width from decompiler */ *)(iVar6 + 0xc) = 0;
+        }
+        uVar12 = *(ushort *)(*(int *)(iVar6 + 8) + *(int *)(iVar6 + 0xc) * 2);
+        *(int *)(iVar6 + 0xc) = *(int *)(iVar6 + 0xc) + 1;
+        if ((uVar12 & 1) == 0) {
+          FUN_005ccf00();
+        }
+      }
+      FUN_00638be0();
+      pOutNextDelayMs_00 = extraout_EDX_00;
+    }
+    else {
+      if (*(char *)((int)this + 0x6d) == '\0') {
+        if (*(int *)(iVar6 + 0x250) == 0) {
+          piVar1 = (int *)(*(int *)(*(int *)((int)this + 0x18) + 0xa4) + 0x20);
+          *piVar1 = *piVar1 + 1;
+        }
+        else {
+          piVar1 = (int *)(*(int *)(*(int *)((int)this + 0x18) + 0xa4) + 0x24);
+          *piVar1 = *piVar1 + 1;
+        }
+        *(uint8_t *)((int)this + 0x6d) = 1;
+        iVar6 = CVOGReaction_RandomUnitScalar();
+        if (0xfffff < *(int *)(iVar6 + 0xc)) {
+          *(uint32_t /* width from decompiler */ *)(iVar6 + 0xc) = 0;
+        }
+        uVar12 = *(ushort *)(*(int *)(iVar6 + 8) + *(int *)(iVar6 + 0xc) * 2);
+        *(int *)(iVar6 + 0xc) = *(int *)(iVar6 + 0xc) + 1;
+        *(uint *)((int)this + 8) = ((uint)uVar12 % 1000) / 2 + 1000;
+      }
+      FUN_005ce990();
+      pOutNextDelayMs_00 = extraout_EDX;
+    }
+    pcVar11 = (char *)((int)this + 0x78);
+    iVar6 = 3;
+    do {
+      uVar10 = g_dwClientTickMs;
+      if (*pcVar11 != '\0') {
+        *(uint *)(pcVar11 + -8) = g_dwClientTickMs;
+        *pcVar11 = '\0';
+        pOutNextDelayMs_00 = (uint *)uVar10;
+      }
+      pcVar11 = pcVar11 + 0xc;
+      iVar6 = iVar6 + -1;
+    } while (iVar6 != 0);
+  }
+  else {
+    fVar3 = (float)(int)g_dwClientTickMs;
+    if ((int)g_dwClientTickMs < 0) {
+      fVar3 = fVar3 + _DAT_00aaa5dc;
+    }
+    pOutNextDelayMs_00 = pOutNextDelayMs;
+    if (*(float *)((int)this + 0x34) <=
+        fVar3 * g_flMsToSeconds_Inferred - *(float *)((int)this + 0x38)) goto LAB_005d03c1;
+  }
+LAB_005d0809:
+  CVOGHBBase_RescheduleAfterFire(this,pOutNextDelayMs_00);
+LAB_005d081c:
+  local_14 = 0xffffffff;
+  FUN_0076cef0();
+  ExceptionList = local_1c;
+  return;
+}

@@ -1,0 +1,58 @@
+# Raw capture: Client_SendUpdateFirstTimeFlags
+
+| Field | Value |
+|---|---|
+| **Stable ID** | `aa_0092c6d0` |
+| **Module** | `autoassault.exe` |
+| **Image base** | `0x400000` |
+| **VA** | `0x0092c6d0` |
+| **Canonical name** | `Client_SendUpdateFirstTimeFlags` |
+| **System** | unknown |
+| **Capture timestamp** | `2026-07-23` |
+| **Tool** | Ghidra MCP `batch_decompile` |
+| **Integrity** | Do not overwrite this raw body; append versioned sections only |
+
+---
+
+## Raw pseudocode (authoritative decompile)
+
+```c
+/* Send EMSG_Sector_UpdateFirstTimeFlags_Request (0x20B1).
+   Payload: opcode + 4x uint32 FirstTimeFlags (size 0x14).
+   ESI = game state; EDX = pointer to 4 dwords (char+0xD30 or copy).
+   Copies flags into local player char+0xD30 then sends via connection vtable+0x18.
+   AutoCore: UpdateFirstTimeFlagsRequestPacket / HandleUpdateFirstTimeFlagsRequest. */
+
+void __fastcall Client_SendUpdateFirstTimeFlags(undefined4 param_1,undefined4 *param_2)
+
+{
+  int iVar1;
+  byte bVar2;
+  int unaff_ESI;
+  undefined4 local_14;
+  undefined4 local_10;
+  undefined4 local_c;
+  undefined4 local_8;
+  undefined4 local_4;
+  
+  if ((*(int *)(unaff_ESI + 0xe98) != 0) && (param_2 != (undefined4 *)0x0)) {
+    bVar2 = 0;
+    iVar1 = 0xd30;
+    do {
+      *(undefined4 *)(iVar1 + *(int *)(unaff_ESI + 0xe98)) =
+           *(undefined4 *)((int)param_2 + iVar1 + -0xd30);
+      bVar2 = bVar2 + 1;
+      iVar1 = iVar1 + 4;
+    } while (bVar2 < 4);
+    local_10 = *param_2;
+    local_c = param_2[1];
+    local_8 = param_2[2];
+    local_4 = param_2[3];
+    local_14 = 0x20b1;
+    if (*(int *)(unaff_ESI + 0xc78) != 0) {
+      (**(code **)(**(int **)(unaff_ESI + 0xc78) + 0x18))(0xffffffff,&local_14,0x14,0);
+    }
+  }
+  return;
+}
+```

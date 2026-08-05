@@ -1,0 +1,43 @@
+# Annotated low-level: FUN_005fdfc0
+
+| Field | Value |
+|---|---|
+| Stable ID | `aa_005fdfc0` |
+| VA | `0x005fdfc0` |
+| System | unknown |
+| Date | 2026-07-23 |
+
+## Machine-level notes
+
+- Source: raw capture for `aa_005fdfc0`.
+- Prefer assembly when decompiler conflicts.
+- Recover types for still-generic parameters via callers/xrefs.
+- Map DAT_* globals and FUN_* callees in follow-up waves.
+
+## Pseudocode (annotated copy of raw)
+
+```c
+void __thiscall FUN_005fdfc0(int param_1,undefined4 *param_2)
+
+{
+  float fVar1;
+  float fVar2;
+  float fVar3;
+  
+  fVar1 = g_flOne;
+  *(undefined4 *)(param_1 + 0x28) = *param_2;
+  *(undefined4 *)(param_1 + 0x38) = param_2[2];
+  fVar2 = *(float *)(param_1 + 0x28) - *(float *)(param_1 + 0x38);
+  *(undefined4 *)(param_1 + 0x2c) = param_2[1];
+  fVar3 = *(float *)(param_1 + 0x2c) * fVar2;
+  *(undefined1 *)(param_1 + 0x3c) = *(undefined1 *)(param_2 + 3);
+  *(float *)(param_1 + 0x34) = fVar3;
+  *(float *)(param_1 + 0x30) = (fVar1 - fVar3) / ((fVar1 - *(float *)(param_1 + 0x38)) - fVar2);
+  return;
+}
+```
+
+## Open questions
+
+- Confirm calling convention and full signature against callers.
+- Recover meaningful types for still-generic parameters.

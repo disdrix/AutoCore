@@ -1,0 +1,1135 @@
+// =============================================================================
+// FUN_009365e0
+// -----------------------------------------------------------------------------
+// Stable ID: aa_009365e0
+// Address:   0x009365e0  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_009365e0 @ 0x009365e0
+// Stable ID: aa_009365e0
+// Embedded strings (evidence for future rename):
+//   - "VOG.ini"
+//   - "INTERNAL"
+//   - "USERNAME"
+//   - "PASSWORD"
+//   - "MODE_WINDOWED"
+//   - "DRAW_WINDOW_BORDER"
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~546 non-empty decompiler lines.
+//  - Control keywords: if×57, while×15, do×14, goto×7, return×1.
+//  - Notable callees: strtok×36, _stricmp×28, atoi×22, atof×6, atol×3, FUN_004a81c0×2, CONCAT31, FUN_00402cd0.
+//  - Strings: "VOG.ini"; "INTERNAL"; "USERNAME"; "PASSWORD".
+//  - Return sites: 1.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+void FUN_009365e0(int param_1)
+
+
+
+{
+
+  char cVar1;
+
+  char *pcVar2;
+
+  int iVar3;
+
+  char *pcVar4;
+
+  char *pcVar5;
+
+  bool bVar6;
+
+  double dVar7;
+
+  char local_8d4 [2180];
+
+  double local_50;
+
+  long local_48;
+
+  int local_44;
+
+  int local_40;
+
+  int local_3c;
+
+  uint32_t /* width from decompiler */ *local_38;
+
+  long local_34;
+
+  int local_30;
+
+  FILE *local_2c;
+
+  uint8_t local_25;
+
+  uint8_t local_24;
+
+  uint8_t local_20;
+
+  char *local_1c;
+
+  uint16_t local_18;
+
+  uint8_t local_16;
+
+  uint8_t *local_14;
+
+  void *local_10;
+
+  uint8_t *puStack_c;
+
+  int local_8;
+
+  
+
+  puStack_c = &LAB_009b1082;
+
+  local_10 = ExceptionList;
+
+  local_14 = &stack0xfffff720;
+
+  local_8 = 0;
+
+  ExceptionList = &local_10;
+
+  FUN_0092f920();
+
+  local_2c = fopen("VOG.ini","r");
+
+  if (local_2c != (FILE *)0x0) {
+
+    local_18 = DAT_00a152e0;
+
+    local_16 = DAT_00a152e2;
+
+    while (pcVar2 = fgets(local_8d4,0x800,local_2c), pcVar2 != (char *)0x0) {
+
+      local_8._0_1_ = 1;
+
+      pcVar2 = strtok(local_8d4,(char *)&local_18);
+
+      local_1c = pcVar2;
+
+      if ((pcVar2 == (char *)0x0) || (iVar3 = _stricmp(pcVar2,"INTERNAL"), iVar3 == 0))
+
+      goto code_r0x0093711d;
+
+      iVar3 = _stricmp(pcVar2,"USERNAME");
+
+      if (iVar3 == 0) {
+
+        local_1c = strtok((char *)0x0,(char *)&local_18);
+
+        pcVar2 = local_1c;
+
+        do {
+
+          cVar1 = *pcVar2;
+
+          pcVar2 = pcVar2 + 1;
+
+        } while (cVar1 != '\0');
+
+        if ((uint)((int)pcVar2 - (int)(local_1c + 1)) < 0x20) {
+
+          FUN_004a81c0(local_1c);
+
+          local_8 = 0;
+
+        }
+
+        else {
+
+LAB_009366fa:
+
+          FUN_004a81c0(&DAT_00a1419b);
+
+          local_8 = 0;
+
+        }
+
+      }
+
+      else {
+
+        iVar3 = _stricmp(pcVar2,"PASSWORD");
+
+        if (iVar3 == 0) {
+
+          local_1c = strtok((char *)0x0,(char *)&local_18);
+
+          pcVar2 = local_1c;
+
+          do {
+
+            cVar1 = *pcVar2;
+
+            pcVar2 = pcVar2 + 1;
+
+          } while (cVar1 != '\0');
+
+          if (0x1f < (uint)((int)pcVar2 - (int)(local_1c + 1))) goto LAB_009366fa;
+
+          FUN_004a81e0(local_1c);
+
+          local_8 = 0;
+
+        }
+
+        else {
+
+          iVar3 = _stricmp(pcVar2,"MODE_WINDOWED");
+
+          if (iVar3 == 0) {
+
+            local_1c = strtok((char *)0x0,(char *)&local_18);
+
+            iVar3 = atoi(local_1c);
+
+            *(bool *)(param_1 + 0x9c1) = iVar3 == 1;
+
+            local_8 = 0;
+
+          }
+
+          else {
+
+            iVar3 = _stricmp(pcVar2,"DRAW_WINDOW_BORDER");
+
+            if (iVar3 == 0) {
+
+              local_1c = strtok((char *)0x0,(char *)&local_18);
+
+              iVar3 = atoi(local_1c);
+
+              *(bool *)(param_1 + 0x9c2) = iVar3 == 1;
+
+              local_8 = 0;
+
+            }
+
+            else {
+
+              iVar3 = _stricmp(pcVar2,"MODE_DISPLAY");
+
+              if (iVar3 == 0) {
+
+                local_1c = strtok((char *)0x0,(char *)&local_18);
+
+                iVar3 = atoi(local_1c);
+
+                *(short *)(param_1 + 0xa14) = (short)iVar3;
+
+                local_8 = 0;
+
+              }
+
+              else {
+
+                iVar3 = _stricmp(pcVar2,"MODE_ANTIALIASED");
+
+                if (iVar3 == 0) {
+
+                  local_1c = strtok((char *)0x0,(char *)&local_18);
+
+                  iVar3 = atoi(local_1c);
+
+                  *(bool *)(param_1 + 0x9c6) = iVar3 == 1;
+
+                  local_8 = 0;
+
+                }
+
+                else {
+
+                  iVar3 = _stricmp(pcVar2,"RESOLUTIONX");
+
+                  if (iVar3 == 0) {
+
+                    local_1c = strtok((char *)0x0,(char *)&local_18);
+
+                    iVar3 = atoi(local_1c);
+
+                    *(int *)(param_1 + 0xa18) = iVar3;
+
+                    local_8 = 0;
+
+                  }
+
+                  else {
+
+                    iVar3 = _stricmp(pcVar2,"RESOLUTIONY");
+
+                    if (iVar3 == 0) {
+
+                      local_1c = strtok((char *)0x0,(char *)&local_18);
+
+                      iVar3 = atoi(local_1c);
+
+                      *(int *)(param_1 + 0xa1c) = iVar3;
+
+                      local_8 = 0;
+
+                    }
+
+                    else {
+
+                      iVar3 = _stricmp(pcVar2,"GLOBALSERVERIP");
+
+                      if (iVar3 == 0) {
+
+                        local_1c = strtok((char *)0x0,(char *)&local_18);
+
+                        pcVar2 = local_1c;
+
+                        do {
+
+                          cVar1 = *pcVar2;
+
+                          pcVar2 = pcVar2 + 1;
+
+                        } while (cVar1 != '\0');
+
+                        if (0xf < (uint)((int)pcVar2 - (int)(local_1c + 1))) {
+
+                          pcVar2 = "VOG.ini: Parameter Error, GLOBALSERVERIP is too long.";
+
+LAB_00936938:
+
+                          FUN_007a4480(1,pcVar2);
+
+                          local_8 = (uint)local_8._1_3_ << 8;
+
+                          break;
+
+                        }
+
+                        pcVar2 = (char *)(param_1 + 0x730);
+
+                        pcVar4 = local_1c;
+
+                        do {
+
+                          cVar1 = *pcVar4;
+
+                          *pcVar2 = cVar1;
+
+                          pcVar4 = pcVar4 + 1;
+
+                          pcVar2 = pcVar2 + 1;
+
+                        } while (cVar1 != '\0');
+
+                        local_8 = 0;
+
+                      }
+
+                      else {
+
+                        iVar3 = _stricmp(pcVar2,"AUTHSERVERIP");
+
+                        if (iVar3 == 0) {
+
+                          local_1c = strtok((char *)0x0,(char *)&local_18);
+
+                          pcVar2 = local_1c;
+
+                          do {
+
+                            cVar1 = *pcVar2;
+
+                            pcVar2 = pcVar2 + 1;
+
+                          } while (cVar1 != '\0');
+
+                          if (0xf < (uint)((int)pcVar2 - (int)(local_1c + 1))) {
+
+                            pcVar2 = "VOG.ini: Parameter Error, AUTHSERVERIP is too long.";
+
+                            goto LAB_00936938;
+
+                          }
+
+                          local_38 = (uint32_t /* width from decompiler */ *)FUN_00402cd0(local_1c);
+
+                          pcVar4 = (char *)*local_38;
+
+                          pcVar2 = (char *)(param_1 + 0x740);
+
+                          do {
+
+                            cVar1 = *pcVar4;
+
+                            *pcVar2 = cVar1;
+
+                            pcVar4 = pcVar4 + 1;
+
+                            pcVar2 = pcVar2 + 1;
+
+                          } while (cVar1 != '\0');
+
+                          local_8 = CONCAT31(local_8._1_3_,1);
+
+                          FUN_00402cf0();
+
+                          local_8 = 0;
+
+                        }
+
+                        else {
+
+                          iVar3 = _stricmp(pcVar2,"AUTHSERVERID");
+
+                          if (iVar3 == 0) {
+
+                            local_1c = strtok((char *)0x0,(char *)&local_18);
+
+                            iVar3 = atoi(local_1c);
+
+                            local_24 = (uint8_t)iVar3;
+
+                            *(uint8_t *)(param_1 + 0x13c) = local_24;
+
+                            local_8 = 0;
+
+                          }
+
+                          else {
+
+                            iVar3 = _stricmp(pcVar2,"USE3DBUFFERS");
+
+                            if (iVar3 == 0) {
+
+                              local_1c = strtok((char *)0x0,(char *)&local_18);
+
+                              iVar3 = atoi(local_1c);
+
+                              *(bool *)(param_1 + 0x9ea) = iVar3 != 0;
+
+                              local_8 = 0;
+
+                            }
+
+                            else {
+
+                              iVar3 = _stricmp(pcVar2,"SOUND_MUSIC");
+
+                              if (iVar3 == 0) {
+
+                                local_1c = strtok((char *)0x0,(char *)&local_18);
+
+                                dVar7 = atof(local_1c);
+
+                                *(float *)(param_1 + 0x9ec) = (float)dVar7 * DAT_00a0f718;
+
+                                local_8 = 0;
+
+                              }
+
+                              else {
+
+                                iVar3 = _stricmp(pcVar2,"SOUND_3DLOCAL");
+
+                                if (iVar3 == 0) {
+
+                                  local_1c = strtok((char *)0x0,(char *)&local_18);
+
+                                  dVar7 = atof(local_1c);
+
+                                  *(float *)(param_1 + 0x9f4) = (float)dVar7 * DAT_00a0f718;
+
+                                  local_8 = 0;
+
+                                }
+
+                                else {
+
+                                  iVar3 = _stricmp(pcVar2,"SOUND_3D");
+
+                                  if (iVar3 == 0) {
+
+                                    local_1c = strtok((char *)0x0,(char *)&local_18);
+
+                                    dVar7 = atof(local_1c);
+
+                                    *(float *)(param_1 + 0x9f8) = (float)dVar7 * DAT_00a0f718;
+
+                                    local_8 = 0;
+
+                                  }
+
+                                  else {
+
+                                    iVar3 = _stricmp(pcVar2,"SOUND_COLLISION");
+
+                                    if (iVar3 == 0) {
+
+                                      local_1c = strtok((char *)0x0,(char *)&local_18);
+
+                                      dVar7 = atof(local_1c);
+
+                                      *(float *)(param_1 + 0x9fc) = (float)dVar7 * DAT_00a0f718;
+
+                                      local_8 = 0;
+
+                                    }
+
+                                    else {
+
+                                      iVar3 = _stricmp(pcVar2,"SOUND_2D");
+
+                                      if (iVar3 == 0) {
+
+                                        local_1c = strtok((char *)0x0,(char *)&local_18);
+
+                                        dVar7 = atof(local_1c);
+
+                                        *(float *)(param_1 + 0xa00) = (float)dVar7 * DAT_00a0f718;
+
+                                        local_8 = 0;
+
+                                      }
+
+                                      else {
+
+                                        iVar3 = _stricmp(pcVar2,"SOUND_USE_SOFTWARE");
+
+                                        if (iVar3 == 0) {
+
+                                          local_1c = strtok((char *)0x0,(char *)&local_18);
+
+                                          iVar3 = atoi(local_1c);
+
+                                          *(bool *)(param_1 + 0x9e8) = 0 < iVar3;
+
+                                          local_8 = 0;
+
+                                        }
+
+                                        else {
+
+                                          iVar3 = _stricmp(pcVar2,"SOUND_EGOTISM");
+
+                                          if (iVar3 == 0) {
+
+                                            local_1c = strtok((char *)0x0,(char *)&local_18);
+
+                                            iVar3 = atoi(local_1c);
+
+                                            *(char *)(param_1 + 0xbc) = (char)iVar3;
+
+                                            local_8 = 0;
+
+                                          }
+
+                                          else {
+
+                                            iVar3 = _stricmp(pcVar2,"LOGGING_LEVEL");
+
+                                            if (iVar3 == 0) {
+
+                                              local_1c = strtok((char *)0x0,(char *)&local_18);
+
+                                              iVar3 = atoi(local_1c);
+
+                                              *(char *)(param_1 + 0xa5) = (char)iVar3;
+
+                                              if ((char)iVar3 < -1) {
+
+                                                *(uint8_t *)(param_1 + 0xa5) = 0xff;
+
+                                              }
+
+                                              if (*(char *)(param_1 + 0xa5) < '\x02') {
+
+code_r0x0093711d:
+
+                                                local_8 = 0;
+
+                                              }
+
+                                              else {
+
+                                                *(uint8_t *)(param_1 + 0xa5) = 1;
+
+                                                local_8 = 0;
+
+                                              }
+
+                                            }
+
+                                            else {
+
+                                              iVar3 = 9;
+
+                                              bVar6 = true;
+
+                                              pcVar4 = pcVar2;
+
+                                              pcVar5 = "LANGUAGE";
+
+                                              do {
+
+                                                if (iVar3 == 0) break;
+
+                                                iVar3 = iVar3 + -1;
+
+                                                bVar6 = *pcVar4 == *pcVar5;
+
+                                                pcVar4 = pcVar4 + 1;
+
+                                                pcVar5 = pcVar5 + 1;
+
+                                              } while (bVar6);
+
+                                              if (bVar6) {
+
+                                                iVar3 = FUN_007a69d0();
+
+                                                local_30 = iVar3;
+
+                                                local_1c = strtok((char *)0x0,(char *)&local_18);
+
+                                                atoi(local_1c);
+
+                                                FUN_007a66f0();
+
+                                                local_44 = *(int *)(iVar3 + 0x2c);
+
+                                                DAT_00d1b24f = local_44 != 0;
+
+                                                local_8 = 0;
+
+                                              }
+
+                                              else {
+
+                                                iVar3 = 0xb;
+
+                                                bVar6 = true;
+
+                                                pcVar4 = pcVar2;
+
+                                                pcVar5 = "OLDTERRAIN";
+
+                                                do {
+
+                                                  if (iVar3 == 0) break;
+
+                                                  iVar3 = iVar3 + -1;
+
+                                                  bVar6 = *pcVar4 == *pcVar5;
+
+                                                  pcVar4 = pcVar4 + 1;
+
+                                                  pcVar5 = pcVar5 + 1;
+
+                                                } while (bVar6);
+
+                                                if (bVar6) {
+
+                                                  local_1c = strtok((char *)0x0,(char *)&local_18);
+
+                                                  local_40 = atoi(local_1c);
+
+                                                  DAT_00b03631 = local_40 != 1;
+
+                                                  DAT_00b03630 = 1;
+
+                                                  local_8 = 0;
+
+                                                }
+
+                                                else {
+
+                                                  iVar3 = 0x13;
+
+                                                  bVar6 = true;
+
+                                                  pcVar4 = pcVar2;
+
+                                                  pcVar5 = "NEVER_FLUSH_ASSETS";
+
+                                                  do {
+
+                                                    if (iVar3 == 0) break;
+
+                                                    iVar3 = iVar3 + -1;
+
+                                                    bVar6 = *pcVar4 == *pcVar5;
+
+                                                    pcVar4 = pcVar4 + 1;
+
+                                                    pcVar5 = pcVar5 + 1;
+
+                                                  } while (bVar6);
+
+                                                  if (bVar6) {
+
+                                                    local_1c = strtok((char *)0x0,(char *)&local_18)
+
+                                                    ;
+
+                                                    iVar3 = atoi(local_1c);
+
+                                                    *(bool *)(param_1 + 0xa7) = iVar3 == 1;
+
+                                                    local_8 = 0;
+
+                                                  }
+
+                                                  else {
+
+                                                    iVar3 = 0x13;
+
+                                                    bVar6 = true;
+
+                                                    pcVar4 = pcVar2;
+
+                                                    pcVar5 = "USE_LAST_LOD_LEVEL";
+
+                                                    do {
+
+                                                      if (iVar3 == 0) break;
+
+                                                      iVar3 = iVar3 + -1;
+
+                                                      bVar6 = *pcVar4 == *pcVar5;
+
+                                                      pcVar4 = pcVar4 + 1;
+
+                                                      pcVar5 = pcVar5 + 1;
+
+                                                    } while (bVar6);
+
+                                                    if (bVar6) {
+
+                                                      local_1c = strtok((char *)0x0,
+
+                                                                        (char *)&local_18);
+
+                                                      iVar3 = atoi(local_1c);
+
+                                                      local_25 = iVar3 == 1;
+
+                                                      DAT_00afa2f0 = !(bool)local_25;
+
+                                                      local_8 = 0;
+
+                                                    }
+
+                                                    else {
+
+                                                      iVar3 = 0xf;
+
+                                                      bVar6 = true;
+
+                                                      pcVar4 = pcVar2;
+
+                                                      pcVar5 = "LOAD_SPEC_GLOW";
+
+                                                      do {
+
+                                                        if (iVar3 == 0) break;
+
+                                                        iVar3 = iVar3 + -1;
+
+                                                        bVar6 = *pcVar4 == *pcVar5;
+
+                                                        pcVar4 = pcVar4 + 1;
+
+                                                        pcVar5 = pcVar5 + 1;
+
+                                                      } while (bVar6);
+
+                                                      if (bVar6) {
+
+                                                        local_1c = strtok((char *)0x0,
+
+                                                                          (char *)&local_18);
+
+                                                        iVar3 = atoi(local_1c);
+
+                                                        *(bool *)(param_1 + 0x9ce) = iVar3 == 1;
+
+                                                        local_8 = 0;
+
+                                                      }
+
+                                                      else {
+
+                                                        iVar3 = 0xc;
+
+                                                        bVar6 = true;
+
+                                                        pcVar4 = pcVar2;
+
+                                                        pcVar5 = "WINDOWS_KEY";
+
+                                                        do {
+
+                                                          if (iVar3 == 0) break;
+
+                                                          iVar3 = iVar3 + -1;
+
+                                                          bVar6 = *pcVar4 == *pcVar5;
+
+                                                          pcVar4 = pcVar4 + 1;
+
+                                                          pcVar5 = pcVar5 + 1;
+
+                                                        } while (bVar6);
+
+                                                        if (bVar6) {
+
+                                                          local_1c = strtok((char *)0x0,
+
+                                                                            (char *)&local_18);
+
+                                                          iVar3 = atoi(local_1c);
+
+                                                          *(bool *)(param_1 + 0xa8) = iVar3 == 1;
+
+                                                          local_8 = 0;
+
+                                                        }
+
+                                                        else {
+
+                                                          iVar3 = 0xd;
+
+                                                          bVar6 = true;
+
+                                                          pcVar4 = pcVar2;
+
+                                                          pcVar5 = "USE_JOYSTICK";
+
+                                                          do {
+
+                                                            if (iVar3 == 0) break;
+
+                                                            iVar3 = iVar3 + -1;
+
+                                                            bVar6 = *pcVar4 == *pcVar5;
+
+                                                            pcVar4 = pcVar4 + 1;
+
+                                                            pcVar5 = pcVar5 + 1;
+
+                                                          } while (bVar6);
+
+                                                          if (bVar6) {
+
+                                                            local_1c = strtok((char *)0x0,
+
+                                                                              (char *)&local_18);
+
+                                                            iVar3 = atoi(local_1c);
+
+                                                            *(bool *)(param_1 + 0x9cf) = iVar3 == 1;
+
+                                                            local_8 = 0;
+
+                                                          }
+
+                                                          else {
+
+                                                            iVar3 = 0x19;
+
+                                                            bVar6 = true;
+
+                                                            pcVar4 = pcVar2;
+
+                                                            pcVar5 = "PRELOAD_CHARACTER_CREATE";
+
+                                                            do {
+
+                                                              if (iVar3 == 0) break;
+
+                                                              iVar3 = iVar3 + -1;
+
+                                                              bVar6 = *pcVar4 == *pcVar5;
+
+                                                              pcVar4 = pcVar4 + 1;
+
+                                                              pcVar5 = pcVar5 + 1;
+
+                                                            } while (bVar6);
+
+                                                            if (bVar6) {
+
+                                                              local_1c = strtok((char *)0x0,
+
+                                                                                (char *)&local_18);
+
+                                                              iVar3 = atoi(local_1c);
+
+                                                              *(bool *)(param_1 + 0xa9) = iVar3 == 1
+
+                                                              ;
+
+                                                              local_8 = 0;
+
+                                                            }
+
+                                                            else {
+
+                                                              iVar3 = _stricmp(pcVar2,
+
+                                                  "TERRAIN_DRAW_DIST");
+
+                                                  if (iVar3 == 0) {
+
+                                                    local_1c = strtok((char *)0x0,(char *)&local_18)
+
+                                                    ;
+
+                                                    local_50 = atof(local_1c);
+
+                                                    DAT_00b036ac = (float)local_50;
+
+                                                    local_8 = 0;
+
+                                                  }
+
+                                                  else {
+
+                                                    iVar3 = _stricmp(pcVar2,"LOOT_QUEUE");
+
+                                                    if (iVar3 == 0) {
+
+                                                      local_1c = strtok((char *)0x0,
+
+                                                                        (char *)&local_18);
+
+                                                      iVar3 = atoi(local_1c);
+
+                                                      *(bool *)(param_1 + 0xb0) = iVar3 == 1;
+
+                                                      local_8 = 0;
+
+                                                    }
+
+                                                    else {
+
+                                                      iVar3 = _stricmp(pcVar2,
+
+                                                  "DEBUG_BACKGROUND_LOADER");
+
+                                                  if (iVar3 == 0) {
+
+                                                    local_1c = strtok((char *)0x0,(char *)&local_18)
+
+                                                    ;
+
+                                                    iVar3 = atoi(local_1c);
+
+                                                    *(bool *)(param_1 + 0xb3) = iVar3 != 0;
+
+                                                    local_8 = 0;
+
+                                                  }
+
+                                                  else {
+
+                                                    iVar3 = _stricmp(pcVar2,"PARTICLE_LIMIT");
+
+                                                    if (iVar3 == 0) {
+
+                                                      local_1c = strtok((char *)0x0,
+
+                                                                        (char *)&local_18);
+
+                                                      if (local_1c == (char *)0x0)
+
+                                                      goto code_r0x0093711d;
+
+                                                      DAT_00af06e4 = atol(local_1c);
+
+                                                      local_8 = 0;
+
+                                                    }
+
+                                                    else {
+
+                                                      iVar3 = _stricmp(pcVar2,"ALLOW_PHYSX");
+
+                                                      if (iVar3 == 0) {
+
+                                                        local_1c = strtok((char *)0x0,
+
+                                                                          (char *)&local_18);
+
+                                                        if (local_1c == (char *)0x0)
+
+                                                        goto code_r0x0093711d;
+
+                                                        iVar3 = atoi(local_1c);
+
+                                                        DAT_00b036d9 = iVar3 != 0;
+
+                                                        local_8 = 0;
+
+                                                        local_20 = DAT_00b036d9;
+
+                                                      }
+
+                                                      else {
+
+                                                        iVar3 = _stricmp(pcVar2,"PHYSX_MAX_HW_FLUID"
+
+                                                                        );
+
+                                                        if (iVar3 != 0) {
+
+                                                          iVar3 = _stricmp(pcVar2,
+
+                                                  "PHYSX_MAX_HW_RIGID_BODIES");
+
+                                                  if ((iVar3 == 0) &&
+
+                                                     (local_1c = strtok((char *)0x0,
+
+                                                                        (char *)&local_18),
+
+                                                     local_1c != (char *)0x0)) {
+
+                                                    DAT_00af06f0 = atol(local_1c);
+
+                                                    local_34 = DAT_00af06f0;
+
+                                                  }
+
+                                                  goto code_r0x0093711d;
+
+                                                  }
+
+                                                  local_1c = strtok((char *)0x0,(char *)&local_18);
+
+                                                  if (local_1c == (char *)0x0)
+
+                                                  goto code_r0x0093711d;
+
+                                                  DAT_00af06ec = atol(local_1c);
+
+                                                  local_8 = 0;
+
+                                                  local_48 = DAT_00af06ec;
+
+                                                  }
+
+                                                  }
+
+                                                  }
+
+                                                  }
+
+                                                  }
+
+                                                  }
+
+                                                  }
+
+                                                  }
+
+                                                  }
+
+                                                  }
+
+                                                  }
+
+                                                }
+
+                                              }
+
+                                            }
+
+                                          }
+
+                                        }
+
+                                      }
+
+                                    }
+
+                                  }
+
+                                }
+
+                              }
+
+                            }
+
+                          }
+
+                        }
+
+                      }
+
+                    }
+
+                  }
+
+                }
+
+              }
+
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+
+    fclose(local_2c);
+
+  }
+
+  if (*(char *)(param_1 + 0x10) != '\0') {
+
+    local_3c = FUN_007b6a20();
+
+    *(uint32_t /* width from decompiler */ *)(local_3c + 4) = 2;
+
+  }
+
+  cVar1 = FUN_0095ae10(param_1 + 0x9bc);
+
+  if ((cVar1 == '\0') || (*(char *)(param_1 + 0x9dd) != '\0')) {
+
+    FUN_0095c5a0();
+
+  }
+
+  if (*(int *)(param_1 + 0x1168) != 0) {
+
+    FUN_007f9de0();
+
+  }
+
+  ExceptionList = local_10;
+
+  return;
+
+}

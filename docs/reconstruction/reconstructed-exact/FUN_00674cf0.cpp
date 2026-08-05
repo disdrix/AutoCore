@@ -1,0 +1,241 @@
+// =============================================================================
+// FUN_00674cf0
+// -----------------------------------------------------------------------------
+// Stable ID: aa_00674cf0
+// Address:   0x00674cf0  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_00674cf0 @ 0x00674cf0
+// Stable ID: aa_00674cf0
+// Embedded strings (evidence for future rename):
+//   - "voice for non-speaking player %d "
+//   - "C:\\vog\\1_code\\palantir\\core\\infrastruct\\Voice\\TalkClientLib\\AudioOutThread.cpp"
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~101 non-empty decompiler lines.
+//  - Control keywords: if×7, for×3, do×1, while×1, return×1.
+//  - Notable callees: CONCAT31×5, FUN_00680c50×3, FUN_004e3050×2, FUN_00676030×2, FUN_006774c0×2, FUN_00680d90×2, FUN_00680f60×2, FUN_00674cf0.
+//  - Strings: "voice for non-speaking player %d ".
+//  - Return sites: 1.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+uint32_t /* width from decompiler */ __fastcall FUN_00674cf0(int param_1)
+
+
+
+{
+
+  uint8_t uVar1;
+
+  uint uVar2;
+
+  uint32_t /* width from decompiler */ uVar3;
+
+  uint uVar4;
+
+  int *piVar5;
+
+  uint8_t local_7c [4];
+
+  uint8_t local_78 [4];
+
+  int local_74;
+
+  uint8_t local_70 [4];
+
+  uint8_t local_6c [4];
+
+  int local_68;
+
+  uint local_64;
+
+  uint local_60;
+
+  int local_5c;
+
+  uint8_t local_58 [4];
+
+  int local_54;
+
+  uint local_50;
+
+  uint local_4c;
+
+  int local_48;
+
+  uint8_t local_44 [56];
+
+  void *local_c;
+
+  uint8_t *puStack_8;
+
+  int local_4;
+
+  
+
+  local_4 = 0xffffffff;
+
+  puStack_8 = &LAB_009a948a;
+
+  local_c = ExceptionList;
+
+  ExceptionList = &local_c;
+
+  FUN_00680c30();
+
+  local_4 = 0;
+
+  if (*(char *)(param_1 + 0x14c) != '\0') {
+
+    local_54 = 0;
+
+    local_50 = 0;
+
+    local_4c = 0;
+
+    local_48 = 0;
+
+    local_4 = 1;
+
+    FUN_006774c0(local_58);
+
+    for (uVar4 = local_4c; uVar4 != local_48 + local_4c; uVar4 = uVar4 + 1) {
+
+      uVar2 = uVar4;
+
+      if (local_50 <= uVar4) {
+
+        uVar2 = uVar4 - local_50;
+
+      }
+
+      FUN_00680f60(*(uint32_t /* width from decompiler */ *)(local_54 + uVar2 * 4));
+
+      local_4 = CONCAT31(local_4._1_3_,2);
+
+      FUN_00680d90(local_7c,1);
+
+      uVar1 = local_7c[0];
+
+      local_78[0] = local_7c[0];
+
+      FUN_004e3050(&local_74,local_78);
+
+      if ((local_74 == *(int *)(param_1 + 0x144)) || (*(int *)(local_74 + 0x10) == 0)) {
+
+        uVar3 = FUN_0076cec0(local_70,"voice for non-speaking player %d ",uVar1);
+
+        vog_LogMessage("C:\\vog\\1_code\\palantir\\core\\infrastruct\\Voice\\TalkClientLib\\AudioOutThread.cpp"
+
+                       ,0x137,2,uVar3);
+
+      }
+
+      else {
+
+        FUN_00679480(local_44);
+
+      }
+
+      local_4 = CONCAT31(local_4._1_3_,1);
+
+      FUN_00680c50();
+
+    }
+
+    local_68 = 0;
+
+    local_64 = 0;
+
+    local_60 = 0;
+
+    local_5c = 0;
+
+    local_4 = CONCAT31(local_4._1_3_,3);
+
+    FUN_006774c0(local_6c);
+
+    for (uVar4 = local_60; uVar4 != local_5c + local_60; uVar4 = uVar4 + 1) {
+
+      uVar2 = uVar4;
+
+      if (local_64 <= uVar4) {
+
+        uVar2 = uVar4 - local_64;
+
+      }
+
+      FUN_00680f60(*(uint32_t /* width from decompiler */ *)(local_68 + uVar2 * 4));
+
+      local_4 = CONCAT31(local_4._1_3_,4);
+
+      FUN_00680d90(local_78,1);
+
+      local_7c[0] = local_78[0];
+
+      FUN_004e3050(&local_74,local_7c);
+
+      if ((local_74 != *(int *)(param_1 + 0x144)) && (*(int *)(local_74 + 0x10) != 0)) {
+
+        FUN_00679790(local_44);
+
+      }
+
+      local_4 = CONCAT31(local_4._1_3_,3);
+
+      FUN_00680c50();
+
+    }
+
+    local_4._0_1_ = 1;
+
+    FUN_00676030();
+
+    local_4 = (uint)local_4._1_3_ << 8;
+
+    FUN_00676030();
+
+  }
+
+  piVar5 = *(int **)(param_1 + 0x128);
+
+  if (piVar5 != *(int **)(param_1 + 300)) {
+
+    do {
+
+      if (*piVar5 != 0) {
+
+        FUN_00679610();
+
+      }
+
+      piVar5 = piVar5 + 1;
+
+    } while (piVar5 != *(int **)(param_1 + 300));
+
+  }
+
+  local_4 = 0xffffffff;
+
+  FUN_00680c50();
+
+  ExceptionList = local_c;
+
+  return 0;
+
+}

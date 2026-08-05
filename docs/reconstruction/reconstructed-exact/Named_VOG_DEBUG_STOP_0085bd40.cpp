@@ -1,0 +1,652 @@
+// READABILITY (auto CF):
+//  - Body size: ~308 non-empty decompiler lines.
+//  - Control keywords: if×22, goto×12, do×3, while×3, return×2, switch×1.
+//  - Notable callees: FUN_007a6de0×6, FUN_007a69d0×5, FUN_007a4480×4, sprintf×3, CVOGReaction_ResolveObjectTarget×2, FUN_00403450×2, FUN_008572f0×2, free×2.
+//  - Strings: "VOG_DEBUG_STOP"; "Store"; "Refinery"; "Body Shop".
+//  - Return sites: 2.
+
+// =============================================================================
+// Named_VOG_DEBUG_STOP_0085bd40
+// -----------------------------------------------------------------------------
+// Stable ID: aa_0085bd40
+// Address:   0x0085bd40  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+/*
+ * Behavioral notes:
+ * String-driven rename evidence: "VOG_DEBUG_STOP"
+ *
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+/* WARNING: Removing unreachable block (ram,0x0085c3a2) */
+
+
+
+void Named_VOG_DEBUG_STOP_0085bd40(int param_1,uint32_t /* width from decompiler */ param_2,uint32_t /* width from decompiler */ param_3,int param_4,int param_5)
+
+
+
+{
+
+  char cVar1;
+
+  int *piVar2;
+
+  uint32_t /* width from decompiler */ uVar3;
+
+  int *piVar4;
+
+  int iVar5;
+
+  uint32_t /* width from decompiler */ *puVar6;
+
+  void *pvVar7;
+
+  int unaff_EBX;
+
+  int iVar8;
+
+  int unaff_EBP;
+
+  uint8_t *unaff_ESI;
+
+  char *pcVar9;
+
+  uint32_t /* width from decompiler */ uVar10;
+
+  uint key;
+
+  int *piVar11;
+
+  int iStack_cd8;
+
+  int iStack_cd4;
+
+  char *pcStack_cd0;
+
+  int *piStack_ccc;
+
+  int *local_cb4;
+
+  int local_cb0 [5];
+
+  void *local_c9c;
+
+  uint8_t *puStack_c3c;
+
+  uint8_t auStack_c38 [128];
+
+  uint8_t *puStack_bb8;
+
+  uint8_t auStack_bb4 [128];
+
+  char acStack_b34 [256];
+
+  uint8_t auStack_a34 [42];
+
+  uint8_t auStack_a0a [466];
+
+  char acStack_838 [1024];
+
+  char acStack_438 [1032];
+
+  uint32_t /* width from decompiler */ uStack_30;
+
+  int *piStack_28;
+
+  uint8_t auStack_1c [4];
+
+  uint32_t /* width from decompiler */ uStack_18;
+
+  void *local_c;
+
+  undefined *puStack_8;
+
+  uint32_t /* width from decompiler */ local_4;
+
+  
+
+  local_4 = 0xffffffff;
+
+  puStack_8 = &DAT_009b872e;
+
+  local_c = ExceptionList;
+
+  if (param_1 == 0) {
+
+    return;
+
+  }
+
+  iVar8 = *(int *)(DAT_00d1b644 + 0xe5c4);
+
+  local_cb0[0] = 0;
+
+  ExceptionList = &local_c;
+
+  if (*(char *)(iVar8 + 0x1d) != '\0') {
+
+    piStack_ccc = (int *)0x0;
+
+    pcStack_cd0 = (char *)0x85bd92;
+
+    ExceptionList = &local_c;
+
+    FUN_007a4480();
+
+    pcStack_cd0 = "VOG_DEBUG_STOP";
+
+    iStack_cd4 = 0;
+
+    iStack_cd8 = 0x85bd9e;
+
+    FUN_007a4480();
+
+  }
+
+  *(uint8_t *)(iVar8 + 0x1d) = 1;
+
+  iVar8 = unaff_EBX;
+
+LAB_0085bdb0:
+
+  do {
+
+    do {
+
+      iVar5 = *(int *)(DAT_00d1b644 + 0xe5c4);
+
+      if (*(char *)(iVar5 + 0x1d) == '\0') {
+
+        piStack_ccc = (int *)0x0;
+
+        pcStack_cd0 = (char *)0x85bdce;
+
+        FUN_007a4480();
+
+        pcStack_cd0 = "VOG_DEBUG_STOP";
+
+        iStack_cd4 = 0;
+
+        iStack_cd8 = 0x85bdda;
+
+        FUN_007a4480();
+
+      }
+
+      if (local_cb0[0] == 0) {
+
+        local_cb0[0] = *(int *)(iVar5 + 0x14);
+
+        if (local_cb0[0] == 0) {
+
+          local_cb4 = (int *)0x0;
+
+        }
+
+        else {
+
+          local_cb4 = *(int **)(local_cb0[0] + 8);
+
+        }
+
+      }
+
+      else {
+
+        local_cb0[0] = *(int *)(local_cb0[0] + 0x14);
+
+        if (local_cb0[0] == 0) {
+
+          local_cb4 = (int *)0x0;
+
+        }
+
+        else {
+
+          local_cb4 = *(int **)(local_cb0[0] + 8);
+
+        }
+
+      }
+
+      if (local_cb4 == (int *)0x0) {
+
+        *(uint8_t *)(*(int *)(DAT_00d1b644 + 0xe5c4) + 0x1d) = 0;
+
+        ExceptionList = local_c;
+
+        return;
+
+      }
+
+    } while ((-1 < (char)local_cb4[1]) && ((char)local_cb4[1] < '\x03'));
+
+    piStack_ccc = (int *)0x85be3a;
+
+    local_c9c = operator_new(0x4d0);
+
+    local_4 = 0;
+
+    if (local_c9c == (void *)0x0) {
+
+      piVar2 = (int *)0x0;
+
+    }
+
+    else {
+
+      piStack_ccc = (int *)0x85be56;
+
+      piVar2 = (int *)FUN_00413f80();
+
+    }
+
+    local_4 = 0xffffffff;
+
+    piStack_ccc = (int *)0x85be72;
+
+    (**(code **)(*piVar2 + 0x28))();
+
+    iVar5 = local_cb4[1];
+
+    pcStack_cd0 = (char *)CONCAT31((int3)((uint)iVar8 >> 8),(char)iVar5);
+
+    piStack_ccc = local_cb0;
+
+    iStack_cd4 = 0x85be80;
+
+    cVar1 = FUN_008572f0();
+
+    piStack_ccc = (int *)0x0;
+
+    pcStack_cd0 = (char *)0x0;
+
+    iStack_cd4 = 1;
+
+    if (cVar1 == '\0') {
+
+      iStack_cd8 = *(int *)(param_5 + (char)iVar5 * 4);
+
+      (**(code **)(*piVar2 + 0x54))();
+
+    }
+
+    else {
+
+      iStack_cd8 = param_4;
+
+      (**(code **)(*piVar2 + 0x54))();
+
+      piVar2[0x60] = (int)unaff_ESI;
+
+      piVar2[0x61] = unaff_EBP;
+
+      piVar2[0x62] = unaff_EBX;
+
+      piVar2[99] = (int)local_cb4;
+
+      *(uint8_t *)((int)piVar2 + 0xd7) = 1;
+
+      *(uint8_t *)(piVar2 + 0x72) = 1;
+
+    }
+
+    iVar8 = *piVar2;
+
+    uVar3 = FUN_0084fe60();
+
+    piVar11 = (int *)0x0;
+
+    (**(code **)(iVar8 + 0x15c))(0,uVar3);
+
+    (**(code **)(*piVar2 + 0x74))(*local_cb4 + 0x9c41);
+
+    (**(code **)(*piVar2 + 0xfc))(1,0x3f000000);
+
+    (**(code **)(*piVar2 + 300))(auStack_1c);
+
+    piVar2[0x131] = (int)g_flOne;
+
+    switch((char)local_cb4[1]) {
+
+    case '\x03':
+
+      (**(code **)(*piVar2 + 0x308))("Store");
+
+      break;
+
+    case '\x04':
+
+      pcVar9 = "Refinery";
+
+      goto LAB_0085c021;
+
+    case '\x05':
+
+      (**(code **)(*piVar2 + 0x308))("Body Shop");
+
+      break;
+
+    case '\x06':
+
+      pcVar9 = "Garage";
+
+      goto LAB_0085c021;
+
+    case '\b':
+
+      (**(code **)(*piVar2 + 0x308))(&DAT_00a666e0);
+
+      break;
+
+    case '\t':
+
+      pcVar9 = "Waypoint";
+
+      goto LAB_0085c021;
+
+    case '\n':
+
+      (**(code **)(*piVar2 + 0x308))("Repair Station");
+
+      break;
+
+    case '\v':
+
+      pcVar9 = "Arena";
+
+      goto LAB_0085c021;
+
+    case '\f':
+
+      (**(code **)(*piVar2 + 0x308))("Clan Manager");
+
+      break;
+
+    case '\r':
+
+      pcVar9 = "Discipline Trainer";
+
+      goto LAB_0085c021;
+
+    case '\x0e':
+
+      (**(code **)(*piVar2 + 0x308))("Crafting Station: Reactor");
+
+      break;
+
+    case '\x0f':
+
+      pcVar9 = "Crafting Station: Fabrication Plant";
+
+      goto LAB_0085c021;
+
+    case '\x10':
+
+      (**(code **)(*piVar2 + 0x308))("Crafting Station: Control Shop");
+
+      break;
+
+    case '\x11':
+
+      pcVar9 = "Retraining Terminal";
+
+      goto LAB_0085c021;
+
+    case '\x12':
+
+      (**(code **)(*piVar2 + 0x308))("Mail Terminal");
+
+      break;
+
+    case '\x13':
+
+      pcVar9 = "Auction Terminal";
+
+LAB_0085c021:
+
+      (**(code **)(*piVar2 + 0x308))(pcVar9);
+
+    }
+
+    if ((((((char)local_cb4[1] == '\r') &&
+
+          (piVar4 = (int *)CVOGReaction_ResolveObjectTarget(0,local_cb4[8],local_cb4[9]),
+
+          piVar4 != (int *)0x0)) && (*(int *)(piVar4[0x2a] + 0x38) == 0x3a)) &&
+
+        ((iVar5 = (**(code **)(*piVar4 + 0x1e4))(), iVar5 != 0 && (*(char *)(iVar5 + 0x1d1) == 'G'))
+
+        )) && (cVar1 = FUN_0052b040(*(uint32_t /* width from decompiler */ *)(iVar5 + 0x264),auStack_a34), cVar1 != '\0')) {
+
+      puVar6 = (uint32_t /* width from decompiler */ *)FUN_00402d50(auStack_a0a);
+
+      uStack_30 = 1;
+
+      uVar3 = *puVar6;
+
+      uVar10 = 0xffffffff;
+
+      FUN_007a69d0(uVar3,0xffffffff);
+
+      uVar3 = FUN_007a6de0(uVar3,uVar10);
+
+      uVar10 = 0xffffffff;
+
+      pcVar9 = "Discipline Trainer";
+
+      FUN_007a69d0("Discipline Trainer",0xffffffff,uVar3);
+
+      uVar3 = FUN_007a6de0(pcVar9,uVar10);
+
+      sprintf(acStack_838,"%s: %s",uVar3);
+
+      uStack_30 = 0xffffffff;
+
+      if (puStack_bb8 != auStack_bb4) {
+
+        free(puStack_bb8);
+
+      }
+
+      (**(code **)(*piVar2 + 0x308))(acStack_838);
+
+    }
+
+    if ((((char)local_cb4[1] == '\x03') &&
+
+        (piVar4 = (int *)CVOGReaction_ResolveObjectTarget(0,local_cb4[8],local_cb4[9]),
+
+        piVar4 != (int *)0x0)) &&
+
+       ((*(int *)(piVar4[0x2a] + 0x38) == 0x3a &&
+
+        ((iVar5 = (**(code **)(*piVar4 + 0x1e4))(), iVar5 != 0 && (*(char *)(iVar5 + 0x1d1) == '4'))
+
+        )))) {
+
+      if (*(int *)(iVar5 + 0x264) < 1) {
+
+        piVar4 = (int *)CVOGReaction_ResolveObjectTarget
+
+                                  (0,*(int *)(iVar5 + 0x25c),*(int *)(iVar5 + 0x25c) >> 0x1f);
+
+        if ((piVar4 != (int *)0x0) && (iVar5 = (**(code **)(*piVar4 + 0x204))(), iVar5 != 0)) {
+
+          iVar5 = (**(code **)(*piVar4 + 0x204))();
+
+          uVar3 = *(uint32_t /* width from decompiler */ *)(iVar5 + 0x4d8);
+
+          uVar10 = 0xffffffff;
+
+          FUN_007a69d0(uVar3,0xffffffff);
+
+          uVar3 = FUN_007a6de0(uVar3,uVar10);
+
+          uVar10 = 0xffffffff;
+
+          pcVar9 = "Store";
+
+          FUN_007a69d0("Store",0xffffffff,uVar3);
+
+          uVar3 = FUN_007a6de0(pcVar9,uVar10);
+
+          sprintf(acStack_438,"%s: %s",uVar3);
+
+          (**(code **)(*piVar2 + 0x308))(acStack_438);
+
+        }
+
+        goto LAB_0085c232;
+
+      }
+
+LAB_0085c199:
+
+      (**(code **)*piVar2)(1);
+
+      goto LAB_0085bdb0;
+
+    }
+
+LAB_0085c232:
+
+    if ((char)local_cb4[1] == '\b') {
+
+      piVar4 = *(int **)(DAT_00d1b644 + 0xe798);
+
+      if (piVar4 == *(int **)(DAT_00d1b644 + 0xe79c)) goto LAB_0085c199;
+
+      do {
+
+        iVar8 = *piVar4;
+
+        if ((iVar8 == local_cb4[2]) && (iVar8 = piVar4[1], iVar8 == local_cb4[3])) {
+
+          if ((((piVar4[10] & piVar4[0xb]) == 0xffffffff) && ((char)piVar4[0xc] == '\0')) ||
+
+             ((char)piVar4[0xe] == -1)) goto LAB_0085c199;
+
+          local_cb4 = piVar11;
+
+          if (((char)piVar4[0xe] == '\x01') &&
+
+             (cVar1 = FUN_008572f0(100,&iStack_cd8), local_cb4 = piVar11, cVar1 != '\0')) {
+
+            (**(code **)(*piVar2 + 0x54))(uStack_18,1,0,0);
+
+            piVar2[0x60] = iStack_cd8;
+
+            piVar2[0x61] = iStack_cd4;
+
+            piVar2[0x62] = (int)pcStack_cd0;
+
+            piVar2[99] = (int)piStack_ccc;
+
+            *(uint8_t *)((int)piVar2 + 0xd7) = 1;
+
+            *(uint8_t *)(piVar2 + 0x72) = 1;
+
+            local_cb4 = piVar11;
+
+          }
+
+          key = piVar4[7];
+
+          pvVar7 = (void *)FUN_00541a80();
+
+          pvVar7 = CNDHash_LookupByKey(pvVar7,key);
+
+          if (pvVar7 != (void *)0x0) {
+
+            if ((char)piVar4[0xe] == '\x01') {
+
+              FUN_007a69d0();
+
+              unaff_ESI = &stack0xfffff344;
+
+              uVar3 = (*(code *)PTR_FUN_00af8c9c)();
+
+              FUN_00403450((int)pvVar7 + 0xb4,uVar3);
+
+              uStack_30 = 2;
+
+              uVar3 = FUN_007a6de0("[Locked]",0xffffffff);
+
+              uVar10 = FUN_007a6de0(unaff_ESI,0xffffffff);
+
+              sprintf(acStack_b34,"%s  %s",uVar10,uVar3);
+
+              uStack_30 = 0xffffffff;
+
+              (**(code **)(*piVar2 + 0x308))(acStack_b34);
+
+            }
+
+            else {
+
+              puStack_c3c = auStack_c38;
+
+              uVar3 = (*(code *)PTR_FUN_00af8c9c)();
+
+              FUN_00403450((int)pvVar7 + 0xb4,uVar3);
+
+              uStack_30 = 3;
+
+              (**(code **)(*piVar2 + 0x308))(puStack_c3c);
+
+              uStack_30 = 0xffffffff;
+
+              if (puStack_c3c != auStack_c38) {
+
+                free(puStack_c3c);
+
+              }
+
+            }
+
+          }
+
+          goto LAB_0085c430;
+
+        }
+
+        piVar4 = piVar4 + 0x10;
+
+      } while (piVar4 != *(int **)(DAT_00d1b644 + 0xe79c));
+
+      (**(code **)*piVar2)(1);
+
+    }
+
+    else {
+
+LAB_0085c430:
+
+      piVar2[0x133] = (int)local_cb4;
+
+      (**(code **)(*piStack_28 + 0xa8))(piVar2);
+
+      piStack_ccc = (int *)param_2;
+
+      pcStack_cd0 = (char *)0x85c454;
+
+      FUN_0040e380();
+
+    }
+
+  } while( true );
+
+}

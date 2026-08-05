@@ -1,0 +1,400 @@
+// =============================================================================
+// FUN_0079ef30
+// -----------------------------------------------------------------------------
+// Stable ID: aa_0079ef30
+// Address:   0x0079ef30  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_0079ef30 @ 0x0079ef30
+// Stable ID: aa_0079ef30
+// No high-value strings recovered; name via xrefs/callers in follow-up.
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~182 non-empty decompiler lines.
+//  - Control keywords: if×8, goto×6, return×2, for×2, switch×1.
+//  - Notable callees: FUN_0076f5f0×2, CONCAT31, FUN_00567ce0, FUN_0079ef30.
+//  - Return sites: 2.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+uint __thiscall
+
+FUN_0079ef30(int param_1,float *param_2,uint32_t /* width from decompiler */ param_3,float *param_4,float *param_5,
+
+            uint32_t /* width from decompiler */ param_6)
+
+
+
+{
+
+  float *pfVar1;
+
+  float fVar2;
+
+  uint uVar3;
+
+  uint uVar4;
+
+  int iVar5;
+
+  uint32_t /* width from decompiler */ *puVar6;
+
+  uint32_t /* width from decompiler */ *puVar7;
+
+  float fVar8;
+
+  float fVar9;
+
+  float fVar10;
+
+  float fVar11;
+
+  float fVar12;
+
+  float fVar13;
+
+  int local_60;
+
+  float local_54;
+
+  float local_50;
+
+  float local_4c;
+
+  float local_48;
+
+  float local_44;
+
+  float local_40;
+
+  float local_3c;
+
+  float local_34;
+
+  float local_30;
+
+  float local_2c;
+
+  float local_28;
+
+  uint32_t /* width from decompiler */ local_24;
+
+  float local_20;
+
+  float local_1c;
+
+  float local_18;
+
+  float local_14;
+
+  
+
+  switch(param_6) {
+
+  case 1:
+
+    uVar4 = *(uint *)(param_1 + 0x17c);
+
+    if (*(int *)(param_1 + 0x178) < (int)(uVar4 + 6)) {
+
+LAB_0079f032:
+
+      return uVar4 & 0xffffff00;
+
+    }
+
+    local_60 = *(int *)(param_1 + 0x180);
+
+    *(uint *)(param_1 + 0x17c) = uVar4 + 6;
+
+    break;
+
+  case 2:
+
+    uVar4 = *(uint *)(param_1 + 400);
+
+    if (*(int *)(param_1 + 0x18c) < (int)(uVar4 + 6)) goto LAB_0079f032;
+
+    local_60 = *(int *)(param_1 + 0x194);
+
+    *(uint *)(param_1 + 400) = uVar4 + 6;
+
+    break;
+
+  case 3:
+
+    uVar4 = *(uint *)(param_1 + 0x1b8);
+
+    if (*(int *)(param_1 + 0x1b4) < (int)(uVar4 + 6)) goto LAB_0079f032;
+
+    local_60 = *(int *)(param_1 + 0x1bc);
+
+    *(uint *)(param_1 + 0x1b8) = uVar4 + 6;
+
+    break;
+
+  case 4:
+
+    uVar4 = *(uint *)(param_1 + 0x1a4);
+
+    if (*(int *)(param_1 + 0x1a0) < (int)(uVar4 + 6)) goto LAB_0079f032;
+
+    local_60 = *(int *)(param_1 + 0x1a8);
+
+    *(uint *)(param_1 + 0x1a4) = uVar4 + 6;
+
+    break;
+
+  case 5:
+
+    uVar4 = *(uint *)(param_1 + 0x1cc);
+
+    if (*(int *)(param_1 + 0x1c8) < (int)(uVar4 + 6)) goto LAB_0079f032;
+
+    local_60 = *(int *)(param_1 + 0x1d0);
+
+    *(uint *)(param_1 + 0x1cc) = uVar4 + 6;
+
+    break;
+
+  case 6:
+
+    uVar3 = *(uint *)(param_1 + 0x1e8);
+
+    uVar4 = uVar3 + 6;
+
+    if (*(int *)(param_1 + 0x1e4) < (int)uVar4) goto LAB_0079f032;
+
+    local_60 = *(int *)(param_1 + 0x1ec);
+
+    *(uint *)(param_1 + 0x1e8) = uVar4;
+
+    uVar4 = uVar3;
+
+    break;
+
+  default:
+
+    uVar4 = *(uint *)(param_1 + 0x168);
+
+    if (*(int *)(param_1 + 0x164) < (int)(uVar4 + 6)) goto LAB_0079f032;
+
+    local_60 = *(int *)(param_1 + 0x16c);
+
+    *(uint *)(param_1 + 0x168) = uVar4 + 6;
+
+  }
+
+  local_54 = *param_4;
+
+  local_50 = param_4[1];
+
+  local_4c = param_4[2];
+
+  local_48 = *param_5;
+
+  local_44 = param_5[1];
+
+  local_40 = param_5[2];
+
+  if (param_2[10] != 0.0) {
+
+    local_30 = param_2[0xb];
+
+    local_2c = param_2[0xc];
+
+    local_28 = param_2[0xd];
+
+    local_24 = 0;
+
+    FUN_00567ce0(&local_30,param_2[10]);
+
+    fVar12 = *param_4;
+
+    fVar2 = param_4[2];
+
+    fVar10 = param_4[1];
+
+    fVar8 = local_14 * local_14 * g_flLevelUpUiBase_Inferred - g_flOne;
+
+    fVar11 = local_14 * g_flLevelUpUiBase_Inferred;
+
+    fVar9 = (local_20 * fVar12 + local_18 * fVar2 + local_1c * fVar10) * g_flLevelUpUiBase_Inferred;
+
+    fVar13 = fVar10 * local_20 - local_1c * fVar12;
+
+    local_2c = fVar10 * fVar8;
+
+    local_28 = fVar2 * fVar8;
+
+    local_30 = local_20 * fVar9 + fVar8 * *param_4;
+
+    local_54 = (local_1c * fVar2 - local_18 * fVar10) * fVar11 + local_30;
+
+    local_50 = (local_18 * fVar12 - fVar2 * local_20) * fVar11 + local_1c * fVar9 + local_2c;
+
+    local_4c = fVar13 * fVar11 + local_18 * fVar9 + local_28;
+
+    local_3c = fVar8;
+
+    fVar12 = local_18;
+
+    local_18 = fVar13;
+
+    FUN_0076f5f0(&local_54,&local_54);
+
+    fVar12 = *param_5;
+
+    local_28 = param_5[2];
+
+    fVar2 = param_5[1];
+
+    fVar10 = (local_20 * fVar12 + local_18 * local_28 + local_1c * fVar2) *
+
+             g_flLevelUpUiBase_Inferred;
+
+    fVar9 = fVar2 * local_20 - local_1c * fVar12;
+
+    local_30 = fVar8 * fVar12;
+
+    local_2c = fVar2 * fVar8;
+
+    local_48 = (local_1c * local_28 - local_18 * fVar2) * fVar11 + fVar10 * local_20 + local_30;
+
+    local_44 = (local_18 * fVar12 - local_28 * local_20) * fVar11 + local_1c * fVar10 + local_2c;
+
+    local_40 = fVar9 * fVar11 + local_18 * fVar10 + local_28 * fVar8;
+
+    local_34 = fVar11;
+
+    local_18 = fVar9;
+
+    FUN_0076f5f0(&local_48,&local_48);
+
+  }
+
+  fVar12 = param_2[0x10];
+
+  fVar2 = param_2[0xf];
+
+  fVar13 = local_44 * fVar12 * DAT_00a0f298;
+
+  fVar11 = local_40 * fVar12 * DAT_00a0f298;
+
+  fVar10 = local_54 * fVar2 * DAT_00a0f298;
+
+  fVar8 = local_4c * fVar2 * DAT_00a0f298;
+
+  fVar9 = fVar12 * local_48 * DAT_00a0f298;
+
+  fVar12 = local_50 * fVar2 * DAT_00a0f298;
+
+  pfVar1 = (float *)(local_60 + uVar4 * 0x1c);
+
+  *pfVar1 = *param_2 + (fVar9 - fVar10);
+
+  pfVar1[1] = (fVar13 - fVar12) + param_2[1];
+
+  pfVar1[2] = param_2[2] + (fVar11 - fVar8);
+
+  pfVar1[4] = param_2[4];
+
+  pfVar1[5] = param_2[5];
+
+  pfVar1[6] = param_2[9];
+
+  pfVar1[3] = param_2[8];
+
+  pfVar1 = (float *)(local_60 + (uVar4 + 1) * 0x1c);
+
+  *pfVar1 = *param_2 + fVar9 + fVar10;
+
+  pfVar1[1] = fVar13 + fVar12 + param_2[1];
+
+  pfVar1[2] = param_2[2] + fVar11 + fVar8;
+
+  pfVar1[4] = param_2[6];
+
+  pfVar1[5] = param_2[5];
+
+  pfVar1[6] = param_2[9];
+
+  pfVar1[3] = param_2[8];
+
+  pfVar1 = (float *)(local_60 + (uVar4 + 2) * 0x1c);
+
+  *pfVar1 = *param_2 + ((0.0 - fVar10) - fVar9);
+
+  pfVar1[1] = ((0.0 - fVar12) - fVar13) + param_2[1];
+
+  pfVar1[2] = param_2[2] + ((0.0 - fVar8) - fVar11);
+
+  pfVar1[4] = param_2[4];
+
+  pfVar1[5] = param_2[7];
+
+  pfVar1[6] = param_2[9];
+
+  pfVar1[3] = param_2[8];
+
+  puVar6 = (uint32_t /* width from decompiler */ *)(local_60 + (uVar4 + 1) * 0x1c);
+
+  puVar7 = (uint32_t /* width from decompiler */ *)(local_60 + (uVar4 + 3) * 0x1c);
+
+  for (iVar5 = 7; iVar5 != 0; iVar5 = iVar5 + -1) {
+
+    *puVar7 = *puVar6;
+
+    puVar6 = puVar6 + 1;
+
+    puVar7 = puVar7 + 1;
+
+  }
+
+  pfVar1 = (float *)(local_60 + (uVar4 + 4) * 0x1c);
+
+  *pfVar1 = *param_2 + (fVar10 - fVar9);
+
+  pfVar1[1] = (fVar12 - fVar13) + param_2[1];
+
+  pfVar1[2] = param_2[2] + (fVar8 - fVar11);
+
+  pfVar1[4] = param_2[6];
+
+  pfVar1[5] = param_2[7];
+
+  pfVar1[6] = param_2[9];
+
+  pfVar1[3] = param_2[8];
+
+  puVar6 = (uint32_t /* width from decompiler */ *)(local_60 + (uVar4 + 2) * 0x1c);
+
+  puVar7 = (uint32_t /* width from decompiler */ *)(local_60 + (uVar4 + 5) * 0x1c);
+
+  for (iVar5 = 7; iVar5 != 0; iVar5 = iVar5 + -1) {
+
+    *puVar7 = *puVar6;
+
+    puVar6 = puVar6 + 1;
+
+    puVar7 = puVar7 + 1;
+
+  }
+
+  return CONCAT31((int3)(uVar4 + 5 >> 8),1);
+
+}

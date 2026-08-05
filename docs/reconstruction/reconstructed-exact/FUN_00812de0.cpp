@@ -1,0 +1,779 @@
+// =============================================================================
+// FUN_00812de0
+// -----------------------------------------------------------------------------
+// Stable ID: aa_00812de0
+// Address:   0x00812de0  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_00812de0 @ 0x00812de0
+// Stable ID: aa_00812de0
+// Embedded strings (evidence for future rename):
+//   - ".fam"
+//   - "HashError:TraversalLock, already locked for traversal"
+//   - "VOG_DEBUG_STOP"
+//   - "HashError:TraverseToNext, not locked for traversal"
+//   - "TakeCharacter"
+//   - "Connection to server terminated:\n"
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~367 non-empty decompiler lines.
+//  - Control keywords: if×18, while×15, do×14, for×8, return×5, goto×2, switch×1.
+//  - Notable callees: FUN_007a6de0×6, FUN_007a4480×5, FUN_00541a80×4, QueryPerformanceCounter×4, FUN_007a69d0×2, FUN_00944b20×2, FUN_00403450, FUN_00411e40.
+//  - Strings: ".fam"; "HashError:TraversalLock, already locked for traversal"; "VOG_DEBUG_STOP"; "HashError:TraverseToNext, not locked for traversal".
+//  - Return sites: 5.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+/* WARNING: Function: __chkstk replaced with injection: alloca_probe */
+
+
+
+void __thiscall FUN_00812de0(int param_1,int param_2,char param_3)
+
+
+
+{
+
+  float *pfVar1;
+
+  char cVar2;
+
+  char *pcVar3;
+
+  int iVar4;
+
+  uint32_t /* width from decompiler */ *puVar5;
+
+  uint32_t /* width from decompiler */ uVar6;
+
+  char *pcVar7;
+
+  uint uVar8;
+
+  uint uVar9;
+
+  char *pcVar10;
+
+  char *pcVar11;
+
+  float10 fVar12;
+
+  uint32_t /* width from decompiler */ local_23b8;
+
+  int local_23b4;
+
+  uint32_t /* width from decompiler */ local_23b0;
+
+  uint32_t /* width from decompiler */ local_23ac;
+
+  uint32_t /* width from decompiler */ local_23a8;
+
+  uint32_t /* width from decompiler */ local_23a4;
+
+  uint32_t /* width from decompiler */ auStack_23a0 [2];
+
+  uint32_t /* width from decompiler */ uStack_2398;
+
+  uint32_t /* width from decompiler */ uStack_2394;
+
+  uint32_t /* width from decompiler */ uStack_2390;
+
+  uint32_t /* width from decompiler */ uStack_238c;
+
+  uint32_t /* width from decompiler */ uStack_2388;
+
+  uint32_t /* width from decompiler */ uStack_2384;
+
+  uint8_t uStack_2380;
+
+  uint8_t uStack_237f;
+
+  uint32_t /* width from decompiler */ uStack_237c;
+
+  char *local_2368;
+
+  char local_2364 [128];
+
+  char local_22e4 [260];
+
+  char acStack_21e0 [259];
+
+  char cStack_20dd;
+
+  char local_20dc [1024];
+
+  uint32_t /* width from decompiler */ auStack_1cdc [2];
+
+  uint32_t /* width from decompiler */ uStack_1cd4;
+
+  uint32_t /* width from decompiler */ uStack_1cd0;
+
+  uint32_t /* width from decompiler */ uStack_1ccc;
+
+  uint32_t /* width from decompiler */ uStack_1cc8;
+
+  uint8_t uStack_1cc4;
+
+  uint32_t /* width from decompiler */ uStack_1cc0;
+
+  uint32_t /* width from decompiler */ uStack_1cbc;
+
+  char acStack_1cb8 [65];
+
+  uint8_t uStack_1c77;
+
+  char cStack_1c76;
+
+  uint32_t /* width from decompiler */ uStack_1c74;
+
+  uint32_t /* width from decompiler */ uStack_1c70;
+
+  uint8_t uStack_1c6c;
+
+  uint8_t uStack_1c14;
+
+  uint8_t uStack_1c13;
+
+  uint32_t /* width from decompiler */ uStack_1c0c;
+
+  uint32_t /* width from decompiler */ uStack_1c08;
+
+  uint32_t /* width from decompiler */ uStack_1bfc;
+
+  char cStack_40d;
+
+  char local_40c [1020];
+
+  uint32_t /* width from decompiler */ uStack_10;
+
+  void *local_c;
+
+  uint8_t *puStack_8;
+
+  uint32_t /* width from decompiler */ uStack_4;
+
+  
+
+  uStack_4 = 0xffffffff;
+
+  puStack_8 = &LAB_009bb9d2;
+
+  local_c = ExceptionList;
+
+  uStack_10 = 0x812dff;
+
+  if (param_3 != '\0') {
+
+    if (*(char *)(param_2 + 0x1b) == '\0') {
+
+      local_23a8 = *(uint32_t /* width from decompiler */ *)(param_2 + 0x508);
+
+      local_23a4 = *(uint32_t /* width from decompiler */ *)(param_2 + 0x50c);
+
+      if (*(char *)(param_2 + 0x113) == '\0') {
+
+        local_23ac = 0;
+
+        ExceptionList = &local_c;
+
+      }
+
+      else {
+
+        local_23ac = *(uint32_t /* width from decompiler */ *)(param_2 + 0x134);
+
+        ExceptionList = &local_c;
+
+      }
+
+    }
+
+    else {
+
+      pcVar7 = (char *)(param_2 + 0x750);
+
+      local_23b8 = 0xffffffff;
+
+      local_23b4 = 0;
+
+      pcVar3 = pcVar7;
+
+      do {
+
+        cVar2 = *pcVar3;
+
+        pcVar3[(int)(local_22e4 + -(int)pcVar7)] = cVar2;
+
+        pcVar3 = pcVar3 + 1;
+
+      } while (cVar2 != '\0');
+
+      ExceptionList = &local_c;
+
+      pcVar3 = strstr(local_22e4,".fam");
+
+      if (pcVar3 != (char *)0x0) {
+
+        *pcVar3 = '\0';
+
+      }
+
+      iVar4 = FUN_00541a80();
+
+      if (*(char *)(iVar4 + 0x1d) != '\0') {
+
+        FUN_007a4480(0,"HashError:TraversalLock, already locked for traversal");
+
+        FUN_007a4480(0,"VOG_DEBUG_STOP");
+
+      }
+
+      *(uint8_t *)(iVar4 + 0x1d) = 1;
+
+      FUN_00541a80();
+
+      puVar5 = (uint32_t /* width from decompiler */ *)FUN_00411e40();
+
+      while (puVar5 != (uint32_t /* width from decompiler */ *)0x0) {
+
+        local_2368 = local_2364;
+
+        uVar6 = (*(code *)PTR_FUN_00af8c9c)();
+
+        FUN_00403450(puVar5 + 7,uVar6);
+
+        pcVar3 = local_2368;
+
+        do {
+
+          cVar2 = *pcVar3;
+
+          pcVar3[(int)(acStack_21e0 + -(int)local_2368)] = cVar2;
+
+          pcVar3 = pcVar3 + 1;
+
+        } while (cVar2 != '\0');
+
+        uStack_4 = 0xffffffff;
+
+        if (local_2368 != local_2364) {
+
+          free(local_2368);
+
+        }
+
+        iVar4 = _stricmp(acStack_21e0,local_22e4);
+
+        if (iVar4 == 0) {
+
+          local_23b8 = *puVar5;
+
+        }
+
+        iVar4 = FUN_00541a80();
+
+        if (*(char *)(iVar4 + 0x1d) == '\0') {
+
+          FUN_007a4480(0,"HashError:TraverseToNext, not locked for traversal");
+
+          FUN_007a4480(0,"VOG_DEBUG_STOP");
+
+        }
+
+        if (local_23b4 == 0) {
+
+          local_23b4 = *(int *)(iVar4 + 0x14);
+
+        }
+
+        else {
+
+          local_23b4 = *(int *)(local_23b4 + 0x14);
+
+        }
+
+        if (local_23b4 == 0) {
+
+          puVar5 = (uint32_t /* width from decompiler */ *)0x0;
+
+        }
+
+        else {
+
+          puVar5 = *(uint32_t /* width from decompiler */ **)(local_23b4 + 8);
+
+        }
+
+      }
+
+      iVar4 = FUN_00541a80();
+
+      *(uint8_t *)(iVar4 + 0x1d) = 0;
+
+      iVar4 = -(int)pcVar7;
+
+      auStack_1cdc[0] = 0x2064;
+
+      do {
+
+        cVar2 = *pcVar7;
+
+        pcVar7[(int)(acStack_1cb8 + iVar4)] = cVar2;
+
+        pcVar7 = pcVar7 + 1;
+
+      } while (cVar2 != '\0');
+
+      uStack_1c77 = *(uint8_t *)(param_2 + 0x1c);
+
+      uStack_1c6c = *(uint8_t *)(param_2 + 0x1e);
+
+      cStack_1c76 = *(char *)(param_2 + 0x1d);
+
+      uStack_1cc0 = *(uint32_t /* width from decompiler */ *)(param_2 + 0x858);
+
+      uStack_1cbc = *(uint32_t /* width from decompiler */ *)(param_2 + 0x1b8);
+
+      uStack_1cd4 = 900000;
+
+      uStack_1cd0 = 0;
+
+      uStack_1ccc = 1;
+
+      uStack_1cc4 = 1;
+
+      uStack_1cc8 = 1;
+
+      uStack_1c74 = 0;
+
+      if (cStack_1c76 != '\0') {
+
+        uStack_1c0c = *(uint32_t /* width from decompiler */ *)(param_2 + 0x508);
+
+        uStack_1c08 = *(uint32_t /* width from decompiler */ *)(param_2 + 0x50c);
+
+        uStack_1c13 = 1;
+
+        uStack_1c14 = 0;
+
+        uStack_1bfc = 10000;
+
+      }
+
+      uStack_1c70 = local_23b8;
+
+      if (g_pSectorNetConnection_INFERRED != (void *)0x0) {
+
+        (**(code **)(*(int *)g_pSectorNetConnection_INFERRED + 0x18))
+
+                  (0xffffffff,auStack_1cdc,0xe8,0);
+
+      }
+
+      FUN_007a4480(0xffffffff,"TakeCharacter");
+
+      uStack_2398 = *(uint32_t /* width from decompiler */ *)(param_2 + 0x508);
+
+      uStack_2394 = *(uint32_t /* width from decompiler */ *)(param_2 + 0x50c);
+
+      auStack_23a0[0] = 0x2065;
+
+      uStack_2390 = 900000;
+
+      uStack_238c = 0;
+
+      uStack_2388 = 0xffffffff;
+
+      uStack_2384 = 0xffffffff;
+
+      uStack_2380 = 0;
+
+      uStack_237f = 0xff;
+
+      uStack_237c = 0xffffffff;
+
+      if (g_pSectorNetConnection_INFERRED != (void *)0x0) {
+
+        (**(code **)(*(int *)g_pSectorNetConnection_INFERRED + 0x18))
+
+                  (0xffffffff,auStack_23a0,0x38,0);
+
+      }
+
+      local_23a8 = *(uint32_t /* width from decompiler */ *)(param_2 + 0x508);
+
+      local_23a4 = *(uint32_t /* width from decompiler */ *)(param_2 + 0x50c);
+
+      local_23ac = 0;
+
+    }
+
+    local_23b0 = 0x2000;
+
+    if (g_pSectorNetConnection_INFERRED != (int *)0x0) {
+
+      local_23b0 = 0x2000;
+
+      (**(code **)(*(int *)g_pSectorNetConnection_INFERRED + 0x18))(0xffffffff,&local_23b0,0x10,0);
+
+    }
+
+    uVar6 = *(uint32_t /* width from decompiler */ *)(param_2 + 0x990);
+
+    QueryPerformanceCounter((LARGE_INTEGER *)(param_2 + 0xd90));
+
+    QueryPerformanceCounter((LARGE_INTEGER *)(param_2 + 0xd98));
+
+    *(uint32_t /* width from decompiler */ *)(param_2 + 0xd88) = uVar6;
+
+    *(uint8_t *)(param_2 + 0xd80) = 1;
+
+    *(uint32_t /* width from decompiler */ *)(param_2 + 0xd8c) = uVar6;
+
+    uVar6 = *(uint32_t /* width from decompiler */ *)(param_2 + 0x98c);
+
+    QueryPerformanceCounter((LARGE_INTEGER *)(param_2 + 0xd50));
+
+    QueryPerformanceCounter((LARGE_INTEGER *)(param_2 + 0xd58));
+
+    *(uint32_t /* width from decompiler */ *)(param_2 + 0xd48) = uVar6;
+
+    *(uint8_t *)(param_2 + 0xd40) = 1;
+
+    *(uint32_t /* width from decompiler */ *)(param_2 + 0xd4c) = uVar6;
+
+    iVar4 = DAT_00d1b778;
+
+    if (DAT_00d1b778 != 0) {
+
+      pfVar1 = (float *)(DAT_00d1b778 + 0x538);
+
+      *(uint32_t /* width from decompiler */ *)(DAT_00d1b778 + 0xcc4) = 0;
+
+      fVar12 = (float10)fsin((float10)*pfVar1);
+
+      *(uint8_t *)(iVar4 + 0xa82) = 0;
+
+      *(float *)(iVar4 + 0x5ac) = (float)fVar12;
+
+      fVar12 = (float10)fcos((float10)*(float *)(iVar4 + 0x538));
+
+      *(float *)(iVar4 + 0x5b4) = (float)-fVar12;
+
+      *(uint8_t *)(DAT_00d1b778 + 0xc64) = 0;
+
+    }
+
+    FUN_0092dcc0(param_2);
+
+    ExceptionList = local_c;
+
+    return;
+
+  }
+
+  ExceptionList = &local_c;
+
+  FUN_007a69d0();
+
+  if (*(uint *)(param_1 + 0x18) < 0x10) {
+
+    param_1 = param_1 + 4;
+
+  }
+
+  else {
+
+    param_1 = *(int *)(param_1 + 4);
+
+  }
+
+  iVar4 = FUN_00418ca0(param_1);
+
+  switch(iVar4) {
+
+  case 2:
+
+    FUN_009432f0();
+
+    break;
+
+  case 3:
+
+  case 9:
+
+    break;
+
+  default:
+
+    FUN_007a69d0();
+
+    pcVar3 = (char *)FUN_007a6de0("Connection to server terminated:\n",0xffffffff);
+
+    pcVar7 = local_20dc;
+
+    do {
+
+      cVar2 = *pcVar3;
+
+      *pcVar7 = cVar2;
+
+      pcVar3 = pcVar3 + 1;
+
+      pcVar7 = pcVar7 + 1;
+
+    } while (cVar2 != '\0');
+
+    pcVar7 = PTR_s_unknown_00af3e00;
+
+    pcVar3 = PTR_s_unknown_00af3e00;
+
+    if ((iVar4 < 0xd) && (-1 < iVar4)) {
+
+      pcVar7 = (&PTR_s_unknown_00af3e00)[iVar4];
+
+      pcVar3 = (&PTR_s_unknown_00af3e00)[iVar4];
+
+    }
+
+    do {
+
+      cVar2 = *pcVar7;
+
+      pcVar7 = pcVar7 + 1;
+
+    } while (cVar2 != '\0');
+
+    uVar8 = (int)pcVar7 - (int)pcVar3;
+
+    pcVar7 = &cStack_20dd;
+
+    do {
+
+      pcVar11 = pcVar7 + 1;
+
+      pcVar7 = pcVar7 + 1;
+
+    } while (*pcVar11 != '\0');
+
+    for (uVar9 = uVar8 >> 2; uVar9 != 0; uVar9 = uVar9 - 1) {
+
+      *(uint32_t /* width from decompiler */ *)pcVar7 = *(uint32_t /* width from decompiler */ *)pcVar3;
+
+      pcVar3 = pcVar3 + 4;
+
+      pcVar7 = pcVar7 + 4;
+
+    }
+
+    for (uVar8 = uVar8 & 3; uVar8 != 0; uVar8 = uVar8 - 1) {
+
+      *pcVar7 = *pcVar3;
+
+      pcVar3 = pcVar3 + 1;
+
+      pcVar7 = pcVar7 + 1;
+
+    }
+
+    pcVar3 = (char *)FUN_007a6de0("\nClick Accept to return to the login screen.",0xffffffff);
+
+    pcVar7 = pcVar3;
+
+    do {
+
+      cVar2 = *pcVar7;
+
+      pcVar7 = pcVar7 + 1;
+
+    } while (cVar2 != '\0');
+
+    uVar8 = (int)pcVar7 - (int)pcVar3;
+
+    pcVar11 = &cStack_20dd;
+
+    do {
+
+      pcVar7 = pcVar11 + 1;
+
+      pcVar11 = pcVar11 + 1;
+
+    } while (*pcVar7 != '\0');
+
+    goto LAB_00813461;
+
+  case 8:
+
+    Sleep(0x5dc);
+
+    if (*(int *)(param_2 + 0xc78) != 0) {
+
+      (**(code **)(**(int **)(param_2 + 0xc78) + 4))();
+
+    }
+
+    break;
+
+  case 0xb:
+
+    FUN_00944b20(1);
+
+    pcVar3 = (char *)FUN_007a6de0("You have been forced to quit due to GM action.\n",0xffffffff);
+
+    pcVar7 = local_20dc;
+
+    do {
+
+      cVar2 = *pcVar3;
+
+      *pcVar7 = cVar2;
+
+      pcVar3 = pcVar3 + 1;
+
+      pcVar7 = pcVar7 + 1;
+
+    } while (cVar2 != '\0');
+
+    pcVar3 = (char *)FUN_007a6de0("\nClick Accept to return to the login screen.",0xffffffff);
+
+    pcVar7 = pcVar3;
+
+    do {
+
+      cVar2 = *pcVar7;
+
+      pcVar7 = pcVar7 + 1;
+
+    } while (cVar2 != '\0');
+
+    uVar8 = (int)pcVar7 - (int)pcVar3;
+
+    pcVar11 = &cStack_20dd;
+
+    do {
+
+      pcVar7 = pcVar11 + 1;
+
+      pcVar11 = pcVar11 + 1;
+
+    } while (*pcVar7 != '\0');
+
+LAB_00813461:
+
+    for (uVar9 = uVar8 >> 2; uVar9 != 0; uVar9 = uVar9 - 1) {
+
+      *(uint32_t /* width from decompiler */ *)pcVar11 = *(uint32_t /* width from decompiler */ *)pcVar3;
+
+      pcVar3 = pcVar3 + 4;
+
+      pcVar11 = pcVar11 + 4;
+
+    }
+
+    pcVar7 = local_20dc;
+
+    for (uVar8 = uVar8 & 3; uVar8 != 0; uVar8 = uVar8 - 1) {
+
+      *pcVar11 = *pcVar3;
+
+      pcVar3 = pcVar3 + 1;
+
+      pcVar11 = pcVar11 + 1;
+
+    }
+
+LAB_0081347d:
+
+    FUN_007fdfb0(param_2,pcVar7,0xffffffff,1,0);
+
+    break;
+
+  case 0xc:
+
+    FUN_00944b20(1);
+
+    pcVar3 = (char *)FUN_007a6de0("You have been banned due to GM action.\n",0xffffffff);
+
+    pcVar7 = local_40c;
+
+    do {
+
+      cVar2 = *pcVar3;
+
+      *pcVar7 = cVar2;
+
+      pcVar3 = pcVar3 + 1;
+
+      pcVar7 = pcVar7 + 1;
+
+    } while (cVar2 != '\0');
+
+    pcVar3 = (char *)FUN_007a6de0("\nClick Accept to return to the login screen.",0xffffffff);
+
+    pcVar7 = pcVar3;
+
+    do {
+
+      cVar2 = *pcVar7;
+
+      pcVar7 = pcVar7 + 1;
+
+    } while (cVar2 != '\0');
+
+    pcVar11 = &cStack_40d;
+
+    do {
+
+      pcVar10 = pcVar11 + 1;
+
+      pcVar11 = pcVar11 + 1;
+
+    } while (*pcVar10 != '\0');
+
+    pcVar10 = pcVar3;
+
+    for (uVar8 = (uint)((int)pcVar7 - (int)pcVar3) >> 2; uVar8 != 0; uVar8 = uVar8 - 1) {
+
+      *(uint32_t /* width from decompiler */ *)pcVar11 = *(uint32_t /* width from decompiler */ *)pcVar10;
+
+      pcVar10 = pcVar10 + 4;
+
+      pcVar11 = pcVar11 + 4;
+
+    }
+
+    for (uVar8 = (int)pcVar7 - (int)pcVar3 & 3; uVar8 != 0; uVar8 = uVar8 - 1) {
+
+      *pcVar11 = *pcVar10;
+
+      pcVar10 = pcVar10 + 1;
+
+      pcVar11 = pcVar11 + 1;
+
+    }
+
+    pcVar7 = local_40c;
+
+    goto LAB_0081347d;
+
+  }
+
+  ExceptionList = local_c;
+
+  return;
+
+}

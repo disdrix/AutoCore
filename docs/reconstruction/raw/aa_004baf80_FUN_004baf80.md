@@ -1,0 +1,33 @@
+# Raw capture: FUN_004baf80
+
+| Field | Value |
+|---|---|
+| **Stable ID** | `aa_004baf80` |
+| **Module** | `autoassault.exe` |
+| **Image base** | `0x400000` |
+| **VA** | `0x004baf80` |
+| **Canonical name** | `FUN_004baf80` |
+| **System** | unknown |
+| **Capture timestamp** | `2026-07-23` |
+| **Tool** | Ghidra MCP `batch_decompile` |
+| **Integrity** | Do not overwrite this raw body; append versioned sections only |
+
+---
+
+## Raw pseudocode (authoritative decompile)
+
+```c
+undefined4 FUN_004baf80(undefined4 param_1,undefined4 param_2,undefined4 param_3)
+
+{
+  int *piVar1;
+  undefined4 uVar2;
+  
+  piVar1 = (int *)CVOGReaction_ResolveObjectTarget(param_1,param_2,param_3);
+  if (piVar1 != (int *)0x0) {
+    uVar2 = (**(code **)(*piVar1 + 0x1d0))();
+    return uVar2;
+  }
+  return 0;
+}
+```

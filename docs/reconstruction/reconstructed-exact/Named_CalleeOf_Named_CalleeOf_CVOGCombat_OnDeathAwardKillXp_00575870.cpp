@@ -1,0 +1,210 @@
+// =============================================================================
+// Named_CalleeOf_Named_CalleeOf_CVOGCombat_OnDeathAwardKillXp_00575870
+// -----------------------------------------------------------------------------
+// Stable ID: aa_00575870
+// Callee of Named_CalleeOf_CVOGCombat_OnDeathAwardKillXp
+// Address:   0x00575870  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Called from Named_CalleeOf_CVOGCombat_OnDeathAwardKillXp: combat/reward helper with no high-value strings in clean/raw. Role inferred from parent name only; refine when decompile strings or xrefs improve.
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~86 non-empty decompiler lines.
+//  - Control keywords: if×14, return×9, goto×2, do×1, while×1.
+//  - Notable callees: FUN_00419170×3, CONCAT44×2, Client_LookupObjectByTfid_Inferred, FUN_0051bdd0, FUN_00574760, FUN_005747e0, FUN_005756a0, FUN_00575870.
+//  - Return sites: 9.
+
+/*
+ * Behavioral notes:
+ * Callee of Named_CalleeOf_CVOGCombat_OnDeathAwardKillXp
+ * Xref/callee-driven rename (parent seed scan)
+ *
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+uint64_t __thiscall Named_CalleeOf_Named_CalleeOf_CVOGCombat_OnDeathAwardKillXp_00575870(int param_1,int param_2,float *param_3)
+
+
+
+{
+
+  uint *puVar1;
+
+  uint nCoidLo;
+
+  uint nCoidHi;
+
+  int iVar2;
+
+  uint64_t uVar3;
+
+  char cVar4;
+
+  void *pvVar5;
+
+  int iVar6;
+
+  float *pfVar7;
+
+  int aiStack_14 [4];
+
+  
+
+  iVar6 = param_2;
+
+  do {
+
+    if (iVar6 == 0) {
+
+      return 0xffffffffffffffff;
+
+    }
+
+LAB_005758a0:
+
+    iVar6 = *(int *)(*(int *)(param_2 + 4) + 4);
+
+    if (*(int *)(param_1 + 400) == 0) {
+
+LAB_005759f8:
+
+      return CONCAT44(*(uint32_t /* width from decompiler */ *)(iVar6 + 0x168 + param_2),
+
+                      *(uint32_t /* width from decompiler */ *)(iVar6 + 0x164 + param_2));
+
+    }
+
+    if (*(int *)(iVar6 + 0xa8 + param_2) == 0) {
+
+      return 0xffffffffffffffff;
+
+    }
+
+    (**(code **)(*(int *)(*(int *)(*(int *)(param_2 + 4) + 4) + 4 + param_2) + 0x1a0))();
+
+    if ((*(int *)(param_1 + 0x1f8) == 0) ||
+
+       (aiStack_14[0] = *(int *)(param_1 + 0x1fc) - *(int *)(param_1 + 0x1f8) >> 3,
+
+       aiStack_14[0] == 0)) {
+
+      FUN_005756a0();
+
+    }
+
+    if (*(int *)(param_1 + 0x1f8) == 0) {
+
+      return 0xffffffffffffffff;
+
+    }
+
+    aiStack_14[0] = *(int *)(param_1 + 0x1fc) - *(int *)(param_1 + 0x1f8) >> 3;
+
+    if (aiStack_14[0] == 0) {
+
+      return 0xffffffffffffffff;
+
+    }
+
+    if (*(int *)(param_1 + 0x1f8) != *(int *)(param_1 + 0x1fc)) {
+
+      FUN_00575b30(*(int *)(param_1 + 0x1f8),*(int *)(param_1 + 0x1fc),0);
+
+    }
+
+    puVar1 = *(uint **)(param_1 + 0x1f8);
+
+    if (puVar1 == *(uint **)(param_1 + 0x1fc)) {
+
+      return 0xffffffffffffffff;
+
+    }
+
+    nCoidLo = *puVar1;
+
+    nCoidHi = puVar1[1];
+
+    uVar3 = *(uint64_t *)puVar1;
+
+    FUN_0051bdd0(aiStack_14,puVar1);
+
+    pvVar5 = Client_LookupObjectByTfid_Inferred(1,nCoidLo,nCoidHi);
+
+    if (pvVar5 != (void *)0x0) {
+
+      pfVar7 = (float *)(**(code **)(*(int *)(*(int *)(*(int *)((int)pvVar5 + 4) + 4) + 4 +
+
+                                             (int)pvVar5) + 0x1a0))();
+
+      if (SQRT((param_3[2] - pfVar7[2]) * (param_3[2] - pfVar7[2]) +
+
+               (*param_3 - *pfVar7) * (*param_3 - *pfVar7)) <= DAT_00aaa8a8) {
+
+        iVar6 = FUN_00419170();
+
+        if (iVar6 == 1) {
+
+          return uVar3;
+
+        }
+
+        iVar6 = FUN_005747e0(nCoidLo,nCoidHi);
+
+        if (iVar6 < 0) {
+
+          return 0xffffffffffffffff;
+
+        }
+
+        iVar6 = FUN_00574760(iVar6);
+
+        if ((iVar6 != 0) &&
+
+           (cVar4 = (**(code **)(*(int *)(*(int *)(*(int *)(iVar6 + 4) + 4) + 4 + iVar6) + 0x198))()
+
+           , cVar4 == '\0')) {
+
+          iVar2 = *(int *)(*(int *)(iVar6 + 4) + 4);
+
+          return CONCAT44(*(uint32_t /* width from decompiler */ *)(iVar2 + 0x168 + iVar6),
+
+                          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x164 + iVar6));
+
+        }
+
+      }
+
+      else {
+
+        iVar6 = FUN_00419170();
+
+        if (iVar6 == 0) {
+
+          iVar6 = *(int *)(*(int *)(param_2 + 4) + 4);
+
+          goto LAB_005759f8;
+
+        }
+
+      }
+
+      goto LAB_005758a0;
+
+    }
+
+    iVar6 = FUN_00419170();
+
+  } while( true );
+
+}

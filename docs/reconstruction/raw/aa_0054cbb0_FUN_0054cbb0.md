@@ -1,0 +1,44 @@
+# Raw capture: FUN_0054cbb0
+
+| Field | Value |
+|---|---|
+| **Stable ID** | `aa_0054cbb0` |
+| **Module** | `autoassault.exe` |
+| **Image base** | `0x400000` |
+| **VA** | `0x0054cbb0` |
+| **Canonical name** | `FUN_0054cbb0` |
+| **System** | unknown |
+| **Capture timestamp** | `2026-07-23` |
+| **Tool** | Ghidra MCP `batch_decompile` |
+| **Integrity** | Do not overwrite this raw body; append versioned sections only |
+
+---
+
+## Raw pseudocode (authoritative decompile)
+
+```c
+undefined4 * FUN_0054cbb0(void)
+
+{
+  undefined4 *puVar1;
+  undefined4 *puVar2;
+  void *local_c;
+  undefined1 *puStack_8;
+  undefined4 local_4;
+  
+  local_4 = 0xffffffff;
+  puStack_8 = &LAB_009a43fb;
+  local_c = ExceptionList;
+  ExceptionList = &local_c;
+  puVar1 = operator_new(0x6f0);
+  local_4 = 0;
+  puVar2 = (undefined4 *)0x0;
+  if (puVar1 != (undefined4 *)0x0) {
+    FUN_00578830();
+    *puVar1 = &PTR_FUN_009d1ba4;
+    puVar2 = puVar1;
+  }
+  ExceptionList = local_c;
+  return puVar2;
+}
+```

@@ -1,0 +1,248 @@
+// =============================================================================
+// FUN_008d7800
+// -----------------------------------------------------------------------------
+// Stable ID: aa_008d7800
+// Address:   0x008d7800  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_008d7800 @ 0x008d7800
+// Stable ID: aa_008d7800
+// No high-value strings recovered; name via xrefs/callers in follow-up.
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~106 non-empty decompiler lines.
+//  - Control keywords: if×11, do×3, while×3, return×1.
+//  - Notable callees: FUN_00755f10×3, FUN_0076c4d0×3, CONCAT31, FUN_0040cf90, FUN_005a6e00, FUN_007560a0, FUN_008d7800.
+//  - Return sites: 1.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+void FUN_008d7800(int param_1)
+
+
+
+{
+
+  float fVar1;
+
+  float fVar2;
+
+  int iVar3;
+
+  int *piVar4;
+
+  int iVar5;
+
+  int iVar6;
+
+  int iVar7;
+
+  char cVar8;
+
+  uint unaff_EBP;
+
+  float fVar9;
+
+  uint32_t /* width from decompiler */ uVar10;
+
+  uint uVar11;
+
+  uint32_t /* width from decompiler */ uStack_10;
+
+  float fStack_c;
+
+  uint32_t /* width from decompiler */ uStack_8;
+
+  
+
+  iVar7 = param_1;
+
+  iVar3 = *(int *)(param_1 + 0x548);
+
+  if (iVar3 != 0) {
+
+    if ((*(int *)(iVar3 + 600) != 0) && (*(int **)(iVar3 + 0x48) != (int *)0x0)) {
+
+      uVar10 = 3;
+
+      iVar3 = (**(code **)(**(int **)(iVar3 + 0x48) + 0x10))(3);
+
+      uStack_10 = *(uint32_t /* width from decompiler */ *)(iVar3 + 0x90);
+
+      uStack_8 = *(uint32_t /* width from decompiler */ *)(iVar3 + 0x98);
+
+      cVar8 = '\0';
+
+      fStack_c = *(float *)(iVar3 + 0x94);
+
+      fVar9 = 0.0;
+
+      uVar11 = unaff_EBP & 0xffffff00;
+
+      if ('\0' < *(char *)(*(int *)(*(int *)(param_1 + 0x548) + 600) + 0xb0)) {
+
+        do {
+
+          piVar4 = (int *)FUN_005a6e00(uVar11);
+
+          if (piVar4 != (int *)0x0) {
+
+            iVar3 = (**(code **)(*piVar4 + 0x48))();
+
+            fVar1 = *(float *)(iVar3 + 0xc);
+
+            iVar3 = (**(code **)(*piVar4 + 0xc))();
+
+            fVar2 = *(float *)(iVar3 + 0x9c);
+
+            iVar3 = (**(code **)(*piVar4 + 0x28))();
+
+            if (*(float *)(iVar3 + 4) - fVar2 * fVar1 < fVar9) {
+
+              iVar3 = (**(code **)(*piVar4 + 0x48))();
+
+              fVar9 = *(float *)(iVar3 + 0xc);
+
+              iVar3 = (**(code **)(*piVar4 + 0xc))();
+
+              fVar1 = *(float *)(iVar3 + 0x9c);
+
+              iVar3 = (**(code **)(*piVar4 + 0x28))();
+
+              fVar9 = *(float *)(iVar3 + 4) - fVar1 * fVar9;
+
+            }
+
+          }
+
+          cVar8 = cVar8 + '\x01';
+
+          uVar11 = CONCAT31((int3)(uVar11 >> 8),cVar8);
+
+        } while (cVar8 < *(char *)(*(int *)(*(int *)(param_1 + 0x548) + 600) + 0xb0));
+
+      }
+
+      fStack_c = fStack_c - fVar9;
+
+      (**(code **)(**(int **)(*(int *)(param_1 + 0x548) + 0x48) + 0x10))(3,&uStack_10);
+
+      FUN_0040cf90(uVar10);
+
+    }
+
+    (**(code **)(*(int *)(*(int *)(*(int *)(*(int *)(param_1 + 0x548) + 4) + 4) + 4 +
+
+                         *(int *)(param_1 + 0x548)) + 0x144))();
+
+    (**(code **)(**(int **)(param_1 + 0x548) + 0x44))();
+
+    (**(code **)(*(int *)(*(int *)(*(int *)(*(int *)(param_1 + 0x548) + 4) + 4) + 4 +
+
+                         *(int *)(param_1 + 0x548)) + 0x100))();
+
+    if ((DAT_00d1b77c != (int *)0x0) && (iVar3 = (**(code **)(*DAT_00d1b77c + 0x1a8))(), iVar3 != 0)
+
+       ) {
+
+      if (*(int *)(*(int *)(param_1 + 0x548) + 0x48) != 0) {
+
+        (**(code **)(*DAT_00d1b77c + 0x1a8))();
+
+        FUN_007560a0();
+
+      }
+
+      cVar8 = '\0';
+
+      do {
+
+        iVar3 = *(int *)(*(int *)(param_1 + 0x548) + 0x340 + cVar8 * 4);
+
+        if (iVar3 == 0) break;
+
+        iVar5 = (**(code **)(*DAT_00d1b77c + 0x1a8))();
+
+        if (iVar3 != 0) {
+
+          *(uint8_t *)(iVar5 + 0x48) = 1;
+
+          *(uint32_t /* width from decompiler */ *)(iVar5 + 0x44) = *(uint32_t /* width from decompiler */ *)(iVar5 + 0x40);
+
+          FUN_0076c4d0();
+
+          (**(code **)(**(int **)(iVar5 + 8) + 4))(iVar3);
+
+          FUN_00755f10(iVar3);
+
+        }
+
+        cVar8 = cVar8 + '\x01';
+
+      } while (cVar8 < '\x03');
+
+      iVar3 = 0x34c;
+
+      param_1 = 8;
+
+      do {
+
+        iVar5 = *(int *)(iVar3 + *(int *)(iVar7 + 0x548));
+
+        if ((iVar5 != 0) && (iVar6 = (**(code **)(*DAT_00d1b77c + 0x1a8))(), iVar5 != 0)) {
+
+          *(uint8_t *)(iVar6 + 0x48) = 1;
+
+          *(uint32_t /* width from decompiler */ *)(iVar6 + 0x44) = *(uint32_t /* width from decompiler */ *)(iVar6 + 0x40);
+
+          FUN_0076c4d0();
+
+          (**(code **)(**(int **)(iVar6 + 8) + 4))(iVar5);
+
+          FUN_00755f10(iVar5);
+
+        }
+
+        iVar3 = iVar3 + 4;
+
+        param_1 = param_1 + -1;
+
+      } while (param_1 != 0);
+
+      iVar3 = *(int *)(*(int *)(iVar7 + 0x548) + 0x3a0);
+
+      if ((iVar3 != 0) && (iVar7 = (**(code **)(*DAT_00d1b77c + 0x1a8))(), iVar3 != 0)) {
+
+        *(uint8_t *)(iVar7 + 0x48) = 1;
+
+        *(uint32_t /* width from decompiler */ *)(iVar7 + 0x44) = *(uint32_t /* width from decompiler */ *)(iVar7 + 0x40);
+
+        FUN_0076c4d0();
+
+        (**(code **)(**(int **)(iVar7 + 8) + 4))(iVar3);
+
+        FUN_00755f10(iVar3);
+
+      }
+
+    }
+
+  }
+
+  return;
+
+}

@@ -1,0 +1,92 @@
+// =============================================================================
+// Named_CalleeOf_Named_netTcpConnection_0067b790
+// -----------------------------------------------------------------------------
+// Stable ID: aa_0067b790
+// Callee of Named_netTcpConnection
+// Address:   0x0067b790  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Called from Named_netTcpConnection: callee helper with no high-value strings in clean/raw. Role inferred from parent name only; refine when decompile strings or xrefs improve.
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~27 non-empty decompiler lines.
+//  - Control keywords: if×4, return×4.
+//  - Notable callees: FUN_0067b790, WSAGetLastError, closesocket, send.
+//  - Return sites: 4.
+
+/*
+ * Behavioral notes:
+ * Callee of Named_netTcpConnection
+ * Xref/callee-driven rename (parent seed scan)
+ *
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+uint32_t /* width from decompiler */ __thiscall
+
+Named_CalleeOf_Named_netTcpConnection_0067b790(SOCKET *param_1,char *param_2,int param_3,int *param_4,uint *param_5)
+
+
+
+{
+
+  int iVar1;
+
+  
+
+  iVar1 = send(*param_1,param_2,param_3,0);
+
+  if (iVar1 != -1) {
+
+    *param_4 = iVar1;
+
+    *param_5 = (uint)(iVar1 != param_3);
+
+    return 0;
+
+  }
+
+  *param_4 = 0;
+
+  iVar1 = WSAGetLastError();
+
+  if (iVar1 == 0x2733) {
+
+    *param_5 = 2;
+
+    return 0;
+
+  }
+
+  if (iVar1 == 0x2738) {
+
+    *param_5 = 3;
+
+    return 0;
+
+  }
+
+  *param_5 = 0;
+
+  if (*param_1 != 0xffffffff) {
+
+    closesocket(*param_1);
+
+    *param_1 = 0xffffffff;
+
+  }
+
+  return 0xffffffff;
+
+}

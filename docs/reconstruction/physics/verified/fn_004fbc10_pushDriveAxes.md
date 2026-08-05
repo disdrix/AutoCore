@@ -201,6 +201,7 @@ void __fastcall VehicleEntity_PushDriveAxesToController(int param_1)  // entity
 | `+0x109` | u8 | hard-stop — thr 0, handbrake 1, early return |
 | `+0x10c` | f32 | requested / target speed compared to derived max (`local_3c`) |
 | `+0x1a0` | ptr | input-controller holder; must be non-null |
+| `+0x1f4` | f32 | base max-speed field (`FUN_004c4e20` core; decimal +500) |
 | `+0x614` | f32 | throttle source |
 | `+0x618` | f32 | steer — **unread** |
 | `+0x61c` | u8 | sharp/handbrake source |
@@ -306,12 +307,26 @@ Gate condition is **`local_3c < entity+0x10c`** (derived max vs entity field), *
 
 ### 5.5 Max-speed derivation (port caution)
 
+**`FUN_004c4e20` body sealed** (live decompile 2026-07-29):
+
 ```
-baseMax = 0  if driverObj null / vfunc 0x1d8 fails
-        else FUN_004c4e20(...) related float   // driver/vehicle max family
+// param_1 = entity (same layout as PushDrive this)
+driver = vfunc_0x210(component_chain(entity), 0)
+if driver != 0 && DAT_00b037d4 != 0:
+    baseMax = *(float*)(driver + 0xd48) + *(float*)(entity + 0x1f4)   // +500 decimal
+else:
+    baseMax = *(float*)(entity + 0x1f4)
+```
+
+Outer PushDriveAxes formula:
+
+```
+baseMax = 0  if wobj null / vfunc 0x1d8 fails before FUN_004c4e20
+        else FUN_004c4e20 result above
 
 bonus  ≈ 0
        + driver+0xd48 when DAT_00af1854 and driver resolve via vfunc 0x210
+         // INDEPENDENT of DAT_00b037d4 (image defaults: af1854=1, b037d4=0)
        − 0.3 when flag 0x1000 or (obj+0xb5 & 0x10)
        + 0.5 when flag 0x4000 or (obj+0xb5 & 0x40)
 
@@ -320,7 +335,7 @@ if vehicleData+0x634 != −1 and vehicleData+0x634 < local_3c:
     local_3c = vehicleData+0x634
 ```
 
-`fStack_40` appears **without an explicit zeroing store** in the decompile before the `+0xd48` add — treat initial bonus as **0** for porting unless live traces show otherwise (typical MSVC stack reuse). Full bit-exact `FUN_004c4e20` / vfunc `0x1d8` wiring is out of scope of the thr/steer/sharp bridge; those only feed this gate.
+`fStack_40` appears **without an explicit zeroing store** in the decompile before the `+0xd48` add — treat initial bonus as **0** for porting unless live traces show otherwise (typical MSVC stack reuse). Product names for `entity+0x1f4` / `driver+0xd48` remain open; CF of both flags is sealed.
 
 ---
 
@@ -333,7 +348,8 @@ if vehicleData+0x634 != −1 and vehicleData+0x634 < local_3c:
 | `g_flOne` | `0x00a0f2a0` | `00 00 80 3f` | **1.0** | `(bonus+1)*baseMax` |
 | `g_flOverheatCoolFrac` | `0x00a0f714` | `9a 99 99 3e` | **0.3** | bonus penalty |
 | `DAT_009cd0d8` | `0x009cd0d8` | `00 00 00 3f` | **0.5** | bonus add |
-| `DAT_00af1854` | `0x00af1854` | `01` (u8) | **1** | enables driver `+0xd48` bonus path |
+| `DAT_00af1854` | `0x00af1854` | `01` (u8) | **1** | enables **outer** driver `+0xd48` bonus (multiplier path) |
+| `DAT_00b037d4` | `0x00b037d4` | `00` (u8 image) | **0** | enables `FUN_004c4e20` **base add** of `driver+0xd48` |
 | `DAT_00b041b0` | `0x00b041b0` | (vec3) | fallback lin vel when `entity+0x08==0` | |
 
 ---
@@ -342,9 +358,9 @@ if vehicleData+0x634 != −1 and vehicleData+0x634 < local_3c:
 
 | Addr | Name | Role |
 |------|------|------|
-| `0x004c4e20` | `FUN_004c4e20` | Base max-speed float (driver field `+500` / `+0x1f4` family + optional `+0xd48`) |
-| `0x00404a20` | `FUN_00404a20` | Returns chassis basis ptr (`phys+0x3c+0x30`) or fallback |
-| `0x004e8a40` | `FUN_004e8a40` | Extract **forward** unit vector from basis |
+| `0x004c4e20` | `FUN_004c4e20` | Base max = `*(entity+0x1f4)`; optional `+ *(driver+0xd48)` if `DAT_00b037d4` (**body sealed**) |
+| `0x00404a20` | `FUN_00404a20` | Quat ptr: `*(*(+0x08)+0x3c)+0x30` or entity local `+0x94` |
+| `0x004e8a40` | `FUN_004e8a40` | Extract **forward** unit vector from unit quat (scale **2.0**) |
 
 No call into `applyAction`, steering, or torque here — pure input staging.
 
@@ -389,7 +405,8 @@ No call into `applyAction`, steering, or torque here — pure input staging.
 | `read_memory` `0xa0f714` | **0.3** overheat cool frac |
 | `read_memory` `0x9cd0d8` | **0.5** bonus add |
 | `read_memory` `0xaf1854` | **1** (feature flag byte) |
-| Callee decompiles | `FUN_00404a20` basis; `FUN_004c4e20` max-speed helper |
+| Callee decompiles | `FUN_00404a20` quat; `FUN_004c4e20` body sealed (`+0x1f4` ± `+0xd48`); `FUN_004e8a40` forward |
 | Steer path | Confirmed **out of band** via applyAction (cross-doc) |
+| Dual residual | A/B accept-with-gaps 2026-07-29 pass 2 (live re-decompile) |
 | Emulation | Skipped — pointer graph (`+0x1a0`, driver vfuncs, chassis) |
 | No C# | satisfied |

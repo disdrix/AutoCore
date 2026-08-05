@@ -1,0 +1,43 @@
+# Annotated low-level: FUN_006edfb0
+
+| Field | Value |
+|---|---|
+| Stable ID | `aa_006edfb0` |
+| VA | `0x006edfb0` |
+| System | unknown |
+| Date | 2026-07-23 |
+
+## Machine-level notes
+
+- Source: raw capture for `aa_006edfb0`.
+- Prefer assembly when decompiler conflicts.
+- Recover types for still-generic parameters via callers/xrefs.
+- Map DAT_* globals and FUN_* callees in follow-up waves.
+
+## Pseudocode (annotated copy of raw)
+
+```c
+void __thiscall FUN_006edfb0(int param_1,int *param_2,undefined4 param_3,undefined4 param_4)
+
+{
+  undefined4 local_10;
+  int local_c;
+  int local_8;
+  int *local_4;
+  
+  local_8 = param_2[2];
+  local_4 = param_2;
+  local_c = param_2[1];
+  local_10 = *(undefined4 *)(*param_2 + 0xc);
+  (**(code **)(**(int **)(param_1 + 0xc) + 0x1c))(&local_10,param_3,param_4);
+  if (*(int *)(param_1 + 0x10) != 0) {
+    (**(code **)(**(int **)(param_1 + 0x10) + 0x1c))(&stack0xffffffe4,param_3,param_4);
+  }
+  return;
+}
+```
+
+## Open questions
+
+- Confirm calling convention and full signature against callers.
+- Recover meaningful types for still-generic parameters.

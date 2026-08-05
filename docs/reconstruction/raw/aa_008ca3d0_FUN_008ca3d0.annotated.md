@@ -1,0 +1,49 @@
+# Annotated low-level: FUN_008ca3d0
+
+| Field | Value |
+|---|---|
+| Stable ID | `aa_008ca3d0` |
+| VA | `0x008ca3d0` |
+| System | unknown |
+| Date | 2026-07-23 |
+
+## Machine-level notes
+
+- Source: raw capture for `aa_008ca3d0`.
+- Prefer assembly when decompiler conflicts.
+- Recover types for still-generic parameters via callers/xrefs.
+- Map DAT_* globals and FUN_* callees in follow-up waves.
+
+## Pseudocode (annotated copy of raw)
+
+```c
+undefined4 * FUN_008ca3d0(undefined4 *param_1,undefined4 param_2)
+
+{
+  undefined1 extraout_DL;
+  void *local_c;
+  undefined *puStack_8;
+  undefined4 local_4;
+  
+  local_4 = 0xffffffff;
+  puStack_8 = &DAT_009b6d20;
+  local_c = ExceptionList;
+  ExceptionList = &local_c;
+  FUN_0087b890(param_1,param_2);
+  local_4 = 0;
+  *param_1 = &PTR_FUN_00a4211c;
+  param_1[0x13f] = 0xf;
+  param_1[0x140] = 0;
+  FUN_008c91b0();
+  param_1[0x154] = 0;
+  *(undefined1 *)((int)param_1 + 0xbf) = extraout_DL;
+  NDUIWindow_ReloadInterface("i_d_fet.xml");
+  ExceptionList = local_c;
+  return param_1;
+}
+```
+
+## Open questions
+
+- Confirm calling convention and full signature against callers.
+- Recover meaningful types for still-generic parameters.

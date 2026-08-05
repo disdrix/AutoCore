@@ -1,0 +1,46 @@
+# Raw capture: FUN_0092fdd0
+
+| Field | Value |
+|---|---|
+| **Stable ID** | `aa_0092fdd0` |
+| **Module** | `autoassault.exe` |
+| **Image base** | `0x400000` |
+| **VA** | `0x0092fdd0` |
+| **Canonical name** | `FUN_0092fdd0` |
+| **System** | unknown |
+| **Capture timestamp** | `2026-07-23` |
+| **Tool** | Ghidra MCP `batch_decompile` |
+| **Integrity** | Do not overwrite this raw body; append versioned sections only |
+
+---
+
+## Raw pseudocode (authoritative decompile)
+
+```c
+void FUN_0092fdd0(void)
+
+{
+  int iVar1;
+  int iVar2;
+  int in_EAX;
+  undefined4 local_10 [2];
+  undefined4 local_8;
+  undefined4 local_4;
+  
+  *(undefined1 *)(*(int *)(in_EAX + 0xe98) + 0x4fc) = 0;
+  iVar1 = *(int *)(in_EAX + 0xe98);
+  local_10[0] = 0x9003;
+  iVar2 = *(int *)(*(int *)(iVar1 + 4) + 4);
+  local_8 = *(undefined4 *)(iVar2 + 0x164 + iVar1);
+  local_4 = *(undefined4 *)(iVar2 + 0x168 + iVar1);
+  if (*(int *)(in_EAX + 0xc78) != 0) {
+    (**(code **)(**(int **)(in_EAX + 0xc78) + 0x18))(0xffffffff,local_10,0x10,0);
+  }
+  FUN_007fca10();
+  FUN_007fca10();
+  FUN_007fca10();
+  FUN_007fca10();
+  FUN_007fca10();
+  return;
+}
+```

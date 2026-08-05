@@ -1,0 +1,358 @@
+=== bulk 117 (20 addrs) ===
+  skip existing complete tmp_batch_waveE_117.json good=20
+units=20 new_raw=20 new_clean=20
+  NEW aa_005412e0 FUN_005412e0 [unknown]
+  NEW aa_00541950 FUN_00541950 [unknown]
+  NEW aa_00541a80 FUN_00541a80 [unknown]
+  NEW aa_00541aa0 FUN_00541aa0 [unknown]
+  NEW aa_00541bb0 FUN_00541bb0 [unknown]
+  NEW aa_00541e70 FUN_00541e70 [unknown]
+  NEW aa_00542790 FUN_00542790 [unknown]
+  NEW aa_00542a90 FUN_00542a90 [unknown]
+  NEW aa_00542aa0 FUN_00542aa0 [unknown]
+  NEW aa_00542c20 FUN_00542c20 [unknown]
+  NEW aa_00542e20 FUN_00542e20 [unknown]
+  NEW aa_00543060 FUN_00543060 [unknown]
+  NEW aa_00543160 FUN_00543160 [unknown]
+  NEW aa_00543180 FUN_00543180 [unknown]
+  NEW aa_00543190 FUN_00543190 [unknown]
+  NEW aa_005431b0 FUN_005431b0 [unknown]
+  NEW aa_005431d0 FUN_005431d0 [unknown]
+  NEW aa_00543210 FUN_00543210 [unknown]
+  NEW aa_00543230 FUN_00543230 [unknown]
+  NEW aa_005432c0 FUN_005432c0 [unknown]
+=== bulk 118 (20 addrs) ===
+  skip existing complete tmp_batch_waveE_118.json good=20
+units=20 new_raw=20 new_clean=20
+  NEW aa_005432e0 FUN_005432e0 [unknown]
+  NEW aa_00543300 FUN_00543300 [unknown]
+  NEW aa_005433a0 FUN_005433a0 [unknown]
+  NEW aa_00543440 FUN_00543440 [unknown]
+  NEW aa_005434e0 FUN_005434e0 [unknown]
+  NEW aa_00543580 FUN_00543580 [unknown]
+  NEW aa_00543620 FUN_00543620 [unknown]
+  NEW aa_005436c0 FUN_005436c0 [unknown]
+  NEW aa_00543700 FUN_00543700 [unknown]
+  NEW aa_00543720 FUN_00543720 [unknown]
+  NEW aa_00543750 FUN_00543750 [unknown]
+  NEW aa_00543760 FUN_00543760 [unknown]
+  NEW aa_00543800 FUN_00543800 [unknown]
+  NEW aa_00543840 FUN_00543840 [unknown]
+  NEW aa_00543880 FUN_00543880 [unknown]
+  NEW aa_005438c0 FUN_005438c0 [unknown]
+  NEW aa_00543aa0 FUN_00543aa0 [unknown]
+  NEW aa_00543d60 FUN_00543d60 [unknown]
+  NEW aa_00544020 FUN_00544020 [unknown]
+  NEW aa_00544050 FUN_00544050 [unknown]
+=== bulk 119 (20 addrs) ===
+  request attempt=1 n=10
+  status=200 dt=4.4s len=11241
+  request attempt=1 n=10
+  status=200 dt=7.0s len=5116
+  saved tmp_batch_waveE_119.json keys=20
+units=20 new_raw=20 new_clean=20
+  NEW aa_00544110 FUN_00544110 [unknown]
+  NEW aa_005441d0 FUN_005441d0 [unknown]
+  NEW aa_00544590 FUN_00544590 [unknown]
+  NEW aa_00544600 FUN_00544600 [unknown]
+  NEW aa_00544640 FUN_00544640 [unknown]
+  NEW aa_00544750 FUN_00544750 [unknown]
+  NEW aa_005447d0 FUN_005447d0 [unknown]
+  NEW aa_005448f0 FUN_005448f0 [unknown]
+  NEW aa_00544a00 FUN_00544a00 [unknown]
+  NEW aa_00544b10 FUN_00544b10 [unknown]
+  NEW aa_00544ba0 FUN_00544ba0 [unknown]
+  NEW aa_00544ca0 FUN_00544ca0 [unknown]
+  NEW aa_00544ce0 FUN_00544ce0 [unknown]
+  NEW aa_00544d00 FUN_00544d00 [unknown]
+  NEW aa_00544d70 FUN_00544d70 [unknown]
+  NEW aa_00544db0 FUN_00544db0 [unknown]
+  NEW aa_00544df0 FUN_00544df0 [unknown]
+  NEW aa_00544e10 FUN_00544e10 [unknown]
+  NEW aa_00544e80 FUN_00544e80 [unknown]
+  NEW aa_00544ec0 FUN_00544ec0 [unknown]
+=== bulk 120 (20 addrs) ===
+  request attempt=1 n=10
+  status=200 dt=2.8s len=5076
+  request attempt=1 n=10
+  status=200 dt=3.1s len=5996
+  saved tmp_batch_waveE_120.json keys=20
+units=20 new_raw=20 new_clean=20
+  NEW aa_00544f20 FUN_00544f20 [unknown]
+  NEW aa_00544f40 FUN_00544f40 [unknown]
+  NEW aa_00544fb0 FUN_00544fb0 [unknown]
+  NEW aa_00544ff0 FUN_00544ff0 [unknown]
+  NEW aa_00545050 FUN_00545050 [unknown]
+  NEW aa_00545070 FUN_00545070 [unknown]
+  NEW aa_005450e0 FUN_005450e0 [unknown]
+  NEW aa_00545120 FUN_00545120 [unknown]
+  NEW aa_00545190 FUN_00545190 [unknown]
+  NEW aa_00545210 FUN_00545210 [unknown]
+  NEW aa_00545230 FUN_00545230 [unknown]
+  NEW aa_005452a0 FUN_005452a0 [unknown]
+  NEW aa_005452e0 FUN_005452e0 [unknown]
+  NEW aa_00545340 FUN_00545340 [unknown]
+  NEW aa_00545370 FUN_00545370 [unknown]
+  NEW aa_005453a0 FUN_005453a0 [unknown]
+  NEW aa_005453b0 FUN_005453b0 [unknown]
+  NEW aa_00545480 FUN_00545480 [unknown]
+  NEW aa_00545500 FUN_00545500 [unknown]
+  NEW aa_00545510 FUN_00545510 [unknown]
+=== bulk 121 (20 addrs) ===
+  request attempt=1 n=10
+  status=200 dt=3.3s len=13005
+  request attempt=1 n=10
+  status=200 dt=5.2s len=6578
+  saved tmp_batch_waveE_121.json keys=20
+units=20 new_raw=20 new_clean=20
+  NEW aa_00545590 FUN_00545590 [unknown]
+  NEW aa_00545690 FUN_00545690 [unknown]
+  NEW aa_00545790 FUN_00545790 [unknown]
+  NEW aa_00545890 FUN_00545890 [unknown]
+  NEW aa_00545990 FUN_00545990 [unknown]
+  NEW aa_00545a90 FUN_00545a90 [unknown]
+  NEW aa_00545b90 FUN_00545b90 [unknown]
+  NEW aa_00545bb0 FUN_00545bb0 [unknown]
+  NEW aa_00545c20 FUN_00545c20 [unknown]
+  NEW aa_00545c60 FUN_00545c60 [unknown]
+  NEW aa_00545ce0 FUN_00545ce0 [unknown]
+  NEW aa_00545d70 FUN_00545d70 [unknown]
+  NEW aa_00545db0 FUN_00545db0 [unknown]
+  NEW aa_00545df0 FUN_00545df0 [unknown]
+  NEW aa_00545e10 FUN_00545e10 [unknown]
+  NEW aa_00545e30 FUN_00545e30 [unknown]
+  NEW aa_00545f10 FUN_00545f10 [unknown]
+  NEW aa_00545f80 FUN_00545f80 [unknown]
+  NEW aa_00545ff0 FUN_00545ff0 [unknown]
+  NEW aa_00546060 FUN_00546060 [unknown]
+=== bulk 122 (20 addrs) ===
+  request attempt=1 n=10
+  status=200 dt=3.2s len=14820
+  request attempt=1 n=10
+  status=200 dt=3.7s len=26686
+  saved tmp_batch_waveE_122.json keys=20
+units=20 new_raw=20 new_clean=20
+  NEW aa_005460d0 FUN_005460d0 [unknown]
+  NEW aa_00546140 FUN_00546140 [unknown]
+  NEW aa_005461b0 FUN_005461b0 [unknown]
+  NEW aa_00546220 FUN_00546220 [unknown]
+  NEW aa_00546460 FUN_00546460 [unknown]
+  NEW aa_005465c0 FUN_005465c0 [unknown]
+  NEW aa_00546800 FUN_00546800 [unknown]
+  NEW aa_005468c0 FUN_005468c0 [unknown]
+  NEW aa_005469a0 FUN_005469a0 [unknown]
+  NEW aa_00546ad0 FUN_00546ad0 [unknown]
+  NEW aa_00546ce0 FUN_00546ce0 [unknown]
+  NEW aa_00546d50 FUN_00546d50 [unknown]
+  NEW aa_00546e40 FUN_00546e40 [unknown]
+  NEW aa_00546f40 FUN_00546f40 [unknown]
+  NEW aa_00546fb0 FUN_00546fb0 [unknown]
+  NEW aa_00547050 FUN_00547050 [unknown]
+  NEW aa_00547920 FUN_00547920 [unknown]
+  NEW aa_00547f90 FUN_00547f90 [unknown]
+  NEW aa_005480d0 FUN_005480d0 [unknown]
+  NEW aa_00548190 FUN_00548190 [unknown]
+=== bulk 123 (20 addrs) ===
+  request attempt=1 n=10
+  status=200 dt=3.0s len=9426
+  request attempt=1 n=10
+  status=200 dt=2.8s len=5881
+  saved tmp_batch_waveE_123.json keys=20
+units=20 new_raw=20 new_clean=20
+  NEW aa_00548210 FUN_00548210 [unknown]
+  NEW aa_005483f0 FUN_005483f0 [unknown]
+  NEW aa_00548480 FUN_00548480 [unknown]
+  NEW aa_00548550 FUN_00548550 [unknown]
+  NEW aa_005485b0 FUN_005485b0 [unknown]
+  NEW aa_00548630 FUN_00548630 [unknown]
+  NEW aa_00548690 FUN_00548690 [unknown]
+  NEW aa_005486f0 FUN_005486f0 [unknown]
+  NEW aa_00548750 FUN_00548750 [unknown]
+  NEW aa_005487b0 FUN_005487b0 [unknown]
+  NEW aa_00548810 FUN_00548810 [unknown]
+  NEW aa_00548870 FUN_00548870 [unknown]
+  NEW aa_005488d0 FUN_005488d0 [unknown]
+  NEW aa_00548930 FUN_00548930 [unknown]
+  NEW aa_00548990 FUN_00548990 [unknown]
+  NEW aa_005489f0 FUN_005489f0 [unknown]
+  NEW aa_00548a50 FUN_00548a50 [unknown]
+  NEW aa_00548ab0 FUN_00548ab0 [unknown]
+  NEW aa_00548b10 FUN_00548b10 [unknown]
+  NEW aa_00548b70 FUN_00548b70 [unknown]
+=== bulk 124 (20 addrs) ===
+  request attempt=1 n=10
+  status=200 dt=2.9s len=5881
+  request attempt=1 n=10
+  status=200 dt=2.8s len=6894
+  saved tmp_batch_waveE_124.json keys=20
+units=20 new_raw=20 new_clean=20
+  NEW aa_00548bd0 FUN_00548bd0 [unknown]
+  NEW aa_00548c30 FUN_00548c30 [unknown]
+  NEW aa_00548c90 FUN_00548c90 [unknown]
+  NEW aa_00548cf0 FUN_00548cf0 [unknown]
+  NEW aa_00548d50 FUN_00548d50 [unknown]
+  NEW aa_00548db0 FUN_00548db0 [unknown]
+  NEW aa_00548e10 FUN_00548e10 [unknown]
+  NEW aa_00548e70 FUN_00548e70 [unknown]
+  NEW aa_00548ed0 FUN_00548ed0 [unknown]
+  NEW aa_00548f30 FUN_00548f30 [unknown]
+  NEW aa_00548fa0 FUN_00548fa0 [unknown]
+  NEW aa_00549000 FUN_00549000 [unknown]
+  NEW aa_00549060 FUN_00549060 [unknown]
+  NEW aa_005490c0 FUN_005490c0 [unknown]
+  NEW aa_00549120 FUN_00549120 [unknown]
+  NEW aa_00549180 FUN_00549180 [unknown]
+  NEW aa_005491e0 FUN_005491e0 [unknown]
+  NEW aa_00549240 FUN_00549240 [unknown]
+  NEW aa_005492a0 FUN_005492a0 [unknown]
+  NEW aa_00549320 FUN_00549320 [unknown]
+=== bulk 125 (20 addrs) ===
+  request attempt=1 n=10
+  status=200 dt=3.3s len=43542
+  request attempt=1 n=10
+  status=200 dt=3.4s len=21848
+  saved tmp_batch_waveE_125.json keys=20
+units=20 new_raw=20 new_clean=20
+  NEW aa_005495f0 FUN_005495f0 [unknown]
+  NEW aa_0054a1a0 FUN_0054a1a0 [unknown]
+  NEW aa_0054a260 FUN_0054a260 [unknown]
+  NEW aa_0054a290 FUN_0054a290 [unknown]
+  NEW aa_0054a640 FUN_0054a640 [unknown]
+  NEW aa_0054b2c0 FUN_0054b2c0 [unknown]
+  NEW aa_0054b480 FUN_0054b480 [unknown]
+  NEW aa_0054c640 FUN_0054c640 [unknown]
+  NEW aa_0054c660 FUN_0054c660 [unknown]
+  NEW aa_0054c680 FUN_0054c680 [unknown]
+  NEW aa_0054c6a0 FUN_0054c6a0 [unknown]
+  NEW aa_0054c720 FUN_0054c720 [unknown]
+  NEW aa_0054c8d0 FUN_0054c8d0 [unknown]
+  NEW aa_0054cac0 FUN_0054cac0 [unknown]
+  NEW aa_0054cb10 FUN_0054cb10 [unknown]
+  NEW aa_0054cbb0 FUN_0054cbb0 [unknown]
+  NEW aa_0054cc10 FUN_0054cc10 [unknown]
+  NEW aa_0054d440 FUN_0054d440 [unknown]
+  NEW aa_0054d4a0 FUN_0054d4a0 [unknown]
+  NEW aa_0054d500 FUN_0054d500 [unknown]
+=== bulk 126 (20 addrs) ===
+  request attempt=1 n=10
+  status=200 dt=2.9s len=6426
+  request attempt=1 n=10
+  status=200 dt=3.5s len=33276
+  saved tmp_batch_waveE_126.json keys=20
+units=20 new_raw=20 new_clean=20
+  NEW aa_0054d560 FUN_0054d560 [unknown]
+  NEW aa_0054d5c0 FUN_0054d5c0 [unknown]
+  NEW aa_0054d630 FUN_0054d630 [unknown]
+  NEW aa_0054d6a0 FUN_0054d6a0 [unknown]
+  NEW aa_0054d700 FUN_0054d700 [unknown]
+  NEW aa_0054d780 FUN_0054d780 [unknown]
+  NEW aa_0054d7c0 FUN_0054d7c0 [unknown]
+  NEW aa_0054d800 FUN_0054d800 [unknown]
+  NEW aa_0054d850 FUN_0054d850 [unknown]
+  NEW aa_0054d8a0 FUN_0054d8a0 [unknown]
+  NEW aa_0054d8e0 FUN_0054d8e0 [unknown]
+  NEW aa_0054d920 FUN_0054d920 [unknown]
+  NEW aa_0054d960 FUN_0054d960 [unknown]
+  NEW aa_0054d9a0 FUN_0054d9a0 [unknown]
+  NEW aa_0054da10 FUN_0054da10 [unknown]
+  NEW aa_0054dc30 FUN_0054dc30 [unknown]
+  NEW aa_0054de50 FUN_0054de50 [unknown]
+  NEW aa_0054e040 FUN_0054e040 [unknown]
+  NEW aa_0054e390 FUN_0054e390 [unknown]
+  NEW aa_0054e6e0 FUN_0054e6e0 [unknown]
+=== bulk 127 (20 addrs) ===
+  request attempt=1 n=10
+  status=200 dt=2.7s len=9897
+  request attempt=1 n=10
+  status=200 dt=3.1s len=6846
+  saved tmp_batch_waveE_127.json keys=20
+units=20 new_raw=20 new_clean=20
+  NEW aa_0054e9a0 FUN_0054e9a0 [unknown]
+  NEW aa_0054ea60 FUN_0054ea60 [unknown]
+  NEW aa_0054eb20 FUN_0054eb20 [unknown]
+  NEW aa_0054ebe0 FUN_0054ebe0 [unknown]
+  NEW aa_0054ec60 FUN_0054ec60 [unknown]
+  NEW aa_0054ece0 FUN_0054ece0 [unknown]
+  NEW aa_0054eda0 FUN_0054eda0 [unknown]
+  NEW aa_0054ee60 FUN_0054ee60 [unknown]
+  NEW aa_0054ee90 FUN_0054ee90 [unknown]
+  NEW aa_0054eec0 FUN_0054eec0 [unknown]
+  NEW aa_0054eef0 FUN_0054eef0 [unknown]
+  NEW aa_0054ef20 FUN_0054ef20 [unknown]
+  NEW aa_0054ef50 FUN_0054ef50 [unknown]
+  NEW aa_0054f250 FUN_0054f250 [unknown]
+  NEW aa_0054f2c0 FUN_0054f2c0 [unknown]
+  NEW aa_0054f320 FUN_0054f320 [unknown]
+  NEW aa_0054f340 FUN_0054f340 [unknown]
+  NEW aa_0054f3c0 FUN_0054f3c0 [unknown]
+  NEW aa_0054f430 FUN_0054f430 [unknown]
+  NEW aa_0054f970 FUN_0054f970 [unknown]
+=== bulk 128 (20 addrs) ===
+  request attempt=1 n=10
+  status=200 dt=4.9s len=91971
+  request attempt=1 n=10
+  status=200 dt=3.2s len=11776
+  saved tmp_batch_waveE_128.json keys=20
+units=20 new_raw=20 new_clean=20
+  NEW aa_0054fe50 FUN_0054fe50 [unknown]
+  NEW aa_0054fec0 FUN_0054fec0 [unknown]
+  NEW aa_0054ff00 FUN_0054ff00 [unknown]
+  NEW aa_005506a0 FUN_005506a0 [unknown]
+  NEW aa_00551160 FUN_00551160 [unknown]
+  NEW aa_00551700 FUN_00551700 [unknown]
+  NEW aa_00552180 FUN_00552180 [unknown]
+  NEW aa_00552950 FUN_00552950 [unknown]
+  NEW aa_00552f50 FUN_00552f50 [unknown]
+  NEW aa_00553010 FUN_00553010 [unknown]
+  NEW aa_00553090 FUN_00553090 [unknown]
+  NEW aa_005531d0 FUN_005531d0 [unknown]
+  NEW aa_00553240 FUN_00553240 [unknown]
+  NEW aa_005533f0 FUN_005533f0 [unknown]
+  NEW aa_005535c0 FUN_005535c0 [unknown]
+  NEW aa_005536c0 FUN_005536c0 [unknown]
+  NEW aa_005538a0 FUN_005538a0 [unknown]
+  NEW aa_00553c50 FUN_00553c50 [unknown]
+  NEW aa_00553cd0 FUN_00553cd0 [unknown]
+  NEW aa_00553ce0 FUN_00553ce0 [unknown]
+=== bulk 129 (20 addrs) ===
+  request attempt=1 n=10
+  status=200 dt=3.1s len=27075
+  request attempt=1 n=10
+  status=200 dt=3.4s len=26384
+  saved tmp_batch_waveE_129.json keys=20
+units=20 new_raw=20 new_clean=20
+  NEW aa_00553d20 FUN_00553d20 [unknown]
+  NEW aa_00553dd0 FUN_00553dd0 [unknown]
+  NEW aa_00553f50 FUN_00553f50 [unknown]
+  NEW aa_00553fc0 FUN_00553fc0 [unknown]
+  NEW aa_00553ff0 FUN_00553ff0 [unknown]
+  NEW aa_00554070 FUN_00554070 [unknown]
+  NEW aa_00555050 FUN_00555050 [unknown]
+  NEW aa_005552c0 FUN_005552c0 [unknown]
+  NEW aa_00555360 FUN_00555360 [unknown]
+  NEW aa_00555450 FUN_00555450 [unknown]
+  NEW aa_005554d0 FUN_005554d0 [unknown]
+  NEW aa_00555600 FUN_00555600 [unknown]
+  NEW aa_00555660 FUN_00555660 [unknown]
+  NEW aa_005556c0 FUN_005556c0 [unknown]
+  NEW aa_005557a0 FUN_005557a0 [unknown]
+  NEW aa_005558d0 FUN_005558d0 [unknown]
+  NEW aa_00555bf0 FUN_00555bf0 [unknown]
+  NEW aa_00555f10 FUN_00555f10 [unknown]
+  NEW aa_00556450 FUN_00556450 [unknown]
+  NEW aa_00556880 FUN_00556880 [unknown]
+==== SUMMARY ====
+bulk 117: keys=20 emit_rc=0
+bulk 118: keys=20 emit_rc=0
+bulk 119: keys=20 emit_rc=0
+bulk 120: keys=20 emit_rc=0
+bulk 121: keys=20 emit_rc=0
+bulk 122: keys=20 emit_rc=0
+bulk 123: keys=20 emit_rc=0
+bulk 124: keys=20 emit_rc=0
+bulk 125: keys=20 emit_rc=0
+bulk 126: keys=20 emit_rc=0
+bulk 127: keys=20 emit_rc=0
+bulk 128: keys=20 emit_rc=0
+bulk 129: keys=20 emit_rc=0
+DONE

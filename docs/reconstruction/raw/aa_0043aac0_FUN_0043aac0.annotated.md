@@ -1,0 +1,56 @@
+# Annotated low-level: FUN_0043aac0
+
+| Field | Value |
+|---|---|
+| Stable ID | `aa_0043aac0` |
+| VA | `0x0043aac0` |
+| System | unknown |
+| Date | 2026-07-23 |
+
+## Machine-level notes
+
+- Source: raw capture for `aa_0043aac0`.
+- Prefer assembly when decompiler conflicts.
+- Recover types for still-generic parameters via callers/xrefs.
+- Map DAT_* globals and FUN_* callees in follow-up waves.
+
+## Pseudocode (annotated copy of raw)
+
+```c
+basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> * __thiscall
+FUN_0043aac0(basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> *param_1,
+            basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> *param_2,
+            basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> *param_3)
+
+{
+  void *local_10;
+  undefined1 *puStack_c;
+  undefined1 local_8;
+  undefined3 uStack_7;
+  
+  puStack_c = &LAB_009bcc0a;
+  local_10 = ExceptionList;
+  uStack_7 = 0;
+  ExceptionList = &local_10;
+  for (; param_1 != param_2; param_1 = param_1 + 0x38) {
+    local_8 = 1;
+    if (param_3 !=
+        (basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> *)0x0) {
+      std::basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>::
+      basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>(param_3,param_1);
+      local_8 = 2;
+      std::basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>::
+      basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>
+                (param_3 + 0x1c,param_1 + 0x1c);
+    }
+    param_3 = param_3 + 0x38;
+  }
+  ExceptionList = local_10;
+  return param_3;
+}
+```
+
+## Open questions
+
+- Confirm calling convention and full signature against callers.
+- Recover meaningful types for still-generic parameters.

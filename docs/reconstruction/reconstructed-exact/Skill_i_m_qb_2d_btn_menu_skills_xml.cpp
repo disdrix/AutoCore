@@ -1,0 +1,202 @@
+// READABILITY (auto CF):
+//  - Body size: ~84 non-empty decompiler lines.
+//  - Control keywords: if×5, return×1.
+//  - Notable callees: FUN_007b5dd0×3, FUN_0082d2b0, FUN_0082f1d0.
+//  - Strings: "i_m_qb_2d_btn_menu_character.xml"; "i_m_qb_2d_btn_menu_research.xml"; "i_m_qb_2d_btn_menu_socials.xml"; "i_m_qb_2d_btn_menu_equipment.xml".
+//  - Return sites: 1.
+
+// =============================================================================
+// Skill_i_m_qb_2d_btn_menu_skills_xml
+// -----------------------------------------------------------------------------
+// Stable ID: aa_0082f1d0
+// Address:   0x0082f1d0  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+/*
+ * Behavioral notes:
+ * String-driven rename evidence: "i_m_qb_2d_btn_menu_skills.xml"
+ *
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+void __fastcall Skill_i_m_qb_2d_btn_menu_skills_xml(int *param_1)
+
+
+
+{
+
+  int iVar1;
+
+  void *pvVar2;
+
+  void *pvVar3;
+
+  char *pcVar4;
+
+  char *pcVar5;
+
+  uint32_t /* width from decompiler */ uVar6;
+
+  uint32_t /* width from decompiler */ uVar7;
+
+  void *local_c;
+
+  uint8_t *puStack_8;
+
+  uint32_t /* width from decompiler */ uStack_4;
+
+  
+
+  uStack_4 = 0xffffffff;
+
+  puStack_8 = &LAB_009b33ac;
+
+  local_c = ExceptionList;
+
+  if (param_1[0x130] != 0) {
+
+    ExceptionList = &local_c;
+
+    FUN_0082d2b0();
+
+    if (param_1[0x14e] != 0) {
+
+      (**(code **)(*param_1 + 0xbc))(param_1[0x14e]);
+
+    }
+
+    param_1[0x14e] = 0;
+
+    iVar1 = (**(code **)(*param_1 + 0x444))("i_m_qb_2d_btn_menu_character.xml",0,4,0xffffffff);
+
+    param_1[0x153] = iVar1;
+
+    iVar1 = (**(code **)(*param_1 + 0x444))("i_m_qb_2d_btn_menu_research.xml",0,5,0xffffffff);
+
+    param_1[0x154] = iVar1;
+
+    iVar1 = (**(code **)(*param_1 + 0x444))("i_m_qb_2d_btn_menu_socials.xml",0,6,0xffffffff);
+
+    param_1[0x155] = iVar1;
+
+    iVar1 = (**(code **)(*param_1 + 0x444))("i_m_qb_2d_btn_menu_equipment.xml",0,7,0xffffffff);
+
+    param_1[0x156] = iVar1;
+
+    iVar1 = (**(code **)(*param_1 + 0x444))("i_m_qb_2d_btn_menu_journal.xml",0,8,0xffffffff);
+
+    param_1[0x157] = iVar1;
+
+    iVar1 = (**(code **)(*param_1 + 0x444))("i_m_qb_2d_btn_menu_disciplines.xml",0,9,0xffffffff);
+
+    param_1[0x158] = iVar1;
+
+    iVar1 = (**(code **)(*param_1 + 0x444))("i_m_qb_2d_btn_menu_options.xml",0,10,0xffffffff);
+
+    param_1[0x159] = iVar1;
+
+    iVar1 = (**(code **)(*param_1 + 0x444))("i_m_qb_2d_btn_menu_cargo.xml",0,0xb,0xffffffff);
+
+    param_1[0x15a] = iVar1;
+
+    iVar1 = (**(code **)(*param_1 + 0x444))("i_m_qb_2d_btn_menu_skills.xml",0,0xc,0xffffffff);
+
+    uVar7 = 0xffffffff;
+
+    uVar6 = 0xd;
+
+    pcVar5 = "i_m_qb_2d_btn_menu_help.xml";
+
+    param_1[0x15b] = iVar1;
+
+    iVar1 = (**(code **)(*param_1 + 0x444))("i_m_qb_2d_btn_menu_help.xml",0,0xd,0xffffffff);
+
+    param_1[0x15c] = iVar1;
+
+    pvVar2 = operator_new(0x488);
+
+    if (pvVar2 == (void *)0x0) {
+
+      iVar1 = 0;
+
+    }
+
+    else {
+
+      iVar1 = FUN_007b5dd0(pvVar2,0);
+
+    }
+
+    param_1[0x15d] = iVar1;
+
+    (**(code **)(*param_1 + 0xa8))(iVar1,pcVar5,pvVar2,uVar6,uVar7,0xffffffff);
+
+    pcVar4 = "i_m_qb_2d_wnd_menu_highlight.xml";
+
+    (**(code **)(*(int *)param_1[0x15d] + 0x28))("i_m_qb_2d_wnd_menu_highlight.xml");
+
+    pvVar3 = operator_new(0x488);
+
+    if (pvVar3 == (void *)0x0) {
+
+      iVar1 = 0;
+
+    }
+
+    else {
+
+      iVar1 = FUN_007b5dd0(pvVar3,0);
+
+    }
+
+    param_1[0x15e] = iVar1;
+
+    (**(code **)(*param_1 + 0xa8))(iVar1,pcVar4,pvVar3,pcVar5,pvVar2,0xffffffff);
+
+    pcVar5 = "i_m_qb_2d_wnd_menu_highlight.xml";
+
+    (**(code **)(*(int *)param_1[0x15e] + 0x28))("i_m_qb_2d_wnd_menu_highlight.xml");
+
+    pvVar2 = operator_new(0x488);
+
+    if (pvVar2 == (void *)0x0) {
+
+      iVar1 = 0;
+
+    }
+
+    else {
+
+      iVar1 = FUN_007b5dd0(pvVar2,0);
+
+    }
+
+    param_1[0x15f] = iVar1;
+
+    (**(code **)(*param_1 + 0xa8))(iVar1,pcVar5,pvVar2,pcVar4,pvVar3,0xffffffff);
+
+    (**(code **)(*(int *)param_1[0x15f] + 0x28))("i_m_qb_2d_wnd_menu_highlight.xml");
+
+    (**(code **)(*param_1 + 0x47c))();
+
+    (**(code **)(*param_1 + 0x480))();
+
+    (**(code **)(*param_1 + 0x484))();
+
+  }
+
+  ExceptionList = local_c;
+
+  return;
+
+}

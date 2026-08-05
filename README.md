@@ -9,6 +9,7 @@
 - **[Client Setup Guide](CLIENT_SETUP.md)** - Configure the Auto Assault client to connect to your server
 - **[Documentation index](docs/TOC.md)** - Networking, packet layout, and subsystem docs
 - **[Inventory Catalog](tools/inventory-catalog/README.md)** - Browse exported inventory item definitions and stack sizes
+- **[Mission Viewer](tools/mission-viewer/README.md)** - Offline browser for all missions (requirements, flow, gates)
 
 ## Overview
 

@@ -1,0 +1,126 @@
+// =============================================================================
+// FUN_0084f4f0
+// -----------------------------------------------------------------------------
+// Stable ID: aa_0084f4f0
+// Address:   0x0084f4f0  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_0084f4f0 @ 0x0084f4f0
+// Stable ID: aa_0084f4f0
+// No high-value strings recovered; name via xrefs/callers in follow-up.
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~45 non-empty decompiler lines.
+//  - Control keywords: if×4, return×1.
+//  - Notable callees: FUN_0084f4f0.
+//  - Return sites: 1.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+float * FUN_0084f4f0(float *param_1)
+
+
+
+{
+
+  float fVar1;
+
+  float fVar2;
+
+  int iVar3;
+
+  int iVar4;
+
+  float *in_EAX;
+
+  int iVar5;
+
+  int iVar6;
+
+  int unaff_EBX;
+
+  int *unaff_ESI;
+
+  float unaff_EDI;
+
+  int iVar7;
+
+  uint8_t local_8 [4];
+
+  float fStack_4;
+
+  
+
+  iVar5 = DAT_00af9328;
+
+  (**(code **)(*unaff_ESI + 0x140))(local_8,1);
+
+  if (fStack_4 <= unaff_EDI) {
+
+    if (fStack_4 < unaff_EDI) {
+
+      iVar5 = (int)(((float)iVar5 / unaff_EDI) * fStack_4);
+
+    }
+
+  }
+
+  else {
+
+    unaff_EBX = (int)(((float)unaff_EBX / fStack_4) * unaff_EDI);
+
+  }
+
+  fVar1 = in_EAX[2];
+
+  fVar2 = (float)unaff_ESI[0x141];
+
+  iVar3 = unaff_ESI[0x15b];
+
+  iVar7 = 0;
+
+  iVar6 = 0;
+
+  if (fStack_4 <= unaff_EDI) {
+
+    if (fStack_4 < unaff_EDI) {
+
+      iVar6 = -(iVar5 / 2);
+
+    }
+
+  }
+
+  else {
+
+    iVar7 = unaff_EBX / 2;
+
+  }
+
+  iVar4 = unaff_ESI[0x15d];
+
+  *param_1 = (float)(unaff_ESI[0x15c] + iVar7) +
+
+             ((*in_EAX / unaff_EDI) * (float)unaff_EBX * (float)unaff_ESI[0x141] -
+
+             (float)unaff_ESI[0x15a]);
+
+  param_1[1] = (float)(iVar4 + iVar6) - ((fVar1 / fStack_4) * (float)iVar5 * fVar2 - (float)iVar3);
+
+  return param_1;
+
+}

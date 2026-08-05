@@ -1,0 +1,264 @@
+// =============================================================================
+// FUN_006f2d10
+// -----------------------------------------------------------------------------
+// Stable ID: aa_006f2d10
+// Address:   0x006f2d10  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_006f2d10 @ 0x006f2d10
+// Stable ID: aa_006f2d10
+// No high-value strings recovered; name via xrefs/callers in follow-up.
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~113 non-empty decompiler lines.
+//  - Control keywords: do×1, if×1, while×1, return×1.
+//  - Notable callees: FUN_006f2d10, SQRT.
+//  - Return sites: 1.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+/* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+
+
+
+uint32_t /* width from decompiler */ * __thiscall
+
+FUN_006f2d10(uint32_t /* width from decompiler */ *param_1,uint32_t /* width from decompiler */ *param_2,uint32_t /* width from decompiler */ param_3,uint32_t /* width from decompiler */ param_4)
+
+
+
+{
+
+  float fVar1;
+
+  float fVar2;
+
+  float *pfVar3;
+
+  float *pfVar4;
+
+  float fVar5;
+
+  
+
+  *param_1 = &PTR_LAB_00a0eea0;
+
+  param_1[0x14] = 0x3f000000;
+
+  param_1[0x16] = 0x3f800000;
+
+  param_1[0x1c] = 4;
+
+  param_1[0x15] = 0x3e4ccccd;
+
+  param_1[0x18] = 0x3e4ccccd;
+
+  param_1[0x19] = 0x3e4ccccd;
+
+  param_1[0x1a] = 0x3d4ccccd;
+
+  param_1[0x1b] = 0;
+
+  DAT_00d096a0 = 0x3f800000;
+
+  DAT_00d096a4 = 0;
+
+  DAT_00d096a8 = 0;
+
+  DAT_00d096ac = 0;
+
+  DAT_00d096c0 = 0;
+
+  DAT_00d096c4 = 0x3f800000;
+
+  DAT_00d096c8 = 0;
+
+  _DAT_00d096cc = 0;
+
+  _DAT_00d096e0 = 0;
+
+  _DAT_00d096e4 = 0;
+
+  _DAT_00d096e8 = 0x3f800000;
+
+  _DAT_00d096ec = 0;
+
+  _DAT_00d096b0 = 0;
+
+  _DAT_00d096d0 = 0;
+
+  _DAT_00d096f0 = 0;
+
+  _DAT_00d09700 = 0;
+
+  _DAT_00d09704 = 0x3f800000;
+
+  _DAT_00d09708 = 0x3f800000;
+
+  _DAT_00d0970c = 0;
+
+  _DAT_00d09720 = 0x3f800000;
+
+  _DAT_00d09724 = 0;
+
+  _DAT_00d09728 = 0x3f800000;
+
+  _DAT_00d0972c = 0;
+
+  _DAT_00d09740 = 0x3f800000;
+
+  _DAT_00d09744 = 0x3f800000;
+
+  _DAT_00d09748 = 0;
+
+  _DAT_00d0974c = 0;
+
+  _DAT_00d09710 = 0x3e4ccccd;
+
+  _DAT_00d09730 = 0x3e4ccccd;
+
+  _DAT_00d09750 = 0x3e4ccccd;
+
+  _DAT_00d09760 = 0;
+
+  _DAT_00d09764 = 0x3f800000;
+
+  _DAT_00d09768 = 0xbf800000;
+
+  _DAT_00d0976c = 0;
+
+  _DAT_00d09780 = 0x3f800000;
+
+  _DAT_00d09784 = 0;
+
+  _DAT_00d09788 = 0xbf800000;
+
+  _DAT_00d0978c = 0;
+
+  _DAT_00d097a0 = 0x3f800000;
+
+  _DAT_00d097a4 = 0xbf800000;
+
+  _DAT_00d097a8 = 0;
+
+  _DAT_00d097ac = 0;
+
+  _DAT_00d09770 = 0x3e800000;
+
+  _DAT_00d09790 = 0x3e800000;
+
+  _DAT_00d097b0 = 0x3e800000;
+
+  _DAT_00d097c0 = 0x3f800000;
+
+  _DAT_00d097c4 = 0x3f800000;
+
+  _DAT_00d097c8 = 0x3f800000;
+
+  _DAT_00d097cc = 0;
+
+  _DAT_00d097e0 = 0x3f800000;
+
+  _DAT_00d097e4 = 0x3f800000;
+
+  _DAT_00d097e8 = 0xbf800000;
+
+  _DAT_00d097ec = 0;
+
+  _DAT_00d09800 = 0x3f800000;
+
+  _DAT_00d09804 = 0xbf800000;
+
+  _DAT_00d09808 = 0xbf800000;
+
+  _DAT_00d0980c = 0;
+
+  _DAT_00d09820 = 0x3f800000;
+
+  _DAT_00d09824 = 0xbf800000;
+
+  _DAT_00d09828 = 0xbf800000;
+
+  _DAT_00d0982c = 0;
+
+  _DAT_00d097d0 = 0x3e99999a;
+
+  _DAT_00d097f0 = 0x3ea3d70a;
+
+  _DAT_00d09810 = 0x3ea3d70a;
+
+  _DAT_00d09830 = 0x3eae147b;
+
+  fVar5 = 0.0;
+
+  pfVar3 = (float *)&DAT_00d096a8;
+
+  do {
+
+    fVar1 = pfVar3[-1] * pfVar3[-1] + pfVar3[-2] * pfVar3[-2] + *pfVar3 * *pfVar3;
+
+    fVar2 = g_flZero;
+
+    if (fVar1 != g_flZero) {
+
+      fVar2 = g_flOne / SQRT(fVar1);
+
+    }
+
+    pfVar4 = pfVar3 + 8;
+
+    pfVar3[-2] = fVar2 * pfVar3[-2];
+
+    pfVar3[-1] = fVar2 * pfVar3[-1];
+
+    *pfVar3 = fVar2 * *pfVar3;
+
+    pfVar3[1] = fVar2 * pfVar3[1];
+
+    pfVar3[3] = fVar5;
+
+    fVar5 = (float)((int)fVar5 + 1);
+
+    pfVar3 = pfVar4;
+
+  } while ((int)pfVar4 < 0xd09848);
+
+  param_1[0x14] = *param_2;
+
+  param_1[0x15] = param_2[1];
+
+  param_1[0x16] = param_2[2];
+
+  param_1[0x18] = param_2[4];
+
+  param_1[0x19] = param_2[5];
+
+  param_1[0x1a] = param_2[6];
+
+  param_1[0x1b] = param_2[7];
+
+  param_1[0x1c] = param_2[8];
+
+  param_1[2] = param_4;
+
+  param_1[4] = param_3;
+
+  param_1[3] = 0;
+
+  return param_1;
+
+}

@@ -1,0 +1,42 @@
+# Raw capture: FUN_0068cec0
+
+| Field | Value |
+|---|---|
+| **Stable ID** | `aa_0068cec0` |
+| **Module** | `autoassault.exe` |
+| **Image base** | `0x400000` |
+| **VA** | `0x0068cec0` |
+| **Canonical name** | `FUN_0068cec0` |
+| **System** | unknown |
+| **Capture timestamp** | `2026-07-23` |
+| **Tool** | Ghidra MCP `batch_decompile` |
+| **Integrity** | Do not overwrite this raw body; append versioned sections only |
+
+---
+
+## Raw pseudocode (authoritative decompile)
+
+```c
+int FUN_0068cec0(int param_1,int param_2,int param_3)
+
+{
+  void *local_10;
+  undefined1 *puStack_c;
+  undefined1 local_8;
+  undefined3 uStack_7;
+  
+  puStack_c = &LAB_009aa371;
+  local_10 = ExceptionList;
+  uStack_7 = 0;
+  ExceptionList = &local_10;
+  for (; param_1 != param_2; param_1 = param_1 + 0x10) {
+    local_8 = 1;
+    if (param_3 != 0) {
+      FUN_0068c4b0(param_1);
+    }
+    param_3 = param_3 + 0x10;
+  }
+  ExceptionList = local_10;
+  return param_3;
+}
+```

@@ -1,0 +1,47 @@
+# Annotated low-level: FUN_0045efc0
+
+| Field | Value |
+|---|---|
+| Stable ID | `aa_0045efc0` |
+| VA | `0x0045efc0` |
+| System | unknown |
+| Date | 2026-07-23 |
+
+## Machine-level notes
+
+- Source: raw capture for `aa_0045efc0`.
+- Prefer assembly when decompiler conflicts.
+- Recover types for still-generic parameters via callers/xrefs.
+- Map DAT_* globals and FUN_* callees in follow-up waves.
+
+## Pseudocode (annotated copy of raw)
+
+```c
+void __fastcall FUN_0045efc0(undefined4 param_1,undefined4 *param_2)
+
+{
+  undefined4 *in_EAX;
+  undefined4 *puVar1;
+  int iVar2;
+  undefined4 *unaff_EBX;
+  undefined4 *puVar3;
+  undefined4 *puVar4;
+  
+  while (in_EAX != param_2) {
+    puVar1 = in_EAX + 8;
+    puVar3 = unaff_EBX;
+    puVar4 = in_EAX;
+    for (iVar2 = 8; in_EAX = puVar1, iVar2 != 0; iVar2 = iVar2 + -1) {
+      *puVar4 = *puVar3;
+      puVar3 = puVar3 + 1;
+      puVar4 = puVar4 + 1;
+    }
+  }
+  return;
+}
+```
+
+## Open questions
+
+- Confirm calling convention and full signature against callers.
+- Recover meaningful types for still-generic parameters.

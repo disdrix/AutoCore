@@ -1,0 +1,112 @@
+// =============================================================================
+// FUN_0073a800
+// -----------------------------------------------------------------------------
+// Stable ID: aa_0073a800
+// Address:   0x0073a800  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_0073a800 @ 0x0073a800
+// Stable ID: aa_0073a800
+// No high-value strings recovered; name via xrefs/callers in follow-up.
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~38 non-empty decompiler lines.
+//  - Control keywords: if×5, do×2, goto×2, while×2, return×2.
+//  - Notable callees: FUN_0073a800.
+//  - Return sites: 2.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+int FUN_0073a800(byte *param_1)
+
+
+
+{
+
+  byte bVar1;
+
+  byte *pbVar2;
+
+  int iVar3;
+
+  byte *pbVar4;
+
+  int iVar5;
+
+  bool bVar6;
+
+  
+
+  iVar5 = 0;
+
+  do {
+
+    pbVar2 = (&PTR_s_ColorTop_00afa3e8)[iVar5];
+
+    pbVar4 = param_1;
+
+    do {
+
+      bVar1 = *pbVar2;
+
+      bVar6 = bVar1 < *pbVar4;
+
+      if (bVar1 != *pbVar4) {
+
+LAB_0073a844:
+
+        iVar3 = (1 - (uint)bVar6) - (uint)(bVar6 != 0);
+
+        goto LAB_0073a849;
+
+      }
+
+      if (bVar1 == 0) break;
+
+      bVar1 = pbVar2[1];
+
+      bVar6 = bVar1 < pbVar4[1];
+
+      if (bVar1 != pbVar4[1]) goto LAB_0073a844;
+
+      pbVar2 = pbVar2 + 2;
+
+      pbVar4 = pbVar4 + 2;
+
+    } while (bVar1 != 0);
+
+    iVar3 = 0;
+
+LAB_0073a849:
+
+    if (iVar3 == 0) {
+
+      return iVar5;
+
+    }
+
+    iVar5 = iVar5 + 1;
+
+    if (1 < iVar5) {
+
+      return -1;
+
+    }
+
+  } while( true );
+
+}

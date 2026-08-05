@@ -1,0 +1,334 @@
+// READABILITY (auto CF):
+//  - Body size: ~149 non-empty decompiler lines.
+//  - Control keywords: if×22, do×3, goto×3, while×3, return×2.
+//  - Notable callees: FUN_0074f360×2, FUN_0074fca0×2, CONCAT13, FUN_00733b40, FUN_00733d60, FUN_0074f200, FUN_0074fba0, FUN_0075b720.
+//  - Strings: ",
+
+                             0x123,3,".
+//  - Return sites: 2.
+
+// =============================================================================
+// Named_gfxPhaseAlphaTest
+// -----------------------------------------------------------------------------
+// Stable ID: aa_00733d60
+// Address:   0x00733d60  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+/*
+ * Behavioral notes:
+ * String-driven rename evidence: "gfxPhaseAlphaTest"
+ *
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+uint32_t /* width from decompiler */ __fastcall Named_gfxPhaseAlphaTest(int param_1)
+
+
+
+{
+
+  int *piVar1;
+
+  int iVar2;
+
+  int iVar3;
+
+  int *piVar4;
+
+  uint32_t /* width from decompiler */ *puVar5;
+
+  int iVar6;
+
+  int iVar7;
+
+  char cVar8;
+
+  uint32_t /* width from decompiler */ uVar9;
+
+  uint uVar10;
+
+  int *piVar11;
+
+  uint32_t /* width from decompiler */ unaff_EBP;
+
+  int iVar12;
+
+  int iVar13;
+
+  int iVar14;
+
+  int iVar15;
+
+  uint32_t /* width from decompiler */ uStack_40;
+
+  int local_38;
+
+  int iStack_30;
+
+  int iStack_2c;
+
+  int local_28;
+
+  int local_24;
+
+  int iStack_1c;
+
+  
+
+  if ((*(int *)(param_1 + 0xc) == 0) ||
+
+     (*(int *)(param_1 + 0x10) - *(int *)(param_1 + 0xc) >> 2 == 0)) {
+
+    return 1;
+
+  }
+
+  FUN_0075b720(0,0x3f800000);
+
+  local_28 = 0;
+
+  uStack_40 = CONCAT13(*(uint8_t *)(DAT_00d1f048 + 0xf),(undefined3)uStack_40);
+
+  FUN_0074fca0(2);
+
+  iVar2 = *(int *)(*(int *)(param_1 + 0x20) + 8);
+
+  iVar3 = *(int *)(iVar2 + 0x28);
+
+  if (-1 < *(int *)(&DAT_00afe00c + iVar3 * 0xc)) {
+
+    (**(code **)(**(int **)(iVar2 + 0xc) + 0x108))(*(int **)(iVar2 + 0xc));
+
+  }
+
+  (**(code **)(**(int **)(iVar2 + 0xc) + 0x100))(*(int **)(iVar2 + 0xc),0);
+
+  *(uint32_t /* width from decompiler */ *)(&DAT_00afe00c + iVar3 * 0xc) = 0;
+
+  piVar11 = *(int **)(param_1 + 0xc);
+
+  piVar4 = *(int **)(param_1 + 0x10);
+
+  if (piVar11 != piVar4) {
+
+    do {
+
+      puVar5 = (uint32_t /* width from decompiler */ *)*piVar11;
+
+      iVar2 = puVar5[2];
+
+      iVar3 = puVar5[1];
+
+      iVar6 = *(int *)(iVar3 + 8);
+
+      if (((iVar2 != 0) && (*(int *)(iVar2 + 200) != 0)) &&
+
+         (iVar7 = (*(int *)(iVar2 + 0xcc) - *(int *)(iVar2 + 200)) / 0x24, param_1 = iStack_1c,
+
+         0 < iVar7)) {
+
+        if (0 < uStack_40) {
+
+          uStack_40 = -1;
+
+        }
+
+        if ((iVar6 != iStack_30) || (puVar5[2] != iStack_2c)) {
+
+          iStack_2c = puVar5[2];
+
+          FUN_0074fba0(iStack_2c);
+
+          FUN_0074fca0(2);
+
+          uStack_40 = -1;
+
+          iStack_30 = iVar6;
+
+        }
+
+        if (DAT_00d1f614 != 0) {
+
+          piVar1 = (int *)(DAT_00d1f614 + 0xd8 + *(int *)(DAT_00d1f614 + 0xc4) * 0x4c);
+
+          *piVar1 = *piVar1 + 1;
+
+        }
+
+        if ((local_28 != iVar3) &&
+
+           (FUN_0074f200(*(uint32_t /* width from decompiler */ *)(iVar3 + 0xc)), local_28 = iVar3, DAT_00d1f614 != 0)) {
+
+          piVar1 = (int *)(DAT_00d1f614 + 0xd4 + *(int *)(DAT_00d1f614 + 0xc4) * 0x4c);
+
+          *piVar1 = *piVar1 + 1;
+
+        }
+
+        iVar3 = puVar5[3];
+
+        if (iVar3 != 0) {
+
+          if (((char)((uint)unaff_EBP >> 0x18) == '\0') ||
+
+             (cVar8 = (**(code **)(*(int *)*puVar5 + 0x1c))(), cVar8 == '\0')) {
+
+            uVar9 = 0;
+
+          }
+
+          else {
+
+            uVar9 = 1;
+
+          }
+
+          FUN_00967710(iVar2,uVar9);
+
+        }
+
+        (**(code **)(*(int *)*puVar5 + 0xc))(puVar5);
+
+        iVar12 = 0;
+
+        if (0 < iVar7) {
+
+          local_38 = 0;
+
+          iVar14 = -1;
+
+          do {
+
+            iVar13 = *(int *)(iVar2 + 200) + local_38;
+
+            iVar15 = iVar14;
+
+            if ((-1 < (char)(*(uint *)(iVar13 + 0x20) >> 8)) &&
+
+               (iVar15 = iVar12, (*(uint *)(iVar13 + 0x20) & 2) == 0)) {
+
+              local_24 = 0;
+
+              do {
+
+                uVar10 = 0;
+
+                if ((iVar3 != 0) && ((*(uint *)(iVar13 + 0x20) & 0x1000) != 0)) {
+
+                  iVar15 = iVar14;
+
+                  if (((*(uint *)(iVar13 + 0x20) & 1) == 0) && (*(int *)(iVar3 + 0x48) == 0))
+
+                  goto LAB_007340a6;
+
+                  if (*(char *)(iVar2 + 0x11) == '\0') {
+
+                    uVar10 = FUN_00967790(iVar3,iVar13);
+
+                  }
+
+                  else {
+
+                    uVar10 = FUN_009679d0(iVar3,iVar13);
+
+                  }
+
+                  if (uVar10 == 0) goto LAB_007340a6;
+
+                }
+
+                if (uStack_40 < iVar12) {
+
+                  if (-1 < iVar14) {
+
+                    iVar15 = *(int *)(iVar6 + 0x28);
+
+                    if (-1 < *(int *)(&DAT_00afe00c + iVar15 * 0xc)) {
+
+                      (**(code **)(**(int **)(iVar6 + 0xc) + 0x108))(*(int **)(iVar6 + 0xc));
+
+                    }
+
+                    (**(code **)(**(int **)(iVar6 + 0xc) + 0x100))(*(int **)(iVar6 + 0xc),iVar14);
+
+                    *(int *)(&DAT_00afe00c + iVar15 * 0xc) = iVar14;
+
+                    iVar14 = -1;
+
+                  }
+
+                  iVar15 = *(int *)(iVar6 + 0x28);
+
+                  if (-1 < *(int *)(&DAT_00afe00c + iVar15 * 0xc)) {
+
+                    (**(code **)(**(int **)(iVar6 + 0xc) + 0x108))(*(int **)(iVar6 + 0xc));
+
+                  }
+
+                  (**(code **)(**(int **)(iVar6 + 0xc) + 0x100))(*(int **)(iVar6 + 0xc),iVar12);
+
+                  *(int *)(&DAT_00afe00c + iVar15 * 0xc) = iVar12;
+
+                  uStack_40 = iVar12;
+
+                }
+
+                (**(code **)(*(int *)*puVar5 + 8))(puVar5);
+
+                iVar15 = iVar14;
+
+                if ((uVar10 & 2) == 0) goto LAB_007340a6;
+
+                local_24 = local_24 + 1;
+
+              } while (local_24 < 100);
+
+              vog_LogMessage("C:\\vog\\1_code\\palantir\\palantir\\graphics\\gfxPhaseAlphaTest.cpp",
+
+                             0x123,3,"Excess pass looping detected. Aborting pass.");
+
+            }
+
+LAB_007340a6:
+
+            local_38 = local_38 + 0x24;
+
+            iVar12 = iVar12 + 1;
+
+            iVar14 = iVar15;
+
+          } while (iVar12 < iVar7);
+
+        }
+
+      }
+
+      piVar11 = piVar11 + 1;
+
+    } while (piVar11 != piVar4);
+
+    if (iStack_30 != 0) {
+
+      FUN_0074f360();
+
+    }
+
+  }
+
+  FUN_0074f360();
+
+  FUN_00733b40(param_1,*(uint32_t /* width from decompiler */ *)(param_1 + 0x18));
+
+  return 0;
+
+}

@@ -1,0 +1,244 @@
+// =============================================================================
+// FUN_0068b820
+// -----------------------------------------------------------------------------
+// Stable ID: aa_0068b820
+// Address:   0x0068b820  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_0068b820 @ 0x0068b820
+// Stable ID: aa_0068b820
+// No high-value strings recovered; name via xrefs/callers in follow-up.
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~104 non-empty decompiler lines.
+//  - Control keywords: if×9, do×3, while×3, return×2, goto×1.
+//  - Notable callees: CONCAT31, FUN_0068b820.
+//  - Return sites: 2.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+uint __thiscall FUN_0068b820(int param_1,ushort param_2)
+
+
+
+{
+
+  float fVar1;
+
+  float fVar2;
+
+  float fVar3;
+
+  float fVar4;
+
+  float fVar5;
+
+  float fVar6;
+
+  float fVar7;
+
+  float fVar8;
+
+  float fVar9;
+
+  float fVar10;
+
+  float fVar11;
+
+  float fVar12;
+
+  float fVar13;
+
+  float fVar14;
+
+  int iVar15;
+
+  uint in_EAX;
+
+  void *pvVar16;
+
+  int iVar17;
+
+  float *pfVar18;
+
+  uint uVar19;
+
+  int iVar20;
+
+  float *pfVar21;
+
+  int iVar22;
+
+  int iVar23;
+
+  
+
+  if (*(char *)(param_1 + 0x12) != '\0') {
+
+    return in_EAX & 0xffffff00;
+
+  }
+
+  if (*(int *)(param_1 + 100) == 0) {
+
+    uVar19 = 0;
+
+  }
+
+  else {
+
+    uVar19 = *(int *)(param_1 + 0x68) - *(int *)(param_1 + 100) >> 2;
+
+  }
+
+  if (*(int *)(param_1 + 0xc) == 0) {
+
+    pvVar16 = operator_new__(uVar19 / 3 & 0xffff);
+
+    *(void **)(param_1 + 0xc) = pvVar16;
+
+  }
+
+  uVar19 = uVar19 / 3 & 0xffff;
+
+  iVar17 = 0;
+
+  if (uVar19 != 0) {
+
+    do {
+
+      *(uint8_t *)(iVar17 + *(int *)(param_1 + 0xc)) = 0;
+
+      iVar17 = iVar17 + 1;
+
+    } while (iVar17 < (int)uVar19);
+
+  }
+
+  iVar17 = 0;
+
+  do {
+
+    if ((short)param_2 < 0) {
+
+LAB_0068b8c5:
+
+      uVar19 = 0;
+
+    }
+
+    else {
+
+      iVar22 = *(int *)((short)param_2 * 0x10 + 4 + *(int *)(param_1 + 0x44));
+
+      if (iVar22 == 0) goto LAB_0068b8c5;
+
+      uVar19 = *(int *)((short)param_2 * 0x10 + *(int *)(param_1 + 0x44) + 8) - iVar22 >> 2;
+
+    }
+
+    if ((int)(uVar19 & 0xffff) <= iVar17) {
+
+      *(uint8_t *)(param_1 + 0x12) = 1;
+
+      return CONCAT31((int3)((uVar19 & 0xffff) >> 8),1);
+
+    }
+
+    iVar22 = (uint)param_2 * 0x10;
+
+    iVar23 = 0;
+
+    if (*(short *)(*(int *)(*(int *)(param_1 + 0x34) + iVar22 + 4) + iVar17 * 2) != 0) {
+
+      do {
+
+        uVar19 = (uint)*(ushort *)
+
+                        (*(int *)(*(int *)(*(int *)(param_1 + 0x44) + iVar22 + 4) + iVar17 * 4) +
+
+                        iVar23 * 2);
+
+        if (*(char *)(uVar19 + *(int *)(param_1 + 0xc)) == '\0') {
+
+          fVar1 = *(float *)(*(int *)(param_1 + 0xf4) + uVar19 * 4);
+
+          iVar15 = *(int *)(param_1 + 0x74);
+
+          pfVar18 = (float *)((uint)*(byte *)(*(int *)(param_1 + 0x104) + uVar19) * 0x40 +
+
+                             DAT_00d08eac);
+
+          iVar20 = uVar19 * 0xc;
+
+          fVar2 = *(float *)(iVar20 + iVar15);
+
+          fVar3 = *(float *)(iVar20 + 4 + iVar15);
+
+          fVar4 = *(float *)(iVar20 + 8 + iVar15);
+
+          fVar5 = pfVar18[5];
+
+          fVar6 = pfVar18[9];
+
+          fVar7 = pfVar18[1];
+
+          fVar8 = pfVar18[0xd];
+
+          fVar9 = pfVar18[6];
+
+          fVar10 = pfVar18[10];
+
+          fVar11 = pfVar18[2];
+
+          fVar12 = pfVar18[0xe];
+
+          fVar13 = *(float *)(iVar20 + 8 + iVar15);
+
+          fVar14 = *(float *)(iVar20 + 4 + iVar15);
+
+          pfVar21 = (float *)(iVar20 + *(int *)(param_1 + 100));
+
+          *pfVar21 = ((fVar2 * *pfVar18 + fVar4 * pfVar18[8] + fVar3 * pfVar18[4] + pfVar18[0xc]) -
+
+                     *(float *)(iVar20 + iVar15)) * fVar1 + *(float *)(iVar20 + iVar15);
+
+          pfVar21[1] = ((fVar2 * fVar7 + fVar4 * fVar6 + fVar3 * fVar5 + fVar8) - fVar14) * fVar1 +
+
+                       fVar14;
+
+          pfVar21[2] = ((fVar2 * fVar11 + fVar4 * fVar10 + fVar3 * fVar9 + fVar12) - fVar13) * fVar1
+
+                       + fVar13;
+
+          *(uint8_t *)(uVar19 + *(int *)(param_1 + 0xc)) = 1;
+
+        }
+
+        iVar23 = iVar23 + 1;
+
+      } while (iVar23 < (int)(uint)*(ushort *)
+
+                                    (*(int *)(*(int *)(param_1 + 0x34) + iVar22 + 4) + iVar17 * 2));
+
+    }
+
+    iVar17 = iVar17 + 1;
+
+  } while( true );
+
+}

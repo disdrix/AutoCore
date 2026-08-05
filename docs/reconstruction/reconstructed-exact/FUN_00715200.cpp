@@ -1,0 +1,202 @@
+// =============================================================================
+// FUN_00715200
+// -----------------------------------------------------------------------------
+// Stable ID: aa_00715200
+// Address:   0x00715200  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_00715200 @ 0x00715200
+// Stable ID: aa_00715200
+// No high-value strings recovered; name via xrefs/callers in follow-up.
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~82 non-empty decompiler lines.
+//  - Control keywords: if×7, do×3, while×3, return×2.
+//  - Notable callees: FUN_00715200.
+//  - Return sites: 2.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+/* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+
+
+
+void FUN_00715200(float *param_1,uint param_2,float *param_3,float *param_4,float *param_5)
+
+
+
+{
+
+  float fVar1;
+
+  float fVar2;
+
+  float fVar3;
+
+  float fVar4;
+
+  float *pfVar5;
+
+  float *pfVar6;
+
+  float *pfVar7;
+
+  int iVar8;
+
+  float *pfVar9;
+
+  int iVar10;
+
+  int iVar11;
+
+  float local_4c [19];
+
+  
+
+  fVar4 = *param_1;
+
+  if (*param_1 == g_flZero) {
+
+    fVar4 = _DAT_00a111a4;
+
+  }
+
+  if ((param_2 & 1) == 0) {
+
+    pfVar9 = local_4c;
+
+    pfVar6 = param_3;
+
+  }
+
+  else {
+
+    pfVar6 = local_4c;
+
+    pfVar9 = param_3;
+
+  }
+
+  iVar8 = 0;
+
+  *pfVar9 = 1.0;
+
+  *pfVar6 = 1.0;
+
+  if ((int)param_2 < 1) {
+
+    *param_5 = fVar4;
+
+    return;
+
+  }
+
+  iVar11 = 4;
+
+  do {
+
+    pfVar7 = pfVar6;
+
+    fVar3 = g_flZero;
+
+    if (3 < iVar11) {
+
+      pfVar5 = (float *)((int)param_1 + iVar11);
+
+      iVar10 = iVar8 + 1;
+
+      pfVar6 = pfVar7;
+
+      do {
+
+        fVar1 = *pfVar5;
+
+        fVar2 = *pfVar6;
+
+        pfVar5 = pfVar5 + -1;
+
+        pfVar6 = pfVar6 + 1;
+
+        iVar10 = iVar10 + -1;
+
+        fVar3 = fVar1 * fVar2 + fVar3;
+
+      } while (iVar10 != 0);
+
+    }
+
+    fVar1 = fVar3 / fVar4;
+
+    if (_DAT_00a111a0 < fVar3 / fVar4) {
+
+      fVar1 = _DAT_00a111a0;
+
+    }
+
+    if (fVar1 < -_DAT_00a111a0) {
+
+      fVar1 = -_DAT_00a111a0;
+
+    }
+
+    *param_4 = fVar1;
+
+    param_4 = param_4 + 1;
+
+    *(float *)(iVar11 + (int)pfVar9) = -fVar1;
+
+    if (7 < iVar11) {
+
+      pfVar6 = (float *)(iVar11 + -4 + (int)pfVar7);
+
+      pfVar5 = pfVar9 + 1;
+
+      iVar10 = iVar8;
+
+      do {
+
+        fVar3 = *pfVar6;
+
+        pfVar6 = pfVar6 + -1;
+
+        iVar10 = iVar10 + -1;
+
+        *pfVar5 = *(float *)((int)pfVar7 + (-4 - (int)pfVar9) + (int)(pfVar5 + 1)) - fVar1 * fVar3;
+
+        pfVar5 = pfVar5 + 1;
+
+      } while (iVar10 != 0);
+
+    }
+
+    iVar8 = iVar8 + 1;
+
+    iVar11 = iVar11 + 4;
+
+    fVar4 = (g_flOne - fVar1 * fVar1) * fVar4;
+
+    pfVar6 = pfVar9;
+
+    pfVar9 = pfVar7;
+
+  } while (iVar8 < (int)param_2);
+
+  *param_5 = fVar4;
+
+  return;
+
+}

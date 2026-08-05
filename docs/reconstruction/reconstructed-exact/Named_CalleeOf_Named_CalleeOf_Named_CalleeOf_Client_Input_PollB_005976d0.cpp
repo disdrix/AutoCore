@@ -1,0 +1,96 @@
+// =============================================================================
+// Named_CalleeOf_Named_CalleeOf_Named_CalleeOf_Client_Input_PollB_005976d0
+// -----------------------------------------------------------------------------
+// Stable ID: aa_005976d0
+// Callee of Named_CalleeOf_Named_CalleeOf_Client_Input_PollBoundActions
+// Address:   0x005976d0  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Called from Named_CalleeOf_Named_CalleeOf_Client_Input_PollBoundActions: input/binding helper with no high-value strings in clean/raw. Role inferred from parent name only; refine when decompile strings or xrefs improve.
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~29 non-empty decompiler lines.
+//  - Control keywords: if×1, while×1, for×1, return×1.
+//  - Notable callees: FUN_005976d0.
+//  - Return sites: 1.
+
+/*
+ * Behavioral notes:
+ * Callee of Named_CalleeOf_Named_CalleeOf_Client_Input_PollBoundActions
+ * Xref/callee-driven rename (parent seed scan)
+ *
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+void __thiscall
+
+Named_CalleeOf_Named_CalleeOf_Named_CalleeOf_Client_Input_PollB_005976d0(int param_1,uint32_t /* width from decompiler */ *param_2,uint32_t /* width from decompiler */ *param_3,uint32_t /* width from decompiler */ *param_4)
+
+
+
+{
+
+  uint32_t /* width from decompiler */ *puVar1;
+
+  uint32_t /* width from decompiler */ *puVar2;
+
+  uint32_t /* width from decompiler */ *puVar3;
+
+  int iVar4;
+
+  uint32_t /* width from decompiler */ *puVar5;
+
+  uint32_t /* width from decompiler */ *puVar6;
+
+  uint32_t /* width from decompiler */ *puVar7;
+
+  
+
+  if (param_3 != param_4) {
+
+    puVar1 = *(uint32_t /* width from decompiler */ **)(param_1 + 8);
+
+    puVar2 = param_3;
+
+    while (param_4 != puVar1) {
+
+      puVar3 = param_4 + 8;
+
+      puVar5 = puVar2 + 8;
+
+      puVar6 = param_4;
+
+      puVar7 = puVar2;
+
+      for (iVar4 = 8; param_4 = puVar3, puVar2 = puVar5, iVar4 != 0; iVar4 = iVar4 + -1) {
+
+        *puVar7 = *puVar6;
+
+        puVar6 = puVar6 + 1;
+
+        puVar7 = puVar7 + 1;
+
+      }
+
+    }
+
+    *(uint32_t /* width from decompiler */ **)(param_1 + 8) = puVar2;
+
+  }
+
+  *param_2 = param_3;
+
+  return;
+
+}

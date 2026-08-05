@@ -1,0 +1,70 @@
+# Annotated low-level: FUN_0075ebd0
+
+| Field | Value |
+|---|---|
+| Stable ID | `aa_0075ebd0` |
+| VA | `0x0075ebd0` |
+| System | unknown |
+| Date | 2026-07-23 |
+
+## Machine-level notes
+
+- Source: raw capture for `aa_0075ebd0`.
+- Prefer assembly when decompiler conflicts.
+- Recover types for still-generic parameters via callers/xrefs.
+- Map DAT_* globals and FUN_* callees in follow-up waves.
+
+## Pseudocode (annotated copy of raw)
+
+```c
+undefined4
+FUN_0075ebd0(undefined4 *param_1,byte param_2,undefined4 *param_3,undefined4 param_4,
+            undefined4 param_5)
+
+{
+  byte bVar1;
+  int iVar2;
+  int iVar3;
+  
+  iVar3 = DAT_00d1f048;
+  bVar1 = 0;
+  if ((param_2 & 1) != 0) {
+    iVar2 = FUN_0043b800();
+    bVar1 = -(iVar2 != 0) & 2;
+  }
+  if ((param_2 & 4) != 0) {
+    iVar3 = *(int *)(iVar3 + 8);
+    if (iVar3 == 0x49) {
+      iVar3 = 1;
+    }
+    else if (iVar3 == 0x4b) {
+      iVar3 = 8;
+    }
+    else if (iVar3 == 0x4f) {
+      iVar3 = 4;
+    }
+    else {
+      iVar3 = 0;
+    }
+    bVar1 = bVar1 | -(iVar3 != 0) & 4U;
+  }
+  if ((param_2 & 2) != 0) {
+    bVar1 = bVar1 | 1;
+  }
+  if (bVar1 != 0) {
+    iVar3 = (**(code **)(*(int *)*param_1 + 0xac))
+                      ((int *)*param_1,0,0,bVar1,*param_3,param_4,param_5);
+    if (iVar3 < 0) {
+      vog_LogMessage("C:\\vog\\1_code\\palantir\\palantir\\graphics\\gfxDevice.cpp",0x19d,3,
+                     "Clear() Failed");
+      return 0xffffffff;
+    }
+  }
+  return 0;
+}
+```
+
+## Open questions
+
+- Confirm calling convention and full signature against callers.
+- Recover meaningful types for still-generic parameters.

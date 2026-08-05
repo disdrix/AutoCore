@@ -1,0 +1,59 @@
+# Raw capture: FUN_004cf3b0
+
+| Field | Value |
+|---|---|
+| **Stable ID** | `aa_004cf3b0` |
+| **Module** | `autoassault.exe` |
+| **Image base** | `0x400000` |
+| **VA** | `0x004cf3b0` |
+| **Canonical name** | `FUN_004cf3b0` |
+| **System** | unknown |
+| **Capture timestamp** | `2026-07-23` |
+| **Tool** | Ghidra MCP `batch_decompile` |
+| **Integrity** | Do not overwrite this raw body; append versioned sections only |
+
+---
+
+## Raw pseudocode (authoritative decompile)
+
+```c
+void FUN_004cf3b0(int *param_1,int param_2)
+
+{
+  int iVar1;
+  int *piVar2;
+  float unaff_ESI;
+  TFID_16 TStack_14;
+  float fStack_4;
+  
+  iVar1 = (**(code **)(*param_1 + 0x210))(0);
+  if (iVar1 == 0) {
+    iVar1 = (**(code **)(*param_1 + 0x1d8))();
+    if (iVar1 != 0) {
+      TStack_14._12_4_ = *(undefined4 *)(iVar1 + 0x234);
+      if (((*(uint *)(iVar1 + 0x228) & *(uint *)(iVar1 + 0x22c)) != 0xffffffff) ||
+         ((char)*(undefined4 *)(iVar1 + 0x230) != '\0')) {
+        TStack_14.dwCoidLo = *(uint *)(iVar1 + 0x228);
+        TStack_14.dwCoidHi = *(uint *)(iVar1 + 0x22c);
+        TStack_14._8_4_ = *(undefined4 *)(iVar1 + 0x230);
+        TStack_14._12_4_ = *(undefined4 *)(iVar1 + 0x234);
+        piVar2 = Object_ResolveFromTFID(&TStack_14);
+        if ((piVar2 != (int *)0x0) && (iVar1 = (**(code **)(*piVar2 + 0x1dc))(), iVar1 != 0)) {
+          return;
+        }
+      }
+    }
+    (**(code **)(*param_1 + 0x23c))();
+    (**(code **)(*param_1 + 0x244))();
+    iVar1 = (**(code **)(*param_1 + 0x244))();
+    (**(code **)(*param_1 + 0x248))
+              ((int)ROUND((*(float *)(&DAT_009cc390 + param_2 * 4) + g_flOne) *
+                          ((float)iVar1 / (*(float *)(&DAT_009cc390 + (int)param_1 * 4) + g_flOne)))
+              );
+    iVar1 = (**(code **)(*param_1 + 0x244))();
+    fStack_4 = (float)iVar1 * unaff_ESI;
+    (**(code **)(*param_1 + 0x240))((int)ROUND(fStack_4));
+  }
+  return;
+}
+```

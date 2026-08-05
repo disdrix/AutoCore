@@ -1,0 +1,358 @@
+// =============================================================================
+// FUN_00556450
+// -----------------------------------------------------------------------------
+// Stable ID: aa_00556450
+// Address:   0x00556450  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_00556450 @ 0x00556450
+// Stable ID: aa_00556450
+// Embedded strings (evidence for future rename):
+//   - "Weather tried to destroy a destroyed object.\n"
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~160 non-empty decompiler lines.
+//  - Control keywords: if×13, return×4, do×1, for×1, goto×1, while×1.
+//  - Notable callees: SQRT×4, CONCAT31×2, CVOGReaction_RandomUnitScalar, FUN_004ea350, FUN_00556450, FUN_00558eb0, FUN_007a4480.
+//  - Strings: "Weather tried to destroy a destroyed object.\n".
+//  - Return sites: 4.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+uint __thiscall FUN_00556450(int param_1,uchar param_2)
+
+
+
+{
+
+  ushort uVar1;
+
+  ulonglong uVar2;
+
+  uchar uVar3;
+
+  char cVar4;
+
+  uint uVar5;
+
+  float *pfVar6;
+
+  undefined3 extraout_var;
+
+  uint32_t /* width from decompiler */ *puVar7;
+
+  int iVar8;
+
+  void *pvVar9;
+
+  int iVar10;
+
+  int iVar11;
+
+  float fVar12;
+
+  float fVar13;
+
+  int local_6c;
+
+  float fStack_64;
+
+  uint local_60;
+
+  int local_5c;
+
+  float fStack_58;
+
+  int local_54;
+
+  uint8_t auStack_50 [4];
+
+  void *pvStack_4c;
+
+  int iStack_48;
+
+  uint32_t /* width from decompiler */ uStack_44;
+
+  float fStack_40;
+
+  float fStack_3c;
+
+  float fStack_38;
+
+  float fStack_34;
+
+  float fStack_30;
+
+  float fStack_2c;
+
+  float fStack_28;
+
+  float fStack_24;
+
+  void *local_1c;
+
+  uint8_t *puStack_18;
+
+  uint32_t /* width from decompiler */ uStack_14;
+
+  
+
+  uStack_14 = 0xffffffff;
+
+  puStack_18 = &LAB_009a4698;
+
+  local_1c = ExceptionList;
+
+  ExceptionList = &local_1c;
+
+  FUN_00558eb0(&local_60,&param_2);
+
+  uVar5 = *(uint *)(param_1 + 0x174);
+
+  if (local_60 != uVar5) {
+
+    if (*(int *)(local_60 + 0x444) == 0) {
+
+      iVar8 = 0;
+
+    }
+
+    else {
+
+      iVar8 = (*(int *)(local_60 + 0x448) - *(int *)(local_60 + 0x444)) / 0x134;
+
+    }
+
+    uVar5 = *(uint *)(local_60 + 0x568);
+
+    if (((int)uVar5 < iVar8) &&
+
+       (uVar5 = *(int *)(*(int *)(local_60 + 0x444) + uVar5 * 0x134 + 0x110) - 1, uVar5 == 0)) {
+
+      iVar8 = *(int *)(param_1 + 0x40);
+
+      if ((*(char *)(iVar8 + 0x7e) != '\0') &&
+
+         ((*(int *)(iVar8 + 0xe75c) != 0 &&
+
+          (iVar11 = *(int *)(iVar8 + 0xe760) - *(int *)(iVar8 + 0xe75c) >> 2, iVar11 != 0)))) {
+
+        local_54 = iVar11;
+
+        iVar8 = CVOGReaction_RandomUnitScalar();
+
+        if (0xfffff < *(int *)(iVar8 + 0xc)) {
+
+          *(uint32_t /* width from decompiler */ *)(iVar8 + 0xc) = 0;
+
+        }
+
+        uVar1 = *(ushort *)(*(int *)(iVar8 + 8) + *(int *)(iVar8 + 0xc) * 2);
+
+        *(int *)(iVar8 + 0xc) = *(int *)(iVar8 + 0xc) + 1;
+
+        uVar2 = (ulonglong)uVar1;
+
+        iVar8 = (int)((longlong)uVar2 / (longlong)iVar11);
+
+        iVar10 = (int)((longlong)uVar2 % (longlong)iVar11);
+
+        local_6c = iVar10;
+
+        local_5c = iVar10;
+
+        if (iVar10 < iVar11) {
+
+          do {
+
+            iVar8 = *(int *)(*(int *)(*(int *)(param_1 + 0x40) + 0xe75c) + iVar10 * 4);
+
+            pfVar6 = (float *)(**(code **)(*(int *)(*(int *)(*(int *)(iVar8 + 4) + 4) + 4 + iVar8) +
+
+                                          0x1a0))();
+
+            fStack_3c = pfVar6[1];
+
+            fStack_40 = *pfVar6;
+
+            fStack_38 = pfVar6[2];
+
+            fStack_34 = pfVar6[3];
+
+            uVar3 = CVOGTerrain_SampleExploredAreaId
+
+                              (*(void **)(*(int *)(param_1 + 0x40) + 0xe4f8),fStack_40,fStack_38);
+
+            uVar5 = CONCAT31(extraout_var,uVar3);
+
+            if (uVar3 == param_2) {
+
+              uVar5 = 0;
+
+              pvStack_4c = (void *)0x0;
+
+              iStack_48 = 0;
+
+              uStack_44 = 0;
+
+              iVar8 = *(int *)(*(int *)(*(int *)(param_1 + 0x40) + 0xe75c) + iVar10 * 4);
+
+              uStack_14 = 0;
+
+              pfVar6 = (float *)(**(code **)(*(int *)(*(int *)(*(int *)(iVar8 + 4) + 4) + 4 + iVar8)
+
+                                            + 0x1a8))();
+
+              fVar12 = *pfVar6 * DAT_00af2cec;
+
+              fStack_28 = pfVar6[2] * DAT_00af2cec;
+
+              fStack_24 = pfVar6[3] * DAT_00af2cec + fStack_34;
+
+              fVar13 = DAT_00af2cec * g_flZero;
+
+              fStack_30 = fVar12 + fStack_40;
+
+              fStack_2c = fVar13 + fStack_3c;
+
+              fStack_58 = fStack_28 * fStack_28 + fVar13 * fVar13 + fVar12 * fVar12;
+
+              fStack_28 = fStack_28 + fStack_38;
+
+              if (((SQRT(fStack_58) < DAT_00a1109c) ||
+
+                  (fStack_64 = DAT_00aaa7ac, SQRT(fStack_58) < DAT_00aaa7ac)) &&
+
+                 (fStack_64 = DAT_00a1109c, DAT_00a1109c <= SQRT(fStack_58))) {
+
+                fStack_64 = SQRT(fStack_58);
+
+              }
+
+              FUN_004ea350(*(uint32_t /* width from decompiler */ *)(param_1 + 0x40),&fStack_30,fStack_64,auStack_50,0,1);
+
+              pvVar9 = pvStack_4c;
+
+              for (; (pvVar9 != (void *)0x0 && (uVar5 < (uint)(iStack_48 - (int)pvVar9 >> 2)));
+
+                  uVar5 = uVar5 + 1) {
+
+                iVar8 = *(int *)((int)pvVar9 + uVar5 * 4);
+
+                if ((*(int *)(*(int *)(*(int *)(*(int *)(iVar8 + 4) + 4) + 0xac + iVar8) + 0x38) ==
+
+                     3) && ((iVar11 = (**(code **)(*(int *)(*(int *)(*(int *)(iVar8 + 4) + 4) + 4 +
+
+                                                           iVar8) + 0x244))(), pvVar9 = pvStack_4c,
+
+                            iVar11 < 5 &&
+
+                            ((*(uint *)(*(int *)(*(int *)(iVar8 + 4) + 4) + 0x180 + iVar8) >> 10 & 1
+
+                             ) == 0)))) {
+
+                  cVar4 = (**(code **)(*(int *)(*(int *)(*(int *)(iVar8 + 4) + 4) + 4 + iVar8) +
+
+                                      0x198))();
+
+                  if (cVar4 == '\0') {
+
+                    puVar7 = CVOGReaction_ResolveSkillTargets
+
+                                       (*(void **)(*(int *)(local_60 + 0x444) +
+
+                                                   *(int *)(local_60 + 0x568) * 0x134 + 0x114),1);
+
+                    iVar8 = *(int *)(*(int *)(iVar8 + 4) + 4) + 4 + iVar8;
+
+                    CVOGReaction_CastSkillOnTarget
+
+                              (puVar7,iVar8,iVar8,0,0,&DAT_00b04760,0,0xffffffff,0,0);
+
+                    /* WARNING: Subroutine does not return */
+
+                    operator_delete(puVar7);
+
+                  }
+
+                  FUN_007a4480(0,"Weather tried to destroy a destroyed object.\n");
+
+                  pvVar9 = pvStack_4c;
+
+                }
+
+                iVar10 = local_5c;
+
+              }
+
+              uStack_14 = 0xffffffff;
+
+              if (pvVar9 != (void *)0x0) {
+
+                    /* WARNING: Subroutine does not return */
+
+                operator_delete(pvVar9);
+
+              }
+
+              pvStack_4c = (void *)0x0;
+
+              iStack_48 = 0;
+
+              uStack_44 = 0;
+
+              iVar11 = local_54;
+
+            }
+
+            else {
+
+              if (iVar11 <= local_6c + 1) {
+
+                local_6c = -1;
+
+              }
+
+              if (local_6c + 1 == iVar10) goto LAB_005564e9;
+
+            }
+
+            iVar8 = local_6c + 1;
+
+            local_6c = iVar8;
+
+          } while (iVar8 < iVar11);
+
+        }
+
+      }
+
+      ExceptionList = local_1c;
+
+      return CONCAT31((int3)((uint)iVar8 >> 8),1);
+
+    }
+
+  }
+
+LAB_005564e9:
+
+  ExceptionList = local_1c;
+
+  return uVar5 & 0xffffff00;
+
+}

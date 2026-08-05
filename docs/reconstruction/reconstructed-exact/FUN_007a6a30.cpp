@@ -1,0 +1,532 @@
+// =============================================================================
+// FUN_007a6a30
+// -----------------------------------------------------------------------------
+// Stable ID: aa_007a6a30
+// Address:   0x007a6a30  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_007a6a30 @ 0x007a6a30
+// Stable ID: aa_007a6a30
+// Embedded strings (evidence for future rename):
+//   - "Gadget"
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~246 non-empty decompiler lines.
+//  - Control keywords: while×17, do×15, if×14, for×6, goto×2, return×2, switch×1.
+//  - Notable callees: FUN_007a62c0×2, FUN_007a6310×2, FUN_007a6410×2, FUN_007a6490×2, strstr×2, FUN_007a6610, FUN_007a6a30.
+//  - Strings: "Gadget".
+//  - Return sites: 2.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+/* WARNING: Function: __chkstk replaced with injection: alloca_probe */
+
+
+
+byte * __thiscall FUN_007a6a30(byte *param_1,int param_2)
+
+
+
+{
+
+  byte bVar1;
+
+  uint32_t /* width from decompiler */ uVar2;
+
+  byte *pbVar3;
+
+  int iVar4;
+
+  char *pcVar5;
+
+  uint uVar6;
+
+  uint uVar7;
+
+  int iVar8;
+
+  byte *pbVar9;
+
+  byte *pbVar10;
+
+  byte *pbVar11;
+
+  bool bVar12;
+
+  uint32_t /* width from decompiler */ *puVar13;
+
+  int *piVar14;
+
+  uint32_t /* width from decompiler */ local_2008;
+
+  int local_2004;
+
+  byte local_2000 [4095];
+
+  byte bStack_1001;
+
+  byte local_1000 [4092];
+
+  uint32_t /* width from decompiler */ uStack_4;
+
+  
+
+  uStack_4 = 0x7a6a3a;
+
+  puVar13 = &local_2008;
+
+  if ((param_1 != (byte *)0x0) && (*param_1 != 0)) {
+
+    pbVar9 = &DAT_00a32460;
+
+    pbVar3 = param_1;
+
+    do {
+
+      bVar1 = *pbVar3;
+
+      bVar12 = bVar1 < *pbVar9;
+
+      if (bVar1 != *pbVar9) {
+
+LAB_007a6a7c:
+
+        iVar4 = (1 - (uint)bVar12) - (uint)(bVar12 != 0);
+
+        goto LAB_007a6a81;
+
+      }
+
+      if (bVar1 == 0) break;
+
+      bVar1 = pbVar3[1];
+
+      bVar12 = bVar1 < pbVar9[1];
+
+      if (bVar1 != pbVar9[1]) goto LAB_007a6a7c;
+
+      pbVar3 = pbVar3 + 2;
+
+      pbVar9 = pbVar9 + 2;
+
+    } while (bVar1 != 0);
+
+    iVar4 = 0;
+
+LAB_007a6a81:
+
+    if (iVar4 != 0) {
+
+      switch(*(uint32_t /* width from decompiler */ *)(param_2 + 0x2c)) {
+
+      case 0:
+
+      case 4:
+
+        FUN_007a62c0();
+
+        pbVar3 = *(byte **)(param_2 + 4 + *(int *)(param_2 + 0xc0) * 4);
+
+        do {
+
+          bVar1 = *param_1;
+
+          *pbVar3 = bVar1;
+
+          param_1 = param_1 + 1;
+
+          pbVar3 = pbVar3 + 1;
+
+        } while (bVar1 != 0);
+
+        break;
+
+      case 1:
+
+      case 2:
+
+      case 3:
+
+        local_1000[0] = 0;
+
+        if ((*param_1 == 0x2b) && (pcVar5 = strstr((char *)param_1,"Gadget"), pcVar5 != (char *)0x0)
+
+           ) {
+
+          iVar4 = -(int)param_1;
+
+          do {
+
+            bVar1 = *param_1;
+
+            param_1[(int)(local_2000 + iVar4)] = bVar1;
+
+            param_1 = param_1 + 1;
+
+          } while (bVar1 != 0);
+
+          pcVar5 = strstr((char *)local_2000,"Gadget");
+
+          pcVar5[-1] = '\0';
+
+          uVar2 = *(uint32_t /* width from decompiler */ *)(param_2 + 0x2c);
+
+          piVar14 = &local_2004;
+
+          FUN_007a6490(&local_2008,piVar14);
+
+          FUN_007a6410(puVar13,piVar14);
+
+          pbVar3 = local_2000;
+
+          if (local_2004 == -1) {
+
+            do {
+
+              bVar1 = *pbVar3;
+
+              pbVar3 = pbVar3 + 1;
+
+            } while (bVar1 != 0);
+
+            uVar6 = (int)pbVar3 - (int)local_2000;
+
+            pbVar3 = &bStack_1001;
+
+            do {
+
+              pbVar9 = pbVar3 + 1;
+
+              pbVar3 = pbVar3 + 1;
+
+            } while (*pbVar9 != 0);
+
+            pbVar9 = local_2000;
+
+            for (uVar7 = uVar6 >> 2; uVar7 != 0; uVar7 = uVar7 - 1) {
+
+              *(uint32_t /* width from decompiler */ *)pbVar3 = *(uint32_t /* width from decompiler */ *)pbVar9;
+
+              pbVar9 = pbVar9 + 4;
+
+              pbVar3 = pbVar3 + 4;
+
+            }
+
+            for (uVar6 = uVar6 & 3; uVar6 != 0; uVar6 = uVar6 - 1) {
+
+              *pbVar3 = *pbVar9;
+
+              pbVar9 = pbVar9 + 1;
+
+              pbVar3 = pbVar3 + 1;
+
+            }
+
+          }
+
+          else {
+
+            FUN_007a6310(uVar2,local_2008);
+
+            pbVar3 = *(byte **)(param_2 + 4 + *(int *)(param_2 + 0xc0) * 4);
+
+            pbVar9 = pbVar3;
+
+            do {
+
+              bVar1 = *pbVar9;
+
+              pbVar9 = pbVar9 + 1;
+
+            } while (bVar1 != 0);
+
+            pbVar11 = &bStack_1001;
+
+            do {
+
+              pbVar10 = pbVar11 + 1;
+
+              pbVar11 = pbVar11 + 1;
+
+            } while (*pbVar10 != 0);
+
+            pbVar10 = pbVar3;
+
+            for (uVar6 = (uint)((int)pbVar9 - (int)pbVar3) >> 2; uVar6 != 0; uVar6 = uVar6 - 1) {
+
+              *(uint32_t /* width from decompiler */ *)pbVar11 = *(uint32_t /* width from decompiler */ *)pbVar10;
+
+              pbVar10 = pbVar10 + 4;
+
+              pbVar11 = pbVar11 + 4;
+
+            }
+
+            for (uVar6 = (int)pbVar9 - (int)pbVar3 & 3; uVar6 != 0; uVar6 = uVar6 - 1) {
+
+              *pbVar11 = *pbVar10;
+
+              pbVar10 = pbVar10 + 1;
+
+              pbVar11 = pbVar11 + 1;
+
+            }
+
+            pbVar3 = &bStack_1001;
+
+            do {
+
+              pbVar9 = pbVar3;
+
+              pbVar3 = pbVar9 + 1;
+
+            } while (pbVar9[1] != 0);
+
+            *(uint32_t /* width from decompiler */ *)(pbVar9 + 1) = s_Gadget_00a96f94._0_4_;
+
+            *(uint32_t /* width from decompiler */ *)(pbVar9 + 5) = s_Gadget_00a96f94._4_4_;
+
+          }
+
+        }
+
+        else {
+
+          bVar1 = *param_1;
+
+          while (bVar1 != 0) {
+
+            bVar1 = *param_1;
+
+            if (bVar1 == 0xd) {
+
+              param_1 = param_1 + 1;
+
+            }
+
+            else if (bVar1 == 10) {
+
+              pbVar3 = &bStack_1001;
+
+              do {
+
+                pbVar9 = pbVar3 + 1;
+
+                pbVar3 = pbVar3 + 1;
+
+              } while (*pbVar9 != 0);
+
+              *(uint16_t *)pbVar3 = DAT_00a15104;
+
+              param_1 = param_1 + 1;
+
+            }
+
+            else {
+
+              iVar4 = 0;
+
+              while ((bVar1 != 0 && (bVar1 != 10))) {
+
+                if (bVar1 != 0xd) {
+
+                  local_2000[iVar4] = bVar1;
+
+                  iVar4 = iVar4 + 1;
+
+                }
+
+                pbVar3 = param_1 + 1;
+
+                param_1 = param_1 + 1;
+
+                bVar1 = *pbVar3;
+
+              }
+
+              iVar8 = 5;
+
+              bVar12 = true;
+
+              local_2000[iVar4] = 0;
+
+              pbVar3 = local_2000;
+
+              pbVar9 = &DAT_00a96f8c;
+
+              do {
+
+                if (iVar8 == 0) break;
+
+                iVar8 = iVar8 + -1;
+
+                bVar12 = *pbVar3 == *pbVar9;
+
+                pbVar3 = pbVar3 + 1;
+
+                pbVar9 = pbVar9 + 1;
+
+              } while (bVar12);
+
+              if (bVar12) {
+
+                local_2000[iVar4] = 0x20;
+
+                local_2000[iVar4 + 1] = 0;
+
+              }
+
+              uVar2 = *(uint32_t /* width from decompiler */ *)(param_2 + 0x2c);
+
+              piVar14 = &local_2004;
+
+              puVar13 = &local_2008;
+
+              FUN_007a6490(puVar13,piVar14);
+
+              FUN_007a6410(puVar13,piVar14);
+
+              if (local_2004 == -1) {
+
+                pbVar3 = local_2000;
+
+                pbVar9 = pbVar3;
+
+                do {
+
+                  bVar1 = *pbVar9;
+
+                  pbVar9 = pbVar9 + 1;
+
+                } while (bVar1 != 0);
+
+                uVar6 = (int)pbVar9 - (int)pbVar3;
+
+                pbVar9 = &bStack_1001;
+
+                do {
+
+                  pbVar11 = pbVar9 + 1;
+
+                  pbVar9 = pbVar9 + 1;
+
+                } while (*pbVar11 != 0);
+
+              }
+
+              else {
+
+                FUN_007a6310(uVar2,local_2008);
+
+                pbVar3 = *(byte **)(param_2 + 4 + *(int *)(param_2 + 0xc0) * 4);
+
+                pbVar9 = pbVar3;
+
+                do {
+
+                  bVar1 = *pbVar9;
+
+                  pbVar9 = pbVar9 + 1;
+
+                } while (bVar1 != 0);
+
+                uVar6 = (int)pbVar9 - (int)pbVar3;
+
+                pbVar9 = &bStack_1001;
+
+                do {
+
+                  pbVar11 = pbVar9 + 1;
+
+                  pbVar9 = pbVar9 + 1;
+
+                } while (*pbVar11 != 0);
+
+              }
+
+              for (uVar7 = uVar6 >> 2; uVar7 != 0; uVar7 = uVar7 - 1) {
+
+                *(uint32_t /* width from decompiler */ *)pbVar9 = *(uint32_t /* width from decompiler */ *)pbVar3;
+
+                pbVar3 = pbVar3 + 4;
+
+                pbVar9 = pbVar9 + 4;
+
+              }
+
+              for (uVar6 = uVar6 & 3; uVar6 != 0; uVar6 = uVar6 - 1) {
+
+                *pbVar9 = *pbVar3;
+
+                pbVar3 = pbVar3 + 1;
+
+                pbVar9 = pbVar9 + 1;
+
+              }
+
+            }
+
+            bVar1 = *param_1;
+
+          }
+
+        }
+
+        FUN_007a62c0();
+
+        pbVar9 = *(byte **)(param_2 + 4 + *(int *)(param_2 + 0xc0) * 4);
+
+        pbVar3 = local_1000;
+
+        do {
+
+          bVar1 = *pbVar3;
+
+          *pbVar9 = bVar1;
+
+          pbVar3 = pbVar3 + 1;
+
+          pbVar9 = pbVar9 + 1;
+
+        } while (bVar1 != 0);
+
+        FUN_007a6610();
+
+      }
+
+      iVar8 = *(int *)(param_2 + 0xc0);
+
+      iVar4 = iVar8 + 1;
+
+      *(int *)(param_2 + 0xc0) = iVar4;
+
+      if (iVar4 == 10) {
+
+        *(uint32_t /* width from decompiler */ *)(param_2 + 0xc0) = 0;
+
+      }
+
+      return *(byte **)(param_2 + 4 + iVar8 * 4);
+
+    }
+
+  }
+
+  return param_1;
+
+}

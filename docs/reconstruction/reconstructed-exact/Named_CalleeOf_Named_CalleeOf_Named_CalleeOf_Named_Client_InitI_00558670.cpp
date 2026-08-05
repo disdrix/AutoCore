@@ -1,0 +1,462 @@
+// =============================================================================
+// Named_CalleeOf_Named_CalleeOf_Named_CalleeOf_Named_Client_InitI_00558670
+// -----------------------------------------------------------------------------
+// Stable ID: aa_00558670
+// Callee of Named_CalleeOf_Named_CalleeOf_Named_Client_InitInstance
+// Address:   0x00558670  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Called from Named_CalleeOf_Named_CalleeOf_Named_Client_InitInstance: callee helper with no high-value strings in clean/raw. Role inferred from parent name only; refine when decompile strings or xrefs improve.
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~212 non-empty decompiler lines.
+//  - Control keywords: if×2, return×2.
+//  - Notable callees: FUN_00559250×5, FUN_00556a60, FUN_00556da0, FUN_00558670.
+//  - Return sites: 2.
+
+/*
+ * Behavioral notes:
+ * Callee of Named_CalleeOf_Named_CalleeOf_Named_Client_InitInstance
+ * Xref/callee-driven rename (parent seed scan)
+ *
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+void Named_CalleeOf_Named_CalleeOf_Named_CalleeOf_Named_Client_InitI_00558670(void)
+
+
+
+{
+
+  uint local_6a0;
+
+  char local_69c [4];
+
+  char local_698 [4];
+
+  char local_694 [4];
+
+  char local_690;
+
+  uint32_t /* width from decompiler */ local_59c;
+
+  uint8_t local_598;
+
+  uint32_t /* width from decompiler */ local_594;
+
+  uint32_t /* width from decompiler */ local_590;
+
+  uint32_t /* width from decompiler */ local_58c;
+
+  float local_588;
+
+  uint8_t local_584;
+
+  uint32_t /* width from decompiler */ local_580;
+
+  uint32_t /* width from decompiler */ local_57c;
+
+  uint32_t /* width from decompiler */ local_570;
+
+  char local_56c [4];
+
+  char local_568 [4];
+
+  char local_564 [4];
+
+  char local_560 [256];
+
+  char local_460 [4];
+
+  char local_45c [4];
+
+  char local_458 [4];
+
+  char local_454 [256];
+
+  char local_354 [4];
+
+  char local_350 [4];
+
+  char local_34c [4];
+
+  char local_348 [256];
+
+  char local_248 [4];
+
+  char local_244 [4];
+
+  char local_240 [4];
+
+  char local_23c [2];
+
+  char local_23a;
+
+  void *local_138;
+
+  void *local_c;
+
+  uint8_t *puStack_8;
+
+  uint32_t /* width from decompiler */ local_4;
+
+  
+
+  local_4 = 0xffffffff;
+
+  puStack_8 = &LAB_009a470d;
+
+  local_c = ExceptionList;
+
+  ExceptionList = &local_c;
+
+  if (DAT_00b04754 == '\0') {
+
+    DAT_00b04754 = '\x01';
+
+    local_59c = 0;
+
+    local_6a0 = local_6a0 & 0xffffff00;
+
+    local_598 = 0;
+
+    local_594 = 4;
+
+    local_590 = 0;
+
+    local_58c = 0xffffffff;
+
+    local_584 = 0;
+
+    local_580 = 1000;
+
+    local_57c = 120000;
+
+    local_588 = (float)DAT_00a0f298;
+
+    local_570 = 1;
+
+    ExceptionList = &local_c;
+
+    FUN_00559250(&local_6a0);
+
+    local_6a0._0_1_ = s_env_weather_rain_009d2664[0];
+
+    local_6a0._1_1_ = s_env_weather_rain_009d2664[1];
+
+    local_6a0._2_1_ = s_env_weather_rain_009d2664[2];
+
+    local_6a0._3_1_ = s_env_weather_rain_009d2664[3];
+
+    local_69c[0] = s_env_weather_rain_009d2664[4];
+
+    local_69c[1] = s_env_weather_rain_009d2664[5];
+
+    local_69c[2] = s_env_weather_rain_009d2664[6];
+
+    local_69c[3] = s_env_weather_rain_009d2664[7];
+
+    local_690 = s_env_weather_rain_009d2664[0x10];
+
+    local_698[0] = s_env_weather_rain_009d2664[8];
+
+    local_698[1] = s_env_weather_rain_009d2664[9];
+
+    local_698[2] = s_env_weather_rain_009d2664[10];
+
+    local_698[3] = s_env_weather_rain_009d2664[0xb];
+
+    local_594 = 1;
+
+    local_590 = 1;
+
+    local_694[0] = s_env_weather_rain_009d2664[0xc];
+
+    local_694[1] = s_env_weather_rain_009d2664[0xd];
+
+    local_694[2] = s_env_weather_rain_009d2664[0xe];
+
+    local_694[3] = s_env_weather_rain_009d2664[0xf];
+
+    local_58c = 0x4d0;
+
+    local_584 = 4;
+
+    local_580 = 30000;
+
+    local_57c = 60000;
+
+    local_588 = (float)DAT_00a0f728;
+
+    FUN_00559250(&local_6a0);
+
+    local_6a0._0_1_ = s_env_weather_snow_009d2650[0];
+
+    local_6a0._1_1_ = s_env_weather_snow_009d2650[1];
+
+    local_6a0._2_1_ = s_env_weather_snow_009d2650[2];
+
+    local_6a0._3_1_ = s_env_weather_snow_009d2650[3];
+
+    local_69c[0] = s_env_weather_snow_009d2650[4];
+
+    local_69c[1] = s_env_weather_snow_009d2650[5];
+
+    local_69c[2] = s_env_weather_snow_009d2650[6];
+
+    local_69c[3] = s_env_weather_snow_009d2650[7];
+
+    local_690 = s_env_weather_snow_009d2650[0x10];
+
+    local_698[0] = s_env_weather_snow_009d2650[8];
+
+    local_698[1] = s_env_weather_snow_009d2650[9];
+
+    local_698[2] = s_env_weather_snow_009d2650[10];
+
+    local_698[3] = s_env_weather_snow_009d2650[0xb];
+
+    local_694[0] = s_env_weather_snow_009d2650[0xc];
+
+    local_694[1] = s_env_weather_snow_009d2650[0xd];
+
+    local_694[2] = s_env_weather_snow_009d2650[0xe];
+
+    local_694[3] = s_env_weather_snow_009d2650[0xf];
+
+    local_594 = 3;
+
+    local_590 = 0;
+
+    local_58c = 0xffffffff;
+
+    local_584 = 0;
+
+    local_580 = 90000;
+
+    local_57c = 120000;
+
+    local_588 = g_flMultiKillCountBlend;
+
+    FUN_00559250(&local_6a0);
+
+    local_69c[0] = s_env_weather_dust_009d263c[4];
+
+    local_69c[1] = s_env_weather_dust_009d263c[5];
+
+    local_69c[2] = s_env_weather_dust_009d263c[6];
+
+    local_69c[3] = s_env_weather_dust_009d263c[7];
+
+    local_690 = s_env_weather_dust_009d263c[0x10];
+
+    local_6a0._0_1_ = s_env_weather_dust_009d263c[0];
+
+    local_6a0._1_1_ = s_env_weather_dust_009d263c[1];
+
+    local_6a0._2_1_ = s_env_weather_dust_009d263c[2];
+
+    local_6a0._3_1_ = s_env_weather_dust_009d263c[3];
+
+    local_594 = 0;
+
+    local_590 = 0;
+
+    local_58c = 0xffffffff;
+
+    local_698[0] = s_env_weather_dust_009d263c[8];
+
+    local_698[1] = s_env_weather_dust_009d263c[9];
+
+    local_698[2] = s_env_weather_dust_009d263c[10];
+
+    local_698[3] = s_env_weather_dust_009d263c[0xb];
+
+    local_694[0] = s_env_weather_dust_009d263c[0xc];
+
+    local_694[1] = s_env_weather_dust_009d263c[0xd];
+
+    local_694[2] = s_env_weather_dust_009d263c[0xe];
+
+    local_694[3] = s_env_weather_dust_009d263c[0xf];
+
+    local_584 = 0;
+
+    local_580 = 30000;
+
+    local_57c = 120000;
+
+    local_588 = (float)DAT_00a0f298;
+
+    FUN_00559250(&local_6a0);
+
+    local_594 = 2;
+
+    local_590 = 0;
+
+    local_58c = 0xffffffff;
+
+    local_584 = 0;
+
+    local_580 = 30000;
+
+    local_57c = 30000;
+
+    local_588 = 0.0;
+
+    FUN_00559250(&local_6a0);
+
+  }
+
+  FUN_00556a60();
+
+  local_56c[0] = s_env_time_dawn_009d25f8[0];
+
+  local_56c[1] = s_env_time_dawn_009d25f8[1];
+
+  local_56c[2] = s_env_time_dawn_009d25f8[2];
+
+  local_56c[3] = s_env_time_dawn_009d25f8[3];
+
+  local_560[0] = s_env_time_dawn_009d25f8[0xc];
+
+  local_560[1] = s_env_time_dawn_009d25f8[0xd];
+
+  local_564[0] = s_env_time_dawn_009d25f8[8];
+
+  local_564[1] = s_env_time_dawn_009d25f8[9];
+
+  local_564[2] = s_env_time_dawn_009d25f8[10];
+
+  local_564[3] = s_env_time_dawn_009d25f8[0xb];
+
+  local_568[0] = s_env_time_dawn_009d25f8[4];
+
+  local_568[1] = s_env_time_dawn_009d25f8[5];
+
+  local_568[2] = s_env_time_dawn_009d25f8[6];
+
+  local_568[3] = s_env_time_dawn_009d25f8[7];
+
+  local_45c[0] = s_env_time_midday_009d2570[4];
+
+  local_45c[1] = s_env_time_midday_009d2570[5];
+
+  local_45c[2] = s_env_time_midday_009d2570[6];
+
+  local_45c[3] = s_env_time_midday_009d2570[7];
+
+  local_460[0] = s_env_time_midday_009d2570[0];
+
+  local_460[1] = s_env_time_midday_009d2570[1];
+
+  local_460[2] = s_env_time_midday_009d2570[2];
+
+  local_460[3] = s_env_time_midday_009d2570[3];
+
+  local_354[0] = s_env_time_sunset_009d25e8[0];
+
+  local_354[1] = s_env_time_sunset_009d25e8[1];
+
+  local_354[2] = s_env_time_sunset_009d25e8[2];
+
+  local_354[3] = s_env_time_sunset_009d25e8[3];
+
+  local_458[0] = s_env_time_midday_009d2570[8];
+
+  local_458[1] = s_env_time_midday_009d2570[9];
+
+  local_458[2] = s_env_time_midday_009d2570[10];
+
+  local_458[3] = s_env_time_midday_009d2570[0xb];
+
+  local_454[0] = s_env_time_midday_009d2570[0xc];
+
+  local_454[1] = s_env_time_midday_009d2570[0xd];
+
+  local_454[2] = s_env_time_midday_009d2570[0xe];
+
+  local_454[3] = s_env_time_midday_009d2570[0xf];
+
+  local_348[0] = s_env_time_sunset_009d25e8[0xc];
+
+  local_348[1] = s_env_time_sunset_009d25e8[0xd];
+
+  local_348[2] = s_env_time_sunset_009d25e8[0xe];
+
+  local_348[3] = s_env_time_sunset_009d25e8[0xf];
+
+  local_350[0] = s_env_time_sunset_009d25e8[4];
+
+  local_350[1] = s_env_time_sunset_009d25e8[5];
+
+  local_350[2] = s_env_time_sunset_009d25e8[6];
+
+  local_350[3] = s_env_time_sunset_009d25e8[7];
+
+  local_34c[0] = s_env_time_sunset_009d25e8[8];
+
+  local_34c[1] = s_env_time_sunset_009d25e8[9];
+
+  local_34c[2] = s_env_time_sunset_009d25e8[10];
+
+  local_34c[3] = s_env_time_sunset_009d25e8[0xb];
+
+  local_240[0] = s_env_time_night_009d25d8[8];
+
+  local_240[1] = s_env_time_night_009d25d8[9];
+
+  local_240[2] = s_env_time_night_009d25d8[10];
+
+  local_240[3] = s_env_time_night_009d25d8[0xb];
+
+  local_248[0] = s_env_time_night_009d25d8[0];
+
+  local_248[1] = s_env_time_night_009d25d8[1];
+
+  local_248[2] = s_env_time_night_009d25d8[2];
+
+  local_248[3] = s_env_time_night_009d25d8[3];
+
+  local_23c[0] = s_env_time_night_009d25d8[0xc];
+
+  local_23c[1] = s_env_time_night_009d25d8[0xd];
+
+  local_244[0] = s_env_time_night_009d25d8[4];
+
+  local_244[1] = s_env_time_night_009d25d8[5];
+
+  local_244[2] = s_env_time_night_009d25d8[6];
+
+  local_244[3] = s_env_time_night_009d25d8[7];
+
+  local_4 = 0;
+
+  local_23a = s_env_time_night_009d25d8[0xe];
+
+  FUN_00556da0(0,local_56c);
+
+  if (local_138 != (void *)0x0) {
+
+                    /* WARNING: Subroutine does not return */
+
+    operator_delete(local_138);
+
+  }
+
+  ExceptionList = local_c;
+
+  return;
+
+}

@@ -1,0 +1,64 @@
+# Annotated low-level: FUN_008bafa0
+
+| Field | Value |
+|---|---|
+| Stable ID | `aa_008bafa0` |
+| VA | `0x008bafa0` |
+| System | unknown |
+| Date | 2026-07-23 |
+
+## Machine-level notes
+
+- Source: raw capture for `aa_008bafa0`.
+- Prefer assembly when decompiler conflicts.
+- Recover types for still-generic parameters via callers/xrefs.
+- Map DAT_* globals and FUN_* callees in follow-up waves.
+
+## Pseudocode (annotated copy of raw)
+
+```c
+void __fastcall FUN_008bafa0(undefined4 *param_1)
+
+{
+  undefined4 *puVar1;
+  undefined4 *puVar2;
+  int iVar3;
+  void *pvStack_c;
+  undefined1 *puStack_8;
+  undefined4 local_4;
+  
+  puStack_8 = &LAB_009b66e6;
+  pvStack_c = ExceptionList;
+  ExceptionList = &pvStack_c;
+  *param_1 = &PTR_FUN_00a46a14;
+  local_4 = 0;
+  puVar1 = &DAT_00d17788;
+  puVar2 = &DAT_00d177c8;
+  do {
+    iVar3 = 5;
+    do {
+      if ((void *)*puVar2 != (void *)0x0) {
+        operator_delete__((void *)*puVar2);
+      }
+      *puVar2 = 0;
+      puVar2 = puVar2 + 1;
+      iVar3 = iVar3 + -1;
+    } while (iVar3 != 0);
+    if ((void *)*puVar1 != (void *)0x0) {
+      operator_delete__((void *)*puVar1);
+    }
+    *puVar1 = 0;
+    puVar1 = puVar1 + 1;
+  } while ((int)puVar2 < 0xd178f4);
+  *param_1 = &PTR_FUN_00a58c6c;
+  local_4 = 0xffffffff;
+  FUN_00792c20();
+  ExceptionList = pvStack_c;
+  return;
+}
+```
+
+## Open questions
+
+- Confirm calling convention and full signature against callers.
+- Recover meaningful types for still-generic parameters.

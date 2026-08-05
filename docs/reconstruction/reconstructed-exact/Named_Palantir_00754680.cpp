@@ -1,0 +1,290 @@
+// READABILITY (auto CF):
+//  - Body size: ~128 non-empty decompiler lines.
+//  - Control keywords: if×15, return×3, goto×1.
+//  - Notable callees: FUN_0073bf10×3, FUN_00444850×2, vog_LogMessage×2, FUN_00444880, FUN_004448b0, FUN_004448d0, FUN_004448f0, FUN_00444910.
+//  - Strings: "C:\\vog\\1_code\\palantir\\palantir\\framework\\Palantir.cpp"; "Failed to enumerate adapters."; "No mode!"; "No device!".
+//  - Return sites: 3.
+
+// =============================================================================
+// Named_Palantir_00754680
+// -----------------------------------------------------------------------------
+// Stable ID: aa_00754680
+// Address:   0x00754680  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+/*
+ * Behavioral notes:
+ * String-driven rename evidence: "Palantir"
+ *
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+uint32_t /* width from decompiler */ Named_Palantir_00754680(int param_1,uint32_t /* width from decompiler */ *param_2,int *param_3,int param_4)
+
+
+
+{
+
+  int iVar1;
+
+  int iVar2;
+
+  int iVar3;
+
+  HWND hWnd;
+
+  int *piVar4;
+
+  int iVar5;
+
+  uint32_t /* width from decompiler */ *puVar6;
+
+  uint32_t /* width from decompiler */ uVar7;
+
+  char *pcVar8;
+
+  tagRECT local_1c;
+
+  void *local_c;
+
+  uint8_t *puStack_8;
+
+  uint32_t /* width from decompiler */ local_4;
+
+  
+
+  puVar6 = param_2;
+
+  iVar2 = param_1;
+
+  local_4 = 0xffffffff;
+
+  puStack_8 = &LAB_009b3fc7;
+
+  local_c = ExceptionList;
+
+  ExceptionList = &local_c;
+
+  *(bool *)(param_1 + 5) = *(char *)((int)param_2 + 10) == '\0';
+
+  *(uint32_t /* width from decompiler */ *)(param_1 + 0xb0) = param_2[1];
+
+  if ((*(int *)(param_1 + 0x14) == 0) ||
+
+     (param_1 = *(int *)(param_1 + 0x18) - *(int *)(param_1 + 0x14) >> 2, param_1 == 0)) {
+
+    iVar3 = FUN_00964dd0(param_2);
+
+    if (iVar3 < 0) {
+
+      vog_LogMessage("C:\\vog\\1_code\\palantir\\palantir\\framework\\Palantir.cpp",0x55,3,
+
+                     "Failed to enumerate adapters.");
+
+      ExceptionList = local_c;
+
+      return 0xffffffff;
+
+    }
+
+  }
+
+  piVar4 = param_3;
+
+  iVar3 = puVar6[10];
+
+  if (-1 < iVar3) {
+
+    iVar1 = *(int *)(iVar2 + 0x14);
+
+    if (iVar1 == 0) {
+
+      iVar5 = 0;
+
+    }
+
+    else {
+
+      iVar5 = *(int *)(iVar2 + 0x18) - iVar1 >> 2;
+
+    }
+
+    if ((iVar3 < iVar5) && (iVar1 = *(int *)(iVar1 + iVar3 * 4), iVar1 != 0)) {
+
+      *(int *)(iVar2 + 0x24) = iVar3;
+
+      iVar3 = FUN_00735410(iVar1,param_3,&param_1,puVar6);
+
+      if (iVar3 < 0) {
+
+        pcVar8 = "No mode!";
+
+        uVar7 = 0x66;
+
+      }
+
+      else {
+
+        if (*(int *)(*piVar4 + 0xc) == 0x16) {
+
+          *(uint32_t /* width from decompiler */ *)(*piVar4 + 0xc) = 0x15;
+
+        }
+
+        iVar3 = FUN_00735c90(*piVar4,param_1,puVar6);
+
+        *(int *)(iVar2 + 0x28) = iVar3;
+
+        if (iVar3 == 0) {
+
+          pcVar8 = "No device!";
+
+          uVar7 = 0x73;
+
+        }
+
+        else {
+
+          if (*(char *)(puVar6 + 4) != '\0') {
+
+            FUN_0073bf10(&LAB_0073a200,&LAB_00444660);
+
+            FUN_0073bf10(&LAB_0073adf0,&LAB_004446f0);
+
+            puVar6 = param_2;
+
+          }
+
+          if (*(char *)((int)puVar6 + 0xf) != '\0') {
+
+            FUN_0073bf10(0,0);
+
+            puVar6 = param_2;
+
+          }
+
+          FUN_00444850();
+
+          FUN_00444850();
+
+          FUN_00444880();
+
+          if (*(char *)(iVar2 + 5) == '\0') {
+
+            *(uint32_t /* width from decompiler */ *)(iVar2 + 8) = *(uint32_t /* width from decompiler */ *)(*piVar4 + 4);
+
+            *(uint32_t /* width from decompiler */ *)(iVar2 + 0xc) = *(uint32_t /* width from decompiler */ *)(*piVar4 + 8);
+
+          }
+
+          else {
+
+            hWnd = (HWND)puVar6[1];
+
+            if (hWnd == (HWND)0x0) {
+
+              hWnd = (HWND)*puVar6;
+
+            }
+
+            GetClientRect(hWnd,&local_1c);
+
+            *(LONG *)(iVar2 + 0xc) = local_1c.bottom - local_1c.top;
+
+            *(LONG *)(iVar2 + 8) = local_1c.right - local_1c.left;
+
+            *(LONG *)(*piVar4 + 4) = local_1c.right - local_1c.left;
+
+            *(uint32_t /* width from decompiler */ *)(*piVar4 + 8) = *(uint32_t /* width from decompiler */ *)(iVar2 + 0xc);
+
+          }
+
+          if (param_4 != 0) {
+
+            FUN_007540e0();
+
+          }
+
+          iVar3 = FUN_0075fc40();
+
+          if (-1 < iVar3) {
+
+            FUN_004448b0();
+
+            FUN_004448d0();
+
+            FUN_004448f0();
+
+            FUN_00444910();
+
+            FUN_00444930();
+
+            FUN_00757570();
+
+            param_2 = operator_new(0xd4);
+
+            local_4 = 0;
+
+            if (param_2 == (void *)0x0) {
+
+              piVar4 = (int *)0x0;
+
+            }
+
+            else {
+
+              piVar4 = (int *)FUN_009685e0();
+
+            }
+
+            local_4 = 0xffffffff;
+
+            *(int **)(iVar2 + 0x2c) = piVar4;
+
+            (**(code **)(*piVar4 + 8))(iVar2 + 8);
+
+            *(uint8_t *)(iVar2 + 4) = 1;
+
+            ExceptionList = (void *)local_1c.bottom;
+
+            return 0;
+
+          }
+
+          pcVar8 = "Failed to start device.";
+
+          uVar7 = 0xaf;
+
+        }
+
+      }
+
+      goto LAB_00754734;
+
+    }
+
+  }
+
+  pcVar8 = "No adapters!";
+
+  uVar7 = 0x5d;
+
+LAB_00754734:
+
+  vog_LogMessage("C:\\vog\\1_code\\palantir\\palantir\\framework\\Palantir.cpp",uVar7,3,pcVar8);
+
+  ExceptionList = local_c;
+
+  return 0xffffffff;
+
+}

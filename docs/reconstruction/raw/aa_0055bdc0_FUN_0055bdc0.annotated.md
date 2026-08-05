@@ -1,0 +1,36 @@
+# Annotated low-level: FUN_0055bdc0
+
+| Field | Value |
+|---|---|
+| Stable ID | `aa_0055bdc0` |
+| VA | `0x0055bdc0` |
+| System | unknown |
+| Date | 2026-07-23 |
+
+## Machine-level notes
+
+- Source: raw capture for `aa_0055bdc0`.
+- Prefer assembly when decompiler conflicts.
+- Recover types for still-generic parameters via callers/xrefs.
+- Map DAT_* globals and FUN_* callees in follow-up waves.
+
+## Pseudocode (annotated copy of raw)
+
+```c
+void FUN_0055bdc0(void *param_1)
+
+{
+  if (*(char *)((int)param_1 + 0x2d) == '\0') {
+    FUN_0055bdc0(*(undefined4 *)((int)param_1 + 8));
+    FUN_004933e0();
+                    /* WARNING: Subroutine does not return */
+    operator_delete(param_1);
+  }
+  return;
+}
+```
+
+## Open questions
+
+- Confirm calling convention and full signature against callers.
+- Recover meaningful types for still-generic parameters.

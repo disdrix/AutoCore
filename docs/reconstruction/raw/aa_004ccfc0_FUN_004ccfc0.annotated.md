@@ -1,0 +1,39 @@
+# Annotated low-level: FUN_004ccfc0
+
+| Field | Value |
+|---|---|
+| Stable ID | `aa_004ccfc0` |
+| VA | `0x004ccfc0` |
+| System | unknown |
+| Date | 2026-07-23 |
+
+## Machine-level notes
+
+- Source: raw capture for `aa_004ccfc0`.
+- Prefer assembly when decompiler conflicts.
+- Recover types for still-generic parameters via callers/xrefs.
+- Map DAT_* globals and FUN_* callees in follow-up waves.
+
+## Pseudocode (annotated copy of raw)
+
+```c
+undefined1 FUN_004ccfc0(uint param_1)
+
+{
+  int iVar1;
+  int iVar2;
+  
+  iVar2 = FUN_005c9c50();
+  iVar1 = *(int *)(iVar2 + 4);
+  if ((iVar1 != 0) && (param_1 < (uint)(*(int *)(iVar2 + 8) - iVar1 >> 2))) {
+    return *(undefined1 *)(iVar1 + 2 + param_1 * 4);
+  }
+                    /* WARNING: Subroutine does not return */
+  FUN_004ccf30();
+}
+```
+
+## Open questions
+
+- Confirm calling convention and full signature against callers.
+- Recover meaningful types for still-generic parameters.

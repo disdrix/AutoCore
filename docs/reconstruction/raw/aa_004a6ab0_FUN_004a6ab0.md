@@ -1,0 +1,52 @@
+# Raw capture: FUN_004a6ab0
+
+| Field | Value |
+|---|---|
+| **Stable ID** | `aa_004a6ab0` |
+| **Module** | `autoassault.exe` |
+| **Image base** | `0x400000` |
+| **VA** | `0x004a6ab0` |
+| **Canonical name** | `FUN_004a6ab0` |
+| **System** | unknown |
+| **Capture timestamp** | `2026-07-23` |
+| **Tool** | Ghidra MCP `batch_decompile` |
+| **Integrity** | Do not overwrite this raw body; append versioned sections only |
+
+---
+
+## Raw pseudocode (authoritative decompile)
+
+```c
+void __thiscall FUN_004a6ab0(int param_1,uint param_2)
+
+{
+  basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> local_50 [28];
+  undefined **local_34 [3];
+  basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> local_28 [28];
+  void *local_c;
+  undefined1 *puStack_8;
+  int local_4;
+  
+  local_4 = 0xffffffff;
+  puStack_8 = &LAB_009a11a2;
+  local_c = ExceptionList;
+  if (0x1fffffffU - *(int *)(param_1 + 8) < param_2) {
+    ExceptionList = &local_c;
+    std::basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>::
+    basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>
+              (local_50,"list<T> too long");
+    local_4 = 0;
+    exception::exception((exception *)local_34);
+    local_4._0_1_ = 1;
+    local_34[0] = &PTR_FUN_009c7628;
+    std::basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>::
+    basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>(local_28,local_50);
+    local_4 = (uint)local_4._1_3_ << 8;
+    local_34[0] = &PTR_FUN_009c7634;
+                    /* WARNING: Subroutine does not return */
+    _CxxThrowException(local_34,(ThrowInfo *)&DAT_00acc388);
+  }
+  *(uint *)(param_1 + 8) = *(int *)(param_1 + 8) + param_2;
+  return;
+}
+```

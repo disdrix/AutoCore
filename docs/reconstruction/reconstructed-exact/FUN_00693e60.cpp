@@ -1,0 +1,404 @@
+// =============================================================================
+// FUN_00693e60
+// -----------------------------------------------------------------------------
+// Stable ID: aa_00693e60
+// Address:   0x00693e60  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_00693e60 @ 0x00693e60
+// Stable ID: aa_00693e60
+// No high-value strings recovered; name via xrefs/callers in follow-up.
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~184 non-empty decompiler lines.
+//  - Control keywords: if×5, do×3, return×3, while×3, switch×2, goto×1.
+//  - Notable callees: FUN_00699ee0×13, FUN_00699ed0×8, FUN_006874b0×2, FUN_006901c0×2, _CxxThrowException×2, CONCAT31, FUN_00685ee0, FUN_00685f40.
+//  - Return sites: 3.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+void __thiscall FUN_00693e60(int param_1,int *param_2)
+
+
+
+{
+
+  int iVar1;
+
+  int iVar2;
+
+  basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> *pbVar3;
+
+  uint32_t /* width from decompiler */ uVar4;
+
+  int iVar5;
+
+  float10 fVar6;
+
+  uint8_t auStack_12c [16];
+
+  undefined *puStack_11c;
+
+  basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> local_fc [28];
+
+  float local_e0;
+
+  float local_dc;
+
+  float local_d8;
+
+  float local_d4;
+
+  uint8_t *local_d0;
+
+  basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> local_cc [28];
+
+  basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> local_b0 [28];
+
+  uint8_t local_94 [40];
+
+  uint8_t local_6c [96];
+
+  void *local_c;
+
+  uint8_t *puStack_8;
+
+  int local_4;
+
+  
+
+  local_4 = 0xffffffff;
+
+  puStack_8 = &LAB_009aa803;
+
+  local_c = ExceptionList;
+
+  ExceptionList = &local_c;
+
+  iVar1 = FUN_00699ee0();
+
+  do {
+
+    if (iVar1 < 0x36b8) {
+
+      if (iVar1 == 0x36b7) {
+
+        uVar4 = FUN_00699ee0();
+
+        *(uint32_t /* width from decompiler */ *)(param_1 + 100) = uVar4;
+
+      }
+
+      else {
+
+        switch(iVar1) {
+
+        case 0x32ca:
+
+          uVar4 = FUN_00699ee0();
+
+          *(uint32_t /* width from decompiler */ *)(param_1 + 0x38) = uVar4;
+
+          break;
+
+        case 0x32cb:
+
+          uVar4 = FUN_00699ee0();
+
+          *(uint32_t /* width from decompiler */ *)(param_1 + 0x28) = uVar4;
+
+          break;
+
+        case 0x32cc:
+
+          uVar4 = FUN_00699ee0();
+
+          *(uint32_t /* width from decompiler */ *)(param_1 + 0x2c) = uVar4;
+
+          break;
+
+        case 0x32cd:
+
+          FUN_006902a0();
+
+          FUN_00690190();
+
+          break;
+
+        case 0x32ce:
+
+          uVar4 = FUN_00699ee0();
+
+          *(uint32_t /* width from decompiler */ *)(param_1 + 0x34) = uVar4;
+
+          break;
+
+        case 0x32cf:
+
+          iVar1 = *param_2;
+
+          *param_2 = iVar1 + 1;
+
+          *(bool *)(param_1 + 0x3c) = *(char *)(param_2[2] + iVar1) != '\0';
+
+          break;
+
+        case 0x32d0:
+
+          FUN_006919f0();
+
+          iVar1 = FUN_00699ee0();
+
+          iVar5 = 0;
+
+          if (0 < iVar1) {
+
+            do {
+
+              std::basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>::
+
+              basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>(local_fc)
+
+              ;
+
+              local_e0 = 0.5;
+
+              local_dc = 1.0;
+
+              local_d8 = 0.0;
+
+              local_d4 = 0.0;
+
+              local_4 = 0;
+
+              FUN_00699ee0();
+
+              iVar2 = FUN_00699ee0();
+
+              do {
+
+                switch(iVar2) {
+
+                case 0x36b2:
+
+                  local_d0 = auStack_12c;
+
+                  FUN_00699f00(auStack_12c);
+
+                  FUN_00685ee0();
+
+                  local_4._0_1_ = 1;
+
+                  std::basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>
+
+                  ::operator=(local_fc,local_cc);
+
+                  local_4._0_1_ = 0;
+
+                  std::basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>
+
+                  ::~basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>
+
+                            (local_cc);
+
+                  pbVar3 = (basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>
+
+                            *)FUN_00685f40();
+
+                  local_4._0_1_ = 2;
+
+                  std::basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>
+
+                  ::operator=(local_fc,pbVar3);
+
+                  local_4 = (uint)local_4._1_3_ << 8;
+
+                  std::basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>
+
+                  ::~basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>
+
+                            (local_b0);
+
+                  break;
+
+                case 0x36b3:
+
+                  fVar6 = (float10)FUN_00699ed0();
+
+                  local_e0 = (float)fVar6;
+
+                  break;
+
+                case 0x36b4:
+
+                  fVar6 = (float10)FUN_00699ed0();
+
+                  local_dc = (float)fVar6;
+
+                  break;
+
+                case 0x36b5:
+
+                  fVar6 = (float10)FUN_00699ed0();
+
+                  local_d8 = (float)fVar6;
+
+                  break;
+
+                case 0x36b6:
+
+                  fVar6 = (float10)FUN_00699ed0();
+
+                  local_d4 = (float)fVar6;
+
+                  break;
+
+                default:
+
+                  puStack_11c = (undefined *)0x69413e;
+
+                  FUN_006901c0();
+
+                  local_4 = CONCAT31(local_4._1_3_,3);
+
+                  puStack_11c = (undefined *)0x694158;
+
+                  FUN_006874b0();
+
+                    /* WARNING: Subroutine does not return */
+
+                  puStack_11c = (undefined *)0x69416a;
+
+                  _CxxThrowException(local_94,(ThrowInfo *)&DAT_00ac9e00);
+
+                }
+
+                iVar2 = FUN_00699ee0();
+
+              } while (iVar2 != 0x36b1);
+
+              FUN_00693a50();
+
+              local_4 = 0xffffffff;
+
+              std::basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>::
+
+              ~basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>
+
+                        (local_fc);
+
+              iVar5 = iVar5 + 1;
+
+            } while (iVar5 < iVar1);
+
+          }
+
+          break;
+
+        case 0x32d1:
+
+          uVar4 = FUN_00699ee0();
+
+          *(uint32_t /* width from decompiler */ *)(param_1 + 0x50) = uVar4;
+
+          break;
+
+        case 0x32d2:
+
+          fVar6 = (float10)FUN_00699ed0();
+
+          *(float *)(param_1 + 0x54) = (float)fVar6;
+
+          break;
+
+        case 0x32d3:
+
+          fVar6 = (float10)FUN_00699ed0();
+
+          *(float *)(param_1 + 0x58) = (float)fVar6;
+
+          break;
+
+        case 0x32d4:
+
+          fVar6 = (float10)FUN_00699ed0();
+
+          *(float *)(param_1 + 0x5c) = (float)fVar6;
+
+          break;
+
+        case 0x32d5:
+
+          fVar6 = (float10)FUN_00699ed0();
+
+          *(float *)(param_1 + 0x60) = (float)fVar6;
+
+          break;
+
+        default:
+
+          goto switchD_00693eb0_default;
+
+        }
+
+      }
+
+    }
+
+    else {
+
+      if (iVar1 != 0x36b8) {
+
+switchD_00693eb0_default:
+
+        puStack_11c = (undefined *)0x69417c;
+
+        FUN_006901c0();
+
+        local_4 = 4;
+
+        puStack_11c = (undefined *)0x694199;
+
+        FUN_006874b0();
+
+                    /* WARNING: Subroutine does not return */
+
+        puStack_11c = &UNK_006941ab;
+
+        _CxxThrowException(local_6c,(ThrowInfo *)&DAT_00ac9e00);
+
+      }
+
+      uVar4 = FUN_00699ee0();
+
+      *(uint32_t /* width from decompiler */ *)(param_1 + 0x68) = uVar4;
+
+    }
+
+    iVar1 = FUN_00699ee0();
+
+    if (iVar1 == 0x32c9) {
+
+      ExceptionList = local_c;
+
+      return;
+
+    }
+
+  } while( true );
+
+}

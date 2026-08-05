@@ -1,0 +1,88 @@
+{
+  "totals": {
+    "addrs": 100,
+    "decomp": 100,
+    "units": 100,
+    "new_raw": 100,
+    "new_clean": 100,
+    "key_match": 5
+  },
+  "per_batch": [
+    {
+      "id": 45,
+      "status": "ok",
+      "addrs": 20,
+      "decomp": 20,
+      "key_match": true,
+      "units": 20,
+      "new_raw": 20,
+      "new_clean": 20,
+      "verify_raw": 20,
+      "verify_clean": 20,
+      "verify_func": 20,
+      "first": "0x004612d0",
+      "last": "0x004621a0"
+    },
+    {
+      "id": 46,
+      "status": "ok",
+      "addrs": 20,
+      "decomp": 20,
+      "key_match": true,
+      "units": 20,
+      "new_raw": 20,
+      "new_clean": 20,
+      "verify_raw": 20,
+      "verify_clean": 20,
+      "verify_func": 20,
+      "first": "0x00462210",
+      "last": "0x004627c0"
+    },
+    {
+      "id": 47,
+      "status": "ok",
+      "addrs": 20,
+      "decomp": 20,
+      "key_match": true,
+      "units": 20,
+      "new_raw": 20,
+      "new_clean": 20,
+      "verify_raw": 20,
+      "verify_clean": 20,
+      "verify_func": 20,
+      "first": "0x004627e0",
+      "last": "0x004636b0"
+    },
+    {
+      "id": 48,
+      "status": "ok",
+      "addrs": 20,
+      "decomp": 20,
+      "key_match": true,
+      "units": 20,
+      "new_raw": 20,
+      "new_clean": 20,
+      "verify_raw": 20,
+      "verify_clean": 20,
+      "verify_func": 20,
+      "first": "0x00463710",
+      "last": "0x004642d0"
+    },
+    {
+      "id": 49,
+      "status": "ok",
+      "addrs": 20,
+      "decomp": 20,
+      "key_match": true,
+      "units": 20,
+      "new_raw": 20,
+      "new_clean": 20,
+      "verify_raw": 20,
+      "verify_clean": 20,
+      "verify_func": 20,
+      "first": "0x00464340",
+      "last": "0x00464c40"
+    }
+  ],
+  "when": "2026-07-23T08:07:33.051778"
+}

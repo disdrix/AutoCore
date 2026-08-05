@@ -1,0 +1,90 @@
+# Raw capture: FUN_006ecc50
+
+| Field | Value |
+|---|---|
+| **Stable ID** | `aa_006ecc50` |
+| **Module** | `autoassault.exe` |
+| **Image base** | `0x400000` |
+| **VA** | `0x006ecc50` |
+| **Canonical name** | `FUN_006ecc50` |
+| **System** | unknown |
+| **Capture timestamp** | `2026-07-23` |
+| **Tool** | Ghidra MCP `batch_decompile` |
+| **Integrity** | Do not overwrite this raw body; append versioned sections only |
+
+---
+
+## Raw pseudocode (authoritative decompile)
+
+```c
+void __thiscall
+FUN_006ecc50(int param_1,int *param_2,undefined4 param_3,undefined4 param_4,int param_5)
+
+{
+  float fVar1;
+  float fVar2;
+  float fVar3;
+  int iVar4;
+  int iVar5;
+  int iVar6;
+  int iVar7;
+  int *piVar8;
+  undefined **local_a0;
+  uint local_9c;
+  undefined4 local_94;
+  undefined ***local_90;
+  int local_8c;
+  undefined1 *local_88;
+  int *local_84;
+  float local_80;
+  float local_7c;
+  undefined1 local_70 [32];
+  float local_50;
+  float local_4c;
+  float local_48;
+  float local_40;
+  float local_3c;
+  float local_38;
+  float local_30;
+  float local_2c;
+  float local_28;
+  float local_20;
+  float local_1c;
+  float local_18;
+  undefined4 local_14;
+  
+  iVar4 = *param_2;
+  FUN_006e8880(param_2[2]);
+  FUN_006c7fa0(0);
+  piVar8 = *(int **)(param_1 + 0xc);
+  iVar5 = *(int *)(param_1 + 0x10);
+  local_88 = local_70;
+  local_84 = param_2;
+  while (iVar5 = iVar5 + -1, -1 < iVar5) {
+    iVar7 = (*piVar8 + 1) * 0x10;
+    fVar1 = *(float *)(iVar7 + iVar4);
+    iVar7 = iVar7 + iVar4;
+    fVar2 = *(float *)(iVar7 + 4);
+    fVar3 = *(float *)(iVar7 + 8);
+    iVar6 = param_2[2];
+    local_80 = local_50 * fVar1 + local_40 * fVar2 + local_30 * fVar3;
+    local_7c = local_4c * fVar1 + local_3c * fVar2 + local_2c * fVar3;
+    local_20 = local_80 + *(float *)(iVar6 + 0x50);
+    local_1c = local_7c + *(float *)(iVar6 + 0x54);
+    local_18 = local_48 * fVar1 + local_38 * fVar2 + local_28 * fVar3 + *(float *)(iVar6 + 0x58);
+    local_14 = *(undefined4 *)(iVar6 + 0x5c);
+    local_94 = *(undefined4 *)(iVar7 + 0xc);
+    local_90 = &local_a0;
+    local_8c = iVar5;
+    (**(code **)(*(int *)piVar8[1] + 4))(&local_90,param_3,param_4,param_5);
+    if (*(char *)(param_5 + 4) != '\0') break;
+    piVar8 = piVar8 + 2;
+  }
+  local_a0 = &PTR_FUN_009d81e8;
+  if ((char)(local_9c >> 8) < '\0') {
+    local_9c = local_9c & 0xffff7fff;
+    FUN_005ffdb0(0);
+  }
+  return;
+}
+```

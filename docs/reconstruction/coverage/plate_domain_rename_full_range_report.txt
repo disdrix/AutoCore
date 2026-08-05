@@ -1,0 +1,6 @@
+wrote=1
+# Plate-driven domain FUN_* aliases across full address range
+# Source: PURPOSE/READABILITY embedded strings (not CalleeOf)
+# FUN_* originals retained. Skips existing non-CalleeOf domain aliases.
+
+0x00979310 -> Named_AllocateNewObjectFromCbidFailed_00979310  (score=10; allocatenewobjectfromcbid failed %d Get a programmer)

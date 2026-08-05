@@ -1,0 +1,53 @@
+# Annotated low-level: FUN_005b7ab0
+
+| Field | Value |
+|---|---|
+| Stable ID | `aa_005b7ab0` |
+| VA | `0x005b7ab0` |
+| System | unknown |
+| Date | 2026-07-23 |
+
+## Machine-level notes
+
+- Source: raw capture for `aa_005b7ab0`.
+- Prefer assembly when decompiler conflicts.
+- Recover types for still-generic parameters via callers/xrefs.
+- Map DAT_* globals and FUN_* callees in follow-up waves.
+
+## Pseudocode (annotated copy of raw)
+
+```c
+void FUN_005b7ab0(void)
+
+{
+  basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> local_50 [28];
+  undefined **local_34 [3];
+  basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> local_28 [28];
+  void *pvStack_c;
+  undefined1 *puStack_8;
+  int local_4;
+  
+  local_4 = 0xffffffff;
+  puStack_8 = &LAB_009a6ac2;
+  pvStack_c = ExceptionList;
+  ExceptionList = &pvStack_c;
+  std::basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>::
+  basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>
+            (local_50,"vector<T> too long");
+  local_4 = 0;
+  exception::exception((exception *)local_34);
+  local_4._0_1_ = 1;
+  local_34[0] = &PTR_FUN_009c7628;
+  std::basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>::
+  basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>(local_28,local_50);
+  local_4 = (uint)local_4._1_3_ << 8;
+  local_34[0] = &PTR_FUN_009c7634;
+                    /* WARNING: Subroutine does not return */
+  _CxxThrowException(local_34,(ThrowInfo *)&DAT_00acc388);
+}
+```
+
+## Open questions
+
+- Confirm calling convention and full signature against callers.
+- Recover meaningful types for still-generic parameters.

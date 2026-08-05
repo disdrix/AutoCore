@@ -1,0 +1,49 @@
+# Annotated low-level: FUN_007fb9e0
+
+| Field | Value |
+|---|---|
+| Stable ID | `aa_007fb9e0` |
+| VA | `0x007fb9e0` |
+| System | unknown |
+| Date | 2026-07-23 |
+
+## Machine-level notes
+
+- Source: raw capture for `aa_007fb9e0`.
+- Prefer assembly when decompiler conflicts.
+- Recover types for still-generic parameters via callers/xrefs.
+- Map DAT_* globals and FUN_* callees in follow-up waves.
+
+## Pseudocode (annotated copy of raw)
+
+```c
+void FUN_007fb9e0(void)
+
+{
+  char cVar1;
+  int unaff_ESI;
+  int unaff_EDI;
+  undefined4 uVar2;
+  undefined4 uVar3;
+  
+  if (*(int *)(unaff_ESI + 0x1144) != 0) {
+    cVar1 = (**(code **)(**(int **)(unaff_ESI + 0x1144) + 0xd0))();
+    if ((cVar1 != '\0') && (unaff_EDI != 0)) {
+      uVar3 = 1;
+      uVar2 = 1;
+      (**(code **)(**(int **)(unaff_ESI + 0x1144) + 0x1d8))();
+      (**(code **)(**(int **)(unaff_ESI + 0x1144) + 0x13c))();
+                    /* WARNING: Could not recover jumptable at 0x007fba28. Too many branches */
+                    /* WARNING: Treating indirect jump as call */
+      (**(code **)(**(int **)(unaff_ESI + 0x1144) + 0x34c))(uVar2,uVar3);
+      return;
+    }
+  }
+  return;
+}
+```
+
+## Open questions
+
+- Confirm calling convention and full signature against callers.
+- Recover meaningful types for still-generic parameters.

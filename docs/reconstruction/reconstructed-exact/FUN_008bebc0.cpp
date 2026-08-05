@@ -1,0 +1,106 @@
+// =============================================================================
+// FUN_008bebc0
+// -----------------------------------------------------------------------------
+// Stable ID: aa_008bebc0
+// Address:   0x008bebc0  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_008bebc0 @ 0x008bebc0
+// Stable ID: aa_008bebc0
+// No high-value strings recovered; name via xrefs/callers in follow-up.
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~35 non-empty decompiler lines.
+//  - Control keywords: return×1.
+//  - Notable callees: FUN_00410590, FUN_008bebc0.
+//  - Return sites: 1.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+void __fastcall FUN_008bebc0(int param_1)
+
+
+
+{
+
+  uint32_t /* width from decompiler */ uVar1;
+
+  
+
+  uVar1 = DAT_00a110d8;
+
+  *(uint32_t /* width from decompiler */ *)(param_1 + 0x4b8) = 0;
+
+  *(uint32_t /* width from decompiler */ *)(param_1 + 0x4bc) = 0;
+
+  *(uint32_t /* width from decompiler */ *)(param_1 + 0x4b4) = 0;
+
+  *(uint32_t /* width from decompiler */ *)(param_1 + 0x504) = 0;
+
+  *(uint32_t /* width from decompiler */ *)(param_1 + 0x508) = 0;
+
+  *(uint32_t /* width from decompiler */ *)(param_1 + 0x51c) = 0;
+
+  *(uint32_t /* width from decompiler */ *)(param_1 + 0x540) = 0;
+
+  *(uint32_t /* width from decompiler */ *)(param_1 + 0x54c) = 0;
+
+  *(uint32_t /* width from decompiler */ *)(param_1 + 0x558) = 0;
+
+  *(uint32_t /* width from decompiler */ *)(param_1 + 0x564) = 0;
+
+  *(uint32_t /* width from decompiler */ *)(param_1 + 0x570) = 0;
+
+  *(uint32_t /* width from decompiler */ *)(param_1 + 0x57c) = 0;
+
+  *(uint32_t /* width from decompiler */ *)(param_1 + 0x544) = 0;
+
+  *(uint32_t /* width from decompiler */ *)(param_1 + 0x550) = 0;
+
+  *(uint32_t /* width from decompiler */ *)(param_1 + 0x55c) = 0;
+
+  *(uint32_t /* width from decompiler */ *)(param_1 + 0x568) = 0;
+
+  *(uint32_t /* width from decompiler */ *)(param_1 + 0x574) = 0;
+
+  *(uint32_t /* width from decompiler */ *)(param_1 + 0x580) = 0;
+
+  *(uint32_t /* width from decompiler */ *)(param_1 + 0x548) = 0;
+
+  *(uint32_t /* width from decompiler */ *)(param_1 + 0x554) = 0;
+
+  *(uint32_t /* width from decompiler */ *)(param_1 + 0x560) = 0;
+
+  *(uint32_t /* width from decompiler */ *)(param_1 + 0x56c) = 0;
+
+  *(uint32_t /* width from decompiler */ *)(param_1 + 0x578) = 0;
+
+  *(uint32_t /* width from decompiler */ *)(param_1 + 0x584) = 0;
+
+  *(uint32_t /* width from decompiler */ *)(param_1 + 0x510) = uVar1;
+
+  *(uint32_t /* width from decompiler */ *)(param_1 + 0x514) = 0;
+
+  *(float *)(param_1 + 0x518) = g_flMultiKillCountBlend;
+
+  *(uint8_t *)(param_1 + 0x53c) = 0;
+
+  FUN_00410590(0,0);
+
+  return;
+
+}

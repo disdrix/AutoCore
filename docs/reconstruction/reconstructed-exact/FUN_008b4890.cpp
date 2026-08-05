@@ -1,0 +1,1219 @@
+// =============================================================================
+// FUN_008b4890
+// -----------------------------------------------------------------------------
+// Stable ID: aa_008b4890
+// Address:   0x008b4890  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_008b4890 @ 0x008b4890
+// Stable ID: aa_008b4890
+// Embedded strings (evidence for future rename):
+//   - "i_d_mem_2d_wnd_title.xml"
+//   - "i_d_mem_2d_wnd_status.xml"
+//   - "i_d_mem_2d_wnd_status_replace.xml"
+//   - "i_d_mem_2d_sb_memorized.xml"
+//   - "i_d_mem_2d_btn_assemble.xml"
+//   - "i_d_mem_2d_wnd_item_disc_name.xml"
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~587 non-empty decompiler lines.
+//  - Control keywords: if×18, for×1, do×1, while×1, return×1.
+//  - Notable callees: FUN_007b5dd0×12, FUN_0079c860×2, FUN_0078f890, FUN_00792600, FUN_008b2f00, FUN_008b3050, FUN_008b30c0, FUN_008b3670.
+//  - Strings: "i_d_mem_2d_wnd_title.xml"; "i_d_mem_2d_wnd_status.xml"; "i_d_mem_2d_wnd_status_replace.xml"; "i_d_mem_2d_sb_memorized.xml".
+//  - Return sites: 1.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+/* WARNING: Restarted to delay deadcode elimination for space: stack */
+
+
+
+void __fastcall FUN_008b4890(int *param_1)
+
+
+
+{
+
+  void *pvVar1;
+
+  int iVar2;
+
+  int *piVar3;
+
+  int *piVar4;
+
+  uint32_t /* width from decompiler */ *puVar5;
+
+  int *unaff_EBX;
+
+  int unaff_EBP;
+
+  int unaff_EDI;
+
+  int *piVar6;
+
+  char *pcVar7;
+
+  void **ppvStack_2bc;
+
+  int iStack_2b8;
+
+  int *piStack_2b4;
+
+  int *piStack_2b0;
+
+  int *piStack_2ac;
+
+  void ***pppvStack_2a8;
+
+  int *piStack_2a4;
+
+  uint32_t /* width from decompiler */ uStack_2a0;
+
+  int *piStack_29c;
+
+  uint32_t /* width from decompiler */ uStack_294;
+
+  int iStack_290;
+
+  void **ppvStack_28c;
+
+  int **ppiStack_288;
+
+  int *piStack_284;
+
+  uint32_t /* width from decompiler */ uStack_280;
+
+  int *piStack_27c;
+
+  void *pvStack_274;
+
+  int iStack_270;
+
+  void **ppvStack_26c;
+
+  int ***pppiStack_268;
+
+  int *piStack_264;
+
+  uint32_t /* width from decompiler */ uStack_260;
+
+  int *piStack_25c;
+
+  void *pvStack_254;
+
+  int iStack_250;
+
+  void **ppvStack_24c;
+
+  int **ppiStack_248;
+
+  int *piStack_244;
+
+  uint32_t /* width from decompiler */ uStack_240;
+
+  int *piStack_23c;
+
+  void *pvStack_234;
+
+  int iStack_230;
+
+  void **ppvStack_22c;
+
+  int **ppiStack_228;
+
+  int *piStack_224;
+
+  uint32_t /* width from decompiler */ uStack_220;
+
+  int *piStack_21c;
+
+  void *pvStack_214;
+
+  int iStack_210;
+
+  int **ppiStack_20c;
+
+  int *piStack_208;
+
+  int *piStack_204;
+
+  uint32_t /* width from decompiler */ uStack_200;
+
+  int *piStack_1fc;
+
+  int *piStack_1f4;
+
+  int iStack_1f0;
+
+  int **ppiStack_1ec;
+
+  int *piStack_1e8;
+
+  int *piStack_1e4;
+
+  uint32_t /* width from decompiler */ uStack_1e0;
+
+  int *piStack_1dc;
+
+  int *piStack_1d4;
+
+  int **ppiStack_1d0;
+
+  int *piStack_1cc;
+
+  int *piStack_1c8;
+
+  int *piStack_1c4;
+
+  uint32_t /* width from decompiler */ uStack_1c0;
+
+  int iStack_1bc;
+
+  void *pvStack_1b8;
+
+  char *pcStack_1b4;
+
+  int iStack_184;
+
+  void **ppvStack_180;
+
+  char **ppcStack_17c;
+
+  int iStack_178;
+
+  uint32_t /* width from decompiler */ uStack_174;
+
+  int *piStack_170;
+
+  void *pvStack_168;
+
+  int iStack_164;
+
+  int *piStack_160;
+
+  int *piStack_15c;
+
+  int *piStack_158;
+
+  uint32_t /* width from decompiler */ uStack_154;
+
+  int *piStack_150;
+
+  int *piStack_14c;
+
+  int iStack_144;
+
+  int iStack_140;
+
+  int *piStack_13c;
+
+  int *piStack_138;
+
+  int *piStack_134;
+
+  uint32_t /* width from decompiler */ uStack_130;
+
+  char *pcStack_12c;
+
+  int iStack_120;
+
+  char *pcStack_108;
+
+  uint32_t /* width from decompiler */ uStack_104;
+
+  void *pvStack_100;
+
+  uint32_t /* width from decompiler */ uStack_fc;
+
+  int *piStack_f8;
+
+  char *pcStack_f4;
+
+  uint32_t /* width from decompiler */ uStack_f0;
+
+  uint32_t /* width from decompiler */ uStack_ec;
+
+  uint32_t /* width from decompiler */ uStack_e8;
+
+  uint32_t /* width from decompiler */ uStack_e4;
+
+  char *pcStack_e0;
+
+  void *pvStack_14;
+
+  uint8_t *puStack_10;
+
+  uint32_t /* width from decompiler */ local_c;
+
+  
+
+  local_c = 0xffffffff;
+
+  puStack_10 = &LAB_009b9bc9;
+
+  pvStack_14 = ExceptionList;
+
+  ExceptionList = &pvStack_14;
+
+  FUN_00792600();
+
+  pvVar1 = operator_new(0x488);
+
+  local_c = 0;
+
+  if (pvVar1 != (void *)0x0) {
+
+    FUN_007b5dd0();
+
+  }
+
+  local_c = 0xffffffff;
+
+  (**(code **)(*param_1 + 0xa8))();
+
+  (**(code **)(*unaff_EBX + 0x28))();
+
+  (**(code **)(unaff_EBP + 0xfc))();
+
+  param_1[0x15a] = unaff_EDI;
+
+  (**(code **)(*param_1 + 0x404))();
+
+  (**(code **)(iRam3f000000 + 0xfc))();
+
+  iVar2 = param_1[0x1a] + 1;
+
+  param_1[0x1a] = iVar2;
+
+  param_1[0x1d] = (int)(float)-iVar2;
+
+  if (param_1[0x1c] < iVar2) {
+
+    param_1[0x1c] = iVar2;
+
+  }
+
+  (**(code **)(*param_1 + 0x3f4))();
+
+  pcStack_e0 = (char *)0x8b4985;
+
+  pcStack_e0 = operator_new(0x488);
+
+  if (pcStack_e0 != (void *)0x0) {
+
+    uStack_e4 = 0x8b49a2;
+
+    FUN_007b5dd0();
+
+  }
+
+  pcStack_e0 = (char *)0x8b49bc;
+
+  (**(code **)(*param_1 + 0xa8))();
+
+  pcStack_e0 = "i_d_mem_2d_wnd_title.xml";
+
+  uStack_e4 = 0x8b49ca;
+
+  (**(code **)(unaff_EDI + 0x28))();
+
+  uStack_e4 = 0x3f000000;
+
+  uStack_e8 = 1;
+
+  uStack_ec = 0x8b49dd;
+
+  (**(code **)(iRam3f000000 + 0xfc))();
+
+  param_1[0x157] = 1;
+
+  iVar2 = param_1[0x1a] + 1;
+
+  param_1[0x1a] = iVar2;
+
+  param_1[0x1d] = (int)(float)-iVar2;
+
+  if (param_1[0x1c] < iVar2) {
+
+    param_1[0x1c] = iVar2;
+
+  }
+
+  uStack_ec = 1;
+
+  uStack_f0 = 0x8b4a11;
+
+  (**(code **)(*param_1 + 0x3f4))();
+
+  uStack_f0 = 0xffffffff;
+
+  pcStack_f4 = "i_d_mem_2d_wnd_status.xml";
+
+  uStack_fc = 0x8b4a28;
+
+  piStack_f8 = param_1 + 0x158;
+
+  (**(code **)(*param_1 + 0x404))();
+
+  uStack_fc = 0x3f000000;
+
+  pvStack_100 = (void *)0x1;
+
+  uStack_104 = 0x8b4a39;
+
+  (**(code **)(*(int *)param_1[0x158] + 0xfc))();
+
+  uStack_104 = 0xffffffff;
+
+  pcStack_108 = "i_d_mem_2d_wnd_status_replace.xml";
+
+  (**(code **)(*param_1 + 0x404))();
+
+  (**(code **)(*(int *)param_1[0x159] + 0xcc))();
+
+  (**(code **)(*param_1 + 0x408))();
+
+  (**(code **)(*(int *)param_1[0x1bf] + 0xcc))();
+
+  iVar2 = param_1[0x1a] + 1;
+
+  param_1[0x1a] = iVar2;
+
+  param_1[0x1d] = (int)(float)-iVar2;
+
+  if (param_1[0x1c] < iVar2) {
+
+    param_1[0x1c] = iVar2;
+
+  }
+
+  (**(code **)(*param_1 + 0x3f4))();
+
+  pcStack_12c = (char *)0x8b4ab5;
+
+  pvStack_100 = operator_new(0x954);
+
+  if (pvStack_100 == (void *)0x0) {
+
+    iVar2 = 0;
+
+  }
+
+  else {
+
+    iVar2 = FUN_0078f890();
+
+  }
+
+  param_1[0x1ad] = iVar2;
+
+  pcStack_12c = (char *)0x8b4aee;
+
+  (**(code **)(*param_1 + 0xa8))();
+
+  pcStack_12c = "i_d_mem_2d_sb_memorized.xml";
+
+  uStack_130 = 0x8b4afe;
+
+  (**(code **)(*(int *)param_1[0x1ad] + 0x28))();
+
+  uStack_130 = 0x9c41;
+
+  piStack_134 = (int *)0x8b4b0e;
+
+  (**(code **)(*(int *)param_1[0x1ad] + 0x74))();
+
+  piStack_134 = (int *)0x8b4b1c;
+
+  (**(code **)(*(int *)param_1[0x1ad] + 0x43c))();
+
+  piStack_134 = (int *)0x1;
+
+  piStack_138 = (int *)0x8b4b2c;
+
+  (**(code **)(*(int *)param_1[0x1ad] + 0x468))();
+
+  piStack_138 = (int *)0x0;
+
+  piStack_13c = (int *)0x0;
+
+  iStack_140 = 0x8b4b3c;
+
+  (**(code **)(*(int *)param_1[0x1ad] + 0x454))();
+
+  iStack_140 = 0x3f800000;
+
+  iStack_144 = 0x8b4b4f;
+
+  (**(code **)(*(int *)param_1[0x1ad] + 0x460))();
+
+  iStack_144 = 0;
+
+  (**(code **)(*(int *)param_1[0x1ad] + 0xd4))();
+
+  param_1[0x1ab] = 0;
+
+  *(uint16_t *)(param_1 + 0x1ac) = 0;
+
+  piVar6 = param_1 + 0x1a3;
+
+  iStack_120 = 8;
+
+  do {
+
+    piStack_14c = (int *)0x8b4b8f;
+
+    piStack_14c = operator_new(0x488);
+
+    if (piStack_14c == (void *)0x0) {
+
+      piVar3 = (int *)0x0;
+
+    }
+
+    else {
+
+      piStack_150 = (int *)0x8b4bad;
+
+      piVar3 = (int *)FUN_007b5dd0();
+
+    }
+
+    piStack_14c = (int *)0x8b4bc7;
+
+    piStack_134 = piVar3;
+
+    (**(code **)(*param_1 + 0xa8))();
+
+    piStack_14c = (int *)0xa4924c;
+
+    piStack_150 = (int *)0x8b4bd5;
+
+    (**(code **)(*piStack_138 + 0x28))();
+
+    piStack_150 = (int *)0x0;
+
+    uStack_154 = 1;
+
+    piStack_158 = &uStack_104;
+
+    piStack_15c = (int *)0x8b4bea;
+
+    piVar4 = (int *)(**(code **)(*piStack_13c + 0x120))();
+
+    iStack_144 = *piVar4;
+
+    piStack_13c = (int *)(float)(int)pcStack_12c;
+
+    iStack_140 = piVar4[1] + (int)((float)DAT_00d1e81c * (float)piStack_13c * DAT_00aaa678);
+
+    piStack_15c = &iStack_144;
+
+    piStack_160 = (int *)0x8b4c2e;
+
+    (**(code **)(*piVar3 + 0x118))();
+
+    piStack_160 = (int *)0x0;
+
+    iStack_164 = 0x8b4c3c;
+
+    piVar3 = (int *)(**(code **)(*piStack_14c + 0x164))();
+
+    iStack_164 = 0x3f000000;
+
+    param_1[0x1c4] = *piVar3;
+
+    pvStack_168 = (void *)0x1;
+
+    (**(code **)(*piStack_150 + 0xfc))();
+
+    piVar6[-0x48] = (int)piStack_158;
+
+    piStack_170 = (int *)0x8b4c6b;
+
+    piStack_170 = operator_new(0x488);
+
+    if (piStack_170 == (void *)0x0) {
+
+      piVar3 = (int *)0x0;
+
+    }
+
+    else {
+
+      uStack_174 = 0x8b4c89;
+
+      piVar3 = (int *)FUN_007b5dd0();
+
+    }
+
+    piStack_170 = (int *)0x8b4ca3;
+
+    piStack_158 = piVar3;
+
+    (**(code **)(*param_1 + 0xa8))();
+
+    piStack_170 = (int *)0xa49230;
+
+    uStack_174 = 0x8b4cb1;
+
+    (**(code **)(*piStack_15c + 0x28))();
+
+    uStack_174 = 0;
+
+    iStack_178 = 1;
+
+    ppcStack_17c = &pcStack_108;
+
+    ppvStack_180 = (void **)0x8b4cc6;
+
+    puVar5 = (uint32_t /* width from decompiler */ *)(**(code **)(*piStack_160 + 0x120))();
+
+    pvStack_168 = (void *)*puVar5;
+
+    iStack_164 = puVar5[1] + (int)((float)DAT_00d1e81c * (float)piStack_160 * DAT_00aaa678);
+
+    ppvStack_180 = &pvStack_168;
+
+    iStack_184 = 0x8b4d00;
+
+    (**(code **)(*piVar3 + 0x118))();
+
+    iStack_184 = 0x3f000000;
+
+    (**(code **)(*piStack_170 + 0xfc))();
+
+    *piVar6 = iStack_178;
+
+    pvStack_168 = operator_new(0x4cc);
+
+    uStack_e4 = 5;
+
+    if (pvStack_168 == (void *)0x0) {
+
+      piVar3 = (int *)0x0;
+
+    }
+
+    else {
+
+      piVar3 = (int *)FUN_0079c860();
+
+    }
+
+    uStack_e4 = 0xffffffff;
+
+    (**(code **)(*param_1 + 0xa8))();
+
+    (**(code **)(*piVar3 + 0x28))();
+
+    (**(code **)(*piVar3 + 0x74))();
+
+    (**(code **)(*piVar3 + 0xfc))();
+
+    (**(code **)(*piVar3 + 0x120))();
+
+    (**(code **)(*piVar3 + 0x118))();
+
+    piVar6[0xb] = (int)piVar3;
+
+    pcStack_1b4 = (char *)0x8b4dde;
+
+    pvVar1 = operator_new(0x4cc);
+
+    pcStack_108 = (char *)0x6;
+
+    if (pvVar1 == (void *)0x0) {
+
+      piVar3 = (int *)0x0;
+
+    }
+
+    else {
+
+      piVar3 = (int *)FUN_0079c860();
+
+    }
+
+    pcStack_108 = (char *)0xffffffff;
+
+    pcStack_1b4 = (char *)0x8b4e15;
+
+    (**(code **)(*param_1 + 0xa8))();
+
+    pcStack_1b4 = "i_d_mem_2d_btn_assemble.xml";
+
+    pvStack_1b8 = (void *)0x8b4e21;
+
+    (**(code **)(*piVar3 + 0x28))();
+
+    pvStack_1b8 = pvVar1;
+
+    iStack_1bc = 0x8b4e2d;
+
+    (**(code **)(*piVar3 + 0x74))();
+
+    iStack_1bc = 0x3f000000;
+
+    uStack_1c0 = 1;
+
+    piStack_1c4 = (int *)0x8b4e3e;
+
+    (**(code **)(*piVar3 + 0xfc))();
+
+    piStack_1c4 = (int *)0x0;
+
+    piStack_1c8 = (int *)0x8b4e4a;
+
+    (**(code **)(*piVar3 + 0xd4))();
+
+    piStack_1c8 = (int *)0x0;
+
+    piStack_1cc = (int *)0x1;
+
+    ppiStack_1d0 = &piStack_13c;
+
+    piStack_1d4 = (int *)0x8b4e60;
+
+    piVar4 = (int *)(**(code **)(*piVar3 + 0x120))();
+
+    iStack_1bc = *piVar4;
+
+    pvStack_1b8 = (void *)(piVar4[1] +
+
+                          (int)((float)DAT_00d1e81c * (float)pcStack_1b4 * DAT_00aaa678));
+
+    piStack_1d4 = &iStack_1bc;
+
+    (**(code **)(*piVar3 + 0x118))();
+
+    piVar6[0x13] = (int)piVar3;
+
+    piStack_1dc = (int *)0x8b4ea5;
+
+    piStack_1dc = operator_new(0x488);
+
+    uStack_130 = 7;
+
+    pcStack_1b4 = (char *)piStack_1dc;
+
+    if (piStack_1dc == (void *)0x0) {
+
+      piVar3 = (int *)0x0;
+
+    }
+
+    else {
+
+      uStack_1e0 = 0x8b4ec3;
+
+      piVar3 = (int *)FUN_007b5dd0();
+
+    }
+
+    uStack_130 = 0xffffffff;
+
+    piStack_1dc = (int *)0x8b4edd;
+
+    piStack_1c4 = piVar3;
+
+    (**(code **)(*param_1 + 0xa8))();
+
+    piStack_1dc = (int *)0xa491d4;
+
+    uStack_1e0 = 0x8b4eeb;
+
+    (**(code **)(*piStack_1c8 + 0x28))();
+
+    uStack_1e0 = 0;
+
+    piStack_1e4 = (int *)0x1;
+
+    piStack_1e8 = &iStack_184;
+
+    ppiStack_1ec = (int **)0x8b4f04;
+
+    puVar5 = (uint32_t /* width from decompiler */ *)(**(code **)(*piStack_1cc + 0x120))();
+
+    piStack_1d4 = (int *)*puVar5;
+
+    ppiStack_1d0 = (int **)(puVar5[1] +
+
+                           (int)((float)DAT_00d1e81c * (float)piStack_1cc * DAT_00aaa678));
+
+    ppiStack_1ec = &piStack_1d4;
+
+    iStack_1f0 = 0x8b4f3e;
+
+    (**(code **)(*piVar3 + 0x118))();
+
+    iStack_1f0 = 0x3f000000;
+
+    piStack_1f4 = (int *)0x1;
+
+    (**(code **)(*piStack_1dc + 0xfc))();
+
+    piVar6[-0x40] = (int)piStack_1e4;
+
+    piStack_1fc = (int *)0x8b4f64;
+
+    piStack_1fc = operator_new(0x488);
+
+    piStack_150 = (int *)0x8;
+
+    piStack_1d4 = piStack_1fc;
+
+    if (piStack_1fc == (int *)0x0) {
+
+      piVar3 = (int *)0x0;
+
+    }
+
+    else {
+
+      uStack_200 = 0x8b4f82;
+
+      piVar3 = (int *)FUN_007b5dd0();
+
+    }
+
+    piStack_150 = (int *)0xffffffff;
+
+    piStack_1fc = (int *)0x8b4f9c;
+
+    piStack_1e4 = piVar3;
+
+    (**(code **)(*param_1 + 0xa8))();
+
+    piStack_1fc = (int *)0xa491b0;
+
+    uStack_200 = 0x8b4faa;
+
+    (**(code **)(*piStack_1e8 + 0x28))();
+
+    uStack_200 = 0;
+
+    piStack_204 = (int *)0x1;
+
+    piStack_208 = &iStack_184;
+
+    ppiStack_20c = (int **)0x8b4fc1;
+
+    puVar5 = (uint32_t /* width from decompiler */ *)(*(code *)(*ppiStack_1ec)[0x48])();
+
+    piStack_1f4 = (int *)*puVar5;
+
+    iStack_1f0 = puVar5[1] + (int)((float)DAT_00d1e81c * (float)ppiStack_1ec * DAT_00aaa678);
+
+    ppiStack_20c = &piStack_1f4;
+
+    iStack_210 = 0x8b4ffb;
+
+    (**(code **)(*piVar3 + 0x118))();
+
+    iStack_210 = 0x3f000000;
+
+    pvStack_214 = (void *)0x1;
+
+    (**(code **)(*piStack_1fc + 0xfc))();
+
+    piVar6[-0x18] = (int)piStack_204;
+
+    piStack_21c = (int *)0x8b501e;
+
+    piStack_21c = operator_new(0x488);
+
+    piStack_170 = (int *)0x9;
+
+    piStack_1f4 = piStack_21c;
+
+    if (piStack_21c == (int *)0x0) {
+
+      piVar3 = (int *)0x0;
+
+    }
+
+    else {
+
+      uStack_220 = 0x8b503c;
+
+      piVar3 = (int *)FUN_007b5dd0();
+
+    }
+
+    piStack_170 = (int *)0xffffffff;
+
+    piStack_21c = (int *)0x8b5056;
+
+    piStack_204 = piVar3;
+
+    (**(code **)(*param_1 + 0xa8))();
+
+    piStack_21c = (int *)0xa4918c;
+
+    uStack_220 = 0x8b5064;
+
+    (**(code **)(*piStack_208 + 0x28))();
+
+    uStack_220 = 0;
+
+    piStack_224 = (int *)0x1;
+
+    ppiStack_228 = &piStack_1e4;
+
+    ppvStack_22c = (void **)0x8b5078;
+
+    puVar5 = (uint32_t /* width from decompiler */ *)(*(code *)(*ppiStack_20c)[0x48])();
+
+    pvStack_214 = (void *)*puVar5;
+
+    iStack_210 = puVar5[1] + (int)((float)DAT_00d1e81c * (float)ppiStack_20c * DAT_00aaa678);
+
+    ppvStack_22c = &pvStack_214;
+
+    iStack_230 = 0x8b50b2;
+
+    (**(code **)(*piVar3 + 0x118))();
+
+    iStack_230 = 0x3f000000;
+
+    pvStack_234 = (void *)0x1;
+
+    (**(code **)(*piStack_21c + 0xfc))();
+
+    piVar6[-0x28] = (int)piStack_224;
+
+    piStack_23c = (int *)0x8b50d8;
+
+    piStack_23c = operator_new(0x488);
+
+    pvStack_214 = piStack_23c;
+
+    if (piStack_23c == (void *)0x0) {
+
+      piVar3 = (int *)0x0;
+
+    }
+
+    else {
+
+      uStack_240 = 0x8b50f6;
+
+      piVar3 = (int *)FUN_007b5dd0();
+
+    }
+
+    piStack_23c = (int *)0x8b5110;
+
+    piStack_224 = piVar3;
+
+    (**(code **)(*param_1 + 0xa8))();
+
+    piStack_23c = (int *)0xa4916c;
+
+    uStack_240 = 0x8b511e;
+
+    (*(code *)(*ppiStack_228)[10])();
+
+    uStack_240 = 0;
+
+    piStack_244 = (int *)0x1;
+
+    ppiStack_248 = &piStack_1fc;
+
+    ppvStack_24c = (void **)0x8b5132;
+
+    puVar5 = (uint32_t /* width from decompiler */ *)(**(code **)((int)*ppvStack_22c + 0x120))();
+
+    pvStack_234 = (void *)*puVar5;
+
+    iStack_230 = puVar5[1] + (int)((float)DAT_00d1e81c * (float)ppvStack_22c * DAT_00aaa678);
+
+    ppvStack_24c = &pvStack_234;
+
+    iStack_250 = 0x8b516c;
+
+    (**(code **)(*piVar3 + 0x118))();
+
+    iStack_250 = 0x3f000000;
+
+    pvStack_254 = (void *)0x1;
+
+    (**(code **)(*piStack_23c + 0xfc))();
+
+    piVar6[-0x20] = (int)piStack_244;
+
+    piStack_25c = (int *)0x8b518f;
+
+    piStack_25c = operator_new(0x488);
+
+    pvStack_234 = piStack_25c;
+
+    if (piStack_25c == (void *)0x0) {
+
+      piVar3 = (int *)0x0;
+
+    }
+
+    else {
+
+      uStack_260 = 0x8b51ad;
+
+      piVar3 = (int *)FUN_007b5dd0();
+
+    }
+
+    piStack_25c = (int *)0x8b51c7;
+
+    piStack_244 = piVar3;
+
+    (**(code **)(*param_1 + 0xa8))();
+
+    piStack_25c = (int *)0xa49144;
+
+    uStack_260 = 0x8b51d5;
+
+    (*(code *)(*ppiStack_248)[10])();
+
+    uStack_260 = 0;
+
+    piStack_264 = (int *)0x1;
+
+    pppiStack_268 = &ppiStack_20c;
+
+    ppvStack_26c = (void **)0x8b51e9;
+
+    puVar5 = (uint32_t /* width from decompiler */ *)(**(code **)((int)*ppvStack_24c + 0x120))();
+
+    pvStack_254 = (void *)*puVar5;
+
+    iStack_250 = puVar5[1] + (int)((float)DAT_00d1e81c * (float)ppvStack_24c * DAT_00aaa678);
+
+    ppvStack_26c = &pvStack_254;
+
+    iStack_270 = 0x8b5223;
+
+    (**(code **)(*piVar3 + 0x118))();
+
+    iStack_270 = 0x3f000000;
+
+    pvStack_274 = (void *)0x1;
+
+    (**(code **)(*piStack_25c + 0xfc))();
+
+    piVar6[-0x38] = (int)piStack_264;
+
+    piStack_27c = (int *)0x8b5249;
+
+    piStack_27c = operator_new(0x488);
+
+    ppiStack_1d0 = (int **)0xc;
+
+    pvStack_254 = piStack_27c;
+
+    if (piStack_27c == (void *)0x0) {
+
+      piVar3 = (int *)0x0;
+
+    }
+
+    else {
+
+      uStack_280 = 0x8b5267;
+
+      piVar3 = (int *)FUN_007b5dd0();
+
+    }
+
+    ppiStack_1d0 = (int **)0xffffffff;
+
+    piStack_27c = (int *)0x8b5281;
+
+    piStack_264 = piVar3;
+
+    (**(code **)(*param_1 + 0xa8))();
+
+    piStack_27c = (int *)0xa49124;
+
+    uStack_280 = 0x8b528f;
+
+    (*(code *)(*pppiStack_268)[10])();
+
+    uStack_280 = 0;
+
+    piStack_284 = (int *)0x1;
+
+    ppiStack_288 = &piStack_21c;
+
+    ppvStack_28c = (void **)0x8b52a3;
+
+    puVar5 = (uint32_t /* width from decompiler */ *)(**(code **)((int)*ppvStack_26c + 0x120))();
+
+    pvStack_274 = (void *)*puVar5;
+
+    iStack_270 = puVar5[1] + (int)((float)DAT_00d1e81c * (float)ppvStack_26c * DAT_00aaa678);
+
+    ppvStack_28c = &pvStack_274;
+
+    iStack_290 = 0x8b52dd;
+
+    (**(code **)(*piVar3 + 0x118))();
+
+    iStack_290 = 0x3f000000;
+
+    uStack_294 = 1;
+
+    (**(code **)(*piStack_27c + 0xfc))();
+
+    piVar6[-0x30] = (int)piStack_284;
+
+    piStack_29c = (int *)0x8b5303;
+
+    piStack_29c = operator_new(0x488);
+
+    iStack_1f0 = 0xd;
+
+    pvStack_274 = piStack_29c;
+
+    if (piStack_29c == (void *)0x0) {
+
+      piVar3 = (int *)0x0;
+
+    }
+
+    else {
+
+      uStack_2a0 = 0x8b5321;
+
+      piVar3 = (int *)FUN_007b5dd0();
+
+    }
+
+    iStack_1f0 = 0xffffffff;
+
+    piStack_29c = (int *)0x8b533b;
+
+    piStack_284 = piVar3;
+
+    (**(code **)(*param_1 + 0xa8))();
+
+    piStack_29c = (int *)0xa49100;
+
+    uStack_2a0 = 0x8b5349;
+
+    (*(code *)(*ppiStack_288)[10])();
+
+    uStack_2a0 = 0;
+
+    piStack_2a4 = (int *)0x1;
+
+    pppvStack_2a8 = &ppvStack_22c;
+
+    piStack_2ac = (int *)0x8b535d;
+
+    puVar5 = (uint32_t /* width from decompiler */ *)(**(code **)((int)*ppvStack_28c + 0x120))();
+
+    uStack_294 = *puVar5;
+
+    iStack_290 = puVar5[1] + (int)((float)DAT_00d1e81c * (float)ppvStack_28c * DAT_00aaa678);
+
+    piStack_2ac = &uStack_294;
+
+    piStack_2b0 = (int *)0x8b5397;
+
+    (**(code **)(*piVar3 + 0x118))();
+
+    piStack_2b0 = &iRam3f000000;
+
+    piStack_2b4 = (int *)0x1;
+
+    iStack_2b8 = 0x8b53a9;
+
+    (**(code **)(*piStack_29c + 0xfc))();
+
+    iStack_2b8 = 1;
+
+    ppvStack_2bc = &pvStack_234;
+
+    piVar6[-8] = (int)piStack_2a4;
+
+    piVar3 = (int *)(**(code **)(*piStack_2a4 + 0x140))();
+
+    iVar2 = piVar3[1];
+
+    param_1[0x1c1] = *piVar3;
+
+    param_1[0x1c2] = iVar2;
+
+    piStack_29c = operator_new(0x488);
+
+    if (piStack_29c == (void *)0x0) {
+
+      piVar3 = (int *)0x0;
+
+    }
+
+    else {
+
+      piVar3 = (int *)FUN_007b5dd0(piStack_29c,0);
+
+    }
+
+    piStack_2ac = piVar3;
+
+    (**(code **)(*param_1 + 0xa8))();
+
+    pcVar7 = "i_d_mem_2d_wnd_item_disc_name.xml";
+
+    (**(code **)(*piStack_2b0 + 0x28))();
+
+    puVar5 = (uint32_t /* width from decompiler */ *)(**(code **)(*piStack_2b4 + 0x120))(&pvStack_234,1,0);
+
+    ppvStack_2bc = (void **)*puVar5;
+
+    iStack_2b8 = puVar5[1] + (int)((float)DAT_00d1e81c * (float)piStack_2b4 * DAT_00aaa678);
+
+    (**(code **)(*piVar3 + 0x118))(&ppvStack_2bc);
+
+    (**(code **)(*(int *)pcVar7 + 0xfc))(1,0x3f000000);
+
+    piVar6[-0x10] = (int)piStack_134;
+
+    piVar6 = piVar6 + 1;
+
+    iStack_120 = iStack_120 + -1;
+
+  } while (iStack_120 != 0);
+
+  piStack_14c = (int *)0x8b54ab;
+
+  FUN_008b30c0();
+
+  FUN_008b3670();
+
+  FUN_008b3050();
+
+  FUN_008b2f00();
+
+  (**(code **)(*param_1 + 0x34c))();
+
+  ExceptionList = &stack0xfffffffc;
+
+  return;
+
+}

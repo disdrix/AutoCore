@@ -1,0 +1,34 @@
+# Raw capture: FUN_004ba6f0
+
+| Field | Value |
+|---|---|
+| **Stable ID** | `aa_004ba6f0` |
+| **Module** | `autoassault.exe` |
+| **Image base** | `0x400000` |
+| **VA** | `0x004ba6f0` |
+| **Canonical name** | `FUN_004ba6f0` |
+| **System** | unknown |
+| **Capture timestamp** | `2026-07-23` |
+| **Tool** | Ghidra MCP `batch_decompile` |
+| **Integrity** | Do not overwrite this raw body; append versioned sections only |
+
+---
+
+## Raw pseudocode (authoritative decompile)
+
+```c
+/* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+
+undefined * FUN_004ba6f0(undefined4 *param_1)
+
+{
+  if ((_DAT_00b0372c & 1) == 0) {
+    _DAT_00b0372c = _DAT_00b0372c | 1;
+  }
+  _DAT_00b0371c = *param_1;
+  _DAT_00b03720 = param_1[1];
+  _DAT_00b03724 = param_1[2];
+  _DAT_00b03728 = param_1[3];
+  return &DAT_00b0371c;
+}
+```

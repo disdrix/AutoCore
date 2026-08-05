@@ -1,0 +1,556 @@
+// =============================================================================
+// FUN_0050bc60
+// -----------------------------------------------------------------------------
+// Stable ID: aa_0050bc60
+// Address:   0x0050bc60  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_0050bc60 @ 0x0050bc60
+// Stable ID: aa_0050bc60
+// No high-value strings recovered; name via xrefs/callers in follow-up.
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~260 non-empty decompiler lines.
+//  - Control keywords: if×36, return×19, while×12, do×8.
+//  - Notable callees: FUN_00602ff0×6, FUN_00604be0×2, CONCAT31, FUN_0050bc60, FUN_0050f070, FUN_0050f0b0, FUN_0050fa70.
+//  - Return sites: 19.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+void __fastcall FUN_0050bc60(uint32_t /* width from decompiler */ *param_1)
+
+
+
+{
+
+  char cVar1;
+
+  void *pvVar2;
+
+  int *piVar3;
+
+  int *piVar4;
+
+  int iVar5;
+
+  int *piVar6;
+
+  void *local_14;
+
+  uint32_t /* width from decompiler */ *local_10;
+
+  void *pvStack_c;
+
+  uint8_t *puStack_8;
+
+  uint32_t /* width from decompiler */ local_4;
+
+  
+
+  puStack_8 = &LAB_009a332a;
+
+  pvStack_c = ExceptionList;
+
+  ExceptionList = &pvStack_c;
+
+  *param_1 = &PTR_FUN_009cdd3c;
+
+  iVar5 = 0;
+
+  local_4 = 3;
+
+  local_10 = param_1;
+
+  if (0 < DAT_00d02974) {
+
+    do {
+
+      pvVar2 = *(void **)(param_1[0x11] + iVar5 * 4);
+
+      if (pvVar2 != (void *)0x0) {
+
+                    /* WARNING: Subroutine does not return */
+
+        operator_delete(pvVar2);
+
+      }
+
+      *(uint32_t /* width from decompiler */ *)(param_1[0x11] + iVar5 * 4) = 0;
+
+      iVar5 = iVar5 + 1;
+
+    } while (iVar5 < DAT_00d02974);
+
+  }
+
+  iVar5 = 0;
+
+  if (0 < DAT_00d02978) {
+
+    do {
+
+      pvVar2 = *(void **)(param_1[0x12] + iVar5 * 4);
+
+      if (pvVar2 != (void *)0x0) {
+
+                    /* WARNING: Subroutine does not return */
+
+        operator_delete(pvVar2);
+
+      }
+
+      *(uint32_t /* width from decompiler */ *)(param_1[0x12] + iVar5 * 4) = 0;
+
+      iVar5 = iVar5 + 1;
+
+    } while (iVar5 < DAT_00d02978);
+
+  }
+
+  iVar5 = 0;
+
+  if (0 < DAT_00d02984) {
+
+    do {
+
+      pvVar2 = *(void **)(param_1[0x16] + iVar5 * 4);
+
+      if (pvVar2 != (void *)0x0) {
+
+                    /* WARNING: Subroutine does not return */
+
+        operator_delete(pvVar2);
+
+      }
+
+      *(uint32_t /* width from decompiler */ *)(param_1[0x16] + iVar5 * 4) = 0;
+
+      iVar5 = iVar5 + 1;
+
+    } while (iVar5 < DAT_00d02984);
+
+  }
+
+  iVar5 = 0;
+
+  if (0 < DAT_00d02988) {
+
+    do {
+
+      pvVar2 = *(void **)(param_1[0x15] + iVar5 * 4);
+
+      if (pvVar2 != (void *)0x0) {
+
+                    /* WARNING: Subroutine does not return */
+
+        operator_delete(pvVar2);
+
+      }
+
+      *(uint32_t /* width from decompiler */ *)(param_1[0x15] + iVar5 * 4) = 0;
+
+      iVar5 = iVar5 + 1;
+
+    } while (iVar5 < DAT_00d02988);
+
+  }
+
+  iVar5 = 0;
+
+  if (0 < DAT_00d0297c) {
+
+    do {
+
+      pvVar2 = *(void **)(param_1[0x13] + iVar5 * 4);
+
+      if (pvVar2 != (void *)0x0) {
+
+                    /* WARNING: Subroutine does not return */
+
+        operator_delete(pvVar2);
+
+      }
+
+      *(uint32_t /* width from decompiler */ *)(param_1[0x13] + iVar5 * 4) = 0;
+
+      iVar5 = iVar5 + 1;
+
+    } while (iVar5 < DAT_00d0297c);
+
+  }
+
+  iVar5 = 0;
+
+  if (0 < DAT_00d02980) {
+
+    do {
+
+      pvVar2 = *(void **)(param_1[0x14] + iVar5 * 4);
+
+      if (pvVar2 != (void *)0x0) {
+
+                    /* WARNING: Subroutine does not return */
+
+        operator_delete(pvVar2);
+
+      }
+
+      *(uint32_t /* width from decompiler */ *)(param_1[0x14] + iVar5 * 4) = 0;
+
+      iVar5 = iVar5 + 1;
+
+    } while (iVar5 < DAT_00d02980);
+
+  }
+
+  piVar6 = *(int **)param_1[0x1e];
+
+  if (piVar6 != (int *)param_1[0x1e]) {
+
+    do {
+
+      if ((void *)piVar6[4] != (void *)0x0) {
+
+                    /* WARNING: Subroutine does not return */
+
+        operator_delete((void *)piVar6[4]);
+
+      }
+
+      if (*(char *)((int)piVar6 + 0x15) == '\0') {
+
+        piVar3 = (int *)piVar6[2];
+
+        if (*(char *)((int)piVar3 + 0x15) == '\0') {
+
+          cVar1 = *(char *)(*piVar3 + 0x15);
+
+          piVar6 = piVar3;
+
+          piVar3 = (int *)*piVar3;
+
+          while (cVar1 == '\0') {
+
+            cVar1 = *(char *)(*piVar3 + 0x15);
+
+            piVar6 = piVar3;
+
+            piVar3 = (int *)*piVar3;
+
+          }
+
+        }
+
+        else {
+
+          cVar1 = *(char *)(piVar6[1] + 0x15);
+
+          piVar4 = (int *)piVar6[1];
+
+          piVar3 = piVar6;
+
+          while ((piVar6 = piVar4, cVar1 == '\0' && (piVar3 == (int *)piVar6[2]))) {
+
+            cVar1 = *(char *)(piVar6[1] + 0x15);
+
+            piVar4 = (int *)piVar6[1];
+
+            piVar3 = piVar6;
+
+          }
+
+        }
+
+      }
+
+    } while (piVar6 != (int *)param_1[0x1e]);
+
+  }
+
+  pvVar2 = *(void **)(param_1[0x1e] + 4);
+
+  if (*(char *)((int)pvVar2 + 0x15) == '\0') {
+
+    FUN_0050f070(*(uint32_t /* width from decompiler */ *)((int)pvVar2 + 8));
+
+                    /* WARNING: Subroutine does not return */
+
+    operator_delete(pvVar2);
+
+  }
+
+  *(uint32_t /* width from decompiler */ *)(param_1[0x1e] + 4) = param_1[0x1e];
+
+  param_1[0x1f] = 0;
+
+  *(uint32_t /* width from decompiler */ *)param_1[0x1e] = param_1[0x1e];
+
+  *(uint32_t /* width from decompiler */ *)(param_1[0x1e] + 8) = param_1[0x1e];
+
+  piVar6 = *(int **)param_1[0x2d];
+
+  if (piVar6 != (int *)param_1[0x2d]) {
+
+    do {
+
+      if ((void *)piVar6[4] != (void *)0x0) {
+
+                    /* WARNING: Subroutine does not return */
+
+        operator_delete((void *)piVar6[4]);
+
+      }
+
+      if (*(char *)((int)piVar6 + 0x15) == '\0') {
+
+        piVar3 = (int *)piVar6[2];
+
+        if (*(char *)((int)piVar3 + 0x15) == '\0') {
+
+          cVar1 = *(char *)(*piVar3 + 0x15);
+
+          piVar6 = piVar3;
+
+          piVar3 = (int *)*piVar3;
+
+          while (cVar1 == '\0') {
+
+            cVar1 = *(char *)(*piVar3 + 0x15);
+
+            piVar6 = piVar3;
+
+            piVar3 = (int *)*piVar3;
+
+          }
+
+        }
+
+        else {
+
+          cVar1 = *(char *)(piVar6[1] + 0x15);
+
+          piVar4 = (int *)piVar6[1];
+
+          piVar3 = piVar6;
+
+          while ((piVar6 = piVar4, cVar1 == '\0' && (piVar3 == (int *)piVar6[2]))) {
+
+            cVar1 = *(char *)(piVar6[1] + 0x15);
+
+            piVar4 = (int *)piVar6[1];
+
+            piVar3 = piVar6;
+
+          }
+
+        }
+
+      }
+
+    } while (piVar6 != (int *)param_1[0x2d]);
+
+  }
+
+  local_14 = *(void **)(param_1[0x2d] + 4);
+
+  if (*(char *)((int)local_14 + 0x15) == '\0') {
+
+    FUN_0050f0b0(*(uint32_t /* width from decompiler */ *)((int)local_14 + 8));
+
+                    /* WARNING: Subroutine does not return */
+
+    operator_delete(local_14);
+
+  }
+
+  *(uint32_t /* width from decompiler */ *)(param_1[0x2d] + 4) = param_1[0x2d];
+
+  param_1[0x2e] = 0;
+
+  *(uint32_t /* width from decompiler */ *)param_1[0x2d] = param_1[0x2d];
+
+  *(uint32_t /* width from decompiler */ *)(param_1[0x2d] + 8) = param_1[0x2d];
+
+  local_14 = (void *)param_1[0x17];
+
+  if (local_14 != (void *)0x0) {
+
+    FUN_00602ff0();
+
+                    /* WARNING: Subroutine does not return */
+
+    operator_delete(local_14);
+
+  }
+
+  local_14 = (void *)param_1[0x18];
+
+  param_1[0x17] = 0;
+
+  if (local_14 != (void *)0x0) {
+
+    FUN_00602ff0();
+
+                    /* WARNING: Subroutine does not return */
+
+    operator_delete(local_14);
+
+  }
+
+  local_14 = (void *)param_1[0x19];
+
+  param_1[0x18] = 0;
+
+  if (local_14 != (void *)0x0) {
+
+    FUN_00602ff0();
+
+                    /* WARNING: Subroutine does not return */
+
+    operator_delete(local_14);
+
+  }
+
+  local_14 = (void *)param_1[0x1a];
+
+  param_1[0x19] = 0;
+
+  if (local_14 == (void *)0x0) {
+
+    local_14 = (void *)param_1[0x1b];
+
+    param_1[0x1a] = 0;
+
+    if (local_14 != (void *)0x0) {
+
+      FUN_00602ff0();
+
+                    /* WARNING: Subroutine does not return */
+
+      operator_delete(local_14);
+
+    }
+
+    local_14 = (void *)param_1[0x1c];
+
+    param_1[0x1b] = 0;
+
+    if (local_14 == (void *)0x0) {
+
+      param_1[0x1c] = 0;
+
+      if ((void *)param_1[0x11] != (void *)0x0) {
+
+        operator_delete__((void *)param_1[0x11]);
+
+      }
+
+      param_1[0x11] = 0;
+
+      if ((void *)param_1[0x12] != (void *)0x0) {
+
+        operator_delete__((void *)param_1[0x12]);
+
+      }
+
+      param_1[0x12] = 0;
+
+      if ((void *)param_1[0x16] != (void *)0x0) {
+
+        operator_delete__((void *)param_1[0x16]);
+
+      }
+
+      param_1[0x16] = 0;
+
+      if ((void *)param_1[0x15] != (void *)0x0) {
+
+        operator_delete__((void *)param_1[0x15]);
+
+      }
+
+      param_1[0x15] = 0;
+
+      if ((void *)param_1[0x13] != (void *)0x0) {
+
+        operator_delete__((void *)param_1[0x13]);
+
+      }
+
+      param_1[0x13] = 0;
+
+      if ((void *)param_1[0x14] != (void *)0x0) {
+
+        operator_delete__((void *)param_1[0x14]);
+
+      }
+
+      local_14 = (void *)param_1[1];
+
+      param_1[0x14] = 0;
+
+      if (local_14 == (void *)0x0) {
+
+        local_14 = (void *)param_1[2];
+
+        param_1[1] = 0;
+
+        if (local_14 == (void *)0x0) {
+
+          param_1[2] = 0;
+
+          local_4 = CONCAT31(local_4._1_3_,2);
+
+          FUN_0050fa70(&local_14,*(uint32_t /* width from decompiler */ *)param_1[0x2d],(uint32_t /* width from decompiler */ *)param_1[0x2d]);
+
+                    /* WARNING: Subroutine does not return */
+
+          operator_delete((void *)param_1[0x2d]);
+
+        }
+
+        FUN_00604be0();
+
+                    /* WARNING: Subroutine does not return */
+
+        operator_delete(local_14);
+
+      }
+
+      FUN_00604be0();
+
+                    /* WARNING: Subroutine does not return */
+
+      operator_delete(local_14);
+
+    }
+
+    FUN_00602ff0();
+
+                    /* WARNING: Subroutine does not return */
+
+    operator_delete(local_14);
+
+  }
+
+  FUN_00602ff0();
+
+                    /* WARNING: Subroutine does not return */
+
+  operator_delete(local_14);
+
+}

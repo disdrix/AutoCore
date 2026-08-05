@@ -1,0 +1,803 @@
+// READABILITY (auto CF):
+//  - Body size: ~384 non-empty decompiler lines.
+//  - Control keywords: if×25, goto×4, while×2, for×1, return×1.
+//  - Notable callees: sprintf×28, FUN_00800af0×25, SUB84×17, CVOGHBBase_GetRemainingSeconds×4, FUN_004022a0×4, __RTtypeid×4, type_info::name×4, T×3.
+//  - Strings: "Distance: %0.2f, Pos: %0.2f %0.2f %0.2f\n"; "AI: State(%d)\n"; "AI: State(%d) SkillsInState(%d)\n"; "Skill:(%d) Level(%d)".
+//  - Return sites: 1.
+
+// =============================================================================
+// Skill_Owner_Skill_d_Type_s_Time_Left_0_2f
+// -----------------------------------------------------------------------------
+// Stable ID: aa_00955eb0
+// Address:   0x00955eb0  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+/*
+ * Behavioral notes:
+ * String-driven rename evidence: "Owner Skill: %d Type: %s Time Left: %0.2f)
+"
+ *
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+uint32_t /* width from decompiler */ __thiscall Skill_Owner_Skill_d_Type_s_Time_Left_0_2f(int param_1,uint32_t /* width from decompiler */ param_2,char *param_3)
+
+
+
+{
+
+  double dVar1;
+
+  short sVar2;
+
+  char *pcVar3;
+
+  int iVar4;
+
+  RACE_ID_INFERRED RVar5;
+
+  uint32_t /* width from decompiler */ uVar6;
+
+  uint32_t /* width from decompiler */ uVar7;
+
+  float *pfVar8;
+
+  short *psVar9;
+
+  short *psVar10;
+
+  int iVar11;
+
+  void *pCharacter;
+
+  CVOGHBBase *pCVar12;
+
+  type_info *ptVar13;
+
+  int *piVar14;
+
+  short *unaff_EDI;
+
+  int *pObject;
+
+  float10 fVar15;
+
+  float fVar16;
+
+  double dVar17;
+
+  uint8_t *puVar18;
+
+  short *psVar19;
+
+  uint64_t uVar20;
+
+  CVOGHBBase *pCVar21;
+
+  uint local_244;
+
+  int iStack_240;
+
+  int *piStack_23c;
+
+  uint32_t /* width from decompiler */ local_238;
+
+  int local_234;
+
+  int iStack_230;
+
+  int iStack_22c;
+
+  char acStack_224 [2];
+
+  uint8_t local_222;
+
+  uint8_t uStack_221;
+
+  uint8_t auStack_220 [16];
+
+  char acStack_210 [524];
+
+  
+
+  local_222 = 0;
+
+  pcVar3 = strtok((char *)0x0,param_3);
+
+  if (pcVar3 != (char *)0x0) {
+
+    local_222 = 1;
+
+  }
+
+  iVar11 = *(int *)(param_1 + 0xe98);
+
+  pObject = *(int **)(*(int *)(*(int *)(iVar11 + 4) + 4) + 0xa4 + iVar11);
+
+  if ((pObject == (int *)0x0) && (iVar11 = *(int *)(iVar11 + 0x250), iVar11 != 0)) {
+
+    pObject = (int *)(*(int *)(*(int *)(iVar11 + 4) + 4) + 4 + iVar11);
+
+  }
+
+  local_234 = pObject[0x59];
+
+  iVar11 = pObject[0x58];
+
+  local_238 = iVar11;
+
+  FUN_007fe5b0();
+
+  iVar4 = (**(code **)(*pObject + 0x1d4))();
+
+  if (iVar4 == 0) {
+
+    iVar4 = (**(code **)(*pObject + 0x1d8))();
+
+    if (iVar4 != 0) {
+
+      (**(code **)(*pObject + 0x1d8))();
+
+    }
+
+  }
+
+  else {
+
+    (**(code **)(*pObject + 0x1d4))();
+
+  }
+
+  iStack_230 = pObject[0x58];
+
+  piStack_23c = (int *)pObject[0x2a];
+
+  iStack_22c = pObject[0x59];
+
+  iStack_240 = *(int *)((int)piStack_23c + 0x34);
+
+  (**(code **)(*pObject + 0x28c))((uint)pObject[0x5f] >> 10 & 1);
+
+  RVar5 = Object_GetRootRaceId(pObject);
+
+  (**(code **)(*pObject + 0x160))(RVar5);
+
+  sprintf(acStack_210,"C(%d) T(%d) COID(%I64d) UName(%s) Name(%s) F(%d) T(%d) I(%d) Fx(%d)\n");
+
+  FUN_00800af0(param_1,iVar11,local_234,acStack_210);
+
+  uVar6 = (**(code **)(*(int *)(*(int *)(*(int *)(*(int *)(param_1 + 0xe98) + 4) + 4) + 4 +
+
+                               *(int *)(param_1 + 0xe98)) + 0x1a4))();
+
+  FUN_004e8a40(uVar6);
+
+  iVar4 = (**(code **)(*(int *)(*(int *)(*(int *)(*(int *)(param_1 + 0xe98) + 4) + 4) + 4 +
+
+                               *(int *)(param_1 + 0xe98)) + 0x19c))();
+
+  uVar6 = *(uint32_t /* width from decompiler */ *)(iVar4 + 0x34);
+
+  piStack_23c = (int *)(*(int *)(*(int *)(*(int *)(param_1 + 0xe98) + 4) + 4) + 4 +
+
+                       *(int *)(param_1 + 0xe98));
+
+  uVar20 = 0x1bf800000;
+
+  puVar18 = auStack_220;
+
+  uVar7 = (**(code **)(*pObject + 0x1c8))();
+
+  uVar6 = (**(code **)(*piStack_23c + 0x1a0))(uVar6,0x43fa0000,uVar7,puVar18,uVar20);
+
+  fVar15 = (float10)FUN_004e9aa0(uVar6);
+
+  pfVar8 = (float *)(**(code **)(*pObject + 0x1a0))();
+
+  sprintf(acStack_210,"Distance: %0.2f, Pos: %0.2f %0.2f %0.2f\n",SUB84((double)(float)fVar15,0),
+
+          (int)((ulonglong)(double)(float)fVar15 >> 0x20),SUB84((double)*pfVar8,0),
+
+          (int)((ulonglong)(double)*pfVar8 >> 0x20),(double)pfVar8[1],(double)pfVar8[2]);
+
+  FUN_00800af0(param_1,iVar11,local_234,acStack_210);
+
+  iVar4 = (**(code **)(*pObject + 0x214))();
+
+  if (iVar4 != 0) {
+
+    iVar4 = (**(code **)(*pObject + 0x214))();
+
+    uStack_221 = *(uint8_t *)(iVar4 + 0x26c);
+
+    iVar4 = (**(code **)(*pObject + 0x214))();
+
+    Map_LowerBoundFindByCharKey
+
+              ((void *)(*(int *)(*(int *)(*(int *)(*(int *)(iVar4 + 4) + 4) + 0xac + iVar4) + 0x3c)
+
+                       + 0x51c),&iStack_240,&uStack_221,(char *)unaff_EDI);
+
+    iVar4 = (**(code **)(*pObject + 0x214))();
+
+    if (iStack_240 ==
+
+        *(int *)(*(int *)(*(int *)(*(int *)(*(int *)(iVar4 + 4) + 4) + 0xac + iVar4) + 0x3c) + 0x520
+
+                )) {
+
+      (**(code **)(*pObject + 0x214))();
+
+      sprintf(acStack_210,"AI: State(%d)\n");
+
+      FUN_00800af0(param_1,iVar11,local_234,acStack_210);
+
+    }
+
+    else {
+
+      iVar4 = (**(code **)(*pObject + 0x214))();
+
+      sprintf(acStack_210,"AI: State(%d) SkillsInState(%d)\n",(uint)*(byte *)(iVar4 + 0x26c));
+
+      FUN_00800af0(param_1,iVar11,local_234,acStack_210);
+
+      piStack_23c = (int *)0x0;
+
+      for (local_244 = 0;
+
+          (*(int *)(iStack_240 + 0x14) != 0 &&
+
+          (local_244 < (uint)((*(int *)(iStack_240 + 0x18) - *(int *)(iStack_240 + 0x14)) / 0x18)));
+
+          local_244 = local_244 + 1) {
+
+        sprintf(acStack_210,"Skill:(%d) Level(%d)",
+
+                *(uint32_t /* width from decompiler */ *)(*(int *)(iStack_240 + 0x14) + (int)piStack_23c));
+
+        FUN_00800af0(param_1,iVar11,local_234,acStack_210);
+
+        piStack_23c = piStack_23c + 6;
+
+      }
+
+    }
+
+  }
+
+  piVar14 = (int *)pObject[0x2b];
+
+  if (piVar14 != (int *)0x0) {
+
+    if (piVar14[0x49] == 0) {
+
+      iVar4 = 0;
+
+    }
+
+    else {
+
+      iVar4 = piVar14[0x4a] - piVar14[0x49] >> 2;
+
+    }
+
+    piStack_23c = (int *)piVar14[0x2a];
+
+    iStack_230 = piVar14[0x58];
+
+    iStack_22c = piVar14[0x59];
+
+    iStack_240 = piStack_23c[0xd];
+
+    uVar6 = (**(code **)(*piVar14 + 0x28c))();
+
+    uVar20 = CONCAT44(iVar4,uVar6);
+
+    RVar5 = Object_GetRootRaceId(piVar14);
+
+    uVar6 = (**(code **)(*piVar14 + 0x160))();
+
+    sprintf(acStack_210,"Owner(%d) COID(%I64d) UName(%s) Name(%s) F(%d) T(%d) FX(%d)\n",iStack_240,
+
+            iStack_230,iStack_22c,piStack_23c + 0x10,uVar6,RVar5,uVar20);
+
+    FUN_00800af0(param_1,iVar11,local_234,acStack_210);
+
+  }
+
+  pCVar21 = (CVOGHBBase *)0x5;
+
+  (**(code **)(*pObject + 0x164))();
+
+  psVar19 = (short *)0x4;
+
+  psVar9 = (short *)(**(code **)(*pObject + 0x164))();
+
+  (**(code **)(*pObject + 0x164))();
+
+  iStack_240 = (**(code **)(*pObject + 0x164))(1);
+
+  psVar10 = (short *)(**(code **)(*pObject + 0x164))(0);
+
+  sprintf(acStack_224,"%-30s (P:%d, F:%d, Cor:%d, Con:%d, E:%d)\n","Armor:",(int)*psVar10,
+
+          (int)*psVar9,(int)*(short *)&pCVar21->pVTable,(int)*unaff_EDI,(int)*psVar19);
+
+  FUN_00800af0();
+
+  iVar11 = (**(code **)(*pObject + 0x214))();
+
+  if (iVar11 == 0) goto LAB_00956c03;
+
+  pCharacter = (void *)(**(code **)(*pObject + 0x214))();
+
+  if (*(int *)((int)pCharacter + 0x250) != 0) {
+
+    iVar11 = *(int *)(*(int *)((int)pCharacter + 0x250) + 0x254);
+
+    if (iVar11 == 0) {
+
+      iVar4 = 0;
+
+      uVar6 = 0;
+
+    }
+
+    else {
+
+      iVar4 = (int)*(short *)(iVar11 + 0xcc);
+
+      uVar6 = *(uint32_t /* width from decompiler */ *)
+
+               (*(int *)(*(int *)(*(int *)(*(int *)(iVar11 + 4) + 4) + 0xac + iVar11) + 0x3c) +
+
+               0x4c0);
+
+    }
+
+    sprintf(acStack_224,"%-30s (Armor:%d,Total:%d,Deflection: %d)\n","Defense:",iVar4,
+
+            (int)((float)iVar4 + *(float *)((int)pCharacter + 0x25c)),uVar6);
+
+    FUN_00800af0();
+
+  }
+
+  sVar2 = FUN_004c41c0();
+
+  iVar11 = (int)sVar2;
+
+  iVar4 = Character_GetTechForPoolCalcs(pCharacter);
+
+  sVar2 = FUN_004c4140((int)(short)iVar4,iVar11);
+
+  FUN_004c4070((int)sVar2);
+
+  sprintf(acStack_224,"%-30s (C:%d Th:%d Te:%d P:%d)\n");
+
+  FUN_00800af0();
+
+  sprintf(acStack_224,"%-30s (P:%d, F:%d, Cor:%d, Con:%d, E:%d)\n","Resists:",
+
+          (int)*(short *)((int)pCharacter + 0x1ac),(int)*(short *)((int)pCharacter + 0x1ae),
+
+          (int)*(short *)((int)pCharacter + 0x1b2),(int)*(short *)((int)pCharacter + 0x1b4),
+
+          (int)*(short *)((int)pCharacter + 0x1b6));
+
+  FUN_00800af0();
+
+  sprintf(acStack_224,"%-30s (P:%d, F:%d, Cor:%d, Con:%d, E:%d\n)","DmgAddMin:",
+
+          (int)*(short *)((int)pCharacter + 0x194),(int)*(short *)((int)pCharacter + 0x196),
+
+          (int)*(short *)((int)pCharacter + 0x19a),(int)*(short *)((int)pCharacter + 0x19c),
+
+          (int)*(short *)((int)pCharacter + 0x19e));
+
+  FUN_00800af0();
+
+  sprintf(acStack_224,"%-30s (P:%d, F:%d, Cor:%d, Con:%d, E:%d)\n","DmgAddMax:",
+
+          (int)*(short *)((int)pCharacter + 0x17c),(int)*(short *)((int)pCharacter + 0x17e),
+
+          (int)*(short *)((int)pCharacter + 0x182),(int)*(short *)((int)pCharacter + 0x184),
+
+          (int)*(short *)((int)pCharacter + 0x186));
+
+  FUN_00800af0();
+
+  piVar14 = (int *)(*(int *)(*(int *)((int)pCharacter + 4) + 4) + 4 + (int)pCharacter);
+
+  sVar2 = FUN_004c4070();
+
+  fVar16 = (float)(int)sVar2;
+
+  iVar11 = (**(code **)(*piVar14 + 0x27c))();
+
+  pCVar21 = (CVOGHBBase *)
+
+            (((fVar16 - ((float)iVar11 * DAT_00a0f698 + DAT_00aaaad0)) + DAT_00aaa950) *
+
+            DAT_00a110d8);
+
+  sprintf(acStack_224,"%-30s %0.1f\n","TargetAccuracy:",SUB84((double)(float)pCVar21,0),
+
+          (int)((ulonglong)(double)(float)pCVar21 >> 0x20));
+
+  FUN_00800af0();
+
+  dVar17 = (double)(*(float *)((int)pCharacter + 0x174) * DAT_00aaa7ac);
+
+  sprintf(acStack_224,"%-30s (P:%0.1f%%, F:%0.1f%%, Cor:%0.1f%%, Con:%0.1f%%, E:%0.1f%%)\n",
+
+          "SkillsAccuracyBonus:",(double)(*(float *)((int)pCharacter + 0x164) * DAT_00aaa7ac),
+
+          (double)(*(float *)((int)pCharacter + 0x168) * DAT_00aaa7ac),
+
+          (double)(*(float *)((int)pCharacter + 0x170) * DAT_00aaa7ac),SUB84(dVar17,0),
+
+          (int)((ulonglong)dVar17 >> 0x20),SUB84((double)*(float *)((int)pCharacter + 0x178),0),
+
+          (int)((ulonglong)(double)*(float *)((int)pCharacter + 0x178) >> 0x20));
+
+  FUN_00800af0();
+
+  iVar11 = (**(code **)(*(int *)(*(int *)(*(int *)((int)pCharacter + 4) + 4) + 4 + (int)pCharacter)
+
+                       + 0x1dc))();
+
+  if ((iVar11 == 0) ||
+
+     (iVar11 = (**(code **)(*(int *)(*(int *)(*(int *)((int)pCharacter + 4) + 4) + 4 +
+
+                                    (int)pCharacter) + 0x1dc))(), *(int *)(iVar11 + 0x250) == 0)) {
+
+    dVar17 = (double)((*(float *)((int)pCharacter + 0x178) + g_flOne) * (float)pCVar21);
+
+    dVar1 = (double)((*(float *)((int)pCharacter + 0x174) + g_flOne) * (float)pCVar21);
+
+    sprintf(acStack_224,"%-30s (P:%0.1f, F:%0.1f, Cor:%0.1f, Con:%0.1f, E:%0.1f)\n","TotalAccuracy:"
+
+            ,(double)((*(float *)((int)pCharacter + 0x164) + g_flOne) * (float)pCVar21),
+
+            (double)((*(float *)((int)pCharacter + 0x168) + g_flOne) * (float)pCVar21),
+
+            (double)((*(float *)((int)pCharacter + 0x170) + g_flOne) * (float)pCVar21),
+
+            SUB84(dVar1,0),(int)((ulonglong)dVar1 >> 0x20),SUB84(dVar17,0),
+
+            (int)((ulonglong)dVar17 >> 0x20));
+
+LAB_00956a47:
+
+    FUN_00800af0();
+
+  }
+
+  else {
+
+    iVar11 = (**(code **)(*(int *)(*(int *)(*(int *)((int)pCharacter + 4) + 4) + 4 + (int)pCharacter
+
+                                  ) + 0x1dc))();
+
+    if (**(int **)(*(int *)(iVar11 + 0x250) + 0x260) != 0) {
+
+      fVar16 = *(float *)(DAT_00d1b6d8 + 0x260);
+
+      iVar11 = FUN_0056b280();
+
+      fVar15 = (float10)FUN_00569dc0();
+
+      fVar15 = fVar15 + (float10)iVar11 + (float10)fVar16;
+
+      fVar16 = (float)fVar15;
+
+      dVar17 = (double)fVar15;
+
+      sprintf(acStack_224,"%-30s %0.1f\n","FrontAccuracy:",SUB84(dVar17,0),
+
+              (int)((ulonglong)dVar17 >> 0x20));
+
+      FUN_00800af0();
+
+      fVar16 = fVar16 + (float)pCVar21;
+
+      dVar17 = (double)((*(float *)((int)pCharacter + 0x178) + g_flOne) * fVar16);
+
+      dVar1 = (double)((*(float *)((int)pCharacter + 0x174) + g_flOne) * fVar16);
+
+      sprintf(acStack_224,"%-30s (P:%0.1f%%, F:%0.1f%%, Cor:%0.1f%%, Con:%0.1f%%, E:%0.1f%%)\n",
+
+              "FrontTotalAccuracy:",
+
+              (double)((*(float *)((int)pCharacter + 0x164) + g_flOne) * fVar16),
+
+              (double)((*(float *)((int)pCharacter + 0x168) + g_flOne) * fVar16),
+
+              (double)((*(float *)((int)pCharacter + 0x170) + g_flOne) * fVar16),SUB84(dVar1,0),
+
+              (int)((ulonglong)dVar1 >> 0x20),SUB84(dVar17,0),(int)((ulonglong)dVar17 >> 0x20));
+
+      FUN_00800af0();
+
+    }
+
+    iVar11 = (**(code **)(*(int *)(*(int *)(*(int *)((int)pCharacter + 4) + 4) + 4 + (int)pCharacter
+
+                                  ) + 0x1dc))();
+
+    if (*(int *)(*(int *)(*(int *)(iVar11 + 0x250) + 0x260) + 4) != 0) {
+
+      fVar16 = *(float *)(DAT_00d1b6d8 + 0x260);
+
+      iVar11 = FUN_0056b280();
+
+      fVar15 = (float10)FUN_00569dc0();
+
+      fVar15 = fVar15 + (float10)iVar11 + (float10)fVar16;
+
+      fVar16 = (float)fVar15;
+
+      dVar17 = (double)fVar15;
+
+      sprintf(acStack_224,"%-30s %0.1f\n","TurretAccuracy:",SUB84(dVar17,0),
+
+              (int)((ulonglong)dVar17 >> 0x20));
+
+      FUN_00800af0();
+
+      fVar16 = fVar16 + (float)pCVar21;
+
+      dVar17 = (double)((*(float *)((int)pCharacter + 0x178) + g_flOne) * fVar16);
+
+      dVar1 = (double)((*(float *)((int)pCharacter + 0x174) + g_flOne) * fVar16);
+
+      sprintf(acStack_224,"%-30s (P:%0.1f, F:%0.1f, Cor:%0.1f, Con:%0.1f, E:%0.1f)\n",
+
+              "TurretTotalAccuracy:",
+
+              (double)((*(float *)((int)pCharacter + 0x164) + g_flOne) * fVar16),
+
+              (double)((*(float *)((int)pCharacter + 0x168) + g_flOne) * fVar16),
+
+              (double)((*(float *)((int)pCharacter + 0x170) + g_flOne) * fVar16),SUB84(dVar1,0),
+
+              (int)((ulonglong)dVar1 >> 0x20),SUB84(dVar17,0),(int)((ulonglong)dVar17 >> 0x20));
+
+      goto LAB_00956a47;
+
+    }
+
+  }
+
+  sprintf(acStack_224,"%-30s (P:%d, F:%d, Cor:%d, Con:%d, E:%d)\n","DmgAddEquppedMin:",
+
+          (int)*(short *)((int)pCharacter + 0x1a0),(int)*(short *)((int)pCharacter + 0x1a2),
+
+          (int)*(short *)((int)pCharacter + 0x1a6),(int)*(short *)((int)pCharacter + 0x1a8),
+
+          (int)*(short *)((int)pCharacter + 0x1aa));
+
+  FUN_00800af0();
+
+  sprintf(acStack_224,"%-30s (P:%d, F:%d, Cor:%d, Con:%d, E:%d)\n","DmgAddEquippedMax:",
+
+          (int)*(short *)((int)pCharacter + 0x188),(int)*(short *)((int)pCharacter + 0x18a),
+
+          (int)*(short *)((int)pCharacter + 0x18e),(int)*(short *)((int)pCharacter + 400),
+
+          (int)*(short *)((int)pCharacter + 0x192));
+
+  FUN_00800af0();
+
+  sprintf(acStack_224,"%-30s (O: %0.1f Defense: %0.1f P: %0.1f Deflect: %0.1f)\n");
+
+  FUN_00800af0();
+
+  fVar15 = (float10)FUN_004c3140(1);
+
+  dVar17 = (double)fVar15;
+
+  fVar15 = (float10)FUN_004c3140(0);
+
+  sprintf(acStack_224,"Crit Offense Crea:%0.1f Veh:%0.1f\n",SUB84((double)fVar15,0),
+
+          (int)((ulonglong)(double)fVar15 >> 0x20),SUB84(dVar17,0),(int)((ulonglong)dVar17 >> 0x20))
+
+  ;
+
+  FUN_00800af0();
+
+  fVar15 = (float10)FUN_004c3120(1);
+
+  dVar17 = (double)(fVar15 * (float10)DAT_00aaa7ac);
+
+  fVar15 = (float10)FUN_004c3120(0);
+
+  sprintf(acStack_224,"Crit Defense Crea:%0.1f%% Veh:%0.1f%%\n",
+
+          SUB84((double)(fVar15 * (float10)DAT_00aaa7ac),0),
+
+          (int)((ulonglong)(double)(fVar15 * (float10)DAT_00aaa7ac) >> 0x20),SUB84(dVar17,0),
+
+          (int)((ulonglong)dVar17 >> 0x20));
+
+  FUN_00800af0();
+
+LAB_00956c03:
+
+  if (local_238._2_1_ != '\0') {
+
+    FUN_004294f0();
+
+    FUN_004022a0(&stack0xfffffdb0,&stack0xfffffdac);
+
+    while (pCVar21 != (CVOGHBBase *)0x0) {
+
+      if (pCVar21->nUnusedOrFlags == 1) {
+
+        pCVar12 = (CVOGHBBase *)__RTDynamicCast();
+
+        if (pCVar12 != (CVOGHBBase *)0x0) {
+
+          iVar11 = pCVar12[0x27].nPeriodMs;
+
+          fVar16 = CVOGHBBase_GetRemainingSeconds(pCVar12);
+
+          ptVar13 = (type_info *)__RTtypeid(pCVar12,(double)fVar16);
+
+          pcVar3 = type_info::name(ptVar13);
+
+          sprintf(acStack_224,"Skill: %d Type: %s Time Left: %0.2f)\n",iVar11,pcVar3);
+
+          goto LAB_00956d16;
+
+        }
+
+      }
+
+      else {
+
+        fVar16 = CVOGHBBase_GetRemainingSeconds(pCVar21);
+
+        ptVar13 = (type_info *)__RTtypeid(pCVar21,(double)fVar16);
+
+        pcVar3 = type_info::name(ptVar13);
+
+        sprintf(acStack_224,"HB name: %s Time Left: %0.2f)\n",pcVar3);
+
+LAB_00956d16:
+
+        FUN_00800af0();
+
+      }
+
+      FUN_004022a0(&stack0xfffffdb0,&stack0xfffffdac);
+
+    }
+
+    pCVar21 = (CVOGHBBase *)0x0;
+
+    iVar11 = pObject[0x2c];
+
+    if (*(char *)(iVar11 + 0x28) != '\0') {
+
+      *(uint8_t *)(iVar11 + 0x28) = 0;
+
+      LeaveCriticalSection((LPCRITICAL_SECTION)(iVar11 + 4));
+
+    }
+
+    iVar11 = (**(code **)(*pObject + 0x214))();
+
+    if (iVar11 != 0) {
+
+      iVar11 = (**(code **)(*pObject + 0x214))();
+
+      piVar14 = *(int **)(iVar11 + 0x250);
+
+      if (piVar14 != (int *)0x0) {
+
+        piVar14 = (int *)(*(int *)(piVar14[1] + 4) + 4 + (int)piVar14);
+
+      }
+
+      if (pObject == piVar14) {
+
+        iVar11 = (**(code **)(*pObject + 0x214))();
+
+        if (iVar11 == 0) {
+
+          iVar11 = 0;
+
+        }
+
+        else {
+
+          iVar11 = *(int *)(*(int *)(iVar11 + 4) + 4) + 4 + iVar11;
+
+        }
+
+        FUN_004294f0();
+
+        FUN_004022a0(&stack0xfffffdb0,&stack0xfffffdac);
+
+        while (pCVar21 != (CVOGHBBase *)0x0) {
+
+          if (pCVar21->nUnusedOrFlags == 1) {
+
+            pCVar12 = (CVOGHBBase *)__RTDynamicCast();
+
+            if (pCVar12 != (CVOGHBBase *)0x0) {
+
+              iVar4 = pCVar12[0x27].nPeriodMs;
+
+              fVar16 = CVOGHBBase_GetRemainingSeconds(pCVar12);
+
+              ptVar13 = (type_info *)__RTtypeid(pCVar12,(double)fVar16);
+
+              pcVar3 = type_info::name(ptVar13);
+
+              sprintf(acStack_224,"Owner Skill: %d Type: %s Time Left: %0.2f)\n",iVar4,pcVar3);
+
+              goto LAB_00956e7d;
+
+            }
+
+          }
+
+          else {
+
+            pCVar12 = pCVar21;
+
+            fVar16 = CVOGHBBase_GetRemainingSeconds(pCVar21);
+
+            ptVar13 = (type_info *)__RTtypeid(pCVar21,(double)fVar16);
+
+            pCVar21 = pCVar12;
+
+            pcVar3 = type_info::name(ptVar13);
+
+            sprintf(acStack_224,"Owner HB name: %s Time Left: %0.2f)\n",pcVar3);
+
+LAB_00956e7d:
+
+            FUN_00800af0();
+
+          }
+
+          FUN_004022a0(&stack0xfffffdb0,&stack0xfffffdac);
+
+        }
+
+        iVar11 = *(int *)(iVar11 + 0xb0);
+
+        if (*(char *)(iVar11 + 0x28) != '\0') {
+
+          *(uint8_t *)(iVar11 + 0x28) = 0;
+
+          LeaveCriticalSection((LPCRITICAL_SECTION)(iVar11 + 4));
+
+        }
+
+      }
+
+    }
+
+  }
+
+  return 1;
+
+}

@@ -1,0 +1,380 @@
+# Annotated low-level: FUN_005f1ec0
+
+| Field | Value |
+|---|---|
+| Stable ID | `aa_005f1ec0` |
+| VA | `0x005f1ec0` |
+| System | unknown |
+| Date | 2026-07-23 |
+
+## Machine-level notes
+
+- Source: raw capture for `aa_005f1ec0`.
+- Prefer assembly when decompiler conflicts.
+- Recover types for still-generic parameters via callers/xrefs.
+- Map DAT_* globals and FUN_* callees in follow-up waves.
+
+## Pseudocode (annotated copy of raw)
+
+```c
+void FUN_005f1ec0(int *param_1,undefined4 *param_2,undefined4 param_3)
+
+{
+  int *piVar1;
+  uint uVar2;
+  undefined **ppuVar3;
+  undefined4 uVar4;
+  undefined4 *puVar5;
+  int iVar6;
+  int iVar7;
+  undefined4 *puVar8;
+  int iStack_1e0;
+  undefined **ppuStack_1dc;
+  uint uStack_1d8;
+  uint uStack_1d4;
+  undefined **ppuStack_1d0;
+  uint uStack_1cc;
+  int iStack_1c8;
+  int iStack_1c4;
+  uint uStack_1c0;
+  int iStack_1bc;
+  uint uStack_1b8;
+  int iStack_1b4;
+  int iStack_1a4;
+  float local_1a0;
+  float local_19c;
+  undefined4 local_190;
+  undefined4 local_18c;
+  undefined4 local_188;
+  undefined4 local_184;
+  float local_180;
+  float local_17c;
+  float local_178;
+  undefined4 local_174;
+  float local_170;
+  float local_16c;
+  float local_168;
+  undefined4 local_164;
+  float local_160;
+  float local_15c;
+  float local_158;
+  undefined4 local_154;
+  undefined4 uStack_150;
+  undefined4 uStack_14c;
+  undefined4 uStack_148;
+  undefined4 uStack_144;
+  undefined4 uStack_140;
+  undefined4 uStack_13c;
+  undefined4 uStack_138;
+  undefined4 uStack_134;
+  undefined4 uStack_130;
+  undefined4 uStack_12c;
+  undefined4 uStack_128;
+  undefined4 uStack_124;
+  undefined4 uStack_120;
+  undefined4 uStack_11c;
+  undefined4 uStack_118;
+  undefined4 uStack_114;
+  undefined4 uStack_110;
+  undefined4 uStack_10c;
+  undefined4 uStack_100;
+  undefined4 uStack_fc;
+  undefined4 uStack_f8;
+  undefined4 uStack_f4;
+  undefined4 uStack_f0;
+  undefined4 uStack_ec;
+  undefined4 uStack_e8;
+  undefined4 uStack_e4;
+  undefined4 uStack_e0;
+  undefined4 uStack_dc;
+  undefined4 uStack_d8;
+  undefined4 uStack_d4;
+  undefined4 uStack_d0;
+  undefined4 uStack_cc;
+  undefined4 uStack_c8;
+  undefined4 uStack_c4;
+  float afStack_c0 [6];
+  undefined4 uStack_a8;
+  undefined4 uStack_a4;
+  undefined4 uStack_a0;
+  undefined4 uStack_9c;
+  float fStack_98;
+  undefined4 uStack_94;
+  undefined4 uStack_90;
+  undefined4 uStack_8c;
+  undefined4 uStack_88;
+  undefined4 uStack_84;
+  
+  local_1a0 = 0.0;
+  local_19c = 0.0;
+  local_184 = 0;
+  local_188 = 0;
+  local_18c = 0;
+  local_190 = 0;
+  local_174 = 0;
+  local_178 = 0.0;
+  local_17c = 0.0;
+  local_180 = 0.0;
+  local_164 = 0;
+  local_168 = 0.0;
+  local_16c = 0.0;
+  local_170 = 0.0;
+  local_154 = 0;
+  local_158 = 0.0;
+  local_15c = 0.0;
+  local_160 = 0.0;
+  uVar4 = (**(code **)(*param_1 + 0x14))();
+  switch(uVar4) {
+  case 2:
+  case 3:
+  case 10:
+  case 0x13:
+    iVar6 = (**(code **)(*param_1 + 0x14))();
+    if ((iVar6 == 3) || (iVar6 = (**(code **)(*param_1 + 0x14))(), iVar6 == 0x13)) {
+      param_1 = (int *)param_1[3];
+    }
+    iVar6 = (**(code **)(*param_1 + 0x2c))();
+    if (iVar6 == -1) {
+      return;
+    }
+    do {
+      iVar7 = (**(code **)(*param_1 + 0x34))(iVar6,&uStack_110);
+      if (iVar7 != 0) {
+        FUN_005f1ec0(iVar7,param_2,param_3);
+      }
+      iVar6 = (**(code **)(*param_1 + 0x30))(iVar6);
+    } while (iVar6 != -1);
+    return;
+  case 4:
+    FUN_005ee680(param_1[3],0x3f800000,&local_1a0);
+    break;
+  case 5:
+    iStack_1e0 = param_1[4];
+    ppuStack_1dc = (undefined **)param_1[5];
+    uStack_1d8 = param_1[6];
+    uStack_1d4 = param_1[7];
+    uStack_1c0 = param_1[8];
+    iStack_1bc = param_1[9];
+    uStack_1b8 = param_1[10];
+    iStack_1b4 = param_1[0xb];
+    ppuStack_1d0 = (undefined **)param_1[0xc];
+    uStack_1cc = param_1[0xd];
+    iStack_1c8 = param_1[0xe];
+    iStack_1c4 = param_1[0xf];
+    FUN_005f10d0(&iStack_1e0,&uStack_1c0,&ppuStack_1d0,0x3f800000,param_1[3],&local_1a0);
+    break;
+  case 6:
+    ppuStack_1d0 = (undefined **)param_1[4];
+    uStack_1cc = param_1[5];
+    iStack_1c8 = param_1[6];
+    iStack_1c4 = param_1[7];
+    FUN_005ee750(&ppuStack_1d0,0x3f800000,&local_1a0);
+    break;
+  case 7:
+    FUN_005f0210(param_1 + 4,param_1 + 8,param_1[3],0x3f800000,&local_1a0);
+    break;
+  case 8:
+    (**(code **)(*param_1 + 0x28))(&ppuStack_1d0);
+    uVar2 = uStack_1d4;
+    iStack_1c4 = 0;
+    uStack_1c0 = 0;
+    iStack_1bc = -0x80000000;
+    if ((char)ppuStack_1d0 != '\0') {
+      if (0 < (int)uStack_1d4) {
+        FUN_005b3300(&iStack_1c4,uStack_1d4 & ((int)uStack_1d4 < 0) - 1,0x10);
+      }
+      uStack_1c0 = uVar2;
+    }
+    iVar6 = (**(code **)(*param_1 + 0x2c))(iStack_1c4);
+    ppuVar3 = ppuStack_1d0;
+    iStack_1e0 = 0;
+    ppuStack_1dc = (undefined **)0x0;
+    uStack_1d8 = 0x80000000;
+    if (0 < (int)ppuStack_1d0) {
+      FUN_005b3300(&iStack_1e0,(uint)ppuStack_1d0 & ((int)ppuStack_1d0 < 0) - 1,0x10);
+    }
+    iVar7 = 0;
+    ppuStack_1dc = ppuVar3;
+    if (0 < (int)ppuStack_1d0) {
+      puVar8 = (undefined4 *)(iVar6 + 8);
+      do {
+        puVar5 = (undefined4 *)((int)puVar8 + iStack_1e0 + (-8 - iVar6));
+        iVar7 = iVar7 + 1;
+        *puVar5 = puVar8[-2];
+        puVar5[1] = puVar8[-1];
+        puVar5[2] = *puVar8;
+        puVar5[3] = puVar8[1];
+        puVar8 = puVar8 + 4;
+      } while (iVar7 < (int)ppuStack_1d0);
+    }
+    FUN_005effa0(iStack_1e0,0x10,ppuVar3,0x3f800000,&local_1a0);
+    if ((uStack_1d8 & 0x80000000) == 0) {
+      (**(code **)(*DAT_00b05060 + 0x14))(iStack_1e0,uStack_1d8 << 4,0x12);
+    }
+    if ((uStack_1b8 & 0x80000000) == 0) {
+      (**(code **)(*DAT_00b05060 + 0x14))(uStack_1c0,uStack_1b8 << 4,0x12);
+    }
+    break;
+  case 9:
+    iStack_1a4 = 0;
+    piVar1 = param_1;
+    if (param_1[3] < 1) {
+      return;
+    }
+    do {
+      uStack_150 = *param_2;
+      uStack_14c = param_2[1];
+      uStack_148 = param_2[2];
+      uStack_144 = param_2[3];
+      uStack_140 = param_2[4];
+      uStack_13c = param_2[5];
+      uStack_138 = param_2[6];
+      uStack_134 = param_2[7];
+      uStack_130 = param_2[8];
+      uStack_12c = param_2[9];
+      uStack_128 = param_2[10];
+      uStack_124 = param_2[0xb];
+      uStack_120 = param_2[0xc];
+      uStack_11c = param_2[0xd];
+      uStack_118 = param_2[0xe];
+      uStack_114 = param_2[0xf];
+      FUN_005d68f0(&uStack_150,piVar1 + 4);
+      FUN_006c7fa0(piVar1[7]);
+      FUN_005f1ec0(&ppuStack_1d0,&uStack_150,param_3);
+      ppuStack_1d0 = &PTR_FUN_009d81e8;
+      if ((uStack_1cc & 0x8000) != 0) {
+        uStack_1cc = uStack_1cc & 0xffff7fff;
+        FUN_005ffdb0(0);
+      }
+      iStack_1a4 = iStack_1a4 + 1;
+      ppuStack_1d0 = &PTR_LAB_009cc290;
+      piVar1 = piVar1 + 4;
+    } while (iStack_1a4 < param_1[3]);
+    return;
+  default:
+    goto switchD_005f1f78_caseD_b;
+  case 0x11:
+    FUN_005f1ec0(param_1[4],param_2,param_3);
+    return;
+  case 0x12:
+    break;
+  case 0x15:
+    FUN_0063a190(param_2,param_1 + 4);
+    FUN_005f1ec0(param_1[3],&uStack_150,param_3);
+    return;
+  case 0x17:
+    FUN_005f1ec0(param_1[0xc],param_2,param_3);
+    goto switchD_005f1f78_caseD_b;
+  }
+  if (local_1a0 != 0.0) {
+    local_19c = local_19c * local_1a0;
+    local_180 = local_180 * local_1a0;
+    local_170 = local_170 * local_1a0;
+    local_160 = local_160 * local_1a0;
+    local_17c = local_17c * local_1a0;
+    local_16c = local_16c * local_1a0;
+    local_15c = local_15c * local_1a0;
+    local_178 = local_178 * local_1a0;
+    local_168 = local_168 * local_1a0;
+    local_158 = local_158 * local_1a0;
+    iStack_1e0 = 0;
+    ppuStack_1dc = (undefined **)0x0;
+    uStack_1d8 = 0x80000000;
+    uStack_110 = 0;
+    uStack_10c = 0;
+    uStack_f4 = 0;
+    uStack_f8 = 0;
+    uStack_fc = 0;
+    uStack_100 = 0;
+    uStack_e4 = 0;
+    uStack_e8 = 0;
+    uStack_ec = 0;
+    uStack_f0 = 0;
+    uStack_d4 = 0;
+    uStack_d8 = 0;
+    uStack_dc = 0;
+    uStack_e0 = 0;
+    uStack_c4 = 0;
+    uStack_c8 = 0;
+    uStack_cc = 0;
+    uStack_d0 = 0;
+    afStack_c0[3] = 0.0;
+    afStack_c0[2] = 0.0;
+    afStack_c0[1] = 0.0;
+    uStack_a4 = 0;
+    uStack_a8 = 0;
+    afStack_c0[4] = 0.0;
+    uStack_94 = 0;
+    uStack_9c = 0;
+    uStack_a0 = 0;
+    afStack_c0[0] = g_flOne;
+    afStack_c0[5] = g_flOne;
+    fStack_98 = g_flOne;
+    uStack_84 = 0;
+    uStack_88 = 0;
+    uStack_8c = 0;
+    uStack_90 = 0;
+    FUN_005ee860(param_3);
+    if (ppuStack_1dc == (undefined **)(uStack_1d8 & 0x7fffffff)) {
+      FUN_005b3370(&iStack_1e0,0x90);
+    }
+    ppuStack_1dc = (undefined **)((int)ppuStack_1dc + 1);
+    FUN_005ee860(&uStack_110);
+    FUN_005eb040(afStack_c0);
+    uStack_110 = 0;
+    uStack_10c = 0;
+    uStack_f4 = 0;
+    uStack_f8 = 0;
+    uStack_fc = 0;
+    uStack_100 = 0;
+    uStack_e4 = 0;
+    uStack_e8 = 0;
+    uStack_ec = 0;
+    uStack_f0 = 0;
+    uStack_d4 = 0;
+    uStack_d8 = 0;
+    uStack_dc = 0;
+    uStack_e0 = 0;
+    uStack_c4 = 0;
+    uStack_c8 = 0;
+    uStack_cc = 0;
+    uStack_d0 = 0;
+    afStack_c0[3] = 0.0;
+    afStack_c0[2] = 0.0;
+    afStack_c0[1] = 0.0;
+    uStack_a4 = 0;
+    uStack_a8 = 0;
+    afStack_c0[4] = 0.0;
+    uStack_94 = 0;
+    uStack_9c = 0;
+    uStack_a0 = 0;
+    afStack_c0[0] = g_flOne;
+    afStack_c0[5] = g_flOne;
+    fStack_98 = g_flOne;
+    uStack_84 = 0;
+    uStack_88 = 0;
+    uStack_8c = 0;
+    uStack_90 = 0;
+    FUN_005ee860(&local_1a0);
+    FUN_005eb040(param_2);
+    if (ppuStack_1dc == (undefined **)(uStack_1d8 & 0x7fffffff)) {
+      FUN_005b3370(&iStack_1e0,0x90);
+    }
+    ppuStack_1dc = (undefined **)((int)ppuStack_1dc + 1);
+    FUN_005ee860(&uStack_110);
+    FUN_005eb040(afStack_c0);
+    FUN_005ef3d0(&iStack_1e0,param_3);
+    if ((uStack_1d8 & 0x80000000) == 0) {
+      (**(code **)(*DAT_00b05060 + 0x14))(iStack_1e0,(uStack_1d8 & 0x7fffffff) * 0x90,0x12);
+      return;
+    }
+  }
+switchD_005f1f78_caseD_b:
+  return;
+}
+```
+
+## Open questions
+
+- Confirm calling convention and full signature against callers.
+- Recover meaningful types for still-generic parameters.

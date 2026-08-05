@@ -1,0 +1,86 @@
+// =============================================================================
+// FUN_009453e0
+// -----------------------------------------------------------------------------
+// Stable ID: aa_009453e0
+// Address:   0x009453e0  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_009453e0 @ 0x009453e0
+// Stable ID: aa_009453e0
+// Embedded strings (evidence for future rename):
+//   - "\n\n************ Starting ShutDown on Client\n\n"
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~24 non-empty decompiler lines.
+//  - Control keywords: if×3, return×2.
+//  - Notable callees: FUN_0048a410, FUN_007a4480, FUN_008073b0, FUN_009339a0, FUN_009453e0, _exit.
+//  - Strings: "\n\n************ Starting ShutDown on Client\n\n".
+//  - Return sites: 2.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+void FUN_009453e0(void)
+
+
+
+{
+
+  char cVar1;
+
+  int in_EAX;
+
+  uint32_t /* width from decompiler */ uStack_8;
+
+  uint8_t uStack_4;
+
+  
+
+  if (*(int *)(in_EAX + 0x3c10) != 0) {
+
+    FUN_0048a410(in_EAX + 0x3c19,*(int *)(in_EAX + 0x3c10),0);
+
+  }
+
+  FUN_007a4480(0xffffffff,"\n\n************ Starting ShutDown on Client\n\n");
+
+  if (*(int **)(in_EAX + 0xc7c) != (int *)0x0) {
+
+    cVar1 = (**(code **)(**(int **)(in_EAX + 0xc7c) + 8))();
+
+    if ((cVar1 != '\0') && (*(int *)(in_EAX + 0xe98) != 0)) {
+
+      uStack_4 = 1;
+
+      uStack_8 = 0x801c;
+
+      FUN_008073b0(8,&uStack_8);
+
+      return;
+
+    }
+
+  }
+
+  *(uint8_t *)(in_EAX + 0x13) = 0;
+
+  FUN_009339a0();
+
+                    /* WARNING: Subroutine does not return */
+
+  _exit(0);
+
+}

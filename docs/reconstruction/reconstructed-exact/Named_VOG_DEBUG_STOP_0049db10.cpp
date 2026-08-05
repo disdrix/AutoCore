@@ -1,0 +1,326 @@
+// READABILITY (auto CF):
+//  - Body size: ~146 non-empty decompiler lines.
+//  - Control keywords: if×9, return×2, goto×2, for×2.
+//  - Notable callees: FUN_007996d0×5, FUN_00798850×3, FUN_00798bb0×3, FUN_00799200×3, FUN_0049dab0, FUN_0049db10, FUN_005b8370, FUN_00798d90.
+//  - Strings: "VOG_DEBUG_STOP"; "bright"; "addEmitterVelocity"; "detachFromEmitter".
+//  - Return sites: 2.
+
+// =============================================================================
+// Named_VOG_DEBUG_STOP_0049db10
+// -----------------------------------------------------------------------------
+// Stable ID: aa_0049db10
+// Address:   0x0049db10  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+/*
+ * Behavioral notes:
+ * String-driven rename evidence: "VOG_DEBUG_STOP"
+ *
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+uint32_t /* width from decompiler */ Named_VOG_DEBUG_STOP_0049db10(int param_1,int *param_2)
+
+
+
+{
+
+  uint8_t *puVar1;
+
+  float *pfVar2;
+
+  float fVar3;
+
+  int iVar4;
+
+  uint32_t /* width from decompiler */ *puVar5;
+
+  byte bStack_426;
+
+  byte bStack_425;
+
+  int *local_424;
+
+  uint32_t /* width from decompiler */ *puStack_420;
+
+  uint32_t /* width from decompiler */ uStack_41c;
+
+  uint32_t /* width from decompiler */ uStack_418;
+
+  uint32_t /* width from decompiler */ uStack_414;
+
+  uint8_t auStack_410 [4];
+
+  uint32_t /* width from decompiler */ auStack_40c [127];
+
+  int iStack_210;
+
+  uint32_t /* width from decompiler */ auStack_20c [130];
+
+  
+
+  if (param_2 == (int *)0x0) {
+
+LAB_0049e07b:
+
+    FUN_007a4480(0,"VOG_DEBUG_STOP");
+
+    return 0;
+
+  }
+
+  iStack_210 = (**(code **)(*param_2 + 0x44))(param_2,&local_424);
+
+  if ((iStack_210 != 0) || (local_424 == (int *)0x0)) goto LAB_0049e07b;
+
+  puVar5 = auStack_20c;
+
+  for (iVar4 = 0x81; iVar4 != 0; iVar4 = iVar4 + -1) {
+
+    *puVar5 = 0;
+
+    puVar5 = puVar5 + 1;
+
+  }
+
+  bStack_426 = 0;
+
+  *(float *)(param_1 + 0x2f8) = g_flOne;
+
+  puVar1 = (uint8_t *)(param_1 + 0x31c);
+
+  *(uint8_t *)(param_1 + 0x31e) = 0xff;
+
+  *(uint8_t *)(param_1 + 0x31d) = 0xff;
+
+  *puVar1 = 0xff;
+
+  *(uint8_t *)(param_1 + 799) = 0xff;
+
+  bStack_426 = FUN_007996d0(local_424,L"bright",&bStack_425);
+
+  *(byte *)(param_1 + 0x3e3) =
+
+       ((bStack_425 & 1) * '\x02' | bStack_426 & 1) * '\x02' | *(byte *)(param_1 + 0x3e3) & 0xf9;
+
+  FUN_007996d0(local_424,L"addEmitterVelocity",&bStack_426);
+
+  *(byte *)(param_1 + 0x1e8) = *(byte *)(param_1 + 0x1e8) & 0x7f | bStack_426 << 7;
+
+  bStack_426 = 0;
+
+  FUN_007996d0(local_424,L"detachFromEmitter",&bStack_426);
+
+  *(byte *)(param_1 + 0x1e9) =
+
+       *(byte *)(param_1 + 0x1e9) ^ (*(byte *)(param_1 + 0x1e9) ^ bStack_426) & 1;
+
+  bStack_426 = 0;
+
+  FUN_007996d0(local_424,L"lockDirectionToOwner",&bStack_426);
+
+  *(byte *)(param_1 + 0x1e9) =
+
+       *(byte *)(param_1 + 0x1e9) ^ (bStack_426 * '\x02' ^ *(byte *)(param_1 + 0x1e9)) & 2;
+
+  FUN_00798bb0(local_424,L"textureID",&iStack_210);
+
+  FUN_0049dab0(&iStack_210,param_1 + 0x348,param_1 + 0x344);
+
+  bStack_426 = FUN_00799200(local_424,L"scale",param_1 + 0x2f8,param_1 + 0x2fc,&bStack_425);
+
+  *(byte *)(param_1 + 0x3e0) =
+
+       *(byte *)(param_1 + 0x3e0) ^ (bStack_426 << 4 ^ *(byte *)(param_1 + 0x3e0)) & 0x10;
+
+  *(byte *)(param_1 + 0x3e1) =
+
+       *(byte *)(param_1 + 0x3e1) ^ (bStack_425 * '\x02' ^ *(byte *)(param_1 + 0x3e1)) & 2;
+
+  bStack_426 = FUN_00799200(local_424,L"scaleY",param_1 + 0x300,param_1 + 0x304,&bStack_425);
+
+  *(byte *)(param_1 + 0x3e0) =
+
+       *(byte *)(param_1 + 0x3e0) ^ (bStack_426 << 5 ^ *(byte *)(param_1 + 0x3e0)) & 0x20;
+
+  *(byte *)(param_1 + 0x3e1) =
+
+       *(byte *)(param_1 + 0x3e1) ^ (bStack_425 * '\b' ^ *(byte *)(param_1 + 0x3e1)) & 8;
+
+  bStack_426 = FUN_007996d0(local_424,L"scaleYProportional",&bStack_425);
+
+  pfVar2 = (float *)(param_1 + 0x310);
+
+  *(byte *)(param_1 + 0x308) = bStack_425;
+
+  bStack_426 = FUN_00799200(local_424,L"rotationSpeed",param_1 + 0x30c,pfVar2,&bStack_425);
+
+  *(byte *)(param_1 + 0x3e2) = *(byte *)(param_1 + 0x3e2) & 0x7f | bStack_425 << 7;
+
+  *(byte *)(param_1 + 0x3e0) = *(byte *)(param_1 + 0x3e0) & 0x7f | bStack_426 << 7;
+
+  fVar3 = DAT_00aaa7dc;
+
+  if (bStack_426 != 0) {
+
+    *(float *)(param_1 + 0x30c) = *(float *)(param_1 + 0x30c) * DAT_00aaa7dc;
+
+    *pfVar2 = *pfVar2 * fVar3;
+
+  }
+
+  pfVar2 = (float *)(param_1 + 0x314);
+
+  bStack_426 = FUN_00799290(local_424,L"rotation",pfVar2,&bStack_425);
+
+  *(byte *)(param_1 + 0x3e3) =
+
+       *(byte *)(param_1 + 0x3e3) ^ (*(byte *)(param_1 + 0x3e3) ^ bStack_425) & 1;
+
+  *(byte *)(param_1 + 0x3e0) =
+
+       *(byte *)(param_1 + 0x3e0) ^ (bStack_426 << 6 ^ *(byte *)(param_1 + 0x3e0)) & 0x40;
+
+  if (bStack_426 != 0) {
+
+    *pfVar2 = *pfVar2 * DAT_00aaa7dc;
+
+  }
+
+  auStack_410 = (uint8_t  [4])0x0;
+
+  puVar5 = auStack_40c;
+
+  for (iVar4 = 0x7f; iVar4 != 0; iVar4 = iVar4 + -1) {
+
+    *puVar5 = 0;
+
+    puVar5 = puVar5 + 1;
+
+  }
+
+  bStack_426 = FUN_00798bb0(local_424,L"rotationAxis",auStack_410);
+
+  if (bStack_426 == 0) {
+
+    *(uint8_t *)(param_1 + 0x330) = 0;
+
+  }
+
+  else {
+
+    if ((auStack_410._0_2_ == 0x68) || (auStack_410._0_2_ == 0x48)) {
+
+      *(uint8_t *)(param_1 + 0x330) = 1;
+
+      puStack_420 = (uint32_t /* width from decompiler */ *)(auStack_410 + 2);
+
+    }
+
+    else {
+
+      *(uint8_t *)(param_1 + 0x330) = 0;
+
+      puStack_420 = (uint32_t /* width from decompiler */ *)auStack_410;
+
+    }
+
+    FUN_00798850(&puStack_420,param_1 + 0x324);
+
+  }
+
+  *(byte *)(param_1 + 0x3e0) =
+
+       *(byte *)(param_1 + 0x3e0) ^ (*(byte *)(param_1 + 0x3e0) ^ bStack_426) & 1;
+
+  fVar3 = g_flOne;
+
+  if (bStack_426 == 0) {
+
+    *(uint32_t /* width from decompiler */ *)(param_1 + 0x324) = 0;
+
+    *(float *)(param_1 + 0x328) = fVar3;
+
+    *(uint32_t /* width from decompiler */ *)(param_1 + 0x32c) = 0;
+
+  }
+
+  bStack_426 = FUN_00798bb0(local_424,L"heading",auStack_410);
+
+  if (bStack_426 != 0) {
+
+    if ((auStack_410._0_2_ == 0x68) || (auStack_410._0_2_ == 0x48)) {
+
+      puStack_420 = (uint32_t /* width from decompiler */ *)(auStack_410 + 2);
+
+      *(uint8_t *)(param_1 + 0x340) = 1;
+
+      FUN_00798850(&puStack_420,param_1 + 0x334);
+
+      goto LAB_0049df37;
+
+    }
+
+    puStack_420 = (uint32_t /* width from decompiler */ *)auStack_410;
+
+    FUN_00798850(&puStack_420,param_1 + 0x334);
+
+  }
+
+  *(uint8_t *)(param_1 + 0x340) = 0;
+
+LAB_0049df37:
+
+  *(byte *)(param_1 + 0x3e0) =
+
+       *(byte *)(param_1 + 0x3e0) ^ (bStack_426 * '\x02' ^ *(byte *)(param_1 + 0x3e0)) & 2;
+
+  uStack_418 = 0;
+
+  bStack_426 = FUN_00798d90(local_424,&uStack_418,L"color",puVar1,param_1 + 800,&bStack_425);
+
+  FUN_005b8370(uStack_418,4,puVar1,param_1);
+
+  *(byte *)(param_1 + 0x3e0) =
+
+       *(byte *)(param_1 + 0x3e0) ^ (bStack_426 * '\x04' ^ *(byte *)(param_1 + 0x3e0)) & 4;
+
+  *(byte *)(param_1 + 0x3e2) =
+
+       *(byte *)(param_1 + 0x3e2) ^ (bStack_425 * '\x02' ^ *(byte *)(param_1 + 0x3e2)) & 2;
+
+  uStack_41c = 0xff;
+
+  uStack_414 = 0xff;
+
+  bStack_426 = FUN_00799350(local_424,L"alpha",&uStack_41c,&uStack_414,&bStack_425);
+
+  *(byte *)(param_1 + 0x3e0) =
+
+       *(byte *)(param_1 + 0x3e0) ^ (bStack_426 * '\b' ^ *(byte *)(param_1 + 0x3e0)) & 8;
+
+  *(uint8_t *)(param_1 + 799) = (uint8_t)uStack_41c;
+
+  *(uint8_t *)(param_1 + 0x323) = (uint8_t)uStack_414;
+
+  bStack_426 = FUN_00799300(local_424,L"light",param_1 + 0x318);
+
+  *(byte *)(param_1 + 0x3e2) =
+
+       *(byte *)(param_1 + 0x3e2) ^ (bStack_426 << 5 ^ *(byte *)(param_1 + 0x3e2)) & 0x20;
+
+  (**(code **)(*local_424 + 8))(local_424);
+
+  return 1;
+
+}

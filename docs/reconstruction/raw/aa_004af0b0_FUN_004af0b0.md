@@ -1,0 +1,50 @@
+# Raw capture: FUN_004af0b0
+
+| Field | Value |
+|---|---|
+| **Stable ID** | `aa_004af0b0` |
+| **Module** | `autoassault.exe` |
+| **Image base** | `0x400000` |
+| **VA** | `0x004af0b0` |
+| **Canonical name** | `FUN_004af0b0` |
+| **System** | unknown |
+| **Capture timestamp** | `2026-07-23` |
+| **Tool** | Ghidra MCP `batch_decompile` |
+| **Integrity** | Do not overwrite this raw body; append versioned sections only |
+
+---
+
+## Raw pseudocode (authoritative decompile)
+
+```c
+void FUN_004af0b0(int param_1,int param_2,int param_3,undefined4 param_4,undefined4 param_5,
+                 code *param_6)
+
+{
+  char cVar1;
+  int iVar2;
+  int iVar3;
+  
+  iVar2 = param_2;
+  while( true ) {
+    iVar3 = iVar2 * 2 + 2;
+    if (param_3 <= iVar3) break;
+    cVar1 = (*param_6)(*(undefined4 *)(param_1 + iVar3 * 8),*(undefined4 *)(param_1 + 4 + iVar3 * 8)
+                       ,*(undefined4 *)(param_1 + -8 + iVar3 * 8),
+                       *(undefined4 *)(param_1 + -4 + iVar3 * 8));
+    if (cVar1 != '\0') {
+      iVar3 = iVar2 * 2 + 1;
+    }
+    *(undefined4 *)(param_1 + iVar2 * 8) = *(undefined4 *)(param_1 + iVar3 * 8);
+    *(undefined4 *)(param_1 + 4 + iVar2 * 8) = *(undefined4 *)(param_1 + 4 + iVar3 * 8);
+    iVar2 = iVar3;
+  }
+  if (iVar3 == param_3) {
+    *(undefined4 *)(param_1 + iVar2 * 8) = *(undefined4 *)(param_1 + -8 + param_3 * 8);
+    *(undefined4 *)(param_1 + 4 + iVar2 * 8) = *(undefined4 *)(param_1 + -4 + param_3 * 8);
+    iVar2 = param_3 + -1;
+  }
+  FUN_004aeef0(param_1,iVar2,param_2,param_4,param_5,param_6);
+  return;
+}
+```

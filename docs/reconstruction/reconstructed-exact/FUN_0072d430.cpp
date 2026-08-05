@@ -1,0 +1,787 @@
+// =============================================================================
+// FUN_0072d430
+// -----------------------------------------------------------------------------
+// Stable ID: aa_0072d430
+// Address:   0x0072d430  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_0072d430 @ 0x0072d430
+// Stable ID: aa_0072d430
+// Embedded strings (evidence for future rename):
+//   - "C:\\vog\\1_code\\palantir\\palantir\\graphics\\gfxDeviceVB.cpp"
+//   - "Call to gfxDeviceVB::Unlock more times than locked! Bad mojo..."
+//   - "c:\\VOGCRASH.txt"
+//   - ");
+
+// READABILITY (auto CF):
+//  - Body size: ~366 non-empty decompiler lines.
+//  - Control keywords: if×44, do×7, while×7, goto×4, return×2.
+//  - Notable callees: FUN_00746520×4, vog_LogMessage×4, FUN_0076d1b0×3, SQRT×2, fopen×2, ExitProcess, FUN_0072d430, fclose.
+//  - Strings: "C:\\vog\\1_code\\palantir\\palantir\\graphics\\gfxDeviceVB.cpp"; "c:\\VOGCRASH.txt"; "errReport::Massive failure EH_Abort: F:%s l:%d s:%d d:%s\n".
+//  - Return sites: 2.
+
+          if (_File != (FILE *)0x0) {
+
+LAB_0072dbd7:
+
+            fprintf(_File,"
+//   - ",
+
+                    "
+//   - ",0xd3,1,
+
+                    "
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+/* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+
+
+
+uint32_t /* width from decompiler */ FUN_0072d430(int param_1,int param_2)
+
+
+
+{
+
+  int *piVar1;
+
+  float fVar2;
+
+  float fVar3;
+
+  float fVar4;
+
+  float fVar5;
+
+  int *piVar6;
+
+  int *piVar7;
+
+  float *pfVar8;
+
+  int iVar9;
+
+  float *pfVar10;
+
+  FILE *_File;
+
+  float *pfVar11;
+
+  int iVar12;
+
+  int iVar13;
+
+  float *pfVar14;
+
+  int iVar15;
+
+  int iVar16;
+
+  int iVar17;
+
+  float fVar18;
+
+  float fVar19;
+
+  float fVar20;
+
+  int local_2c;
+
+  int local_28;
+
+  float local_20;
+
+  float *local_1c;
+
+  float local_18;
+
+  float local_14;
+
+  float local_10;
+
+  float local_c;
+
+  float local_8;
+
+  float local_4;
+
+  
+
+  iVar17 = *(int *)(*(int *)(param_1 + 200) + 0x14);
+
+  iVar16 = *(int *)(*(int *)(param_1 + 200) + 0xc);
+
+  iVar12 = 0;
+
+  iVar15 = 1;
+
+  local_2c = 0;
+
+  local_20 = g_flOne;
+
+  if (1 < iVar17) {
+
+    local_28 = 0;
+
+    do {
+
+      fVar18 = *(float *)(iVar16 + iVar15 * 4);
+
+      if (fVar18 != g_flZero) {
+
+        (&DAT_00d0e33c)[iVar12 * 2] = fVar18;
+
+        iVar13 = *(int *)(param_1 + 0xd4) + local_28;
+
+        local_20 = local_20 - fVar18;
+
+        (&DAT_00d0e1a8)[iVar12] = iVar13;
+
+        iVar9 = *(int *)(iVar13 + 4);
+
+        if (*(int *)(iVar9 + 0x10) == 0) {
+
+          iVar9 = 0;
+
+        }
+
+        else {
+
+          iVar9 = FUN_00746520(*(uint32_t /* width from decompiler */ *)(iVar9 + 0x14),*(uint32_t /* width from decompiler */ *)(iVar9 + 0x18),4);
+
+        }
+
+        (&DAT_00d0e338)[iVar12 * 2] = iVar9;
+
+        if (iVar9 == 0) {
+
+          piVar6 = *(int **)(*(int *)(iVar13 + 4) + 0x10);
+
+          if ((piVar6 != (int *)0x0) && (piVar7 = (int *)*piVar6, piVar7 != (int *)0x0)) {
+
+            piVar1 = piVar6 + 4;
+
+            *piVar1 = *piVar1 + -1;
+
+            if (*piVar1 < 0) {
+
+              vog_LogMessage("C:\\vog\\1_code\\palantir\\palantir\\graphics\\gfxDeviceVB.cpp",0xd3,1
+
+                             ,"Call to gfxDeviceVB::Unlock more times than locked! Bad mojo...");
+
+              piVar6[4] = 0;
+
+              (&DAT_00d0e1a8)[iVar12] = 0;
+
+              goto LAB_0072d539;
+
+            }
+
+            (**(code **)(*piVar7 + 0x30))(piVar7);
+
+          }
+
+          (&DAT_00d0e1a8)[iVar12] = 0;
+
+        }
+
+        else {
+
+          iVar12 = iVar12 + 1;
+
+        }
+
+      }
+
+LAB_0072d539:
+
+      local_28 = local_28 + 8;
+
+      iVar15 = iVar15 + 1;
+
+      local_2c = iVar12;
+
+    } while (iVar15 < iVar17);
+
+  }
+
+  iVar17 = *(int *)(param_1 + 0x14);
+
+  if (*(int *)(iVar17 + 0x10) == 0) {
+
+    local_28 = 0;
+
+  }
+
+  else {
+
+    local_28 = FUN_00746520(*(uint32_t /* width from decompiler */ *)(iVar17 + 0x14),*(uint32_t /* width from decompiler */ *)(iVar17 + 0x18),4);
+
+  }
+
+  if (*(int *)(param_1 + 0x14) == 0) {
+
+    iVar17 = 0;
+
+  }
+
+  else {
+
+    iVar17 = *(int *)(*(int *)(param_1 + 0x14) + 0x18);
+
+  }
+
+  iVar16 = *(int *)(param_2 + 4);
+
+  iVar12 = *(int *)(iVar16 + 0x10);
+
+  if ((*(byte *)(iVar12 + 4) & 1) == 0) {
+
+    piVar6 = *(int **)(iVar16 + 0x10);
+
+    if (piVar6 == (int *)0x0) {
+
+      pfVar10 = (float *)0x0;
+
+    }
+
+    else {
+
+      iVar12 = iVar17;
+
+      if (iVar17 < 1) {
+
+        iVar12 = *(int *)(iVar16 + 0x18);
+
+      }
+
+      piVar7 = (int *)*piVar6;
+
+      if (piVar7 == (int *)0x0) {
+
+        pfVar10 = (float *)0x0;
+
+      }
+
+      else {
+
+        iVar16 = (**(code **)(*piVar7 + 0x2c))
+
+                           (piVar7,*(int *)(iVar16 + 0x14) * piVar6[2],iVar12 * piVar6[2],&local_1c,
+
+                            0x800);
+
+        if (iVar16 < 0) {
+
+          pfVar10 = (float *)0x0;
+
+        }
+
+        else {
+
+          piVar6[4] = piVar6[4] + 1;
+
+          pfVar10 = local_1c;
+
+        }
+
+      }
+
+    }
+
+  }
+
+  else if (iVar12 == 0) {
+
+    pfVar10 = (float *)0x0;
+
+  }
+
+  else {
+
+    *(int *)(iVar16 + 0x14) = *(int *)(iVar16 + 0x14) + *(int *)(iVar16 + 0x18);
+
+    if (*(int *)(iVar12 + 0xc) - *(int *)(iVar16 + 0x14) < iVar17) {
+
+      pfVar10 = (float *)FUN_00746520(0,iVar17,1);
+
+      *(uint32_t /* width from decompiler */ *)(iVar16 + 0x14) = 0;
+
+      *(int *)(iVar16 + 0x18) = iVar17;
+
+    }
+
+    else {
+
+      pfVar10 = (float *)FUN_00746520(*(int *)(iVar16 + 0x14),iVar17,2);
+
+      *(int *)(iVar16 + 0x18) = iVar17;
+
+    }
+
+  }
+
+  if ((pfVar10 == (float *)0x0) || (local_28 == 0)) {
+
+    piVar6 = *(int **)(*(int *)(param_1 + 0x14) + 0x10);
+
+    if ((piVar6 != (int *)0x0) && (piVar7 = (int *)*piVar6, piVar7 != (int *)0x0)) {
+
+      piVar1 = piVar6 + 4;
+
+      *piVar1 = *piVar1 + -1;
+
+      if (*piVar1 < 0) {
+
+        vog_LogMessage("C:\\vog\\1_code\\palantir\\palantir\\graphics\\gfxDeviceVB.cpp",0xd3,1,
+
+                       "Call to gfxDeviceVB::Unlock more times than locked! Bad mojo...");
+
+        piVar6[4] = 0;
+
+      }
+
+      else {
+
+        (**(code **)(*piVar7 + 0x30))(piVar7);
+
+      }
+
+    }
+
+    piVar6 = *(int **)(*(int *)(param_2 + 4) + 0x10);
+
+    if ((piVar6 != (int *)0x0) && (piVar7 = (int *)*piVar6, piVar7 != (int *)0x0)) {
+
+      piVar1 = piVar6 + 4;
+
+      *piVar1 = *piVar1 + -1;
+
+      if (*piVar1 < 0) {
+
+        vog_LogMessage("C:\\vog\\1_code\\palantir\\palantir\\graphics\\gfxDeviceVB.cpp",0xd3,1,
+
+                       "Call to gfxDeviceVB::Unlock more times than locked! Bad mojo...");
+
+        piVar6[4] = 0;
+
+      }
+
+      else {
+
+        (**(code **)(*piVar7 + 0x30))(piVar7);
+
+      }
+
+    }
+
+    iVar16 = 0;
+
+    if (0 < local_2c) {
+
+      do {
+
+        piVar6 = *(int **)(*(int *)((&DAT_00d0e1a8)[iVar16] + 4) + 0x10);
+
+        if ((piVar6 != (int *)0x0) && (piVar7 = (int *)*piVar6, piVar7 != (int *)0x0)) {
+
+          piVar1 = piVar6 + 4;
+
+          *piVar1 = *piVar1 + -1;
+
+          if (*piVar1 < 0) {
+
+            vog_LogMessage("C:\\vog\\1_code\\palantir\\palantir\\graphics\\gfxDeviceVB.cpp",0xd3,1,
+
+                           "Call to gfxDeviceVB::Unlock more times than locked! Bad mojo...");
+
+            piVar6[4] = 0;
+
+          }
+
+          else {
+
+            (**(code **)(*piVar7 + 0x30))(piVar7);
+
+          }
+
+        }
+
+        iVar16 = iVar16 + 1;
+
+      } while (iVar16 < local_2c);
+
+    }
+
+  }
+
+  if (local_20 <= g_flZero) {
+
+    if (-1 < iVar17 + -1) {
+
+      pfVar11 = (float *)(local_28 + 8);
+
+      pfVar14 = pfVar10 + 3;
+
+      do {
+
+        local_8 = pfVar11[-1];
+
+        fVar19 = 0.0;
+
+        local_c = pfVar11[-2];
+
+        local_4 = *pfVar11;
+
+        iVar16 = 0;
+
+        fVar18 = 0.0;
+
+        fVar20 = 0.0;
+
+        local_18 = 0.0;
+
+        local_14 = 0.0;
+
+        local_10 = 0.0;
+
+        if (0 < local_2c) {
+
+          do {
+
+            pfVar8 = (float *)(&DAT_00d0e338)[iVar16 * 2];
+
+            fVar2 = (float)(&DAT_00d0e33c)[iVar16 * 2];
+
+            local_8 = pfVar8[1] * fVar2 + local_8;
+
+            local_4 = pfVar8[2] * fVar2 + local_4;
+
+            local_c = *pfVar8 * fVar2 + local_c;
+
+            fVar3 = pfVar8[3];
+
+            fVar4 = pfVar8[4];
+
+            fVar5 = pfVar8[5];
+
+            (&DAT_00d0e338)[iVar16 * 2] = pfVar8 + 6;
+
+            iVar16 = iVar16 + 1;
+
+            fVar18 = fVar3 * fVar2 + fVar18;
+
+            fVar19 = fVar4 * fVar2 + fVar19;
+
+            fVar20 = fVar5 * fVar2 + fVar20;
+
+            local_18 = fVar18;
+
+            local_14 = fVar19;
+
+            local_10 = fVar20;
+
+          } while (iVar16 < local_2c);
+
+        }
+
+        fVar18 = SQRT(local_14 * local_14 + local_10 * local_10 + local_18 * local_18);
+
+        if ((_DAT_00a240ec <= fVar18) || (fVar18 <= DAT_00aaa640)) {
+
+          fVar18 = g_flOne / fVar18;
+
+          local_18 = fVar18 * local_18;
+
+          local_14 = local_14 * fVar18;
+
+          local_10 = local_10 * fVar18;
+
+        }
+
+        *pfVar10 = local_c;
+
+        pfVar10[1] = local_8;
+
+        pfVar10[2] = local_4;
+
+        *pfVar14 = local_18;
+
+        pfVar14[1] = local_14;
+
+        pfVar11 = pfVar11 + 6;
+
+        pfVar10 = pfVar10 + 6;
+
+        iVar17 = iVar17 + -1;
+
+        pfVar14[2] = local_10;
+
+        pfVar14 = pfVar14 + 6;
+
+      } while (iVar17 != 0);
+
+    }
+
+  }
+
+  else if (-1 < iVar17 + -1) {
+
+    pfVar11 = (float *)(local_28 + 0x14);
+
+    pfVar14 = pfVar10 + 3;
+
+    do {
+
+      local_8 = pfVar11[-4];
+
+      local_c = pfVar11[-5];
+
+      local_18 = pfVar11[-2];
+
+      local_14 = pfVar11[-1];
+
+      local_10 = *pfVar11;
+
+      local_4 = pfVar11[-3];
+
+      iVar16 = 0;
+
+      if (0 < local_2c) {
+
+        do {
+
+          pfVar8 = (float *)(&DAT_00d0e338)[iVar16 * 2];
+
+          fVar18 = (float)(&DAT_00d0e33c)[iVar16 * 2];
+
+          local_8 = pfVar8[1] * fVar18 + local_8;
+
+          local_4 = pfVar8[2] * fVar18 + local_4;
+
+          local_c = *pfVar8 * fVar18 + local_c;
+
+          fVar19 = pfVar8[4];
+
+          fVar20 = pfVar8[5];
+
+          fVar2 = pfVar8[3];
+
+          (&DAT_00d0e338)[iVar16 * 2] = pfVar8 + 6;
+
+          iVar16 = iVar16 + 1;
+
+          local_18 = fVar18 * fVar2 + local_18;
+
+          local_14 = fVar19 * fVar18 + local_14;
+
+          local_10 = fVar20 * fVar18 + local_10;
+
+        } while (iVar16 < local_2c);
+
+      }
+
+      fVar18 = SQRT(local_14 * local_14 + local_10 * local_10 + local_18 * local_18);
+
+      if ((_DAT_00a240ec <= fVar18) || (fVar18 <= DAT_00aaa640)) {
+
+        fVar18 = g_flOne / fVar18;
+
+        local_18 = fVar18 * local_18;
+
+        local_14 = local_14 * fVar18;
+
+        local_10 = local_10 * fVar18;
+
+      }
+
+      *pfVar10 = local_c;
+
+      pfVar10[1] = local_8;
+
+      pfVar10[2] = local_4;
+
+      *pfVar14 = local_18;
+
+      pfVar14[1] = local_14;
+
+      pfVar11 = pfVar11 + 6;
+
+      pfVar10 = pfVar10 + 6;
+
+      iVar17 = iVar17 + -1;
+
+      pfVar14[2] = local_10;
+
+      pfVar14 = pfVar14 + 6;
+
+    } while (iVar17 != 0);
+
+  }
+
+  piVar6 = *(int **)(*(int *)(param_1 + 0x14) + 0x10);
+
+  if ((piVar6 != (int *)0x0) && (piVar7 = (int *)*piVar6, piVar7 != (int *)0x0)) {
+
+    piVar1 = piVar6 + 4;
+
+    *piVar1 = *piVar1 + -1;
+
+    if (*piVar1 < 0) {
+
+      iVar17 = FUN_0076d1b0("C:\\vog\\1_code\\palantir\\palantir\\graphics\\gfxDeviceVB.cpp",0xd3,
+
+                            "Call to gfxDeviceVB::Unlock more times than locked! Bad mojo...");
+
+      if (iVar17 == 3) goto LAB_0072dae0;
+
+      piVar6[4] = 0;
+
+    }
+
+    else {
+
+      (**(code **)(*piVar7 + 0x30))(piVar7);
+
+    }
+
+  }
+
+  piVar6 = *(int **)(*(int *)(param_2 + 4) + 0x10);
+
+  if (piVar6 != (int *)0x0) {
+
+    piVar7 = (int *)*piVar6;
+
+    if (piVar7 != (int *)0x0) {
+
+      piVar1 = piVar6 + 4;
+
+      *piVar1 = *piVar1 + -1;
+
+      if (*piVar1 < 0) {
+
+        iVar17 = FUN_0076d1b0("C:\\vog\\1_code\\palantir\\palantir\\graphics\\gfxDeviceVB.cpp",0xd3,
+
+                              "Call to gfxDeviceVB::Unlock more times than locked! Bad mojo...");
+
+        if (iVar17 == 3) {
+
+LAB_0072dae0:
+
+          _File = fopen("c:\\VOGCRASH.txt","w");
+
+          if (_File != (FILE *)0x0) {
+
+LAB_0072dbd7:
+
+            fprintf(_File,"errReport::Massive failure EH_Abort: F:%s l:%d s:%d d:%s\n",
+
+                    "C:\\vog\\1_code\\palantir\\palantir\\graphics\\gfxDeviceVB.cpp",0xd3,1,
+
+                    "Call to gfxDeviceVB::Unlock more times than locked! Bad mojo...");
+
+            fclose(_File);
+
+          }
+
+LAB_0072dbfe:
+
+          raise(0x16);
+
+                    /* WARNING: Subroutine does not return */
+
+          ExitProcess(3);
+
+        }
+
+        piVar6[4] = 0;
+
+      }
+
+      else {
+
+        (**(code **)(*piVar7 + 0x30))(piVar7);
+
+      }
+
+    }
+
+  }
+
+  iVar17 = 0;
+
+  if (0 < local_2c) {
+
+    do {
+
+      piVar6 = *(int **)(*(int *)((&DAT_00d0e1a8)[iVar17] + 4) + 0x10);
+
+      if (piVar6 != (int *)0x0) {
+
+        piVar7 = (int *)*piVar6;
+
+        if (piVar7 != (int *)0x0) {
+
+          piVar1 = piVar6 + 4;
+
+          *piVar1 = *piVar1 + -1;
+
+          if (*piVar1 < 0) {
+
+            iVar16 = FUN_0076d1b0("C:\\vog\\1_code\\palantir\\palantir\\graphics\\gfxDeviceVB.cpp",
+
+                                  0xd3,
+
+                                  "Call to gfxDeviceVB::Unlock more times than locked! Bad mojo...")
+
+            ;
+
+            if (iVar16 == 3) {
+
+              _File = fopen("c:\\VOGCRASH.txt","w");
+
+              if (_File == (FILE *)0x0) goto LAB_0072dbfe;
+
+              goto LAB_0072dbd7;
+
+            }
+
+            piVar6[4] = 0;
+
+          }
+
+          else {
+
+            (**(code **)(*piVar7 + 0x30))(piVar7);
+
+          }
+
+        }
+
+      }
+
+      iVar17 = iVar17 + 1;
+
+    } while (iVar17 < local_2c);
+
+  }
+
+  return 1;
+
+}

@@ -1,0 +1,627 @@
+// =============================================================================
+// FUN_008fe650
+// -----------------------------------------------------------------------------
+// Stable ID: aa_008fe650
+// Address:   0x008fe650  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_008fe650 @ 0x008fe650
+// Stable ID: aa_008fe650
+// Embedded strings (evidence for future rename):
+//   - "%S_i.geo"
+//   - "i_d_body_2d_btn_uninstall"
+//   - "%s %s"
+//   - " (ID:%i, exc:%u)"
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~292 non-empty decompiler lines.
+//  - Control keywords: if×24, do×7, while×7, for×2, return×1.
+//  - Notable callees: FUN_00403450×2, FUN_007a69d0×2, FUN_007a6de0×2, _snprintf×2, CONCAT31, FUN_004febe0, FUN_0076f5f0, FUN_0078bde0.
+//  - Strings: "%S_i.geo"; "i_d_body_2d_btn_uninstall"; "%s %s"; " (ID:%i, exc:%u)".
+//  - Return sites: 1.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+/* WARNING: Removing unreachable block (ram,0x008fec95) */
+
+/* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+
+
+
+void FUN_008fe650(char *param_1)
+
+
+
+{
+
+  float fVar1;
+
+  char cVar2;
+
+  int iVar3;
+
+  char **ppcVar4;
+
+  uint32_t /* width from decompiler */ uVar5;
+
+  char *pcVar6;
+
+  uint uVar7;
+
+  byte *pbVar8;
+
+  int iVar9;
+
+  int *piVar10;
+
+  uint uVar11;
+
+  uint32_t /* width from decompiler */ extraout_EDX;
+
+  int unaff_EBX;
+
+  int iVar12;
+
+  char *pcVar13;
+
+  int iVar14;
+
+  uint8_t *puVar15;
+
+  uint8_t *puVar16;
+
+  uint32_t /* width from decompiler */ uVar17;
+
+  char *pcStack_390;
+
+  uint8_t auStack_374 [8];
+
+  uint32_t /* width from decompiler */ local_36c;
+
+  float fStack_368;
+
+  uint32_t /* width from decompiler */ uStack_364;
+
+  uint32_t /* width from decompiler */ *puStack_360;
+
+  uint8_t *puStack_2f4;
+
+  uint8_t auStack_2f0 [128];
+
+  char acStack_270 [63];
+
+  char cStack_231;
+
+  char acStack_230 [32];
+
+  uint8_t local_210;
+
+  uint8_t uStack_131;
+
+  char acStack_110 [236];
+
+  uint32_t /* width from decompiler */ uStack_24;
+
+  uint32_t /* width from decompiler */ uStack_18;
+
+  uint8_t uStack_d;
+
+  void *local_c;
+
+  uint8_t *puStack_8;
+
+  uint32_t /* width from decompiler */ uStack_4;
+
+  
+
+  uStack_4 = 0xffffffff;
+
+  puStack_8 = &LAB_009b2c77;
+
+  local_c = ExceptionList;
+
+  iVar12 = 0;
+
+  if ((DAT_00d1b6d8 != 0) && (*(int *)(DAT_00d1b6d8 + 0x250) != 0)) {
+
+    ExceptionList = &local_c;
+
+    if ((*(uint32_t /* width from decompiler */ **)(param_1 + 0x728) != (uint32_t /* width from decompiler */ *)0x0) &&
+
+       ((ExceptionList = &local_c, *(int *)(param_1 + 0x738) != 0 &&
+
+        (ExceptionList = &local_c, *(int *)(param_1 + 0x5fc) != 0)))) {
+
+      local_36c = *(uint32_t /* width from decompiler */ *)(DAT_00d1b6d8 + 0x250);
+
+      local_210 = 0;
+
+      ExceptionList = &local_c;
+
+      iVar3 = (**(code **)(*(int *)**(uint32_t /* width from decompiler */ **)(param_1 + 0x728) + 0x17c))();
+
+      if (iVar3 != 0) {
+
+        iVar3 = (**(code **)(*(int *)**(uint32_t /* width from decompiler */ **)(param_1 + 0x728) + 0x17c))();
+
+        *(uint32_t /* width from decompiler */ *)(param_1 + 0x598) = *(uint32_t /* width from decompiler */ *)(iVar3 + 0x14);
+
+      }
+
+      iVar3 = 0;
+
+      if (0 < *(int *)(param_1 + 0x518)) {
+
+        do {
+
+          pcStack_390 = (char *)0x8fe712;
+
+          (**(code **)(**(int **)(*(int *)(param_1 + 0x728) + iVar3 * 4) + 0xcc))();
+
+          pcStack_390 = (char *)0x8fe723;
+
+          (**(code **)(**(int **)(*(int *)(param_1 + 0x728) + iVar3 * 4) + 0x34c))();
+
+          pcStack_390 = "";
+
+          (**(code **)(**(int **)(*(int *)(param_1 + 0x738) + iVar3 * 4) + 0x308))();
+
+          (**(code **)(**(int **)(*(int *)(param_1 + 0x738) + iVar3 * 4) + 0xcc))(0);
+
+          (**(code **)(**(int **)(*(int *)(param_1 + 0x738) + iVar3 * 4) + 0x34c))();
+
+          iVar3 = iVar3 + 1;
+
+        } while (iVar3 < *(int *)(param_1 + 0x518));
+
+      }
+
+      uVar7 = *(uint *)(param_1 + 0x7b0);
+
+      iVar3 = *(int *)(param_1 + 0x50c);
+
+      if (uVar7 == 0xffffffff) {
+
+        *(int *)(param_1 + 0x510) = iVar3;
+
+      }
+
+      else {
+
+        iVar14 = 0;
+
+        param_1[0x510] = '\0';
+
+        param_1[0x511] = '\0';
+
+        param_1[0x512] = '\0';
+
+        param_1[0x513] = '\0';
+
+        if (0 < iVar3) {
+
+          pbVar8 = (byte *)(*(int *)(param_1 + 0x5fc) + 8);
+
+          do {
+
+            if (*pbVar8 == uVar7) {
+
+              *(int *)(param_1 + 0x510) = *(int *)(param_1 + 0x510) + 1;
+
+            }
+
+            iVar14 = iVar14 + 1;
+
+            pbVar8 = pbVar8 + 0x110;
+
+          } while (iVar14 < *(int *)(param_1 + 0x50c));
+
+        }
+
+      }
+
+      iVar9 = *(int *)(param_1 + 0x520);
+
+      iVar14 = 0;
+
+      if (0 < iVar3) {
+
+        iVar3 = 0;
+
+        do {
+
+          if (iVar9 < 1) break;
+
+          if ((uVar7 == 0xffffffff) || (*(byte *)(iVar3 + 8 + *(int *)(param_1 + 0x5fc)) == uVar7))
+
+          {
+
+            iVar9 = iVar9 + -1;
+
+          }
+
+          iVar14 = iVar14 + 1;
+
+          iVar3 = iVar3 + 0x110;
+
+        } while (iVar14 < *(int *)(param_1 + 0x50c));
+
+      }
+
+      if (0 < *(int *)(param_1 + 0x518)) {
+
+        do {
+
+          if (*(int *)(param_1 + 0x50c) <= iVar14) break;
+
+          iVar3 = iVar14 * 0x110;
+
+          do {
+
+            if ((*(uint *)(param_1 + 0x7b0) == 0xffffffff) ||
+
+               ((uint)*(byte *)(iVar3 + 8 + *(int *)(param_1 + 0x5fc)) == *(uint *)(param_1 + 0x7b0)
+
+               )) break;
+
+            iVar14 = iVar14 + 1;
+
+            iVar3 = iVar3 + 0x110;
+
+          } while (iVar14 < *(int *)(param_1 + 0x50c));
+
+          if (*(int *)(param_1 + 0x50c) <= iVar14) break;
+
+          iVar3 = iVar14 * 0x110;
+
+          pcStack_390 = (char *)(iVar3 + 10 + *(int *)(param_1 + 0x5fc));
+
+          _snprintf(acStack_110,0x104,"%S_i.geo");
+
+          uStack_d = 0;
+
+          pcStack_390 = acStack_110;
+
+          (**(code **)(**(int **)(*(int *)(param_1 + 0x728) + iVar12 * 4) + 0x3c))();
+
+          (**(code **)(**(int **)(*(int *)(param_1 + 0x728) + iVar12 * 4) + 0x3ac))();
+
+          puStack_360 = operator_new(0x24);
+
+          fVar1 = g_flOne;
+
+          puStack_8 = (uint8_t *)0x0;
+
+          if (puStack_360 == (uint32_t /* width from decompiler */ *)0x0) {
+
+            uVar5 = 0;
+
+          }
+
+          else {
+
+            uVar5 = *(uint32_t /* width from decompiler */ *)(param_1 + 0x594);
+
+            fStack_368 = g_flOne;
+
+            uVar17 = *(uint32_t /* width from decompiler */ *)(param_1 + 0x598);
+
+            puStack_360[1] = 0;
+
+            puStack_360[2] = 0;
+
+            local_36c = 0;
+
+            puStack_360[6] = 0;
+
+            puStack_360[7] = fVar1;
+
+            uStack_364 = 0;
+
+            puStack_360[8] = 0;
+
+            *puStack_360 = &PTR_LAB_00a9a3d4;
+
+            puStack_360[4] = uVar17;
+
+            puStack_360[5] = 0;
+
+            puStack_360[3] = uVar5;
+
+            FUN_0076f5f0(puStack_360 + 6,puStack_360 + 6);
+
+            uVar5 = extraout_EDX;
+
+          }
+
+          puStack_8 = (uint8_t *)0xffffffff;
+
+          (**(code **)(**(int **)(*(int *)(param_1 + 0x728) + iVar12 * 4) + 0x178))(uVar5,1);
+
+          (**(code **)(**(int **)(*(int *)(param_1 + 0x728) + iVar12 * 4) + 0xfc))(1,0x3f000000);
+
+          uVar7 = DAT_00d21840 & 1;
+
+          *(int *)(*(int *)(*(int *)(param_1 + 0x728) + iVar12 * 4) + 0x110) = iVar14;
+
+          if (uVar7 == 0) {
+
+            DAT_00d21840 = DAT_00d21840 | 1;
+
+            uStack_18 = 0xffffffff;
+
+          }
+
+          DAT_00d21830 = g_flLevelUpUiBase_Inferred;
+
+          DAT_00d21834 = g_flLevelUpUiBase_Inferred;
+
+          DAT_00d21838 = g_flLevelUpUiBase_Inferred;
+
+          DAT_00d2183c = g_flLevelUpUiBase_Inferred;
+
+          iVar9 = *(int *)(*(int *)(param_1 + 0x728) + iVar12 * 4);
+
+          *(float *)(iVar9 + 0x4b8) = g_flLevelUpUiBase_Inferred;
+
+          *(float *)(iVar9 + 0x4bc) = DAT_00d21834;
+
+          *(float *)(iVar9 + 0x4c0) = DAT_00d21838;
+
+          *(float *)(iVar9 + 0x4c4) = DAT_00d2183c;
+
+          FUN_0078bde0();
+
+          iVar9 = *(int *)(*(int *)(param_1 + 0x728) + iVar12 * 4);
+
+          uVar7 = DAT_00d21840 & 2;
+
+          *(float *)(iVar9 + 0x4c8) = DAT_00d21830;
+
+          *(float *)(iVar9 + 0x4cc) = DAT_00d21834;
+
+          *(float *)(iVar9 + 0x4d0) = DAT_00d21838;
+
+          *(float *)(iVar9 + 0x4d4) = DAT_00d2183c;
+
+          if (uVar7 == 0) {
+
+            DAT_00d21840 = DAT_00d21840 | 2;
+
+            uStack_18 = 0xffffffff;
+
+          }
+
+          _DAT_00d21824 = 0;
+
+          _DAT_00d21828 = 0;
+
+          _DAT_00d2182c = g_flOne;
+
+          FUN_0078be40();
+
+          if (*(int *)(unaff_EBX + 0x28c +
+
+                      (uint)*(byte *)(iVar3 + 8 + *(int *)(param_1 + 0x5fc)) * 4) ==
+
+              *(int *)(iVar3 + *(int *)(param_1 + 0x5fc))) {
+
+            (**(code **)(**(int **)(*(int *)(param_1 + 0x738) + iVar12 * 4) + 0x3ac))
+
+                      ("i_d_body_2d_btn_uninstall");
+
+            piVar10 = *(int **)(*(int *)(param_1 + 0x738) + iVar12 * 4);
+
+            ppcVar4 = (char **)&stack0xfffffc78;
+
+          }
+
+          else {
+
+            (**(code **)(**(int **)(*(int *)(param_1 + 0x738) + iVar12 * 4) + 0x3ac))
+
+                      (param_1 + 0x604);
+
+            cVar2 = FUN_004febe0(*(int *)(param_1 + 0x5fc) + iVar3);
+
+            if (cVar2 == '\0') {
+
+              pcStack_390 = (char *)0xffff4040;
+
+              piVar10 = *(int **)(*(int *)(param_1 + 0x738) + iVar12 * 4);
+
+              ppcVar4 = &pcStack_390;
+
+            }
+
+            else {
+
+              piVar10 = *(int **)(*(int *)(param_1 + 0x738) + iVar12 * 4);
+
+              ppcVar4 = (char **)&stack0xfffffc74;
+
+            }
+
+          }
+
+          (**(code **)(*piVar10 + 0x15c))(0,ppcVar4);
+
+          iVar9 = *(int *)(param_1 + 0x5fc);
+
+          puVar16 = auStack_374;
+
+          uVar5 = (*(code *)PTR_FUN_00af8c9c)();
+
+          FUN_00403450(iVar3 + 0x8c + iVar9,uVar5);
+
+          uStack_24 = 3;
+
+          iVar9 = *(int *)(param_1 + 0x5fc);
+
+          puStack_2f4 = auStack_2f0;
+
+          uVar5 = (*(code *)PTR_FUN_00af8c9c)();
+
+          FUN_00403450(iVar3 + 0xce + iVar9,uVar5);
+
+          puVar15 = puStack_2f4;
+
+          uStack_24._0_1_ = 4;
+
+          uVar5 = 0xffffffff;
+
+          FUN_007a69d0(puVar16,0xffffffff);
+
+          uVar5 = FUN_007a6de0(puVar16,uVar5);
+
+          uVar17 = 0xffffffff;
+
+          FUN_007a69d0(puVar15,0xffffffff,uVar5);
+
+          uVar5 = FUN_007a6de0(puVar15,uVar17);
+
+          _snprintf(acStack_230,0x100,"%s %s",uVar5);
+
+          uStack_24 = CONCAT31(uStack_24._1_3_,3);
+
+          if (puStack_2f4 != auStack_2f0) {
+
+            free(puStack_2f4);
+
+          }
+
+          uStack_24 = 0xffffffff;
+
+          uStack_131 = 0;
+
+          if ((DAT_00d1b6d8 != 0) && (0 < *(int *)(DAT_00d1b6d8 + 0x6b4))) {
+
+            sprintf(acStack_270," (ID:%i, exc:%u)",
+
+                    *(uint32_t /* width from decompiler */ *)(iVar3 + *(int *)(param_1 + 0x5fc)),
+
+                    (uint)*(byte *)(iVar3 + 8 + *(int *)(param_1 + 0x5fc)));
+
+            pcVar6 = acStack_270;
+
+            do {
+
+              cVar2 = *pcVar6;
+
+              pcVar6 = pcVar6 + 1;
+
+            } while (cVar2 != '\0');
+
+            uVar7 = (int)pcVar6 - (int)acStack_270;
+
+            pcVar6 = &cStack_231;
+
+            do {
+
+              pcVar13 = pcVar6 + 1;
+
+              pcVar6 = pcVar6 + 1;
+
+            } while (*pcVar13 != '\0');
+
+            pcVar13 = acStack_270;
+
+            for (uVar11 = uVar7 >> 2; uVar11 != 0; uVar11 = uVar11 - 1) {
+
+              *(uint32_t /* width from decompiler */ *)pcVar6 = *(uint32_t /* width from decompiler */ *)pcVar13;
+
+              pcVar13 = pcVar13 + 4;
+
+              pcVar6 = pcVar6 + 4;
+
+            }
+
+            for (uVar7 = uVar7 & 3; uVar7 != 0; uVar7 = uVar7 - 1) {
+
+              *pcVar6 = *pcVar13;
+
+              pcVar13 = pcVar13 + 1;
+
+              pcVar6 = pcVar6 + 1;
+
+            }
+
+          }
+
+          (**(code **)(**(int **)(*(int *)(param_1 + 0x738) + iVar12 * 4) + 0x308))(acStack_230);
+
+          (**(code **)(**(int **)(*(int *)(param_1 + 0x738) + iVar12 * 4) + 0xcc))(1);
+
+          if (*(int *)(param_1 + 0x4b8) == *(int *)(*(int *)(param_1 + 0x738) + iVar12 * 4)) {
+
+            pcStack_390 = (char *)0x8fed6d;
+
+            FUN_007fb9e0();
+
+          }
+
+          iVar14 = iVar14 + 1;
+
+          iVar12 = iVar12 + 1;
+
+        } while (iVar12 < *(int *)(param_1 + 0x518));
+
+      }
+
+      pcStack_390 = (char *)0x8fed88;
+
+      FUN_008fda30();
+
+      pcStack_390 = param_1;
+
+      FUN_008fdb60();
+
+    }
+
+    piVar10 = *(int **)(param_1 + 0x748);
+
+    if (piVar10 != (int *)0x0) {
+
+      if (*(int *)(param_1 + 0x518) < *(int *)(param_1 + 0x510)) {
+
+        pcStack_390 = (char *)0x8fedd5;
+
+        (**(code **)(*piVar10 + 0x460))();
+
+        pcStack_390 = (char *)0x1;
+
+        (**(code **)(**(int **)(param_1 + 0x748) + 0xd4))();
+
+      }
+
+      else {
+
+        pcStack_390 = (char *)0x8fedb3;
+
+        (**(code **)(*piVar10 + 0xd4))();
+
+      }
+
+    }
+
+  }
+
+  ExceptionList = local_c;
+
+  return;
+
+}

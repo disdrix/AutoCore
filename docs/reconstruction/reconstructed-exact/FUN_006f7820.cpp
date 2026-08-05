@@ -1,0 +1,268 @@
+// =============================================================================
+// FUN_006f7820
+// -----------------------------------------------------------------------------
+// Stable ID: aa_006f7820
+// Address:   0x006f7820  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_006f7820 @ 0x006f7820
+// Stable ID: aa_006f7820
+// No high-value strings recovered; name via xrefs/callers in follow-up.
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~115 non-empty decompiler lines.
+//  - Control keywords: return×5, if×4.
+//  - Notable callees: FUN_006f71e0×3, SQRT×3, FUN_006f7820.
+//  - Return sites: 5.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+/* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+
+
+
+uint32_t /* width from decompiler */ FUN_006f7820(float *param_1,float *param_2,float *param_3,float *param_4)
+
+
+
+{
+
+  float fVar1;
+
+  float fVar2;
+
+  float fVar3;
+
+  float fVar4;
+
+  float fVar5;
+
+  float fVar6;
+
+  uint uVar7;
+
+  int iVar8;
+
+  float local_40;
+
+  float local_3c;
+
+  float local_38;
+
+  float local_34;
+
+  float local_30;
+
+  float local_2c;
+
+  float local_28;
+
+  float local_24;
+
+  float local_20;
+
+  float local_1c;
+
+  float local_18;
+
+  float local_14;
+
+  
+
+  local_30 = param_2[4] - *param_1;
+
+  local_2c = param_2[5] - param_1[1];
+
+  local_28 = param_2[6] - param_1[2];
+
+  fVar2 = *param_2 - param_2[4];
+
+  fVar1 = param_2[1] - param_2[5];
+
+  fVar4 = param_2[2] - param_2[6];
+
+  fVar3 = fVar2 * local_30 + fVar1 * local_2c + fVar4 * local_28;
+
+  local_40 = param_2[8] - param_2[4];
+
+  local_3c = param_2[9] - param_2[5];
+
+  local_38 = param_2[10] - param_2[6];
+
+  fVar5 = local_40 * local_30 + local_3c * local_2c + local_38 * local_28;
+
+  fVar6 = fVar5 * param_3[2] - fVar3 * param_3[1];
+
+  local_18 = fVar3 * param_3[2] - fVar5 * *param_3;
+
+  local_1c = (_DAT_00a0ef08 - fVar6) - local_18;
+
+  local_18 = local_18 + g_flMsToSeconds_Inferred;
+
+  uVar7 = (uint)(DAT_00bc5638 < local_18) << 1 | (uint)(DAT_00bc5634 < local_1c) << 2 |
+
+          (uint)(DAT_00bc5630 < fVar6 + g_flMsToSeconds_Inferred) * -8 & 0xe;
+
+  if (uVar7 == 0xe) {
+
+    param_4[3] = 0.0;
+
+    fVar3 = local_38 * fVar1 - local_3c * fVar4;
+
+    *param_4 = fVar3;
+
+    fVar4 = fVar4 * local_40 - local_38 * fVar2;
+
+    param_4[1] = fVar4;
+
+    fVar1 = local_3c * fVar2 - fVar1 * local_40;
+
+    param_4[2] = fVar1;
+
+    fVar2 = param_3[3];
+
+    fVar3 = fVar3 * fVar2;
+
+    *param_4 = fVar3;
+
+    fVar4 = fVar4 * fVar2;
+
+    param_4[1] = fVar4;
+
+    fVar1 = fVar1 * fVar2;
+
+    fVar2 = fVar2 * g_flZero;
+
+    param_4[2] = fVar1;
+
+    param_4[3] = fVar2;
+
+    fVar5 = fVar3 * local_30 + fVar4 * local_2c + fVar1 * local_28;
+
+    param_4[4] = fVar5;
+
+    if (g_flZero < fVar5) {
+
+      *param_4 = -fVar3;
+
+      param_4[1] = -fVar4;
+
+      param_4[2] = -fVar1;
+
+      param_4[3] = -fVar2;
+
+      return 0;
+
+    }
+
+    param_4[4] = -fVar5;
+
+    return 0;
+
+  }
+
+  iVar8 = (int)(char)(&DAT_00a0eeec)[uVar7];
+
+  if (-1 < iVar8) {
+
+    FUN_006f71e0(param_1,param_2 + iVar8 * 4,param_2 + (char)(&DAT_00a0eefe)[iVar8] * 4,&local_40);
+
+    FUN_006f71e0(param_1,param_2 + (char)(&DAT_00a0eefc)[iVar8] * 4,param_2 + iVar8 * 4,&local_20);
+
+    local_40 = *param_1 - local_40;
+
+    local_3c = param_1[1] - local_3c;
+
+    local_38 = param_1[2] - local_38;
+
+    fVar2 = param_1[3];
+
+    local_20 = *param_1 - local_20;
+
+    local_1c = param_1[1] - local_1c;
+
+    local_18 = param_1[2] - local_18;
+
+    fVar1 = param_1[3];
+
+    fVar3 = local_40 * local_40 + local_3c * local_3c + local_38 * local_38;
+
+    fVar4 = local_20 * local_20 + local_1c * local_1c + local_18 * local_18;
+
+    if (fVar3 < fVar4) {
+
+      fVar1 = g_flOne / SQRT(fVar3);
+
+      param_4[4] = fVar3 * fVar1;
+
+      *param_4 = local_40 * fVar1;
+
+      param_4[1] = local_3c * fVar1;
+
+      param_4[2] = local_38 * fVar1;
+
+      param_4[3] = (fVar2 - local_34) * fVar1;
+
+      return 1;
+
+    }
+
+    fVar2 = g_flOne / SQRT(fVar4);
+
+    param_4[4] = fVar4 * fVar2;
+
+    *param_4 = local_20 * fVar2;
+
+    param_4[1] = local_1c * fVar2;
+
+    param_4[2] = local_18 * fVar2;
+
+    param_4[3] = (fVar1 - local_14) * fVar2;
+
+    return 1;
+
+  }
+
+  FUN_006f71e0(param_1,param_2 + (char)(&DAT_00a0ef06)[iVar8] * 4,
+
+               param_2 + (char)(&DAT_00a0ef04)[iVar8] * 4,&local_30);
+
+  *param_4 = *param_1 - local_30;
+
+  param_4[1] = param_1[1] - local_2c;
+
+  param_4[2] = param_1[2] - local_28;
+
+  param_4[3] = param_1[3] - local_24;
+
+  fVar2 = SQRT(*param_4 * *param_4 + param_4[1] * param_4[1] + param_4[2] * param_4[2]);
+
+  fVar1 = g_flOne / fVar2;
+
+  *param_4 = fVar1 * *param_4;
+
+  param_4[1] = fVar1 * param_4[1];
+
+  param_4[2] = fVar1 * param_4[2];
+
+  param_4[3] = fVar1 * param_4[3];
+
+  param_4[4] = fVar2;
+
+  return 1;
+
+}

@@ -1,0 +1,66 @@
+# Raw capture: FUN_0050fcd0
+
+| Field | Value |
+|---|---|
+| **Stable ID** | `aa_0050fcd0` |
+| **Module** | `autoassault.exe` |
+| **Image base** | `0x400000` |
+| **VA** | `0x0050fcd0` |
+| **Canonical name** | `FUN_0050fcd0` |
+| **System** | unknown |
+| **Capture timestamp** | `2026-07-23` |
+| **Tool** | Ghidra MCP `batch_decompile` |
+| **Integrity** | Do not overwrite this raw body; append versioned sections only |
+
+---
+
+## Raw pseudocode (authoritative decompile)
+
+```c
+void __thiscall FUN_0050fcd0(int param_1,undefined4 *param_2,int *param_3)
+
+{
+  undefined4 uVar1;
+  bool bVar2;
+  int *piVar3;
+  undefined4 *puVar4;
+  undefined4 *puVar5;
+  
+  piVar3 = param_3;
+  puVar5 = *(undefined4 **)(param_1 + 4);
+  bVar2 = true;
+  if (*(char *)((int)puVar5[1] + 0x15) == '\0') {
+    puVar4 = (undefined4 *)puVar5[1];
+    do {
+      puVar5 = puVar4;
+      bVar2 = *param_3 < (int)puVar5[3];
+      if (bVar2) {
+        puVar4 = (undefined4 *)*puVar5;
+      }
+      else {
+        puVar4 = (undefined4 *)puVar5[2];
+      }
+    } while (*(char *)((int)puVar4 + 0x15) == '\0');
+  }
+  param_3 = puVar5;
+  if (bVar2) {
+    if (puVar5 == (undefined4 *)**(int **)(param_1 + 4)) {
+      puVar5 = (undefined4 *)FUN_0050f710(&param_3,1,puVar5,piVar3);
+      uVar1 = *puVar5;
+      *(undefined1 *)(param_2 + 1) = 1;
+      *param_2 = uVar1;
+      return;
+    }
+    FUN_005a2850();
+  }
+  if (param_3[3] < *piVar3) {
+    puVar5 = (undefined4 *)FUN_0050f710(&param_3,bVar2,puVar5,piVar3);
+    *param_2 = *puVar5;
+    *(undefined1 *)(param_2 + 1) = 1;
+    return;
+  }
+  *(undefined1 *)(param_2 + 1) = 0;
+  *param_2 = param_3;
+  return;
+}
+```

@@ -1,0 +1,61 @@
+# Raw capture: FUN_004ead30
+
+| Field | Value |
+|---|---|
+| **Stable ID** | `aa_004ead30` |
+| **Module** | `autoassault.exe` |
+| **Image base** | `0x400000` |
+| **VA** | `0x004ead30` |
+| **Canonical name** | `FUN_004ead30` |
+| **System** | unknown |
+| **Capture timestamp** | `2026-07-23` |
+| **Tool** | Ghidra MCP `batch_decompile` |
+| **Integrity** | Do not overwrite this raw body; append versioned sections only |
+
+---
+
+## Raw pseudocode (authoritative decompile)
+
+```c
+void __thiscall FUN_004ead30(int param_1,uint param_2)
+
+{
+  uint uVar1;
+  void *pvVar2;
+  uint extraout_EDX;
+  void *local_10;
+  undefined1 *puStack_c;
+  undefined4 local_8;
+  
+  local_8 = 0xffffffff;
+  puStack_c = &LAB_009a25d0;
+  local_10 = ExceptionList;
+  ExceptionList = &local_10;
+  if (0x3fffffff < param_2) {
+    ExceptionList = &local_10;
+    FUN_004ba670();
+    param_2 = extraout_EDX;
+  }
+  if (*(int *)(param_1 + 4) == 0) {
+    uVar1 = 0;
+  }
+  else {
+    uVar1 = *(int *)(param_1 + 0xc) - *(int *)(param_1 + 4) >> 2;
+  }
+  if (uVar1 < param_2) {
+    param_2 = param_2 * 4;
+    pvVar2 = operator_new(param_2);
+    local_8 = 0;
+    FUN_004935b0(*(undefined4 *)(param_1 + 4),*(undefined4 *)(param_1 + 8),pvVar2,param_1,param_2);
+    if (*(void **)(param_1 + 4) != (void *)0x0) {
+                    /* WARNING: Subroutine does not return */
+      operator_delete(*(void **)(param_1 + 4));
+    }
+    *(void **)(param_1 + 0xc) = (void *)(param_2 + (int)pvVar2);
+    *(void **)(param_1 + 8) = pvVar2;
+    *(void **)(param_1 + 4) = pvVar2;
+  }
+  ExceptionList = local_10;
+  return;
+}
+```

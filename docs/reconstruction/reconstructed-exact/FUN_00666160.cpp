@@ -1,0 +1,358 @@
+// =============================================================================
+// FUN_00666160
+// -----------------------------------------------------------------------------
+// Stable ID: aa_00666160
+// Address:   0x00666160  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_00666160 @ 0x00666160
+// Stable ID: aa_00666160
+// No high-value strings recovered; name via xrefs/callers in follow-up.
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~161 non-empty decompiler lines.
+//  - Control keywords: if×2, return×1.
+//  - Notable callees: FUN_00646af0, FUN_00665f10, FUN_00666160, FUN_006c2fb0, FUN_006c32b0, FUN_006c39b0, FUN_006c3d90, SQRT.
+//  - Return sites: 1.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+void __thiscall FUN_00666160(int param_1,uint32_t /* width from decompiler */ param_2,uint32_t /* width from decompiler */ param_3)
+
+
+
+{
+
+  float fVar1;
+
+  float fVar2;
+
+  float fVar3;
+
+  int iVar4;
+
+  int iVar5;
+
+  int iVar6;
+
+  float *pfVar7;
+
+  float10 fVar8;
+
+  float fVar9;
+
+  float fVar10;
+
+  float fVar11;
+
+  float local_b0;
+
+  float local_ac;
+
+  float local_a8;
+
+  float local_a4;
+
+  float local_a0;
+
+  float local_9c;
+
+  float local_98;
+
+  uint32_t /* width from decompiler */ local_94;
+
+  float local_90;
+
+  float local_8c;
+
+  float local_88;
+
+  uint32_t /* width from decompiler */ local_84;
+
+  float local_80;
+
+  float local_7c;
+
+  float local_78;
+
+  float local_74;
+
+  float local_70;
+
+  float local_6c;
+
+  float local_68;
+
+  uint32_t /* width from decompiler */ local_64;
+
+  float local_60;
+
+  float local_5c;
+
+  float local_58;
+
+  uint32_t /* width from decompiler */ local_54;
+
+  float local_50;
+
+  float local_4c;
+
+  float local_48;
+
+  float local_44;
+
+  float local_34;
+
+  float local_30;
+
+  float local_2c;
+
+  float local_28;
+
+  float local_24;
+
+  uint32_t /* width from decompiler */ local_20;
+
+  uint32_t /* width from decompiler */ local_1c;
+
+  float local_18;
+
+  
+
+  FUN_006c2fb0(param_2,param_3,param_1 + 0x98,8);
+
+  iVar4 = *(int *)(param_1 + 0xc);
+
+  iVar5 = *(int *)(iVar4 + 0x3c);
+
+  fVar9 = *(float *)(param_1 + 0x24);
+
+  fVar10 = *(float *)(param_1 + 0x28);
+
+  fVar11 = *(float *)(param_1 + 0x20);
+
+  pfVar7 = (float *)(iVar5 + 0x80);
+
+  fVar1 = *(float *)(param_1 + 0x34);
+
+  fVar2 = *(float *)(param_1 + 0x30);
+
+  local_60 = *(float *)(iVar5 + 0xa0) * *(float *)(param_1 + 0x38) +
+
+             *(float *)(iVar5 + 0x90) * fVar1 + *pfVar7 * fVar2;
+
+  local_5c = *(float *)(iVar5 + 0xa4) * *(float *)(param_1 + 0x38) +
+
+             *(float *)(iVar5 + 0x94) * fVar1 + fVar2 * *(float *)(iVar5 + 0x84);
+
+  local_58 = *(float *)(iVar5 + 0xa8) * *(float *)(param_1 + 0x38) +
+
+             *(float *)(iVar5 + 0x98) * fVar1 + fVar2 * *(float *)(iVar5 + 0x88);
+
+  fVar1 = *(float *)(param_1 + 0x40);
+
+  local_54 = 0;
+
+  fVar2 = *(float *)(param_1 + 0x44);
+
+  local_50 = *(float *)(iVar5 + 0xa0) * *(float *)(param_1 + 0x48) +
+
+             *(float *)(iVar5 + 0x90) * fVar2 + *pfVar7 * fVar1;
+
+  local_4c = *(float *)(iVar5 + 0xa4) * *(float *)(param_1 + 0x48) +
+
+             *(float *)(iVar5 + 0x94) * fVar2 + fVar1 * *(float *)(iVar5 + 0x84);
+
+  local_44 = 0.0;
+
+  fVar3 = *(float *)(param_1 + 0x50);
+
+  local_48 = *(float *)(iVar5 + 0xa8) * *(float *)(param_1 + 0x48) +
+
+             *(float *)(iVar5 + 0x98) * fVar2 + fVar1 * *(float *)(iVar5 + 0x88);
+
+  iVar6 = *(int *)(iVar4 + 0x3c);
+
+  local_70 = *(float *)(iVar6 + 0xb0) +
+
+             *(float *)(iVar5 + 0xa0) * fVar10 + *(float *)(iVar5 + 0x90) * fVar9 + *pfVar7 * fVar11
+
+  ;
+
+  fVar1 = *(float *)(param_1 + 0x54);
+
+  local_6c = *(float *)(iVar6 + 0xb4) +
+
+             *(float *)(iVar5 + 0xa4) * fVar10 + *(float *)(iVar5 + 0x94) * fVar9 +
+
+             fVar11 * *(float *)(iVar5 + 0x84);
+
+  fVar2 = *(float *)(param_1 + 0x58);
+
+  local_68 = *(float *)(iVar6 + 0xb8) +
+
+             *(float *)(iVar5 + 0xa8) * fVar10 + *(float *)(iVar5 + 0x98) * fVar9 +
+
+             fVar11 * *(float *)(iVar5 + 0x88);
+
+  local_64 = *(uint32_t /* width from decompiler */ *)(iVar6 + 0xbc);
+
+  iVar5 = *(int *)(*(int *)(param_1 + 0x10) + 0x3c);
+
+  fVar9 = *(float *)(param_1 + 0x68);
+
+  fVar10 = *(float *)(param_1 + 100);
+
+  local_90 = *(float *)(iVar5 + 0x80) * *(float *)(param_1 + 0x60) +
+
+             *(float *)(iVar5 + 0xa0) * fVar9 + *(float *)(iVar5 + 0x90) * fVar10;
+
+  local_8c = *(float *)(iVar5 + 0x84) * *(float *)(param_1 + 0x60) +
+
+             fVar9 * *(float *)(iVar5 + 0xa4) + fVar10 * *(float *)(iVar5 + 0x94);
+
+  fVar11 = *(float *)(param_1 + 0x78);
+
+  local_88 = *(float *)(iVar5 + 0x88) * *(float *)(param_1 + 0x60) +
+
+             fVar9 * *(float *)(iVar5 + 0xa8) + fVar10 * *(float *)(iVar5 + 0x98);
+
+  fVar9 = *(float *)(param_1 + 0x74);
+
+  local_84 = 0;
+
+  local_80 = *(float *)(iVar5 + 0x80) * *(float *)(param_1 + 0x70) +
+
+             *(float *)(iVar5 + 0xa0) * fVar11 + *(float *)(iVar5 + 0x90) * fVar9;
+
+  local_7c = *(float *)(iVar5 + 0x84) * *(float *)(param_1 + 0x70) +
+
+             fVar11 * *(float *)(iVar5 + 0xa4) + fVar9 * *(float *)(iVar5 + 0x94);
+
+  local_74 = 0.0;
+
+  local_78 = *(float *)(iVar5 + 0x88) * *(float *)(param_1 + 0x70) +
+
+             fVar11 * *(float *)(iVar5 + 0xa8) + fVar9 * *(float *)(iVar5 + 0x98);
+
+  iVar6 = *(int *)(*(int *)(param_1 + 0x10) + 0x3c);
+
+  local_a0 = *(float *)(iVar5 + 0x80) * fVar3 + *(float *)(iVar5 + 0xa0) * fVar2 +
+
+             *(float *)(iVar5 + 0x90) * fVar1 + *(float *)(iVar6 + 0xb0);
+
+  local_9c = *(float *)(iVar6 + 0xb4) +
+
+             *(float *)(iVar5 + 0x84) * fVar3 + fVar2 * *(float *)(iVar5 + 0xa4) +
+
+             fVar1 * *(float *)(iVar5 + 0x94);
+
+  local_98 = *(float *)(iVar6 + 0xb8) +
+
+             *(float *)(iVar5 + 0x88) * fVar3 + fVar2 * *(float *)(iVar5 + 0xa8) +
+
+             fVar1 * *(float *)(iVar5 + 0x98);
+
+  local_94 = *(uint32_t /* width from decompiler */ *)(iVar6 + 0xbc);
+
+  FUN_00665f10(&local_50,&local_80,&local_90,param_2,param_3);
+
+  local_30 = local_50;
+
+  local_20 = *(uint32_t /* width from decompiler */ *)(param_1 + 0x8c);
+
+  local_1c = *(uint32_t /* width from decompiler */ *)(param_1 + 0x90);
+
+  fVar10 = local_80 + local_50;
+
+  local_ac = local_7c + local_4c;
+
+  local_24 = local_44;
+
+  local_2c = local_4c;
+
+  local_a8 = local_78 + local_48;
+
+  local_28 = local_48;
+
+  fVar9 = fVar10 * fVar10 + local_a8 * local_a8 + local_ac * local_ac;
+
+  if (fVar9 == 0.0) {
+
+    local_b0 = 0.0;
+
+  }
+
+  else {
+
+    local_b0 = g_flOne / SQRT(fVar9);
+
+  }
+
+  local_a8 = local_a8 * local_b0;
+
+  local_a4 = (local_74 + local_44) * local_b0;
+
+  local_ac = local_ac * local_b0;
+
+  local_b0 = local_b0 * fVar10;
+
+  fVar9 = local_88 * local_ac - local_8c * local_a8;
+
+  fVar11 = local_8c * local_b0 - local_90 * local_ac;
+
+  fVar10 = local_90 * local_a8 - local_88 * local_b0;
+
+  local_34 = fVar11 * local_58 + fVar10 * local_5c + fVar9 * local_60;
+
+  fVar8 = (float10)FUN_00646af0(local_34,local_58 * (fVar9 * local_ac - fVar10 * local_b0) +
+
+                                         local_5c * (fVar11 * local_b0 - fVar9 * local_a8) +
+
+                                         (fVar10 * local_a8 - fVar11 * local_ac) * local_60);
+
+  local_18 = (float)fVar8;
+
+  local_30 = local_b0;
+
+  local_2c = local_ac;
+
+  local_28 = local_a8;
+
+  local_24 = local_a4;
+
+  FUN_006c39b0(&local_30,param_2,param_3);
+
+  FUN_006c3d90(&local_70,&local_a0,param_2,param_3);
+
+  local_a8 = *(float *)(param_1 + 0x94);
+
+  if (g_flZero < local_a8) {
+
+    local_b0 = (float)(*(int *)(iVar4 + 0x3c) + 0x80);
+
+    local_ac = (float)(param_1 + 200);
+
+    local_a4 = 4.2039e-45;
+
+    FUN_006c32b0(&local_b0,param_2,param_3);
+
+  }
+
+  return;
+
+}

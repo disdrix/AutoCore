@@ -1,0 +1,246 @@
+// =============================================================================
+// FUN_008edc80
+// -----------------------------------------------------------------------------
+// Stable ID: aa_008edc80
+// Address:   0x008edc80  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_008edc80 @ 0x008edc80
+// Stable ID: aa_008edc80
+// No high-value strings recovered; name via xrefs/callers in follow-up.
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~105 non-empty decompiler lines.
+//  - Control keywords: if×12, while×2, return×2, do×1, goto×1.
+//  - Notable callees: FUN_00404060×2, FUN_0040e180×2, FUN_0040e340×2, FUN_0040e490×2, CNDHash_LookupByKey, CVOGCharacter_IsAreaExplored, FUN_004023f0, FUN_0040e380.
+//  - Return sites: 2.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+void FUN_008edc80(int param_1,uint param_2)
+
+
+
+{
+
+  uchar areaId;
+
+  bool bVar1;
+
+  void *pvVar2;
+
+  int *piVar3;
+
+  int iVar4;
+
+  int *piVar5;
+
+  float *pfVar6;
+
+  int iVar7;
+
+  uint key;
+
+  float *local_3c;
+
+  int local_34;
+
+  float local_30;
+
+  float local_28;
+
+  uint8_t local_24 [4];
+
+  int *piStack_20;
+
+  uint8_t auStack_18 [12];
+
+  void *local_c;
+
+  uint8_t *puStack_8;
+
+  uint32_t /* width from decompiler */ local_4;
+
+  
+
+  local_4 = 0xffffffff;
+
+  puStack_8 = &LAB_009b164d;
+
+  local_c = ExceptionList;
+
+  if (((*(int *)(param_1 + 0x67c) != 0) && (DAT_00d1b644 != 0)) && (DAT_00d1b644 != -0xa0)) {
+
+    ExceptionList = &local_c;
+
+    key = param_2;
+
+    pvVar2 = (void *)FUN_00541a80();
+
+    pvVar2 = CNDHash_LookupByKey(pvVar2,key);
+
+    if (((pvVar2 != (void *)0x0) && (*(int *)((int)pvVar2 + 0x18) == 0)) &&
+
+       (*(int *)((int)pvVar2 + 0x14) == 0)) {
+
+      local_3c = (float *)0x0;
+
+      if (*(uint *)(DAT_00d1b644 + 0xfc) != param_2) {
+
+        FUN_0040e180();
+
+        if (local_34 == *(int *)(param_1 + 0x560)) {
+
+          FUN_008ed6d0(param_1,param_2);
+
+          piVar3 = (int *)FUN_0040e180();
+
+          local_34 = *piVar3;
+
+        }
+
+        if (local_34 != *(int *)(param_1 + 0x560)) {
+
+          local_3c = (float *)(local_34 + 0x10);
+
+        }
+
+      }
+
+      FUN_004023f0();
+
+      local_4 = 0;
+
+      iVar4 = FUN_0040e340();
+
+      piVar3 = (int *)FUN_0040e490(*(int *)(param_1 + 0x67c) + 0x624);
+
+      while (piVar3 != (int *)0x0) {
+
+        iVar7 = piVar3[0x133];
+
+        if (iVar7 != 0) {
+
+          piVar5 = (int *)CVOGReaction_ResolveObjectTarget
+
+                                    (0,*(uint32_t /* width from decompiler */ *)(iVar7 + 8),*(uint32_t /* width from decompiler */ *)(iVar7 + 0xc));
+
+          if (piVar5 != (int *)0x0) {
+
+            FUN_00404060();
+
+            (**(code **)(*piVar5 + 0x124))(local_24);
+
+            piVar5 = (int *)*piStack_20;
+
+            if (piVar5 != piStack_20) {
+
+              do {
+
+                (**(code **)(*(int *)piVar5[2] + 0x144))();
+
+                pfVar6 = (float *)FUN_004e88e0(auStack_18,piVar5[2] + 0x80);
+
+                local_30 = *pfVar6;
+
+                piVar5 = (int *)*piVar5;
+
+                local_28 = pfVar6[2];
+
+              } while (piVar5 != piStack_20);
+
+              goto LAB_008ede46;
+
+            }
+
+          }
+
+          local_28 = *(float *)(iVar7 + 0x18);
+
+          local_30 = *(float *)(iVar7 + 0x10);
+
+        }
+
+LAB_008ede46:
+
+        if (local_3c == (float *)0x0) {
+
+          areaId = CVOGTerrain_SampleExploredAreaId
+
+                             (*(void **)(DAT_00d1b644 + 0xe4f8),local_30,local_28);
+
+        }
+
+        else {
+
+          areaId = *(uchar *)((int)local_3c[1] *
+
+                              (int)((local_30 - *local_3c * DAT_00a0f298) * (g_flOne / *local_3c)) +
+
+                              (int)local_3c[3] +
+
+                             (int)((local_28 - *local_3c * DAT_00a0f298) * (g_flOne / *local_3c)));
+
+        }
+
+        bVar1 = false;
+
+        if (DAT_00d1b6d8 != (void *)0x0) {
+
+          bVar1 = CVOGCharacter_IsAreaExplored(DAT_00d1b6d8,param_2,areaId);
+
+        }
+
+        if ((areaId == '\0') || (bVar1 != false)) {
+
+          (**(code **)(*piVar3 + 4))(1);
+
+        }
+
+        else {
+
+          (**(code **)(*piVar3 + 4))(0);
+
+        }
+
+        FUN_0040e380(*(int *)(param_1 + 0x67c) + 0x624,piVar3);
+
+        iVar7 = FUN_0040e340();
+
+        if (iVar7 == iVar4) break;
+
+        piVar3 = (int *)FUN_0040e490(*(int *)(param_1 + 0x67c) + 0x624);
+
+      }
+
+      local_4 = 0xffffffff;
+
+      FUN_00404060();
+
+                    /* WARNING: Subroutine does not return */
+
+      operator_delete(piStack_20);
+
+    }
+
+  }
+
+  ExceptionList = local_c;
+
+  return;
+
+}

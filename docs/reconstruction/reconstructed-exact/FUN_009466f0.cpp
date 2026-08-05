@@ -1,0 +1,392 @@
+// =============================================================================
+// FUN_009466f0
+// -----------------------------------------------------------------------------
+// Stable ID: aa_009466f0
+// Address:   0x009466f0  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_009466f0 @ 0x009466f0
+// Stable ID: aa_009466f0
+// No high-value strings recovered; name via xrefs/callers in follow-up.
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~177 non-empty decompiler lines.
+//  - Control keywords: if×11, goto×3, return×3, do×2, while×2.
+//  - Notable callees: CNDHash_LookupByKey, Client_GetMissionCompleteAudioTable, FUN_00403450, FUN_00406750, FUN_004f4fb0, FUN_0052b4e0, FUN_0052cca0, FUN_00541a80.
+//  - Return sites: 3.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+/* WARNING: Function: __chkstk replaced with injection: alloca_probe */
+
+/* WARNING: Removing unreachable block (ram,0x00946923) */
+
+
+
+void __fastcall FUN_009466f0(int param_1)
+
+
+
+{
+
+  char cVar1;
+
+  int *piVar2;
+
+  int iVar3;
+
+  uint32_t /* width from decompiler */ *puVar4;
+
+  char *pcVar5;
+
+  void *pvVar6;
+
+  int iVar7;
+
+  int *piVar8;
+
+  bool bVar9;
+
+  uint key;
+
+  char local_c944 [136];
+
+  uint32_t /* width from decompiler */ local_c8bc;
+
+  uint32_t /* width from decompiler */ local_c8b8;
+
+  uint8_t local_c8b4;
+
+  int local_c8b0;
+
+  uint32_t /* width from decompiler */ local_c8ac;
+
+  char local_c8a8 [4];
+
+  char local_c8a4 [4];
+
+  char local_c8a0 [57];
+
+  uint8_t local_c867;
+
+  uint8_t local_c866;
+
+  uint32_t /* width from decompiler */ local_c864;
+
+  int local_c860;
+
+  uint32_t /* width from decompiler */ local_c854;
+
+  uint32_t /* width from decompiler */ local_c844;
+
+  uint32_t /* width from decompiler */ local_c840;
+
+  uint32_t /* width from decompiler */ local_c83c;
+
+  uint32_t /* width from decompiler */ local_c838;
+
+  uint16_t local_c01c;
+
+  uint32_t /* width from decompiler */ uStack_10;
+
+  void *local_c;
+
+  uint8_t *puStack_8;
+
+  uint32_t /* width from decompiler */ uStack_4;
+
+  
+
+  uStack_4 = 0xffffffff;
+
+  puStack_8 = &LAB_009bba1d;
+
+  local_c = ExceptionList;
+
+  uStack_10 = 0x94670f;
+
+  if (*(int *)(*(int *)(param_1 + 0xe04) + 0xe780) != 0) {
+
+    iVar7 = *(int *)(param_1 + 0xe98);
+
+    ExceptionList = &local_c;
+
+    if ((iVar7 != 0) &&
+
+       (piVar2 = *(int **)(*(int *)(param_1 + 0xe04) + 0xe77c), piVar8 = (int *)*piVar2,
+
+       ExceptionList = &local_c, piVar8 != piVar2)) {
+
+      iVar3 = *(int *)(*(int *)(iVar7 + 4) + 4);
+
+      piVar2 = (int *)(iVar3 + 0x164 + iVar7);
+
+LAB_00946760:
+
+      if (((piVar8[2] != *piVar2) || (piVar8[3] != *(int *)(iVar3 + 0x168 + iVar7))) ||
+
+         ((char)piVar8[4] != (char)piVar2[2])) goto LAB_00946776;
+
+      local_c8b0 = *(int *)(param_1 + 0x858);
+
+      local_c83c = 0;
+
+      local_c840 = 0;
+
+      local_c844 = 0;
+
+      local_c8bc = 0xffffffff;
+
+      local_c8b8 = 1;
+
+      local_c8b4 = 1;
+
+      local_c8ac = 0xffffffff;
+
+      ExceptionList = &local_c;
+
+      sprintf(local_c8a8,"%s");
+
+      local_c864 = 0xffffffff;
+
+      bVar9 = false;
+
+      local_c860 = 0;
+
+      local_c854 = 0;
+
+      local_c867 = 0;
+
+      local_c866 = 0;
+
+      local_c838 = 0;
+
+      local_c01c = 0;
+
+      if (*(char *)(param_1 + 0x9c) == '\0') {
+
+        key = piVar8[7];
+
+        pvVar6 = (void *)FUN_00541a80();
+
+        pvVar6 = CNDHash_LookupByKey(pvVar6,key);
+
+        if (pvVar6 == (void *)0x0) {
+
+          bVar9 = true;
+
+          local_c8a8[0] = s_empty_fam_00a2e3c4[0];
+
+          local_c8a8[1] = s_empty_fam_00a2e3c4[1];
+
+          local_c8a8[2] = s_empty_fam_00a2e3c4[2];
+
+          local_c8a8[3] = s_empty_fam_00a2e3c4[3];
+
+          local_c8a4[0] = s_empty_fam_00a2e3c4[4];
+
+          local_c8a4[1] = s_empty_fam_00a2e3c4[5];
+
+          local_c8a4[2] = s_empty_fam_00a2e3c4[6];
+
+          local_c8a4[3] = s_empty_fam_00a2e3c4[7];
+
+          local_c8a0[0] = s_empty_fam_00a2e3c4[8];
+
+          local_c8a0[1] = s_empty_fam_00a2e3c4[9];
+
+          vog_LogMessage();
+
+        }
+
+        else {
+
+          bVar9 = *(int *)((int)pvVar6 + 0x18) != 0;
+
+          pcVar5 = local_c944;
+
+          (*(code *)PTR_FUN_00af8c9c)();
+
+          FUN_00403450();
+
+          iVar7 = -(int)pcVar5;
+
+          do {
+
+            cVar1 = *pcVar5;
+
+            pcVar5[(int)(local_c8a8 + iVar7)] = cVar1;
+
+            pcVar5 = pcVar5 + 1;
+
+          } while (cVar1 != '\0');
+
+          uStack_4 = 0xffffffff;
+
+          local_c860 = piVar8[7];
+
+          local_c866 = *(int *)((int)pvVar6 + 0x14) != 0;
+
+          local_c867 = bVar9;
+
+        }
+
+      }
+
+      else {
+
+        pcVar5 = (char *)(param_1 + 0xae0);
+
+        iVar7 = -(int)pcVar5;
+
+        do {
+
+          cVar1 = *pcVar5;
+
+          pcVar5[(int)(local_c8a8 + iVar7)] = cVar1;
+
+          pcVar5 = pcVar5 + 1;
+
+        } while (cVar1 != '\0');
+
+        *(uint8_t *)(param_1 + 0x9c) = 0;
+
+      }
+
+      *(uint8_t *)(param_1 + 0xad8) = *(uint8_t *)(param_1 + 0xad0);
+
+      *(uint32_t /* width from decompiler */ *)(param_1 + 0xadc) = *(uint32_t /* width from decompiler */ *)(param_1 + 0xad4);
+
+      *(char *)(param_1 + 0xad0) = (char)piVar8[6];
+
+      *(int *)(param_1 + 0xad4) = piVar8[7];
+
+      *(bool *)(param_1 + 0x1c) = bVar9;
+
+      FUN_00943b80();
+
+      Client_GetMissionCompleteAudioTable();
+
+      FUN_007246d0();
+
+      (**(code **)(**(int **)(*(int *)(param_1 + 0xe98) + 0x250) + 4))();
+
+      *(uint16_t *)(*(int *)(param_1 + 0xe98) + 0x60c) = 0;
+
+      iVar7 = *(int *)(param_1 + 0xe04);
+
+      FUN_00406750();
+
+      *(int *)(*(int *)(iVar7 + 0x48) + 4) = *(int *)(iVar7 + 0x48);
+
+      *(uint32_t /* width from decompiler */ *)(iVar7 + 0x4c) = 0;
+
+      *(uint32_t /* width from decompiler */ *)*(uint32_t /* width from decompiler */ *)(iVar7 + 0x48) = *(uint32_t /* width from decompiler */ *)(iVar7 + 0x48);
+
+      *(int *)(*(int *)(iVar7 + 0x48) + 8) = *(int *)(iVar7 + 0x48);
+
+      if ((*(int *)(*(int *)(param_1 + 0xe04) + 0xfc) == local_c860) &&
+
+         (*(int *)(*(int *)(param_1 + 0xe04) + 0xac) == local_c8b0)) {
+
+        FUN_0052b4e0();
+
+      }
+
+      local_c8b0 = FUN_0052cca0();
+
+      iVar7 = FUN_009463b0();
+
+      if (iVar7 < 0) {
+
+        ExceptionList = local_c;
+
+        return;
+
+      }
+
+      (**(code **)**(uint32_t /* width from decompiler */ **)(*(int *)(param_1 + 0xe98) + 0x250))();
+
+      *(bool *)(*(int *)(param_1 + 0xe98) + 0x30c) = bVar9 == false;
+
+      *(bool *)(*(int *)(*(int *)(param_1 + 0xe98) + 0x250) + 0x101) = bVar9;
+
+      if (*(int *)(*(int *)(param_1 + 0xe98) + 0x250) != 0) {
+
+        FUN_004f4fb0();
+
+      }
+
+      if (bVar9 != false) {
+
+        (*(code *)**(uint32_t /* width from decompiler */ **)(*(int *)(param_1 + 0xe98) + 0x40))(1);
+
+        (**(code **)(*(int *)(*(int *)(param_1 + 0xe98) + 0x40) + 0x20))();
+
+        (**(code **)**(uint32_t /* width from decompiler */ **)(param_1 + 0xe98))
+
+                  (*(uint32_t /* width from decompiler */ *)(param_1 + 0xe04),&DAT_00d1a630,&DAT_00d1e480,0);
+
+      }
+
+      *(uint8_t *)(*(int *)(param_1 + 0xe98) + 0x4f4) = 0;
+
+      *(bool *)(*(int *)(param_1 + 0xe04) + 0xf5) = bVar9;
+
+      *(uint8_t *)(*(int *)(param_1 + 0xe04) + 0x80) = 1;
+
+    }
+
+LAB_00946b56:
+
+    iVar7 = *(int *)(param_1 + 0xe04);
+
+    puVar4 = *(uint32_t /* width from decompiler */ **)(iVar7 + 0xe77c);
+
+    pvVar6 = (void *)*puVar4;
+
+    *puVar4 = puVar4;
+
+    *(int *)(*(int *)(iVar7 + 0xe77c) + 4) = *(int *)(iVar7 + 0xe77c);
+
+    *(uint32_t /* width from decompiler */ *)(iVar7 + 0xe780) = 0;
+
+    if (pvVar6 != *(void **)(iVar7 + 0xe77c)) {
+
+                    /* WARNING: Subroutine does not return */
+
+      operator_delete(pvVar6);
+
+    }
+
+  }
+
+  ExceptionList = local_c;
+
+  return;
+
+LAB_00946776:
+
+  piVar8 = (int *)*piVar8;
+
+  ExceptionList = &local_c;
+
+  if (piVar8 == (int *)*(int *)(*(int *)(param_1 + 0xe04) + 0xe77c)) goto LAB_00946b56;
+
+  goto LAB_00946760;
+
+}

@@ -1,0 +1,194 @@
+// =============================================================================
+// FUN_005a0120
+// -----------------------------------------------------------------------------
+// Stable ID: aa_005a0120
+// Address:   0x005a0120  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_005a0120 @ 0x005a0120
+// Stable ID: aa_005a0120
+// Embedded strings (evidence for future rename):
+//   - "received %d msg %d (%d bytes) [%s]"
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~78 non-empty decompiler lines.
+//  - Control keywords: if×10, goto×2, return×1.
+//  - Notable callees: CONCAT31, Client_UnpackSpecialMessage, FUN_00419190, FUN_0059e210, FUN_005a0120, FUN_0076cef0, FUN_0076cf00, FUN_007a4480.
+//  - Strings: "received %d msg %d (%d bytes) [%s]".
+//  - Return sites: 1.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+void __thiscall FUN_005a0120(int param_1,int *param_2,uint32_t /* width from decompiler */ param_3)
+
+
+
+{
+
+  int *piVar1;
+
+  int iVar2;
+
+  uint uVar3;
+
+  uint32_t /* width from decompiler */ *puVar4;
+
+  int *piVar5;
+
+  uint32_t /* width from decompiler */ extraout_ECX;
+
+  uint32_t /* width from decompiler */ *puVar6;
+
+  int *local_14;
+
+  uint32_t /* width from decompiler */ local_10;
+
+  void *pvStack_c;
+
+  uint8_t *puStack_8;
+
+  uint local_4;
+
+  
+
+  puStack_8 = &LAB_009a6002;
+
+  pvStack_c = ExceptionList;
+
+  local_4 = 0;
+
+  local_10 = DAT_00d1f040;
+
+  ExceptionList = &pvStack_c;
+
+  FUN_0076cf00();
+
+  local_4._0_1_ = 1;
+
+  puVar4 = operator_new(0x18);
+
+  puVar6 = (uint32_t /* width from decompiler */ *)0x0;
+
+  if (puVar4 != (uint32_t /* width from decompiler */ *)0x0) {
+
+    puVar4[2] = 0;
+
+    puVar6 = puVar4;
+
+  }
+
+  puVar6[1] = *(uint32_t /* width from decompiler */ *)(param_1 + 0x238);
+
+  local_14 = (int *)&stack0xffffffd8;
+
+  puVar6[5] = param_2[4];
+
+  param_2[2] = param_2[2] + 1;
+
+  piVar5 = (int *)Client_UnpackSpecialMessage(&local_14,param_3);
+
+  piVar1 = (int *)puVar6[2];
+
+  iVar2 = *piVar5;
+
+  local_4._0_1_ = 2;
+
+  if (piVar1 != (int *)0x0) {
+
+    piVar5 = piVar1 + 2;
+
+    *piVar5 = *piVar5 + -1;
+
+    if (*piVar5 == 0) {
+
+      (**(code **)(*piVar1 + 8))();
+
+    }
+
+  }
+
+  piVar1 = local_14;
+
+  puVar6[2] = iVar2;
+
+  if (iVar2 != 0) {
+
+    *(int *)(iVar2 + 8) = *(int *)(iVar2 + 8) + 1;
+
+  }
+
+  local_4 = CONCAT31(local_4._1_3_,1);
+
+  if ((local_14 != (int *)0x0) && (local_14[2] = local_14[2] + -1, piVar1[2] == 0)) {
+
+    (**(code **)(*piVar1 + 8))();
+
+  }
+
+  *puVar6 = 0;
+
+  puVar6[3] = *(uint32_t /* width from decompiler */ *)(puVar6[2] + 0xc);
+
+  puVar6[4] = *(uint32_t /* width from decompiler */ *)(puVar6[2] + 0x10);
+
+  FUN_00419190();
+
+  if (DAT_00b04ec0 != '\0') {
+
+    uVar3 = *(uint *)puVar6[3];
+
+    if (uVar3 < 0x2010) {
+
+      if ((uVar3 == 0x200f) ||
+
+         ((uVar3 < 0x200d && ((0x200a < uVar3 || ((0x25 < uVar3 && (uVar3 < 0x28))))))))
+
+      goto LAB_005a026f;
+
+    }
+
+    else if ((uVar3 == 0x2030) || (uVar3 == 0x2061)) goto LAB_005a026f;
+
+    FUN_0059e210();
+
+    FUN_007a4480(0xffffffff,"received %d msg %d (%d bytes) [%s]",puVar6[1],extraout_ECX,puVar6[4]);
+
+  }
+
+LAB_005a026f:
+
+  local_4 = local_4 & 0xffffff00;
+
+  FUN_0076cef0();
+
+  piVar1 = param_2 + 2;
+
+  *piVar1 = *piVar1 + -1;
+
+  local_4 = 0xffffffff;
+
+  if (*piVar1 == 0) {
+
+    (**(code **)(*param_2 + 8))();
+
+  }
+
+  ExceptionList = pvStack_c;
+
+  return;
+
+}

@@ -1,0 +1,282 @@
+// =============================================================================
+// FUN_00990860
+// -----------------------------------------------------------------------------
+// Stable ID: aa_00990860
+// Address:   0x00990860  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for FUN_00990860 @ 0x00990860
+// Stable ID: aa_00990860
+// No high-value strings recovered; name via xrefs/callers in follow-up.
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~123 non-empty decompiler lines.
+//  - Control keywords: if×8, do×2, while×2, return×2.
+//  - Notable callees: FUN_004522a0×3, FUN_00990800×3, CONCAT22×2, FUN_00414a50, FUN_00444ad0, FUN_0044b610, FUN_0044ba80, FUN_00450ef0.
+//  - Return sites: 2.
+
+/*
+ * Behavioral notes:
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+uint32_t /* width from decompiler */ FUN_00990860(int param_1,int param_2)
+
+
+
+{
+
+  uint16_t uVar1;
+
+  uint16_t uVar2;
+
+  int iVar3;
+
+  uint8_t *puVar4;
+
+  int *piVar5;
+
+  ushort uVar6;
+
+  int iVar7;
+
+  int local_70;
+
+  int local_6c;
+
+  ushort *local_68;
+
+  ushort *local_64;
+
+  ushort *local_60;
+
+  int local_5c;
+
+  uint8_t *local_58;
+
+  int local_54;
+
+  int local_50;
+
+  int local_4c;
+
+  int local_48;
+
+  uint8_t local_44 [4];
+
+  uint8_t local_40 [8];
+
+  int local_38;
+
+  ushort local_34;
+
+  uint8_t local_30 [4];
+
+  uint32_t /* width from decompiler */ *local_2c;
+
+  uint32_t /* width from decompiler */ local_28;
+
+  uint8_t local_24 [16];
+
+  void *local_14;
+
+  uint8_t *puStack_10;
+
+  int local_c;
+
+  
+
+  local_c = 0xffffffff;
+
+  puStack_10 = &LAB_009b088d;
+
+  local_14 = ExceptionList;
+
+  if (((*(int *)(param_1 + 4) != 0) && (iVar7 = *(int *)(*(int *)(param_1 + 4) + 0x18), iVar7 != 0))
+
+     && (ExceptionList = &local_14, iVar3 = FUN_0044b610(), -1 < iVar3)) {
+
+    iVar3 = *(int *)(param_1 + 4);
+
+    if (iVar3 == 0) {
+
+      local_70 = 0;
+
+    }
+
+    else if (*(int *)(iVar3 + 0x10) == 0) {
+
+      local_70 = 0;
+
+    }
+
+    else {
+
+      local_70 = *(int *)(*(int *)(iVar3 + 0x10) + 8);
+
+    }
+
+    if (*(int *)(iVar3 + 0x10) == 0) {
+
+      local_6c = 0;
+
+    }
+
+    else {
+
+      local_6c = FUN_00746520(*(uint32_t /* width from decompiler */ *)(iVar3 + 0x14),*(uint32_t /* width from decompiler */ *)(iVar3 + 0x18),4);
+
+    }
+
+    iVar3 = *(int *)(param_2 + 4);
+
+    if (*(int *)(iVar3 + 0x10) == 0) {
+
+      local_64 = (ushort *)0x0;
+
+    }
+
+    else {
+
+      local_64 = (ushort *)
+
+                 FUN_00743be0(*(uint32_t /* width from decompiler */ *)(iVar3 + 0x18),*(uint32_t /* width from decompiler */ *)(iVar3 + 0x1c),0x810);
+
+    }
+
+    if ((local_6c != 0) && (local_64 != (ushort *)0x0)) {
+
+      FUN_00444ad0();
+
+      uVar6 = 0;
+
+      local_c = 0;
+
+      local_68 = (ushort *)local_6c;
+
+      if (0 < iVar7) {
+
+        do {
+
+          local_38 = (int)local_68;
+
+          local_34 = uVar6;
+
+          FUN_00452190(local_24,&local_38);
+
+          local_68 = (ushort *)((int)local_68 + local_70);
+
+          uVar6 = uVar6 + 1;
+
+        } while ((int)(uint)uVar6 < iVar7);
+
+      }
+
+      local_68 = local_64 + 1;
+
+      local_60 = local_64 + 2;
+
+      puVar4 = (uint8_t *)FUN_00450ef0();
+
+      local_2c = (uint32_t /* width from decompiler */ *)FUN_004568c0();
+
+      *(uint8_t *)((int)local_2c + 0x11) = 1;
+
+      local_2c[1] = local_2c;
+
+      *local_2c = local_2c;
+
+      local_2c[2] = local_2c;
+
+      local_28 = 0;
+
+      local_c._0_1_ = 1;
+
+      if (0 < (int)puVar4) {
+
+        local_50 = (int)local_58 * 2;
+
+        local_4c = local_5c * 2;
+
+        local_48 = local_54 * 2;
+
+        local_58 = puVar4;
+
+        do {
+
+          local_38 = (uint)*local_64 * local_70 + local_6c;
+
+          FUN_004522a0(&local_5c);
+
+          iVar7 = CONCAT22((short)((uint)puVar4 >> 0x10),*(uint16_t *)(local_5c + 0x10));
+
+          local_38 = (uint)*local_68 * local_70 + local_6c;
+
+          local_54 = iVar7;
+
+          piVar5 = (int *)FUN_004522a0(local_44);
+
+          uVar1 = *(uint16_t *)(*piVar5 + 0x10);
+
+          local_38 = (uint)*local_60 * local_70 + local_6c;
+
+          piVar5 = (int *)FUN_004522a0(local_40);
+
+          local_5c = *piVar5;
+
+          uVar2 = *(uint16_t *)(local_5c + 0x10);
+
+          puVar4 = local_30;
+
+          FUN_00990800(iVar7);
+
+          FUN_00990800(uVar1);
+
+          FUN_00990800(CONCAT22((short)((uint)&local_38 >> 0x10),uVar2));
+
+          local_64 = (ushort *)((int)local_64 + local_50);
+
+          local_68 = (ushort *)((int)local_68 + local_4c);
+
+          local_60 = (ushort *)((int)local_60 + local_48);
+
+          local_58 = local_58 + -1;
+
+        } while (local_58 != (uint8_t *)0x0);
+
+        local_58 = (uint8_t *)0x0;
+
+      }
+
+      local_c = (uint)local_c._1_3_ << 8;
+
+      FUN_004551f0(local_40,*local_2c,local_2c);
+
+                    /* WARNING: Subroutine does not return */
+
+      operator_delete(local_2c);
+
+    }
+
+    FUN_00414a50();
+
+    FUN_0044ba80();
+
+  }
+
+  ExceptionList = local_14;
+
+  return 0;
+
+}

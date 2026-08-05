@@ -1,0 +1,54 @@
+wrote=50
+# Domain FUN_* human aliases (Mission|Inventory|Skill|QuickBar|Objective|AuthServer)
+# without prior primary human Stable ID. Bodies mirror FUN_<addr> clean captures.
+
+0x007c0350 -> Mission_bActiveObjectiveOverride  (bActiveObjectiveOverride)
+0x007d9440 -> Skill_tSkillElements_row  (//tSkillElements/row)
+0x007e34b0 -> Skill_vSkillsNotCharacters_row  (//vSkillsNotCharacters/row)
+0x0080e360 -> Inv_Failed_removing_item_from_refinery_Object_not_found_in_i  (Failed removing item from refinery: Object not found in inventory...)
+0x0089bf50 -> Inv_You_cannot_make_this_item_with_the_components_you_curren  (You cannot make this item with the components you currently have...)
+0x0093bf60 -> Inv_Item_that_was_in_locker_with_coid_I64d_with_quantity_d_n  (Item that was in locker with coid: %I64d ...)
+0x00546460 -> Mission_missions_00546460  (..\missions\)
+0x004d5c10 -> Mission_Uses_CVOGCharacter_CheckMissionRequirements  (CVOGCharacter_CheckMissionRequirements)
+0x004d1b80 -> Skill_Uses_CVOGReaction_ResolveSkillTargets  (CVOGReaction_ResolveSkillTargets)
+0x004c8a60 -> Skill_Uses_Skill_EnsureLoadedInTree  (Skill_EnsureLoadedInTree)
+0x004de760 -> Mission_CVOGObjectiveRequirement_RTTI_Type_Descriptor  (CVOGObjectiveRequirement_RTTI_Type_Descriptor)
+0x004c8f00 -> Mission_CVOGClonedObjectBase_RTTI_Type_Descriptor  (CVOGClonedObjectBase_RTTI_Type_Descriptor)
+0x004b0f80 -> Mission_Uses_Client_GetMissionCompleteAudioTable  (Client_GetMissionCompleteAudioTable)
+0x004b6a00 -> Mission_Uses_Client_GetMissionCompleteAudioTable_004b6a00
+0x004b6ab0 -> Mission_Uses_Client_GetMissionCompleteAudioTable_004b6ab0
+0x004b6e00 -> Mission_Uses_Client_GetMissionCompleteAudioTable_004b6e00
+0x004b7e50 -> Mission_Uses_Client_GetMissionCompleteAudioTable_004b7e50
+0x004b85d0 -> Mission_Uses_Client_GetMissionCompleteAudioTable_004b85d0
+0x004b88e0 -> Mission_Uses_Client_GetMissionCompleteAudioTable_004b88e0
+0x004b8dc0 -> Mission_Uses_Client_GetMissionCompleteAudioTable_004b8dc0
+0x004b9af0 -> Mission_Uses_Client_GetMissionCompleteAudioTable_004b9af0
+0x004ba0a0 -> Mission_Uses_Client_GetMissionCompleteAudioTable_004ba0a0
+0x004bb5b0 -> Mission_Uses_Client_GetMissionCompleteAudioTable_004bb5b0
+0x00414cd0 -> Mission_Uses_CVOGReaction_FailMissionNotify  (CVOGReaction_FailMissionNotify)
+0x00416ff0 -> Mission_Uses_CVOGReaction_FailMissionNotify_00416ff0
+0x00419bd0 -> Mission_Uses_CVOGReaction_FailMissionNotify_00419bd0
+0x0043f120 -> Mission_Uses_CVOGReaction_FailMissionNotify_0043f120
+0x0043f780 -> Mission_Uses_CVOGReaction_FailMissionNotify_0043f780
+0x0044c150 -> Mission_Uses_CVOGReaction_FailMissionNotify_0044c150
+0x0044c1b0 -> Mission_Uses_CVOGReaction_FailMissionNotify_0044c1b0
+0x0044c210 -> Mission_Uses_CVOGReaction_FailMissionNotify_0044c210
+0x004506f0 -> Mission_Uses_CVOGReaction_FailMissionNotify_004506f0
+0x00456600 -> Mission_Uses_CVOGReaction_FailMissionNotify_00456600
+0x00456720 -> Mission_Uses_CVOGReaction_FailMissionNotify_00456720
+0x00457040 -> Mission_Uses_CVOGReaction_FailMissionNotify_00457040
+0x00462510 -> Mission_Uses_CVOGReaction_FailMissionNotify_00462510
+0x00480460 -> Mission_Uses_CVOGReaction_FailMissionNotify_00480460
+0x00496410 -> Mission_Uses_CVOGReaction_FailMissionNotify_00496410
+0x00412730 -> Skill_Uses_SkillSet_GetEntryCount  (SkillSet_GetEntryCount)
+0x0041e210 -> Skill_Uses_SkillSet_GetEntryCount_0041e210
+0x00440f80 -> Skill_Uses_SkillSet_GetEntryCount_00440f80
+0x00442760 -> Skill_Uses_SkillSet_GetEntryCount_00442760
+0x00454f30 -> Skill_Uses_SkillSet_GetEntryCount_00454f30
+0x00455c90 -> Skill_Uses_SkillSet_GetEntryCount_00455c90
+0x0046bba0 -> Skill_Uses_SkillSet_GetEntryCount_0046bba0
+0x004bb3a0 -> Mission_Sound_s_is_incorrectly_marked_as_a_looping_explosion_on_
+0x004bc180 -> Mission_VOG_DEBUG_STOP
+0x004c82b0 -> Mission_VOG_DEBUG_STOP_004c82b0
+0x004d2e50 -> Mission_VOG_DEBUG_STOP_004d2e50
+0x0040dab0 -> Mission_Bulk_0040dab0

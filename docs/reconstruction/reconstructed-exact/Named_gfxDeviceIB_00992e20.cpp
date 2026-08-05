@@ -1,0 +1,784 @@
+// READABILITY (auto CF):
+//  - Body size: ~374 non-empty decompiler lines.
+//  - Control keywords: if×52, goto×10, while×8, return×7, do×6, for×2.
+//  - Notable callees: ABS×20, FUN_0076d1b0×2, fopen×2, ExitProcess, FUN_00414a50, FUN_004406e0, FUN_0044b9c0, FUN_0044ba80.
+//  - Strings: "C:\\vog\\1_code\\palantir\\palantir\\graphics\\gfxDeviceIB.cpp"; "c:\\VOGCRASH.txt"; "errReport::Massive failure EH_Abort: F:%s l:%d s:%d d:%s\n"; "C:\\vog\\1_code\\palantir\\palantir\\graphics\\gfxDeviceVB.cpp".
+//  - Return sites: 7.
+
+// =============================================================================
+// Named_gfxDeviceIB_00992e20
+// -----------------------------------------------------------------------------
+// Stable ID: aa_00992e20
+// Address:   0x00992e20  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+/*
+ * Behavioral notes:
+ * String-driven rename evidence: "gfxDeviceIB"
+ *
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+/* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+
+
+
+uint32_t /* width from decompiler */ Named_gfxDeviceIB_00992e20(float *param_1,int param_2,int param_3)
+
+
+
+{
+
+  int *piVar1;
+
+  int iVar2;
+
+  float fVar3;
+
+  int *piVar4;
+
+  int *piVar5;
+
+  int iVar6;
+
+  float *pfVar7;
+
+  float *pfVar8;
+
+  FILE *_File;
+
+  uint32_t /* width from decompiler */ *puVar9;
+
+  short *psVar10;
+
+  uint uVar11;
+
+  int iVar12;
+
+  bool bVar13;
+
+  float *pfVar14;
+
+  uint32_t /* width from decompiler */ *puVar15;
+
+  uint uVar16;
+
+  float fVar17;
+
+  char *pcVar18;
+
+  uint32_t /* width from decompiler */ uVar19;
+
+  char *pcVar20;
+
+  int local_58;
+
+  int local_50;
+
+  uint local_48;
+
+  float local_40;
+
+  float local_3c;
+
+  float local_38;
+
+  float local_34;
+
+  float local_30;
+
+  float *local_2c;
+
+  int local_28;
+
+  float *local_24;
+
+  int local_20;
+
+  void *local_18;
+
+  int local_14;
+
+  uint32_t /* width from decompiler */ local_10;
+
+  void *local_c;
+
+  uint8_t *puStack_8;
+
+  uint32_t /* width from decompiler */ local_4;
+
+  
+
+  local_4 = 0xffffffff;
+
+  puStack_8 = &LAB_009b221c;
+
+  local_c = ExceptionList;
+
+  iVar12 = *(int *)(param_2 + 4);
+
+  if (iVar12 == 0) {
+
+    local_50 = 0;
+
+  }
+
+  else {
+
+    local_50 = *(int *)(iVar12 + 0x1c);
+
+  }
+
+  if (*(int *)((int)param_1 + 4) == 0) {
+
+    local_58 = 0;
+
+  }
+
+  else {
+
+    local_58 = *(int *)(*(int *)((int)param_1 + 4) + 0x18);
+
+  }
+
+  piVar4 = *(int **)(iVar12 + 0x10);
+
+  if (piVar4 == (int *)0x0) {
+
+    iVar12 = 0;
+
+    ExceptionList = &local_c;
+
+  }
+
+  else {
+
+    piVar5 = (int *)*piVar4;
+
+    if (piVar5 == (int *)0x0) {
+
+      iVar12 = 0;
+
+      ExceptionList = &local_c;
+
+    }
+
+    else {
+
+      ExceptionList = &local_c;
+
+      iVar12 = (**(code **)(*piVar5 + 0x2c))
+
+                         (piVar5,*(int *)(iVar12 + 0x18) * piVar4[4],
+
+                          *(int *)(iVar12 + 0x1c) * piVar4[4],&local_28,0x800);
+
+      if (iVar12 < 0) {
+
+        iVar12 = 0;
+
+      }
+
+      else {
+
+        piVar4[3] = piVar4[3] + 1;
+
+        iVar12 = local_28;
+
+      }
+
+    }
+
+  }
+
+  iVar6 = *(int *)((int)param_1 + 4);
+
+  piVar4 = *(int **)(iVar6 + 0x10);
+
+  if (piVar4 == (int *)0x0) {
+
+    pfVar14 = (float *)0x0;
+
+  }
+
+  else {
+
+    piVar5 = (int *)*piVar4;
+
+    if (piVar5 == (int *)0x0) {
+
+      pfVar14 = (float *)0x0;
+
+    }
+
+    else {
+
+      iVar6 = (**(code **)(*piVar5 + 0x2c))
+
+                        (piVar5,*(int *)(iVar6 + 0x14) * piVar4[2],
+
+                         *(int *)(iVar6 + 0x18) * piVar4[2],&local_24,0x800);
+
+      if (iVar6 < 0) {
+
+        pfVar14 = (float *)0x0;
+
+      }
+
+      else {
+
+        piVar4[4] = piVar4[4] + 1;
+
+        pfVar14 = local_24;
+
+      }
+
+    }
+
+  }
+
+  if ((iVar12 == 0) || (pfVar14 == (float *)0x0)) {
+
+    FUN_0044ba80();
+
+    FUN_00414a50();
+
+    ExceptionList = local_c;
+
+    return 0xffffffff;
+
+  }
+
+  local_18 = (void *)0x0;
+
+  local_14 = 0;
+
+  local_10 = 0;
+
+  local_4 = 0;
+
+  for (uVar16 = 0;
+
+      (iVar6 = *(int *)(param_3 + 4), iVar6 != 0 &&
+
+      (uVar16 < (uint)(*(int *)(param_3 + 8) - iVar6 >> 3))); uVar16 = uVar16 + 1) {
+
+    iVar6 = *(int *)(iVar6 + 4 + uVar16 * 8);
+
+    if (*(int *)(iVar6 + 0x10) == 0) {
+
+      iVar6 = 0;
+
+    }
+
+    else {
+
+      iVar6 = FUN_00746520(*(uint32_t /* width from decompiler */ *)(iVar6 + 0x14),*(uint32_t /* width from decompiler */ *)(iVar6 + 0x18),4);
+
+    }
+
+    if (iVar6 != 0) {
+
+      FUN_004406e0();
+
+    }
+
+  }
+
+  if (0 < local_58) {
+
+    pfVar7 = pfVar14 + 3;
+
+    iVar6 = local_58;
+
+    do {
+
+      *pfVar7 = 0.0;
+
+      pfVar7 = pfVar7 + 4;
+
+      iVar6 = iVar6 + -1;
+
+    } while (iVar6 != 0);
+
+  }
+
+  iVar6 = 0;
+
+  if (0 < local_50) {
+
+    do {
+
+      iVar2 = iVar6 * 2;
+
+      iVar6 = iVar6 + 1;
+
+      pfVar14[(uint)*(ushort *)(iVar12 + iVar2) * 4 + 3] = 3.57331e-43;
+
+    } while (iVar6 < local_50);
+
+  }
+
+  fVar17 = *(float *)(DAT_00d1f048 + 0x14) * *(float *)(DAT_00d1f048 + 0x14);
+
+  local_48 = 0;
+
+  if (0 < local_58) {
+
+    local_20 = -0x10 - (int)pfVar14;
+
+    do {
+
+      param_1 = pfVar14 + 4;
+
+      pfVar7 = param_1;
+
+      uVar16 = local_48;
+
+      if (pfVar14[3] != 0.0) {
+
+        while (uVar16 = uVar16 + 1, (int)uVar16 < local_58) {
+
+          bVar13 = true;
+
+          local_38 = ABS(*pfVar7 - *pfVar14);
+
+          if (local_38 <= _DAT_00a240ec) {
+
+LAB_009930a4:
+
+            local_34 = pfVar7[1];
+
+            local_40 = ABS(local_34 - pfVar14[1]);
+
+            if (_DAT_00a240ec < local_40) {
+
+              local_3c = ABS(pfVar14[1]);
+
+              pfVar8 = &local_38;
+
+              local_38 = ABS(local_34);
+
+              if (ABS(local_34) <= local_3c) {
+
+                pfVar8 = &local_3c;
+
+              }
+
+              if (*pfVar8 * fVar17 < local_40) goto LAB_00993156;
+
+            }
+
+            local_30 = pfVar7[2];
+
+            local_40 = ABS(local_30 - pfVar14[2]);
+
+            if (_DAT_00a240ec < local_40) {
+
+              local_3c = ABS(pfVar14[2]);
+
+              pfVar8 = &local_38;
+
+              local_38 = ABS(local_30);
+
+              if (ABS(local_30) <= local_3c) {
+
+                pfVar8 = &local_3c;
+
+              }
+
+              if (*pfVar8 * fVar17 < local_40) goto LAB_00993156;
+
+            }
+
+          }
+
+          else {
+
+            local_3c = ABS(*pfVar14);
+
+            pfVar8 = &local_40;
+
+            local_40 = ABS(*pfVar7);
+
+            if (local_40 <= local_3c) {
+
+              pfVar8 = &local_3c;
+
+            }
+
+            if (local_38 <= *pfVar8 * fVar17) goto LAB_009930a4;
+
+LAB_00993156:
+
+            bVar13 = false;
+
+          }
+
+          uVar11 = 0;
+
+          iVar6 = uVar16 * 0x10;
+
+          while ((local_18 != (void *)0x0 && (uVar11 < (uint)(local_14 - (int)local_18 >> 2)))) {
+
+            iVar2 = *(int *)((int)local_18 + uVar11 * 4);
+
+            fVar3 = *(float *)((int)param_1 + iVar2 + local_20);
+
+            local_40 = ABS(*(float *)(iVar2 + iVar6) - fVar3);
+
+            if (local_40 <= _DAT_00a240ec) {
+
+LAB_009931dd:
+
+              fVar3 = *(float *)((int)param_1 + iVar2 + 4 + local_20);
+
+              local_38 = *(float *)(iVar2 + 4 + iVar6);
+
+              local_40 = ABS(local_38 - fVar3);
+
+              if (_DAT_00a240ec < local_40) {
+
+                local_3c = ABS(fVar3);
+
+                pfVar8 = &local_38;
+
+                local_38 = ABS(local_38);
+
+                if (local_38 <= local_3c) {
+
+                  pfVar8 = &local_3c;
+
+                }
+
+                if (*pfVar8 * fVar17 < local_40) goto LAB_0099328b;
+
+              }
+
+              fVar3 = *(float *)((int)param_1 + iVar2 + 8 + local_20);
+
+              local_38 = *(float *)(iVar2 + 8 + iVar6);
+
+              local_40 = ABS(local_38 - fVar3);
+
+              if (_DAT_00a240ec < local_40) {
+
+                local_3c = ABS(fVar3);
+
+                pfVar8 = &local_38;
+
+                local_38 = ABS(local_38);
+
+                if (local_38 <= local_3c) {
+
+                  pfVar8 = &local_3c;
+
+                }
+
+                if (*pfVar8 * fVar17 < local_40) goto LAB_0099328b;
+
+              }
+
+              uVar11 = uVar11 + 1;
+
+            }
+
+            else {
+
+              local_3c = ABS(fVar3);
+
+              pfVar8 = &local_38;
+
+              local_38 = ABS(*(float *)(iVar2 + iVar6));
+
+              if (local_38 <= local_3c) {
+
+                pfVar8 = &local_3c;
+
+              }
+
+              if (local_40 <= *pfVar8 * fVar17) goto LAB_009931dd;
+
+LAB_0099328b:
+
+              bVar13 = false;
+
+              uVar11 = uVar11 + 1;
+
+            }
+
+          }
+
+          if (bVar13) {
+
+            iVar6 = 0;
+
+            pfVar7[3] = 0.0;
+
+            if (0 < local_50) {
+
+              do {
+
+                if (*(ushort *)(iVar12 + iVar6 * 2) == uVar16) {
+
+                  *(uint16_t *)(iVar12 + iVar6 * 2) = (uint16_t)local_48;
+
+                }
+
+                iVar6 = iVar6 + 1;
+
+              } while (iVar6 < local_50);
+
+            }
+
+          }
+
+          local_2c = pfVar7 + 4;
+
+          pfVar7 = local_2c;
+
+        }
+
+      }
+
+      local_48 = local_48 + 1;
+
+      pfVar14 = param_1;
+
+    } while ((int)local_48 < local_58);
+
+  }
+
+  uVar16 = 0;
+
+LAB_00993320:
+
+  do {
+
+    iVar6 = *(int *)(param_3 + 4);
+
+    if ((iVar6 == 0) || ((uint)(*(int *)(param_3 + 8) - iVar6 >> 3) <= uVar16)) {
+
+      puVar9 = *(uint32_t /* width from decompiler */ **)(param_3 + 4);
+
+      if (puVar9 != (uint32_t /* width from decompiler */ *)0x0) {
+
+        puVar15 = *(uint32_t /* width from decompiler */ **)(param_3 + 8);
+
+        for (; puVar9 != puVar15; puVar9 = puVar9 + 2) {
+
+          (**(code **)*puVar9)(0);
+
+        }
+
+                    /* WARNING: Subroutine does not return */
+
+        operator_delete(*(void **)(param_3 + 4));
+
+      }
+
+      *(uint32_t /* width from decompiler */ *)(param_3 + 4) = 0;
+
+      *(uint32_t /* width from decompiler */ *)(param_3 + 8) = 0;
+
+      *(uint32_t /* width from decompiler */ *)(param_3 + 0xc) = 0;
+
+      puVar9 = operator_new__(local_50 * 2);
+
+      if (0 < local_50) {
+
+        psVar10 = (short *)(iVar12 + 4);
+
+        iVar12 = (local_50 - 1U) / 3 + 1;
+
+        iVar6 = 0;
+
+        puVar15 = puVar9;
+
+        do {
+
+          if (((psVar10[-2] != psVar10[-1]) && (psVar10[-1] != *psVar10)) &&
+
+             (psVar10[-2] != *psVar10)) {
+
+            *puVar15 = *(uint32_t /* width from decompiler */ *)(psVar10 + -2);
+
+            iVar6 = iVar6 + 3;
+
+            *(short *)(puVar15 + 1) = *psVar10;
+
+            puVar15 = (uint32_t /* width from decompiler */ *)((int)puVar15 + 6);
+
+          }
+
+          psVar10 = psVar10 + 3;
+
+          iVar12 = iVar12 + -1;
+
+        } while (iVar12 != 0);
+
+        if (0 < iVar6) {
+
+          if (local_50 != iVar6) {
+
+            piVar4 = *(int **)(*(int *)(param_2 + 4) + 0x10);
+
+            if ((piVar4 != (int *)0x0) && (piVar5 = (int *)*piVar4, piVar5 != (int *)0x0)) {
+
+              piVar1 = piVar4 + 3;
+
+              *piVar1 = *piVar1 + -1;
+
+              if (*piVar1 < 0) {
+
+                iVar12 = FUN_0076d1b0("C:\\vog\\1_code\\palantir\\palantir\\graphics\\gfxDeviceIB.cpp"
+
+                                      ,0xca,
+
+                                      "Call to gfxDeviceIB::Unlock more times than locked! Bad mojo..."
+
+                                     );
+
+                if (iVar12 == 3) {
+
+                  _File = fopen("c:\\VOGCRASH.txt","w");
+
+                  if (_File != (FILE *)0x0) {
+
+                    pcVar20 = "Call to gfxDeviceIB::Unlock more times than locked! Bad mojo...";
+
+                    uVar19 = 0xca;
+
+                    pcVar18 = "C:\\vog\\1_code\\palantir\\palantir\\graphics\\gfxDeviceIB.cpp";
+
+LAB_00993517:
+
+                    fprintf(_File,"errReport::Massive failure EH_Abort: F:%s l:%d s:%d d:%s\n",
+
+                            pcVar18,uVar19,1,pcVar20);
+
+                    fclose(_File);
+
+                  }
+
+LAB_0099352d:
+
+                  raise(0x16);
+
+                    /* WARNING: Subroutine does not return */
+
+                  ExitProcess(3);
+
+                }
+
+                piVar4[3] = 0;
+
+              }
+
+              else {
+
+                (**(code **)(*piVar5 + 0x30))(piVar5);
+
+              }
+
+            }
+
+            FUN_0044b9c0(iVar6,8,0,0);
+
+            FUN_0044bad0(puVar9,0);
+
+          }
+
+          operator_delete__(puVar9);
+
+          if (local_18 == (void *)0x0) {
+
+            ExceptionList = local_c;
+
+            return 0;
+
+          }
+
+                    /* WARNING: Subroutine does not return */
+
+          operator_delete(local_18);
+
+        }
+
+      }
+
+      if (local_18 == (void *)0x0) {
+
+        ExceptionList = local_c;
+
+        return 1;
+
+      }
+
+                    /* WARNING: Subroutine does not return */
+
+      operator_delete(local_18);
+
+    }
+
+    piVar4 = *(int **)(*(int *)(iVar6 + 4 + uVar16 * 8) + 0x10);
+
+    if ((piVar4 == (int *)0x0) || (piVar5 = (int *)*piVar4, piVar5 == (int *)0x0)) {
+
+LAB_00993388:
+
+      uVar16 = uVar16 + 1;
+
+      goto LAB_00993320;
+
+    }
+
+    piVar1 = piVar4 + 4;
+
+    *piVar1 = *piVar1 + -1;
+
+    if (-1 < *piVar1) {
+
+      (**(code **)(*piVar5 + 0x30))(piVar5);
+
+      goto LAB_00993388;
+
+    }
+
+    iVar6 = FUN_0076d1b0("C:\\vog\\1_code\\palantir\\palantir\\graphics\\gfxDeviceVB.cpp",0xd3,
+
+                         "Call to gfxDeviceVB::Unlock more times than locked! Bad mojo...");
+
+    if (iVar6 == 3) {
+
+      _File = fopen("c:\\VOGCRASH.txt","w");
+
+      if (_File == (FILE *)0x0) goto LAB_0099352d;
+
+      pcVar20 = "Call to gfxDeviceVB::Unlock more times than locked! Bad mojo...";
+
+      uVar19 = 0xd3;
+
+      pcVar18 = "C:\\vog\\1_code\\palantir\\palantir\\graphics\\gfxDeviceVB.cpp";
+
+      goto LAB_00993517;
+
+    }
+
+    piVar4[4] = 0;
+
+    uVar16 = uVar16 + 1;
+
+  } while( true );
+
+}

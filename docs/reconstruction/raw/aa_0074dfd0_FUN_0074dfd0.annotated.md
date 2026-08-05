@@ -1,0 +1,73 @@
+# Annotated low-level: FUN_0074dfd0
+
+| Field | Value |
+|---|---|
+| Stable ID | `aa_0074dfd0` |
+| VA | `0x0074dfd0` |
+| System | unknown |
+| Date | 2026-07-23 |
+
+## Machine-level notes
+
+- Source: raw capture for `aa_0074dfd0`.
+- Prefer assembly when decompiler conflicts.
+- Recover types for still-generic parameters via callers/xrefs.
+- Map DAT_* globals and FUN_* callees in follow-up waves.
+
+## Pseudocode (annotated copy of raw)
+
+```c
+undefined4 FUN_0074dfd0(int param_1)
+
+{
+  int *piVar1;
+  code *pcVar2;
+  int *piVar3;
+  int iVar4;
+  int iVar5;
+  
+  if ((*(int *)(param_1 + 0x3c) != 0) && (*(char *)(*(int *)(param_1 + 0x3c) + 0xd0) != '\0')) {
+    iVar4 = 0;
+    if (0 < *DAT_00d1f62c) {
+      iVar5 = 0;
+      piVar3 = DAT_00d1f62c;
+      do {
+        if ((*(int *)(param_1 + 0x3c) == 0) || (*(int *)(*(int *)(param_1 + 0x3c) + 0xd8) != iVar4))
+        {
+          if (*(int *)(DAT_00d1f05c + 4) != 0) {
+            piVar1 = *(int **)(*(int *)(DAT_00d1f05c + 4) + 0xc);
+            (**(code **)(*piVar1 + 0x50))(piVar1,piVar3[iVar4 + 0x2d],&g_flZero,0xffffffff);
+            piVar3 = DAT_00d1f62c;
+          }
+          (&DAT_00d1a56c)[iVar4] = 0;
+          pcVar2 = *(code **)(iVar5 + 0x28 + (int)piVar3);
+          if (pcVar2 != (code *)0x0) {
+            (*pcVar2)(0);
+            piVar3 = DAT_00d1f62c;
+          }
+        }
+        else {
+          if (*(int *)(DAT_00d1f05c + 4) != 0) {
+            piVar1 = *(int **)(*(int *)(DAT_00d1f05c + 4) + 0xc);
+            (**(code **)(*piVar1 + 0x50))(piVar1,piVar3[iVar4 + 0x2d],&DAT_00aa0464,0xffffffff);
+            piVar3 = DAT_00d1f62c;
+          }
+          (&DAT_00d1a56c)[iVar4] = 1;
+        }
+        iVar4 = iVar4 + 1;
+        iVar5 = iVar5 + 0x2c;
+      } while (iVar4 < *piVar3);
+    }
+    (**(code **)(**(int **)(param_1 + 0x3c) + 0x3c))(0);
+    (**(code **)(**(int **)(param_1 + 0x3c) + 0x38))();
+    FUN_0073e480();
+    return 1;
+  }
+  return 0;
+}
+```
+
+## Open questions
+
+- Confirm calling convention and full signature against callers.
+- Recover meaningful types for still-generic parameters.

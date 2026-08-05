@@ -1,0 +1,47 @@
+# Raw capture: FUN_008aa4b0
+
+| Field | Value |
+|---|---|
+| **Stable ID** | `aa_008aa4b0` |
+| **Module** | `autoassault.exe` |
+| **Image base** | `0x400000` |
+| **VA** | `0x008aa4b0` |
+| **Canonical name** | `FUN_008aa4b0` |
+| **System** | unknown |
+| **Capture timestamp** | `2026-07-23` |
+| **Tool** | Ghidra MCP `batch_decompile` |
+| **Integrity** | Do not overwrite this raw body; append versioned sections only |
+
+---
+
+## Raw pseudocode (authoritative decompile)
+
+```c
+void FUN_008aa4b0(void)
+
+{
+  int *piVar1;
+  int iVar2;
+  int in_EAX;
+  undefined4 uVar3;
+  int unaff_ESI;
+  
+  piVar1 = *(int **)(unaff_ESI + 0x6d8);
+  *(int *)(unaff_ESI + 0x644) = in_EAX;
+  if (piVar1 != (int *)0x0) {
+    if (in_EAX == 0) {
+      (**(code **)(*piVar1 + 0x1d8))(&DAT_00a1419b,1,1);
+    }
+    else {
+      iVar2 = *piVar1;
+      uVar3 = (**(code **)(*(int *)(*(int *)(*(int *)(in_EAX + 4) + 4) + 4 + in_EAX) + 0x160))(1,1);
+      (**(code **)(iVar2 + 0x1d8))(uVar3);
+    }
+                    /* WARNING: Could not recover jumptable at 0x008aa508. Too many branches */
+                    /* WARNING: Treating indirect jump as call */
+    (**(code **)(**(int **)(unaff_ESI + 0x6d8) + 0x34c))();
+    return;
+  }
+  return;
+}
+```

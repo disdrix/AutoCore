@@ -1,0 +1,72 @@
+# Function record: CSoundManager_TickHardKillAndRegions_Inferred
+
+| Field | Value |
+|---|---|
+| **Stable ID** | `aa_007252d0` |
+| **Canonical name** | `CSoundManager_TickHardKillAndRegions_Inferred` |
+| **Ghidra name** | `FUN_007252d0` |
+| **Address** | `0x007252d0`–`0x0072589f` |
+| **Module** | `autoassault.exe` (image base `0x400000`) |
+| **System** | client audio / `CSoundManager` |
+| **Classification** | sound manager tick (hard-kill + region lists) |
+| **Completion status** | **Sealed** — dual A/B 2026-07-29 W18-F; ABI + gates + two-phase CF sealed |
+| **Bit-for-bit / runtime / diff** | Open (deferred / not run) |
+| **Dual verdict** | **accept-with-gaps** |
+
+## Purpose
+
+From **`UpdateSounds::updateSoundRegions`**, process deferred hard-kill timers on vector **`this+0x28c`** and optional region/proximity walk on **`this+0x29c`**.
+
+## Signature (sealed)
+
+```c
+// this in EBX (custom; parent leaves manager in EBX)
+// stack: int enableFlag, float dt
+// RET 8
+void CSoundManager_TickHardKillAndRegions_Inferred(int enableFlag, float dt);
+```
+
+| Param | Location | Meaning |
+|---|---|---|
+| `this` | **`EBX`** | `CSoundManager*` |
+| `enableFlag` | `[ebp+8]` | parent `param_2`; must be non-zero to enter |
+| `dt` | `[ebp+0xC]` | frame/slice dt; added to `this+0x284` |
+
+## Host fields touched
+
+| Offset | Role |
+|---|---|
+| `+0x220,+0x224,+0x228` | listener / ref position (XYZ) |
+| `+0x284` | hard-kill dt accumulator |
+| `+0x28c,+0x290` | hard-kill vector begin/end |
+| `+0x29c,+0x2a0` | region vector begin/end |
+| `+0x303` | flag: zero timer on in-range erase |
+| `+0x310` | list for `FUN_00480350` push |
+
+## Artifacts
+
+- Raw: `docs/reconstruction/raw/aa_007252d0_FUN_007252d0.md`
+- Annotated: `docs/reconstruction/raw/aa_007252d0_FUN_007252d0.annotated.md`
+- Clean: `docs/reconstruction/reconstructed-exact/CSoundManager_TickHardKillAndRegions_Inferred.cpp`
+- Scaffold alias: `docs/reconstruction/reconstructed-exact/FUN_007252d0.cpp`
+- Review A: `docs/reconstruction/reviews/A_aa_007252d0_CSoundManager_TickHardKillAndRegions_Inferred.md`
+- Review B: `docs/reconstruction/reviews/B_aa_007252d0_CSoundManager_TickHardKillAndRegions_Inferred.md`
+- Report: `docs/agents/task-dual-ab-007252d0-004ba310-w18f-report.md`
+
+## Callers / callees
+
+**Caller (1):** `Snd_UpdateSounds_UpdateSoundRegions` / `FUN_00727440` @ `0x00727440`.
+
+**Callees (16):** `FUN_004406e0`, `FUN_00480170`, `FUN_007249c0`, `strncpy`, `FUN_00480460`, `FUN_00722f20`, `FUN_00415d60`, `FUN_00480310`, `FUN_004933f0`, `FUN_00480200`, `FUN_007229f0`, `FUN_004bbbc0`, `FUN_00480350`, `FUN_00723440`, `CVOGReaction_RandomUnitScalar`, `FUN_00723b20`.
+
+**Xrefs:** 1.
+
+## Confidence
+
+| Claim | Level |
+|---|---|
+| CF two-phase hard-kill + regions | **High** |
+| EBX-this + RET 8 | **High** |
+| Feature gates DAT_00afa9b* | **High** |
+| Hard-kill constants 4.0f / ~1/65536 | **High** |
+| Product method name | **Tentative** (`_Inferred`) |

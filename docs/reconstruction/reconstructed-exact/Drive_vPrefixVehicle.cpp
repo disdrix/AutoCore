@@ -1,0 +1,907 @@
+// =============================================================================
+// Drive_vPrefixVehicle
+// -----------------------------------------------------------------------------
+// Stable ID: aa_007d15c0
+// Address:   0x007d15c0  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for Drive_vPrefixVehicle @ 0x007d15c0
+// Stable ID: aa_007d15c0
+// Embedded strings (evidence for future rename):
+//   - "//vPrefixVehicle/row"
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~432 non-empty decompiler lines.
+//  - Control keywords: if×16, return×5, do×2, while×2.
+//  - Notable callees: block×145, FUN_004231d0×49, FUN_0041a3e0×4, _com_issue_error×3, CONCAT31×2, CoTaskMemAlloc×2, FUN_00423170×2, wcscpy×2.
+//  - Strings: "//vPrefixVehicle/row".
+//  - Return sites: 5.
+
+/*
+ * Behavioral notes:
+ * Plate-driven rename evidence: "//vPrefixVehicle/row"
+ * Domain alias of FUN_007d15c0 (FUN_* retained)
+ *
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+/* WARNING: Removing unreachable block (ram,0x007d2ffc) */
+
+/* WARNING: Removing unreachable block (ram,0x007d238b) */
+
+/* WARNING: Removing unreachable block (ram,0x007d23a3) */
+
+/* WARNING: Removing unreachable block (ram,0x007d23b8) */
+
+/* WARNING: Removing unreachable block (ram,0x007d23be) */
+
+/* WARNING: Removing unreachable block (ram,0x007d23f8) */
+
+/* WARNING: Removing unreachable block (ram,0x007d240d) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2413) */
+
+/* WARNING: Removing unreachable block (ram,0x007d243b) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2450) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2456) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2480) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2495) */
+
+/* WARNING: Removing unreachable block (ram,0x007d249b) */
+
+/* WARNING: Removing unreachable block (ram,0x007d24c3) */
+
+/* WARNING: Removing unreachable block (ram,0x007d24d8) */
+
+/* WARNING: Removing unreachable block (ram,0x007d24de) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2508) */
+
+/* WARNING: Removing unreachable block (ram,0x007d251d) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2523) */
+
+/* WARNING: Removing unreachable block (ram,0x007d254b) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2560) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2566) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2590) */
+
+/* WARNING: Removing unreachable block (ram,0x007d25a5) */
+
+/* WARNING: Removing unreachable block (ram,0x007d25ab) */
+
+/* WARNING: Removing unreachable block (ram,0x007d25d3) */
+
+/* WARNING: Removing unreachable block (ram,0x007d25e8) */
+
+/* WARNING: Removing unreachable block (ram,0x007d25ee) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2618) */
+
+/* WARNING: Removing unreachable block (ram,0x007d262d) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2633) */
+
+/* WARNING: Removing unreachable block (ram,0x007d265d) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2672) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2678) */
+
+/* WARNING: Removing unreachable block (ram,0x007d26a2) */
+
+/* WARNING: Removing unreachable block (ram,0x007d26b7) */
+
+/* WARNING: Removing unreachable block (ram,0x007d26bd) */
+
+/* WARNING: Removing unreachable block (ram,0x007d26e7) */
+
+/* WARNING: Removing unreachable block (ram,0x007d26fc) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2702) */
+
+/* WARNING: Removing unreachable block (ram,0x007d272c) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2741) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2747) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2771) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2786) */
+
+/* WARNING: Removing unreachable block (ram,0x007d278c) */
+
+/* WARNING: Removing unreachable block (ram,0x007d27b6) */
+
+/* WARNING: Removing unreachable block (ram,0x007d27cb) */
+
+/* WARNING: Removing unreachable block (ram,0x007d27d1) */
+
+/* WARNING: Removing unreachable block (ram,0x007d27f9) */
+
+/* WARNING: Removing unreachable block (ram,0x007d280e) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2814) */
+
+/* WARNING: Removing unreachable block (ram,0x007d283e) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2853) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2859) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2883) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2898) */
+
+/* WARNING: Removing unreachable block (ram,0x007d289e) */
+
+/* WARNING: Removing unreachable block (ram,0x007d28c8) */
+
+/* WARNING: Removing unreachable block (ram,0x007d28dd) */
+
+/* WARNING: Removing unreachable block (ram,0x007d28e3) */
+
+/* WARNING: Removing unreachable block (ram,0x007d290d) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2922) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2928) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2952) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2967) */
+
+/* WARNING: Removing unreachable block (ram,0x007d296d) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2997) */
+
+/* WARNING: Removing unreachable block (ram,0x007d29ac) */
+
+/* WARNING: Removing unreachable block (ram,0x007d29b2) */
+
+/* WARNING: Removing unreachable block (ram,0x007d29db) */
+
+/* WARNING: Removing unreachable block (ram,0x007d29f0) */
+
+/* WARNING: Removing unreachable block (ram,0x007d29f6) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2a20) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2a35) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2a3b) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2a62) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2a77) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2a7d) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2aa4) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2ab9) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2abf) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2ae3) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2af8) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2afe) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2b23) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2b38) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2b3e) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2b63) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2b78) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2b7e) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2ba6) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2bbb) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2bc1) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2be6) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2bfb) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2c01) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2c29) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2c3e) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2c44) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2c6c) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2c81) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2c87) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2caf) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2cc4) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2cca) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2cf2) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2d07) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2d0d) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2d35) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2d4a) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2d50) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2d78) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2d8d) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2d93) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2dbb) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2dd0) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2dd6) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2dff) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2e14) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2e1a) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2e44) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2e59) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2e5f) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2e88) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2e9d) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2ea3) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2ecc) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2ee1) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2ee7) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2f10) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2f25) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2f2b) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2f54) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2f69) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2f6f) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2fa2) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2fb7) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2fbd) */
+
+/* WARNING: Removing unreachable block (ram,0x007d2fe7) */
+
+/* WARNING: Removing unreachable block (ram,0x007d3002) */
+
+/* WARNING: Removing unreachable block (ram,0x007d3021) */
+
+/* WARNING: Removing unreachable block (ram,0x007d3036) */
+
+/* WARNING: Removing unreachable block (ram,0x007d303c) */
+
+
+
+uint32_t /* width from decompiler */ __thiscall Drive_vPrefixVehicle(char *param_1,int *param_2,int *param_3)
+
+
+
+{
+
+  int *piVar1;
+
+  int iVar2;
+
+  LPVOID pvVar3;
+
+  int iVar4;
+
+  IUnknown *This;
+
+  ULONG UVar5;
+
+  int *unaff_EBX;
+
+  int *unaff_retaddr;
+
+  int *piVar6;
+
+  uint32_t /* width from decompiler */ local_1b0;
+
+  uint32_t /* width from decompiler */ local_1ac;
+
+  uint32_t /* width from decompiler */ *local_1a8;
+
+  uint32_t /* width from decompiler */ local_1a4;
+
+  int local_1a0;
+
+  uint32_t /* width from decompiler */ local_19c;
+
+  uint32_t /* width from decompiler */ *local_198;
+
+  uint32_t /* width from decompiler */ local_194;
+
+  uint32_t /* width from decompiler */ local_190;
+
+  uint32_t /* width from decompiler */ local_18c;
+
+  int *local_188;
+
+  IUnknown *local_184;
+
+  uint16_t local_180;
+
+  short local_17c;
+
+  short local_178;
+
+  int local_174;
+
+  uint32_t /* width from decompiler */ local_170;
+
+  uint16_t local_16c;
+
+  short local_168;
+
+  uint16_t local_164;
+
+  int local_160;
+
+  uint8_t *local_15c;
+
+  uint16_t local_158;
+
+  short local_154;
+
+  uint32_t /* width from decompiler */ local_150;
+
+  uint32_t /* width from decompiler */ local_14c;
+
+  uint32_t /* width from decompiler */ local_148;
+
+  uint32_t /* width from decompiler */ local_144;
+
+  uint32_t /* width from decompiler */ local_140;
+
+  uint32_t /* width from decompiler */ local_13c;
+
+  uint32_t /* width from decompiler */ local_138;
+
+  uint32_t /* width from decompiler */ local_134;
+
+  uint32_t /* width from decompiler */ local_130;
+
+  uint32_t /* width from decompiler */ local_12c;
+
+  uint32_t /* width from decompiler */ local_128;
+
+  uint32_t /* width from decompiler */ local_124;
+
+  uint32_t /* width from decompiler */ local_120;
+
+  uint32_t /* width from decompiler */ local_11c;
+
+  uint32_t /* width from decompiler */ local_118;
+
+  uint32_t /* width from decompiler */ local_114;
+
+  uint32_t /* width from decompiler */ local_110;
+
+  uint32_t /* width from decompiler */ local_10c;
+
+  uint32_t /* width from decompiler */ local_108;
+
+  uint32_t /* width from decompiler */ local_104;
+
+  uint32_t /* width from decompiler */ local_100;
+
+  uint32_t /* width from decompiler */ local_fc;
+
+  uint32_t /* width from decompiler */ local_f8;
+
+  uint32_t /* width from decompiler */ local_f4;
+
+  uint32_t /* width from decompiler */ local_f0;
+
+  uint32_t /* width from decompiler */ local_ec;
+
+  uint32_t /* width from decompiler */ local_e8;
+
+  uint32_t /* width from decompiler */ local_e4;
+
+  uint32_t /* width from decompiler */ local_e0;
+
+  uint32_t /* width from decompiler */ local_dc;
+
+  BSTR local_d8;
+
+  BSTR local_d4;
+
+  uint32_t /* width from decompiler */ local_d0;
+
+  uint32_t /* width from decompiler */ local_cc;
+
+  uint32_t /* width from decompiler */ local_c8;
+
+  uint32_t /* width from decompiler */ local_c4;
+
+  uint32_t /* width from decompiler */ local_c0;
+
+  uint32_t /* width from decompiler */ local_bc;
+
+  wchar_t local_b8 [34];
+
+  wchar_t local_74 [50];
+
+  void *pvStack_10;
+
+  void *local_c;
+
+  uint8_t *puStack_8;
+
+  uint32_t /* width from decompiler */ local_4;
+
+  
+
+  local_4 = 0xffffffff;
+
+  puStack_8 = &LAB_009ae997;
+
+  local_c = ExceptionList;
+
+  ExceptionList = &local_c;
+
+  *param_3 = 0;
+
+  *param_2 = 0;
+
+  if (*param_1 == '\0') {
+
+    ExceptionList = pvStack_10;
+
+    return 0x80004004;
+
+  }
+
+  if (DAT_00d1793c == '\0') {
+
+    local_198 = &local_1b0;
+
+    local_1b0 = 0;
+
+    local_1ac = 0;
+
+    local_1a8 = (uint32_t /* width from decompiler */ *)0x0;
+
+    local_1a4 = 0;
+
+    local_1a0 = 0;
+
+    local_19c = 0;
+
+    local_190 = 0;
+
+    local_194 = 0;
+
+    local_18c = 0;
+
+    local_188 = (int *)0x0;
+
+    local_4 = 0;
+
+    iVar2 = FUN_0041a810(local_198,param_1 + 0x28,0);
+
+    local_1a8 = &local_150;
+
+    if (((((iVar2 < 0) || (iVar2 = FUN_004231d0(), iVar2 < 0)) ||
+
+         (iVar2 = FUN_004231d0(), iVar2 < 0)) ||
+
+        ((((iVar2 = FUN_004231d0(), iVar2 < 0 || (iVar2 = FUN_004231d0(), iVar2 < 0)) ||
+
+          ((iVar2 = FUN_004231d0(), iVar2 < 0 ||
+
+           ((iVar2 = FUN_004231d0(), iVar2 < 0 || (iVar2 = FUN_004231d0(), iVar2 < 0)))))) ||
+
+         ((iVar2 = FUN_004231d0(), iVar2 < 0 ||
+
+          ((((iVar2 = FUN_004231d0(), iVar2 < 0 || (iVar2 = FUN_004231d0(), iVar2 < 0)) ||
+
+            (iVar2 = FUN_004231d0(), iVar2 < 0)) ||
+
+           ((iVar2 = FUN_004231d0(), iVar2 < 0 || (iVar2 = FUN_004231d0(), iVar2 < 0)))))))))) ||
+
+       (((iVar2 = FUN_004231d0(), iVar2 < 0 ||
+
+         ((iVar2 = FUN_004231d0(), iVar2 < 0 || (iVar2 = FUN_004231d0(), iVar2 < 0)))) ||
+
+        (((iVar2 = FUN_004231d0(), iVar2 < 0 ||
+
+          ((((iVar2 = FUN_004231d0(), iVar2 < 0 || (iVar2 = FUN_004231d0(), iVar2 < 0)) ||
+
+            (iVar2 = FUN_004231d0(), iVar2 < 0)) ||
+
+           (((iVar2 = FUN_004231d0(), iVar2 < 0 || (iVar2 = FUN_004231d0(), iVar2 < 0)) ||
+
+            ((iVar2 = FUN_004231d0(), iVar2 < 0 ||
+
+             ((iVar2 = FUN_004231d0(), iVar2 < 0 || (iVar2 = FUN_004231d0(), iVar2 < 0)))))))))) ||
+
+         (((iVar2 = FUN_004231d0(), iVar2 < 0 ||
+
+           ((((((iVar2 = FUN_004231d0(), iVar2 < 0 || (iVar2 = FUN_004231d0(), iVar2 < 0)) ||
+
+               (iVar2 = FUN_004231d0(), iVar2 < 0)) ||
+
+              (((iVar2 = FUN_004231d0(), iVar2 < 0 || (iVar2 = FUN_004231d0(), iVar2 < 0)) ||
+
+               ((iVar2 = FUN_004231d0(), iVar2 < 0 ||
+
+                ((iVar2 = FUN_004231d0(), iVar2 < 0 || (iVar2 = FUN_004231d0(), iVar2 < 0)))))))) ||
+
+             (iVar2 = FUN_004231d0(), iVar2 < 0)) ||
+
+            ((((((iVar2 = FUN_004231d0(), iVar2 < 0 || (iVar2 = FUN_004231d0(), iVar2 < 0)) ||
+
+                (iVar2 = FUN_004231d0(), iVar2 < 0)) ||
+
+               ((iVar2 = FUN_004231d0(), iVar2 < 0 || (iVar2 = FUN_004231d0(), iVar2 < 0)))) ||
+
+              (iVar2 = FUN_004231d0(), iVar2 < 0)) ||
+
+             ((iVar2 = FUN_004231d0(), iVar2 < 0 || (iVar2 = FUN_004231d0(), iVar2 < 0)))))))) ||
+
+          (((iVar2 = FUN_004231d0(), iVar2 < 0 ||
+
+            (((iVar2 = FUN_004231d0(), iVar2 < 0 || (iVar2 = FUN_004231d0(), iVar2 < 0)) ||
+
+             (iVar2 = FUN_004231d0(), iVar2 < 0)))) ||
+
+           (((iVar2 = FUN_004231d0(), iVar2 < 0 || (iVar2 = FUN_004231d0(), iVar2 < 0)) ||
+
+            (local_1a0 == 0)))))))))))) {
+
+      FUN_00423170();
+
+      FUN_007a4480();
+
+      local_4 = 0xffffffff;
+
+      FUN_0041a3e0();
+
+    }
+
+    else {
+
+      *param_3 = 0;
+
+      *param_2 = 0;
+
+      iVar2 = FUN_0041a9b0();
+
+      if (iVar2 == 0) {
+
+        if (local_154 < 1) {
+
+          local_4 = 0xffffffff;
+
+          FUN_0041a3e0();
+
+          ExceptionList = pvStack_10;
+
+          return 0;
+
+        }
+
+        *param_2 = (int)local_154;
+
+        pvVar3 = CoTaskMemAlloc(local_154 * 0x164);
+
+        *param_3 = (int)pvVar3;
+
+        if (pvVar3 == (LPVOID)0x0) {
+
+          local_4 = 0xffffffff;
+
+          FUN_0041a3e0();
+
+          ExceptionList = pvStack_10;
+
+          return 0x8007000e;
+
+        }
+
+        iVar2 = 0;
+
+        do {
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x108 + *param_3) = local_120;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x10c + *param_3) = local_cc;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x110 + *param_3) = local_c4;
+
+          *(BSTR *)(iVar2 + 0x114 + *param_3) = local_d8;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x118 + *param_3) = local_140;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x11c + *param_3) = local_f8;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x120 + *param_3) = local_138;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x124 + *param_3) = local_bc;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x128 + *param_3) = local_130;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 300 + *param_3) = local_f0;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x130 + *param_3) = local_128;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x134 + *param_3) = local_d0;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x138 + *param_3) = local_14c;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x13c + *param_3) = local_e8;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x140 + *param_3) = local_118;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x144 + *param_3) = local_c0;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x148 + *param_3) = local_110;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x14c + *param_3) = local_e0;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x150 + *param_3) = local_108;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x154 + *param_3) = local_c8;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x158 + *param_3) = local_100;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x15c + *param_3) = local_148;
+
+          *(uint16_t *)(iVar2 + 0x160 + *param_3) = local_16c;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x84 + *param_3) = local_144;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x10 + *param_3) = local_13c;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 8 + *param_3) = local_134;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + *param_3) = local_150;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x14 + *param_3) = local_12c;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x18 + *param_3) = local_124;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x88 + *param_3) = local_11c;
+
+          *(uint *)(iVar2 + 0xc + *param_3) = (uint)(local_17c == -1);
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x8c + *param_3) = local_114;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x90 + *param_3) = local_10c;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x94 + *param_3) = local_104;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x98 + *param_3) = local_fc;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0x9c + *param_3) = local_f4;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0xa0 + *param_3) = local_ec;
+
+          *(uint *)(iVar2 + 0xa4 + *param_3) = (uint)(local_178 == -1);
+
+          *(uint16_t *)(iVar2 + 0xa8 + *param_3) = local_158;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0xac + *param_3) = local_e4;
+
+          *(uint16_t *)(iVar2 + 0xb0 + *param_3) = local_164;
+
+          *(uint16_t *)(iVar2 + 0xb2 + *param_3) = (uint16_t)local_174;
+
+          *(uint16_t *)(iVar2 + 0xb4 + *param_3) = (uint16_t)local_160;
+
+          *(uint16_t *)(iVar2 + 0xb6 + *param_3) = local_180;
+
+          *(uint32_t /* width from decompiler */ *)(iVar2 + 0xbc + *param_3) = local_dc;
+
+          wcscpy((wchar_t *)(iVar2 + 0x1c + *param_3),local_74);
+
+          wcscpy((wchar_t *)(iVar2 + 0xc4 + *param_3),local_b8);
+
+          *(uint *)(iVar2 + 0xc0 + *param_3) = (uint)(local_168 == -1);
+
+          iVar4 = FUN_0041c000();
+
+          iVar2 = iVar2 + 0x164;
+
+        } while (iVar4 == 0);
+
+      }
+
+      if (local_1a0 != 0) {
+
+        FUN_00422de0();
+
+        FUN_0041bf70();
+
+      }
+
+      FUN_00423170();
+
+      local_4 = 0xffffffff;
+
+      FUN_0041a3e0();
+
+    }
+
+  }
+
+  else {
+
+    local_d4 = SysAllocString(L"//vPrefixVehicle/row");
+
+    if (local_d4 == (BSTR)0x0) {
+
+                    /* WARNING: Subroutine does not return */
+
+      FUN_004048e0();
+
+    }
+
+    local_15c = &stack0xfffffe34;
+
+    local_4 = 1;
+
+    FUN_00419ca0();
+
+    local_4._0_1_ = 2;
+
+    if (DAT_00d1e56c == 0) {
+
+      _com_issue_error(-0x7fffbffd);
+
+    }
+
+    local_4._0_1_ = 1;
+
+    FUN_00419ed0();
+
+    local_4 = CONCAT31(local_4._1_3_,4);
+
+    This = local_184;
+
+    if (local_184 == (IUnknown *)0x0) {
+
+      _com_issue_error(-0x7fffbffd);
+
+      This = local_184;
+
+    }
+
+    local_170 = 0;
+
+    UVar5 = (*This->lpVtbl[2].Release)(This);
+
+    if ((int)UVar5 < 0) {
+
+      _com_issue_errorex(UVar5,This,(_GUID *)&DAT_00a86118);
+
+    }
+
+    iVar2 = local_174;
+
+    *unaff_retaddr = local_174;
+
+    pvVar3 = CoTaskMemAlloc(local_174 * 0x164);
+
+    *param_3 = (int)pvVar3;
+
+    local_160 = 0;
+
+    piVar6 = unaff_EBX;
+
+    if (0 < iVar2) {
+
+      do {
+
+        iVar2 = local_160;
+
+        if (local_188 == (int *)0x0) {
+
+          _com_issue_error(-0x7fffbffd);
+
+        }
+
+        piVar1 = local_188;
+
+        if (piVar6 != (int *)0x0) {
+
+          (**(code **)(*piVar6 + 8))();
+
+        }
+
+        piVar6 = (int *)0x0;
+
+        (**(code **)(*piVar1 + 0x1c))();
+
+        unaff_EBX = (int *)0x0;
+
+        local_160 = iVar2 + 1;
+
+      } while (local_160 < local_174);
+
+    }
+
+    puStack_8._0_1_ = 3;
+
+    if (unaff_EBX != (int *)0x0) {
+
+      (**(code **)(*unaff_EBX + 8))();
+
+    }
+
+    puStack_8 = (uint8_t *)CONCAT31(puStack_8._1_3_,1);
+
+    if (local_188 != (int *)0x0) {
+
+      (**(code **)(*local_188 + 8))();
+
+    }
+
+    SysFreeString(local_d8);
+
+  }
+
+  ExceptionList = pvStack_10;
+
+  return 0;
+
+}

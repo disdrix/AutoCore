@@ -1,0 +1,1008 @@
+// =============================================================================
+// Named_vColorBiomek
+// -----------------------------------------------------------------------------
+// Stable ID: aa_007c9230
+// Address:   0x007c9230  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Scaffold unit for Named_vColorBiomek @ 0x007c9230
+// Stable ID: aa_007c9230
+// Embedded strings (evidence for future rename):
+//   - "//vColorBiomek/row"
+//   - "//vColorHuman/row"
+//   - "IDColor"
+//   - "intRGBColor"
+//   - "intWorth"
+//   - "//vColorMutant/row"
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~480 non-empty decompiler lines.
+//  - Control keywords: if×51, return×9, while×6, goto×4, do×3.
+//  - Notable callees: block×21, FUN_004231d0×9, _com_issue_error×9, CONCAT31×8, FUN_00415e90×6, FUN_0041a3e0×6, FUN_0041c000×6, FUN_00423170×6.
+//  - Strings: "//vColorBiomek/row"; "//vColorHuman/row"; "IDColor"; "intRGBColor".
+//  - Return sites: 9.
+
+/*
+ * Behavioral notes:
+ * Plate-driven rename evidence: "//vColorBiomek/row"
+ * Domain alias of FUN_007c9230 (FUN_* retained)
+ *
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+/* WARNING: Removing unreachable block (ram,0x007c9ed3) */
+
+/* WARNING: Removing unreachable block (ram,0x007c9eeb) */
+
+/* WARNING: Removing unreachable block (ram,0x007c9f00) */
+
+/* WARNING: Removing unreachable block (ram,0x007c9f06) */
+
+/* WARNING: Removing unreachable block (ram,0x007c9f28) */
+
+/* WARNING: Removing unreachable block (ram,0x007c9f3d) */
+
+/* WARNING: Removing unreachable block (ram,0x007c9f43) */
+
+/* WARNING: Removing unreachable block (ram,0x007c9f65) */
+
+/* WARNING: Removing unreachable block (ram,0x007c9af8) */
+
+/* WARNING: Removing unreachable block (ram,0x007c9a86) */
+
+/* WARNING: Removing unreachable block (ram,0x007c9aa2) */
+
+/* WARNING: Removing unreachable block (ram,0x007c9ab7) */
+
+/* WARNING: Removing unreachable block (ram,0x007c9abd) */
+
+/* WARNING: Removing unreachable block (ram,0x007c9ae3) */
+
+/* WARNING: Removing unreachable block (ram,0x007c9afe) */
+
+/* WARNING: Removing unreachable block (ram,0x007c9b24) */
+
+/* WARNING: Removing unreachable block (ram,0x007c9b39) */
+
+/* WARNING: Removing unreachable block (ram,0x007c9b3f) */
+
+/* WARNING: Removing unreachable block (ram,0x007c9f7a) */
+
+/* WARNING: Removing unreachable block (ram,0x007c9f80) */
+
+/* WARNING: Removing unreachable block (ram,0x007c9be6) */
+
+/* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+
+/* WARNING: Exceeded maximum restarts with more pending */
+
+
+
+void __thiscall Named_vColorBiomek(char *param_1,int param_2,int param_3,int param_4)
+
+
+
+{
+
+  uint32_t /* width from decompiler */ *puVar1;
+
+  void *pvVar2;
+
+  uint uVar3;
+
+  uint8_t *puVar4;
+
+  int *piVar5;
+
+  int iVar6;
+
+  int iVar7;
+
+  uint32_t /* width from decompiler */ *puVar8;
+
+  ULONG UVar9;
+
+  BSTR bstrString;
+
+  IUnknown *pIVar10;
+
+  BSTR pOVar11;
+
+  uint32_t /* width from decompiler */ uVar12;
+
+  IUnknown *unaff_EBX;
+
+  IUnknown *unaff_EBP;
+
+  IUnknown *unaff_ESI;
+
+  bool bVar13;
+
+  IUnknown *This;
+
+  IUnknown *local_c4;
+
+  IUnknown *local_c0;
+
+  void *local_bc;
+
+  BSTR local_b4;
+
+  uint8_t *local_a4 [2];
+
+  uint32_t /* width from decompiler */ local_9c;
+
+  uint32_t /* width from decompiler */ local_98;
+
+  uint32_t /* width from decompiler */ local_94;
+
+  uint32_t /* width from decompiler */ local_90;
+
+  uint8_t **local_8c;
+
+  uint32_t /* width from decompiler */ local_88;
+
+  int local_84;
+
+  uint32_t /* width from decompiler */ local_80;
+
+  uint32_t /* width from decompiler */ *local_7c;
+
+  uint32_t /* width from decompiler */ local_78;
+
+  uint32_t /* width from decompiler */ local_74;
+
+  uint32_t /* width from decompiler */ local_70;
+
+  uint32_t /* width from decompiler */ local_6c;
+
+  uint32_t /* width from decompiler */ local_68;
+
+  uint32_t /* width from decompiler */ local_64;
+
+  uint8_t **local_60;
+
+  uint32_t /* width from decompiler */ local_5c;
+
+  int local_58;
+
+  uint32_t /* width from decompiler */ local_54;
+
+  uint32_t /* width from decompiler */ *local_50;
+
+  uint32_t /* width from decompiler */ local_4c;
+
+  uint32_t /* width from decompiler */ local_48;
+
+  uint32_t /* width from decompiler */ local_44;
+
+  uint32_t /* width from decompiler */ local_40;
+
+  uint32_t /* width from decompiler */ local_3c;
+
+  uint32_t /* width from decompiler */ local_38;
+
+  uint8_t **local_34;
+
+  uint32_t /* width from decompiler */ local_30;
+
+  int local_2c;
+
+  uint32_t /* width from decompiler */ local_28;
+
+  uint32_t /* width from decompiler */ *local_24;
+
+  uint32_t /* width from decompiler */ local_20;
+
+  BSTR local_1c;
+
+  uint32_t /* width from decompiler */ local_18;
+
+  uint32_t /* width from decompiler */ local_14;
+
+  BSTR local_10;
+
+  void *pvStack_c;
+
+  uint8_t *puStack_8;
+
+  uint local_4;
+
+  
+
+  local_4 = 0xffffffff;
+
+  puStack_8 = &LAB_009ae5dc;
+
+  pvStack_c = ExceptionList;
+
+  ExceptionList = &pvStack_c;
+
+  piVar5 = (int *)FUN_004933f0();
+
+  local_4 = 0;
+
+  if (*param_1 == '\0') {
+
+    FUN_00415e90();
+
+                    /* WARNING: Subroutine does not return */
+
+    operator_delete(piVar5);
+
+  }
+
+  if (DAT_00d1793c == '\0') {
+
+    local_7c = &local_94;
+
+    local_94 = 0;
+
+    local_90 = 0;
+
+    local_8c = (uint8_t **)0x0;
+
+    local_88 = 0;
+
+    local_84 = 0;
+
+    local_80 = 0;
+
+    local_74 = 0;
+
+    local_78 = 0;
+
+    local_70 = 0;
+
+    local_6c = 0;
+
+    param_1 = param_1 + 0x28;
+
+    local_4 = 1;
+
+    iVar6 = FUN_0041a810(local_7c,param_1);
+
+    local_8c = local_a4;
+
+    if ((((iVar6 < 0) || (iVar6 = FUN_004231d0(), iVar6 < 0)) || (iVar6 = FUN_004231d0(), iVar6 < 0)
+
+        ) || ((iVar6 = FUN_004231d0(), iVar6 < 0 || (local_84 == 0)))) {
+
+      FUN_00423170();
+
+      local_bc = (void *)0x1;
+
+      FUN_007a4480();
+
+    }
+
+    else {
+
+      iVar6 = 0;
+
+      iVar7 = FUN_0041c000();
+
+      while (iVar7 == 0) {
+
+        puVar8 = operator_new(0xc);
+
+        *puVar8 = local_a4[0];
+
+        puVar8[1] = local_9c;
+
+        puVar8[2] = local_98;
+
+        iVar7 = FUN_006759b0();
+
+        FUN_0043fe60();
+
+        piVar5[1] = iVar7;
+
+        **(int **)(iVar7 + 4) = iVar7;
+
+        iVar6 = iVar6 + 1;
+
+        iVar7 = FUN_0041c000();
+
+      }
+
+      if (local_84 != 0) {
+
+        FUN_00422de0();
+
+        FUN_0041bf70();
+
+      }
+
+      FUN_00423170();
+
+      if (iVar6 != 0) {
+
+        FUN_0041b420();
+
+        puVar8 = *(uint32_t /* width from decompiler */ **)(param_2 + 4);
+
+        iVar7 = *piVar5;
+
+        if (0 < iVar6) {
+
+          puVar1 = *(uint32_t /* width from decompiler */ **)(iVar7 + 8);
+
+          *puVar8 = *puVar1;
+
+          puVar8[1] = puVar1[1];
+
+          puVar8[2] = puVar1[2];
+
+                    /* WARNING: Subroutine does not return */
+
+          operator_delete(*(void **)(iVar7 + 8));
+
+        }
+
+        FUN_00415e90();
+
+      }
+
+      local_50 = &local_68;
+
+      local_68 = 0;
+
+      local_64 = 0;
+
+      local_60 = (uint8_t **)0x0;
+
+      local_5c = 0;
+
+      local_58 = 0;
+
+      local_54 = 0;
+
+      local_48 = 0;
+
+      local_4c = 0;
+
+      local_44 = 0;
+
+      local_40 = 0;
+
+      local_4 = CONCAT31(local_4._1_3_,2);
+
+      iVar6 = FUN_0041a810(local_50,param_1);
+
+      local_60 = local_a4;
+
+      if (((iVar6 < 0) || (iVar6 = FUN_004231d0(), iVar6 < 0)) ||
+
+         ((iVar6 = FUN_004231d0(), iVar6 < 0 ||
+
+          ((iVar6 = FUN_004231d0(), iVar6 < 0 || (local_58 == 0)))))) {
+
+        FUN_00423170();
+
+        local_bc = (void *)0x1;
+
+        FUN_007a4480();
+
+      }
+
+      else {
+
+        iVar6 = 0;
+
+        iVar7 = FUN_0041c000();
+
+        while (iVar7 == 0) {
+
+          puVar8 = operator_new(0xc);
+
+          *puVar8 = local_a4[0];
+
+          puVar8[1] = local_9c;
+
+          puVar8[2] = local_98;
+
+          iVar7 = FUN_006759b0();
+
+          FUN_0043fe60();
+
+          piVar5[1] = iVar7;
+
+          **(int **)(iVar7 + 4) = iVar7;
+
+          iVar6 = iVar6 + 1;
+
+          iVar7 = FUN_0041c000();
+
+        }
+
+        if (local_58 != 0) {
+
+          FUN_00422de0();
+
+          FUN_0041bf70();
+
+        }
+
+        FUN_00423170();
+
+        if (iVar6 != 0) {
+
+          FUN_0041d230();
+
+          puVar8 = *(uint32_t /* width from decompiler */ **)(param_3 + 4);
+
+          iVar7 = *piVar5;
+
+          if (0 < iVar6) {
+
+            puVar1 = *(uint32_t /* width from decompiler */ **)(iVar7 + 8);
+
+            *puVar8 = *puVar1;
+
+            puVar8[1] = puVar1[1];
+
+            puVar8[2] = puVar1[2];
+
+                    /* WARNING: Subroutine does not return */
+
+            operator_delete(*(void **)(iVar7 + 8));
+
+          }
+
+          FUN_00415e90();
+
+        }
+
+        local_24 = &local_3c;
+
+        local_3c = 0;
+
+        local_38 = 0;
+
+        local_34 = (uint8_t **)0x0;
+
+        local_30 = 0;
+
+        local_2c = 0;
+
+        local_28 = 0;
+
+        local_1c = (BSTR)0x0;
+
+        local_20 = 0;
+
+        local_18 = 0;
+
+        local_14 = 0;
+
+        local_4 = CONCAT31(local_4._1_3_,3);
+
+        iVar6 = FUN_0041a810(local_24,param_1);
+
+        local_34 = local_a4;
+
+        if (((-1 < iVar6) && (iVar6 = FUN_004231d0(), -1 < iVar6)) &&
+
+           (iVar6 = FUN_004231d0(), -1 < iVar6)) {
+
+          local_bc = (void *)0x7c977f;
+
+          iVar6 = FUN_004231d0();
+
+          if ((-1 < iVar6) && (local_2c != 0)) {
+
+            iVar6 = 0;
+
+            iVar7 = FUN_0041c000();
+
+            while (iVar7 == 0) {
+
+              puVar8 = operator_new(0xc);
+
+              *puVar8 = local_a4[0];
+
+              puVar8[1] = local_9c;
+
+              puVar8[2] = local_98;
+
+              local_bc = (void *)0x7c984e;
+
+              iVar7 = FUN_006759b0();
+
+              FUN_0043fe60();
+
+              piVar5[1] = iVar7;
+
+              **(int **)(iVar7 + 4) = iVar7;
+
+              iVar6 = iVar6 + 1;
+
+              iVar7 = FUN_0041c000();
+
+            }
+
+            if (local_2c != 0) {
+
+              FUN_00422de0();
+
+              FUN_0041bf70();
+
+            }
+
+            FUN_00423170();
+
+            if (iVar6 != 0) {
+
+              local_bc = (void *)0x7c98ce;
+
+              FUN_0041d230();
+
+              puVar8 = *(uint32_t /* width from decompiler */ **)(param_4 + 4);
+
+              iVar7 = *piVar5;
+
+              if (0 < iVar6) {
+
+                puVar1 = *(uint32_t /* width from decompiler */ **)(iVar7 + 8);
+
+                *puVar8 = *puVar1;
+
+                puVar8[1] = puVar1[1];
+
+                puVar8[2] = puVar1[2];
+
+                    /* WARNING: Subroutine does not return */
+
+                operator_delete(*(void **)(iVar7 + 8));
+
+              }
+
+              FUN_00415e90();
+
+            }
+
+            local_4._0_1_ = 2;
+
+            FUN_0041a3e0();
+
+            local_4._0_1_ = 1;
+
+            FUN_0041a3e0();
+
+            local_4 = (uint)local_4._1_3_ << 8;
+
+            FUN_0041a3e0();
+
+            FUN_00415e90();
+
+            goto LAB_007ca009;
+
+          }
+
+        }
+
+        FUN_00423170();
+
+        local_bc = (void *)0x1;
+
+        FUN_007a4480();
+
+        local_4 = CONCAT31(local_4._1_3_,2);
+
+        FUN_0041a3e0();
+
+      }
+
+      local_4 = CONCAT31(local_4._1_3_,1);
+
+      FUN_0041a3e0();
+
+    }
+
+    local_4 = local_4 & 0xffffff00;
+
+    FUN_0041a3e0();
+
+    FUN_00415e90();
+
+  }
+
+  else {
+
+    local_10 = SysAllocString(L"//vColorBiomek/row");
+
+    if (local_10 == (BSTR)0x0) {
+
+                    /* WARNING: Subroutine does not return */
+
+      FUN_004048e0();
+
+    }
+
+    local_4._0_1_ = 4;
+
+    FUN_00419ca0();
+
+    local_4._0_1_ = 5;
+
+    if (DAT_00d1e56c == 0) {
+
+      _com_issue_error(-0x7fffbffd);
+
+    }
+
+    local_4._0_1_ = 4;
+
+    FUN_00419ed0();
+
+    local_c4 = (IUnknown *)0x0;
+
+    local_4 = CONCAT31(local_4._1_3_,7);
+
+    if (local_c0 == (IUnknown *)0x0) {
+
+      _com_issue_error(-0x7fffbffd);
+
+    }
+
+    UVar9 = (*local_c0->lpVtbl[2].Release)(local_c0);
+
+    if ((int)UVar9 < 0) {
+
+      _com_issue_errorex(UVar9,local_c0,(_GUID *)&DAT_00a86118);
+
+    }
+
+    FUN_0041d230();
+
+    iVar6 = 0;
+
+    if (0 < (int)local_c0) {
+
+      do {
+
+        _com_issue_error(-0x7fffbffd);
+
+        if (unaff_EBX != (IUnknown *)0x0) {
+
+          (*unaff_EBX->lpVtbl->Release)();
+
+        }
+
+        unaff_EBX = (IUnknown *)0x0;
+
+        (**(code **)((int)_DAT_00000000 + 0x1c))();
+
+        iVar6 = iVar6 + 1;
+
+      } while (iVar6 < (int)local_c0);
+
+    }
+
+    bstrString = SysAllocString(L"//vColorHuman/row");
+
+    if (bstrString == (BSTR)0x0) {
+
+                    /* WARNING: Subroutine does not return */
+
+      FUN_004048e0();
+
+    }
+
+    local_a4[0] = &stack0xffffff24;
+
+    puStack_8._0_1_ = 8;
+
+    FUN_00419ca0();
+
+    puStack_8._0_1_ = 9;
+
+    if (DAT_00d1e56c == 0) {
+
+      _com_issue_error(-0x7fffbffd);
+
+    }
+
+    puStack_8 = (uint8_t *)CONCAT31(puStack_8._1_3_,8);
+
+    puVar8 = (uint32_t /* width from decompiler */ *)FUN_00419ed0();
+
+    pIVar10 = (IUnknown *)*puVar8;
+
+    if ((pIVar10 != (IUnknown *)0x0) && (local_c4 = pIVar10, pIVar10 != (IUnknown *)0x0)) {
+
+      (*pIVar10->lpVtbl->AddRef)(pIVar10);
+
+    }
+
+    iVar6 = 0;
+
+    if (local_c0 != (IUnknown *)0x0) {
+
+      (*local_c0->lpVtbl->Release)();
+
+    }
+
+    if (local_c4 == (IUnknown *)0x0) {
+
+      _com_issue_error(-0x7fffbffd);
+
+    }
+
+    local_bc = (void *)0x0;
+
+    UVar9 = (*local_c4->lpVtbl[2].Release)(local_c4);
+
+    if ((int)UVar9 < 0) {
+
+      _com_issue_errorex(UVar9,local_c4,(_GUID *)&DAT_00a86118);
+
+    }
+
+    uVar3 = local_4;
+
+    FUN_0041d230();
+
+    if (0 < (int)local_c0) {
+
+      puVar8 = (uint32_t /* width from decompiler */ *)(*(int *)(uVar3 + 4) + 8);
+
+      pIVar10 = unaff_EBP;
+
+      do {
+
+        if (unaff_EBX == (IUnknown *)0x0) {
+
+          _com_issue_error(-0x7fffbffd);
+
+          pIVar10 = unaff_EBP;
+
+        }
+
+        if (pIVar10 != (IUnknown *)0x0) {
+
+          (*pIVar10->lpVtbl->Release)();
+
+        }
+
+        unaff_EBP = (IUnknown *)0x0;
+
+        (*unaff_EBX->lpVtbl[2].AddRef)();
+
+        if (unaff_EBX != (IUnknown *)0x0) {
+
+          local_a4[0] = &stack0xffffff24;
+
+          pOVar11 = SysAllocString(L"IDColor");
+
+          if (pOVar11 == (BSTR)0x0) goto LAB_007c9d8b;
+
+          local_a4[0] = &stack0xffffff20;
+
+          puVar4 = &stack0xffffff20;
+
+          if (unaff_EBX != (IUnknown *)0x0) {
+
+            (*unaff_EBX->lpVtbl->AddRef)();
+
+            puVar4 = local_a4[0];
+
+          }
+
+          local_a4[0] = puVar4;
+
+          uVar12 = FUN_007b8a60();
+
+          local_a4[0] = &stack0xffffff24;
+
+          puVar8[-2] = uVar12;
+
+          pOVar11 = SysAllocString(L"intRGBColor");
+
+          if (pOVar11 == (BSTR)0x0) goto LAB_007c9d8b;
+
+          local_a4[0] = &stack0xffffff20;
+
+          if (unaff_EBX != (IUnknown *)0x0) {
+
+            local_a4[0] = &stack0xffffff20;
+
+            (*unaff_EBX->lpVtbl->AddRef)();
+
+          }
+
+          uVar12 = FUN_007b8a60();
+
+          local_a4[0] = &stack0xffffff24;
+
+          puVar8[-1] = uVar12;
+
+          pOVar11 = SysAllocString(L"intWorth");
+
+          if (pOVar11 == (BSTR)0x0) goto LAB_007c9d8b;
+
+          local_a4[0] = &stack0xffffff20;
+
+          if (unaff_EBX != (IUnknown *)0x0) {
+
+            local_a4[0] = &stack0xffffff20;
+
+            (*unaff_EBX->lpVtbl->AddRef)();
+
+          }
+
+          uVar12 = FUN_007b8a60();
+
+          *puVar8 = uVar12;
+
+        }
+
+        iVar6 = iVar6 + 1;
+
+        puVar8 = puVar8 + 3;
+
+        pIVar10 = unaff_EBX;
+
+      } while (iVar6 < (int)local_c0);
+
+    }
+
+    pvVar2 = _DAT_00000000;
+
+    pOVar11 = SysAllocString(L"//vColorMutant/row");
+
+    if (pOVar11 == (BSTR)0x0) {
+
+LAB_007c9d8b:
+
+                    /* WARNING: Subroutine does not return */
+
+      FUN_004048e0();
+
+    }
+
+    pvStack_c._0_1_ = 10;
+
+    FUN_00419ca0();
+
+    pvStack_c._0_1_ = 0xb;
+
+    if (DAT_00d1e56c == 0) {
+
+      _com_issue_error(-0x7fffbffd);
+
+    }
+
+    pvStack_c = (void *)CONCAT31(pvStack_c._1_3_,10);
+
+    puVar8 = (uint32_t /* width from decompiler */ *)FUN_00419ed0();
+
+    pIVar10 = (IUnknown *)*puVar8;
+
+    This = unaff_EBX;
+
+    if (unaff_EBX != pIVar10) {
+
+      if (pIVar10 != (IUnknown *)0x0) {
+
+        (*pIVar10->lpVtbl->AddRef)(pIVar10);
+
+      }
+
+      This = pIVar10;
+
+      if (unaff_EBX != (IUnknown *)0x0) {
+
+        (*unaff_EBX->lpVtbl->Release)();
+
+      }
+
+    }
+
+    if (local_c4 != (IUnknown *)0x0) {
+
+      (*local_c4->lpVtbl->Release)(local_c4);
+
+    }
+
+    if (This == (IUnknown *)0x0) {
+
+      _com_issue_error(-0x7fffbffd);
+
+    }
+
+    UVar9 = (*This->lpVtbl[2].Release)(This);
+
+    if ((int)UVar9 < 0) {
+
+      _com_issue_errorex(UVar9,This,(_GUID *)&DAT_00a86118);
+
+    }
+
+    FUN_0041d230(0);
+
+    iVar6 = 0;
+
+    if (0 < (int)local_c4) {
+
+      do {
+
+        if (unaff_EBP == (IUnknown *)0x0) {
+
+          _com_issue_error(-0x7fffbffd);
+
+        }
+
+        if (unaff_ESI != (IUnknown *)0x0) {
+
+          (*unaff_ESI->lpVtbl->Release)();
+
+        }
+
+        unaff_ESI = (IUnknown *)0x0;
+
+        (*unaff_EBP->lpVtbl[2].AddRef)(unaff_EBP);
+
+        iVar6 = iVar6 + 1;
+
+      } while (iVar6 < (int)local_c4);
+
+    }
+
+    SysFreeString(bstrString);
+
+    SysFreeString(local_b4);
+
+    local_10._0_1_ = 6;
+
+    if (unaff_ESI != (IUnknown *)0x0) {
+
+      (*unaff_ESI->lpVtbl->Release)(unaff_ESI);
+
+    }
+
+    local_10 = (BSTR)CONCAT31(local_10._1_3_,4);
+
+    if (unaff_EBP != (IUnknown *)0x0) {
+
+      (*unaff_EBP->lpVtbl->Release)(unaff_EBP);
+
+    }
+
+    SysFreeString(local_1c);
+
+    bVar13 = _DAT_00000000 != (void *)0x0;
+
+    _DAT_00000000 = (void *)0x0;
+
+    uRam00000004 = 0;
+
+    if (bVar13) {
+
+                    /* WARNING: Subroutine does not return */
+
+      operator_delete(pvVar2);
+
+    }
+
+  }
+
+LAB_007ca009:
+
+                    /* WARNING: Subroutine does not return */
+
+  operator_delete(local_bc);
+
+}

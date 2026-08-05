@@ -1,0 +1,442 @@
+// READABILITY (auto CF):
+//  - Body size: ~203 non-empty decompiler lines.
+//  - Control keywords: if×18, return×6, for×2, switch×1, goto×1, do×1, while×1.
+//  - Notable callees: vog_LogMessage×8, FUN_0076cec0×7, d×3, FUN_00673da0×2, FUN_00673dc0×2, FUN_00680d90×2, FUN_0066eec0, FUN_0066f910.
+//  - Strings: "
+
+                     ,0x333,1,"; "Login failed: %s."; "Added player %d(%d)"; "Tell new player %d i am talking".
+//  - Return sites: 6.
+
+// =============================================================================
+// Named_ChatClientImpl_0066ff20
+// -----------------------------------------------------------------------------
+// Stable ID: aa_0066ff20
+// Address:   0x0066ff20  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+/*
+ * Behavioral notes:
+ * String-driven rename evidence: "ChatClientImpl"
+ *
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+uint32_t /* width from decompiler */ __thiscall Named_ChatClientImpl_0066ff20(int param_1,uint32_t /* width from decompiler */ param_2,uint32_t /* width from decompiler */ param_3,int param_4)
+
+
+
+{
+
+  uint32_t /* width from decompiler */ uVar1;
+
+  int iVar2;
+
+  uint32_t /* width from decompiler */ unaff_EDI;
+
+  float10 fVar3;
+
+  uint local_ac;
+
+  uint local_a8;
+
+  int local_a4;
+
+  float local_a0;
+
+  uint32_t /* width from decompiler */ local_9c;
+
+  byte local_96;
+
+  byte local_95;
+
+  uint32_t /* width from decompiler */ local_94;
+
+  uint32_t /* width from decompiler */ local_90;
+
+  uint32_t /* width from decompiler */ local_8c;
+
+  basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> local_88 [44];
+
+  uint8_t local_5c [4];
+
+  uint8_t auStack_58 [28];
+
+  float fStack_3c;
+
+  void *local_c;
+
+  uint8_t *puStack_8;
+
+  int local_4;
+
+  
+
+  local_4 = 0xffffffff;
+
+  puStack_8 = &LAB_009a8feb;
+
+  local_c = ExceptionList;
+
+  ExceptionList = &local_c;
+
+  FUN_0067a190(param_2,&local_95);
+
+  switch(local_95) {
+
+  case 0x14:
+
+    if (param_4 != 0) {
+
+      ExceptionList = local_c;
+
+      return 0;
+
+    }
+
+    FUN_0067a440(param_2,&local_a8,param_1 + 0x10,param_1 + 0xc,param_1 + 0x14,param_1 + 0x15,
+
+                 (byte *)(param_1 + 0x20),param_1 + 0x18,param_1 + 0x1c,&local_96,param_1 + 0x1d0);
+
+    *(uint *)(param_1 + 0x1c8) = (uint)local_96;
+
+    if ((local_a8 & 0xff) == 0) {
+
+      *(uint *)(param_1 + 0x70) = (uint)*(byte *)(param_1 + 0x20);
+
+      vog_LogMessage("C:\\vog\\1_code\\palantir\\core\\infrastruct\\Voice\\TalkClientLib\\ChatClientImpl.cpp"
+
+                     ,0x333,1,"Logged into voice chat server");
+
+      *(uint8_t *)(param_1 + 0x5a) = 1;
+
+      FUN_0066fcf0();
+
+    }
+
+    else {
+
+      uVar1 = FUN_0076cec0(&local_9c,"Login failed: %s.",(&PTR_s_Success_00af52bc)[local_a8 & 0xff])
+
+      ;
+
+      vog_LogMessage("C:\\vog\\1_code\\palantir\\core\\infrastruct\\Voice\\TalkClientLib\\ChatClientImpl.cpp"
+
+                     ,0x339,2,uVar1);
+
+      *(uint8_t *)(param_1 + 0x58) = 0;
+
+      *(uint8_t *)(param_1 + 0x5a) = 0;
+
+      (**(code **)(**(int **)(param_1 + 0x54) + 0x18))();
+
+      FUN_0066f910();
+
+    }
+
+    break;
+
+  case 0x15:
+
+    if ((*(int *)(param_1 + 0x30) != 0) && (*(char *)(*(int *)(param_1 + 0x30) + 0x14c) != '\0')) {
+
+      FUN_00680d90(&local_a8,1);
+
+      if ((*(int *)(param_1 + 0x1f8) == 0) ||
+
+         (*(char *)((local_a8 & 0xff) + *(int *)(param_1 + 0x1f8)) != '\x01')) {
+
+        FUN_00674980();
+
+      }
+
+    }
+
+    break;
+
+  case 0x16:
+
+    if (param_4 != 0) {
+
+      ExceptionList = local_c;
+
+      return 0;
+
+    }
+
+    std::basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>::
+
+    basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>(local_88);
+
+    local_4 = 0;
+
+    FUN_0067a8b0(param_2,&local_94,&local_a4,&local_ac,&local_a8,&local_a0,&local_90,local_88);
+
+    uVar1 = FUN_0076cec0(&local_9c,"Added player %d(%d)",local_a4,local_ac & 0xff);
+
+    vog_LogMessage("C:\\vog\\1_code\\palantir\\core\\infrastruct\\Voice\\TalkClientLib\\ChatClientImpl.cpp"
+
+                   ,0x3a3,1,uVar1);
+
+    if ((*(int *)(param_1 + 0x200) != 0) && (*(int *)(param_1 + 0x30) != 0)) {
+
+      FUN_00673e40();
+
+    }
+
+    (**(code **)(**(int **)(param_1 + 0x54) + 0x28))
+
+              (local_94,local_a4,local_ac,local_a0,local_90,local_88);
+
+    if ((char)local_a8 != '\0') {
+
+      FUN_00673da0();
+
+      (**(code **)(**(int **)(param_1 + 0x54) + 0x20))();
+
+    }
+
+    if ((((local_a0 != 0.0) && (*(int *)(param_1 + 0x1c8) == 4)) &&
+
+        ((char)local_ac != *(char *)(param_1 + 0xc))) &&
+
+       ((*(float *)(*(int *)(param_1 + 0x208) + (local_ac & 0xff) * 4) = local_a0,
+
+        *(char *)(param_1 + 0x184) != '\0' && (*(int *)(param_1 + 0x20c) != 0)))) {
+
+      FUN_00680c30();
+
+      local_4._0_1_ = 1;
+
+      FUN_0067b070();
+
+      local_4._0_1_ = 2;
+
+      FUN_0067aad0(auStack_58,*(uint8_t *)(param_1 + 0xc));
+
+      FUN_0067b180(local_a0,0x2289);
+
+      uVar1 = FUN_0076cec0(&local_9c,"Tell new player %d i am talking",local_ac & 0xff);
+
+      vog_LogMessage("C:\\vog\\1_code\\palantir\\core\\infrastruct\\Voice\\TalkClientLib\\ChatClientImpl.cpp"
+
+                     ,0x3c1,1,uVar1);
+
+      FUN_006714d0();
+
+      local_4._0_1_ = 3;
+
+      fVar3 = (float10)FUN_0076c330();
+
+      fStack_3c = (float)(fVar3 + (float10)g_flOne);
+
+      FUN_0067b120();
+
+      FUN_00680fd0();
+
+      FUN_00671910();
+
+      local_4._0_1_ = 2;
+
+      FUN_00671520();
+
+      local_4._0_1_ = 1;
+
+      FUN_0067b110();
+
+      local_4 = (uint)local_4._1_3_ << 8;
+
+      FUN_00680c50();
+
+    }
+
+    goto LAB_006703f4;
+
+  case 0x17:
+
+    if (param_4 != 0) {
+
+      ExceptionList = local_c;
+
+      return 0;
+
+    }
+
+    FUN_0067a9c0(param_2,&local_94,&local_a4,&local_ac);
+
+    uVar1 = FUN_0076cec0(&local_9c,"Removed player %d(%d)",local_a4,local_ac & 0xff);
+
+    vog_LogMessage("C:\\vog\\1_code\\palantir\\core\\infrastruct\\Voice\\TalkClientLib\\ChatClientImpl.cpp"
+
+                   ,0x3d8,1,uVar1);
+
+    FUN_00673dc0();
+
+    if ((*(int *)(param_1 + 0x200) != 0) && (*(int *)(param_1 + 0x30) != 0)) {
+
+      FUN_00673e60();
+
+    }
+
+    (**(code **)(**(int **)(param_1 + 0x54) + 0x2c))(local_94,local_a4,local_ac);
+
+    (**(code **)(**(int **)(param_1 + 0x54) + 0x24))(unaff_EDI,0);
+
+    if (*(int *)(param_1 + 0x1c8) == 4) {
+
+      *(uint32_t /* width from decompiler */ *)(*(int *)(param_1 + 0x208) + (local_ac & 0xff) * 4) = 0;
+
+    }
+
+    break;
+
+  case 0x18:
+
+    FUN_0067aa80(param_2,&local_ac,&local_a0,&local_a8);
+
+    uVar1 = FUN_0076cec0(&local_9c,"Received Stop msg for %d (%f seconds talkTime)",local_ac & 0xff,
+
+                         (double)local_a0);
+
+    vog_LogMessage("C:\\vog\\1_code\\palantir\\core\\infrastruct\\Voice\\TalkClientLib\\ChatClientImpl.cpp"
+
+                   ,0x382,1,uVar1);
+
+    FUN_00673dc0();
+
+    if (((char)local_ac == *(char *)(param_1 + 0xc)) &&
+
+       ((short)local_a8 == *(short *)(param_1 + 0x204))) {
+
+      FUN_0066eec0();
+
+    }
+
+    (**(code **)(**(int **)(param_1 + 0x54) + 0x24))(local_ac,local_a0);
+
+    break;
+
+  case 0x19:
+
+    FUN_0067ab10(param_2,&local_ac);
+
+    uVar1 = FUN_0076cec0(&local_9c,"Received Start msg for %d",local_ac & 0xff);
+
+    vog_LogMessage("C:\\vog\\1_code\\palantir\\core\\infrastruct\\Voice\\TalkClientLib\\ChatClientImpl.cpp"
+
+                   ,0x369,1,uVar1);
+
+    if ((char)local_ac != *(char *)(param_1 + 0xc)) {
+
+      if ((*(int *)(param_1 + 0x1f8) != 0) &&
+
+         (*(char *)((local_ac & 0xff) + *(int *)(param_1 + 0x1f8)) == '\x01')) {
+
+        ExceptionList = local_c;
+
+        return 1;
+
+      }
+
+      FUN_00673da0();
+
+    }
+
+    (**(code **)(**(int **)(param_1 + 0x54) + 0x20))();
+
+    break;
+
+  case 0x1a:
+
+    break;
+
+  case 0x1b:
+
+    if ((*(int *)(param_1 + 0x30) != 0) && (*(char *)(*(int *)(param_1 + 0x30) + 0x14c) != '\0')) {
+
+      FUN_00680d90(&local_a8,1);
+
+      if ((*(int *)(param_1 + 0x1f8) == 0) ||
+
+         (*(char *)((local_a8 & 0xff) + *(int *)(param_1 + 0x1f8)) != '\x01')) {
+
+        FUN_00674990();
+
+      }
+
+    }
+
+    break;
+
+  case 0x1c:
+
+    if (param_4 != 0) {
+
+      ExceptionList = local_c;
+
+      return 0;
+
+    }
+
+    FUN_0067abd0(param_2,&local_a4);
+
+    std::basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>::
+
+    basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>(local_88);
+
+    iVar2 = 0;
+
+    local_4 = 4;
+
+    if (local_a4 != 0) {
+
+      do {
+
+        FUN_0067aca0(param_2,&local_9c,&local_8c,&local_a8,&local_ac,&local_a0,&local_90,&local_94,
+
+                     local_88);
+
+        (**(code **)(**(int **)(param_1 + 0x54) + 0x30))
+
+                  (local_9c,local_8c,local_a8,local_ac,local_a0,local_90);
+
+        iVar2 = iVar2 + 1;
+
+      } while (iVar2 != local_a4);
+
+    }
+
+LAB_006703f4:
+
+    local_4 = 0xffffffff;
+
+    std::basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>::
+
+    ~basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>(local_88);
+
+    break;
+
+  default:
+
+    uVar1 = FUN_0076cec0(local_5c,"Uknown packet type: %d",local_95);
+
+    vog_LogMessage("C:\\vog\\1_code\\palantir\\core\\infrastruct\\Voice\\TalkClientLib\\ChatClientImpl.cpp"
+
+                   ,0x40a,2,uVar1);
+
+  }
+
+  ExceptionList = local_c;
+
+  return 1;
+
+}

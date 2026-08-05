@@ -1,0 +1,364 @@
+// =============================================================================
+// Named_CalleeOf_CVOGSpawnPoint_CreateTemplateVehicle_00563ab0
+// -----------------------------------------------------------------------------
+// Stable ID: aa_00563ab0
+// Callee of CVOGSpawnPoint_CreateTemplateVehicle
+// Address:   0x00563ab0  (autoassault.exe, image base 0x400000)
+// System:    unknown
+// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// =============================================================================
+
+// PURPOSE (auto): Called from CVOGSpawnPoint_CreateTemplateVehicle: spawn/transfer helper. Evidence string: "allocatenewobjectfromcbid failed %d". Supports parent flow (not a free-standing entry point).
+// Embedded strings (evidence):
+//   - "allocatenewobjectfromcbid failed %d"
+//   - "allocatenewobjectfromcbid failed %d %d"
+//   - "Elite %s"
+//   - "generic_elite"
+// Readability: control flow preserved from Ghidra decompile; types tentative.
+
+// READABILITY (auto CF):
+//  - Body size: ~160 non-empty decompiler lines.
+//  - Control keywords: if×14, return×3, goto×1.
+//  - Notable callees: FUN_00512160×3, CVOGReaction_GiveItemByCbid×2, FUN_004c3700×2, FUN_004cf320×2, FUN_007a4480×2, CVOGHBList_Enqueue, FUN_004024d0, FUN_004c49d0.
+//  - Strings: "allocatenewobjectfromcbid failed %d"; "allocatenewobjectfromcbid failed %d %d"; "Elite %s"; "generic_elite".
+//  - Return sites: 3.
+
+/*
+ * Behavioral notes:
+ * Callee of CVOGSpawnPoint_CreateTemplateVehicle
+ * Xref/callee-driven rename (parent seed scan)
+ *
+ * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
+ * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
+ * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ *
+ * Readability pass:
+ * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
+ * - Control flow and call order preserved from authoritative raw.
+ */
+
+int Named_CalleeOf_CVOGSpawnPoint_CreateTemplateVehicle_00563ab0(int param_1,int param_2,int param_3,int param_4,int param_5)
+
+
+
+{
+
+  float fVar1;
+
+  uint uVar2;
+
+  int iVar3;
+
+  char cVar4;
+
+  int *piVar5;
+
+  int iVar6;
+
+  uint32_t /* width from decompiler */ uVar7;
+
+  void *pvVar8;
+
+  CVOGHBBase *pAction;
+
+  float10 fVar9;
+
+  int unaff_retaddr;
+
+  uint8_t *puVar10;
+
+  uint8_t auStack_a8 [56];
+
+  char acStack_70 [100];
+
+  void *local_c;
+
+  uint8_t *puStack_8;
+
+  uint32_t /* width from decompiler */ uStack_4;
+
+  
+
+  uStack_4 = 0xffffffff;
+
+  puStack_8 = &LAB_009a4ad3;
+
+  local_c = ExceptionList;
+
+  if (*(char *)(param_3 + 0x7e) == '\0') {
+
+    return 0;
+
+  }
+
+  ExceptionList = &local_c;
+
+  if (param_4 == 0) {
+
+    ExceptionList = &local_c;
+
+    piVar5 = (int *)CVOGReaction_GiveItemByCbid(param_1);
+
+    param_4 = (**(code **)(*piVar5 + 0x1d4))();
+
+    if (param_4 != 0) {
+
+      (**(code **)(*(int *)(*(int *)(*(int *)(param_4 + 4) + 4) + 4 + param_4) + 8))
+
+                (param_1,param_3,1);
+
+      uVar2 = *(uint *)(param_3 + 0xe6d8);
+
+      iVar6 = *(int *)(param_3 + 0xe6dc);
+
+      *(uint *)(param_3 + 0xe6dc) = iVar6 + (uint)(0xfffffffe < uVar2);
+
+      *(uint *)(param_3 + 0xe6d8) = uVar2 + 1;
+
+      FUN_00512160(uVar2,iVar6,0);
+
+      piVar5 = (int *)CVOGReaction_GiveItemByCbid
+
+                                (*(int *)(*(int *)(*(int *)(*(int *)(*(int *)(param_4 + 4) + 4) +
+
+                                                            0xac + param_4) + 0x3c) + 0x6f4));
+
+      iVar6 = (**(code **)(*piVar5 + 0x1f0))();
+
+      if (iVar6 != 0) {
+
+        (**(code **)(*(int *)(*(int *)(*(int *)(iVar6 + 4) + 4) + 4 + iVar6) + 8))
+
+                  (*(uint32_t /* width from decompiler */ *)
+
+                    (*(int *)(*(int *)(*(int *)(*(int *)(param_4 + 4) + 4) + 0xac + param_4) + 0x3c)
+
+                    + 0x6f4),param_3,1);
+
+        uVar2 = *(uint *)(param_3 + 0xe6d8);
+
+        iVar3 = *(int *)(param_3 + 0xe6dc);
+
+        *(uint *)(param_3 + 0xe6dc) = iVar3 + (uint)(0xfffffffe < uVar2);
+
+        *(uint *)(param_3 + 0xe6d8) = uVar2 + 1;
+
+        FUN_00512160(uVar2,iVar3,0);
+
+        *(uint8_t *)(iVar6 + 0xcc) = 1;
+
+        Vehicle_SetWheelset(iVar6);
+
+        goto LAB_00563c15;
+
+      }
+
+      param_1 = *(int *)(*(int *)(*(int *)(*(int *)(*(int *)(param_4 + 4) + 4) + 0xac + param_4) +
+
+                                 0x3c) + 0x6f4);
+
+    }
+
+    FUN_007a4480(0,"allocatenewobjectfromcbid failed %d",param_1);
+
+    param_4 = 0;
+
+  }
+
+  else {
+
+LAB_00563c15:
+
+    *(uint8_t *)(param_4 + 0x114) = 0;
+
+    if (param_5 == 0) {
+
+      piVar5 = (int *)CVOGReaction_GiveItemByCbid
+
+                                (*(int *)(*(int *)(*(int *)(*(int *)(*(int *)(param_4 + 4) + 4) +
+
+                                                            0xac + param_4) + 0x3c) + 0x6f8));
+
+      param_5 = (**(code **)(*piVar5 + 0x1d8))();
+
+      if (param_5 == 0) {
+
+        piVar5 = (int *)CVOGReaction_GiveItemByCbid(0x1a9);
+
+        (**(code **)(*piVar5 + 0x1d8))();
+
+        FUN_007a4480(0,"allocatenewobjectfromcbid failed %d %d",
+
+                     *(uint32_t /* width from decompiler */ *)
+
+                      (*(int *)(*(int *)(*(int *)(*(int *)(param_4 + 4) + 4) + 0xac + param_4) +
+
+                               0x3c) + 0x6f8),0x1a9);
+
+        ExceptionList = local_c;
+
+        return 0;
+
+      }
+
+      (**(code **)(*(int *)(*(int *)(*(int *)(param_5 + 4) + 4) + 4 + param_5) + 8))
+
+                (*(uint32_t /* width from decompiler */ *)
+
+                  (*(int *)(*(int *)(*(int *)(*(int *)(param_4 + 4) + 4) + 0xac + param_4) + 0x3c) +
+
+                  0x6f8),param_3,1);
+
+      uVar2 = *(uint *)(param_3 + 0xe6d8);
+
+      iVar6 = *(int *)(param_3 + 0xe6dc);
+
+      *(uint *)(param_3 + 0xe6dc) = iVar6 + (uint)(0xfffffffe < uVar2);
+
+      *(uint *)(param_3 + 0xe6d8) = uVar2 + 1;
+
+      FUN_00512160(uVar2,iVar6,0);
+
+      (**(code **)(*(int *)(*(int *)(*(int *)(param_4 + 4) + 4) + 4 + param_4) + 0x158))
+
+                (*(int *)(*(int *)(param_5 + 4) + 4) + 4 + param_5);
+
+      FUN_004c49d0(param_4);
+
+    }
+
+    FUN_004024d0(*(int *)(*(int *)(param_5 + 4) + 4) + 4 + param_5);
+
+    if (param_2 != 0) {
+
+      iVar6 = (**(code **)(*(int *)(*(int *)(*(int *)(param_5 + 4) + 4) + 4 + param_5) + 0x27c))();
+
+      param_2 = iVar6 + param_2;
+
+      if (param_2 < 1) {
+
+        param_2 = 1;
+
+      }
+
+      param_2 = param_2 - iVar6;
+
+      if (param_2 != 0) {
+
+        puVar10 = auStack_a8;
+
+        FUN_004cf320(param_2,puVar10);
+
+        cVar4 = FUN_005685e0(param_2,puVar10);
+
+        if (cVar4 == '\0') {
+
+          fVar9 = (float10)_CIpow();
+
+          (**(code **)(*(int *)(*(int *)(*(int *)(param_4 + 4) + 4) + 4 + param_4) + 0x29c))
+
+                    ((float)(fVar9 - (float10)g_flOne));
+
+          iVar6 = *(int *)(*(int *)(*(int *)(param_4 + 4) + 4) + 4 + param_4);
+
+          uVar7 = (**(code **)(*(int *)(*(int *)(*(int *)(param_4 + 4) + 4) + 4 + param_4) + 0x244))
+
+                            ();
+
+          (**(code **)(iVar6 + 0x240))(uVar7);
+
+          if (unaff_retaddr < 100) {
+
+            iVar6 = (**(code **)(*(int *)(*(int *)(*(int *)(param_5 + 4) + 4) + 4 + param_5) + 0x27c
+
+                                ))();
+
+            FUN_004c3700(iVar6 + unaff_retaddr);
+
+          }
+
+          else {
+
+            *(uint8_t *)(param_5 + 0x30b) = 1;
+
+            iVar6 = (**(code **)(*(int *)(*(int *)(*(int *)(param_5 + 4) + 4) + 4 + param_5) + 0x27c
+
+                                ))();
+
+            FUN_004c3700(iVar6 + -100 + unaff_retaddr);
+
+            uVar7 = (**(code **)(*(int *)(*(int *)(*(int *)(param_5 + 4) + 4) + 4 + param_5) + 0x15c
+
+                                ))();
+
+            sprintf(acStack_70,"Elite %s",uVar7);
+
+            FUN_00516720(acStack_70);
+
+          }
+
+        }
+
+        else {
+
+          puVar10 = auStack_a8;
+
+          iVar6 = param_5;
+
+          FUN_004cf320(puVar10,param_5);
+
+          FUN_00568250(puVar10,iVar6);
+
+        }
+
+      }
+
+    }
+
+    iVar6 = (**(code **)(*(int *)(*(int *)(*(int *)(param_5 + 4) + 4) + 4 + param_5) + 0x27c))();
+
+    if (iVar6 < 6) {
+
+      fVar1 = *(float *)(param_4 + 0x10c);
+
+      iVar6 = (**(code **)(*(int *)(*(int *)(*(int *)(param_5 + 4) + 4) + 4 + param_5) + 0x27c))();
+
+      *(float *)(param_4 + 0x10c) = ((float)iVar6 * DAT_00a10e78 + DAT_00a0f728) * fVar1;
+
+    }
+
+    if ((*(char *)(param_5 + 0x30b) != '\0') &&
+
+       (pvVar8 = NDSpecialFX_LoadFromScriptName("generic_elite",-1,0), pvVar8 != (void *)0x0)) {
+
+      (**(code **)(*(int *)(*(int *)(*(int *)(param_5 + 4) + 4) + 4 + param_5) + 0xf8))(pvVar8,1,0);
+
+    }
+
+    pvVar8 = operator_new(0x28);
+
+    pAction = (CVOGHBBase *)0x0;
+
+    uStack_4 = 0;
+
+    if (pvVar8 != (void *)0x0) {
+
+      pAction = (CVOGHBBase *)Vehicle_CreateWeaponTrackAction(param_4);
+
+    }
+
+    uStack_4 = 0xffffffff;
+
+    CVOGHBList_Enqueue(*(void **)(param_3 + 0xe4ec),pAction);
+
+    FUN_005081d0();
+
+  }
+
+  ExceptionList = local_c;
+
+  return param_4;
+
+}
