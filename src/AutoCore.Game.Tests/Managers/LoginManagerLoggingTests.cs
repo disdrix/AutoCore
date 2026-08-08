@@ -78,6 +78,52 @@ public class LoginManagerLoggingTests
     }
 
     [TestMethod]
+    public void ExpectLoginToGlobal_Replace_EmitsLoginTicketReplaced()
+    {
+        Assert.IsTrue(_login.ExpectLoginToGlobal(15, "user15", 1));
+        _sink.Clear();
+
+        Assert.IsTrue(_login.ExpectLoginToGlobal(15, "user15", 2));
+
+        var record = _sink.Single("LoginTicketReplaced");
+        Assert.AreEqual(15u, record.GetProperty("AccountId"));
+        Assert.AreEqual("user15", record.GetProperty("Username"));
+        Assert.IsNull(record.GetProperty("AuthKey"));
+        Assert.IsFalse(_sink.Records.Any(r => r.EventName == "LoginTicketIssued"),
+            "Replacement must not also emit a fresh Issued event.");
+    }
+
+    [TestMethod]
+    public void LoginToGlobal_Supersede_EmitsGameSessionSuperseded()
+    {
+        _login.DisconnectSession = (_, _) => { };
+
+        Assert.IsTrue(_login.ExpectLoginToGlobal(16, "user16", 10));
+        var older = CreateClient();
+        Assert.IsTrue(_login.LoginToGlobal(older, new LoginRequestPacket
+        {
+            UserId = 16,
+            Username = "user16",
+            AuthKey = 10
+        }));
+        _sink.Clear();
+
+        Assert.IsTrue(_login.ExpectLoginToGlobal(16, "user16", 11));
+        var newer = CreateClient();
+        Assert.IsTrue(_login.LoginToGlobal(newer, new LoginRequestPacket
+        {
+            UserId = 16,
+            Username = "user16",
+            AuthKey = 11
+        }));
+
+        var record = _sink.Single("GameSessionSuperseded");
+        Assert.AreEqual(16u, record.GetProperty("AccountId"));
+        Assert.AreEqual(older.SessionId, record.GetProperty("OldSessionId"));
+        Assert.AreEqual(newer.SessionId, record.GetProperty("NewSessionId"));
+    }
+
+    [TestMethod]
     public void LoginToGlobal_Success_EmitsGlobalLoginSucceeded_WithSessionId()
     {
         Assert.IsTrue(_login.ExpectLoginToGlobal(6, "user6", 42));

@@ -100,6 +100,10 @@ public partial class AuthClient
             Account = account;
         }
 
+        // Single-session: a second Auth login wins; older Auth TCP sessions are kicked now.
+        // Game-side TNL sessions are superseded separately in LoginManager on Global/Sector login.
+        Server.KickOtherSessions(Account!.Id, this);
+
         State = ClientState.LoggedIn;
 
         GameLog.Info("AuthLoginSucceeded",

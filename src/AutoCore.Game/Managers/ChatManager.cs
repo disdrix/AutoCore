@@ -7,6 +7,8 @@ using AutoCore.Game.Combat;
 using AutoCore.Game.Constants;
 using AutoCore.Game.Entities;
 using AutoCore.Game.Inventory;
+using AutoCore.Game.Map;
+using AutoCore.Game.Packets;
 using AutoCore.Game.Packets.Global;
 using AutoCore.Game.Packets.Sector;
 using AutoCore.Game.Structures;
@@ -17,6 +19,20 @@ using AutoCore.Utils.Memory;
 
 public class ChatManager : Singleton<ChatManager>
 {
+    /// <summary>Client chat body cap (mirror of send helper ~1000). Longer messages are dropped.</summary>
+    internal const int MaxChatMessageBytes = 1000;
+
+    private static readonly Func<IEnumerable<Character>> DefaultListOnline =
+        static () => ObjectManager.Instance.GetOnlineCharacters();
+
+    /// <summary>Process-local online characters for Global fan-out. Tests inject a fixed list.</summary>
+    internal Func<IEnumerable<Character>> ListOnlineForTests { get; set; } = DefaultListOnline;
+
+    internal void ResetRoutingForTests()
+    {
+        ListOnlineForTests = DefaultListOnline;
+    }
+
     /// <summary>
     /// Delivers a private message to <paramref name="target"/> when online.
     /// Returns false when the target is missing or has no <see cref="Character.OwningConnection"/> (SS-04).
@@ -31,12 +47,67 @@ public class ChatManager : Singleton<ChatManager>
         return true;
     }
 
+    /// <summary>
+    /// Fan-out <paramref name="packet"/> to every online character with a live owning connection (SS-04).
+    /// Returns the number of successful deliveries. Per-recipient failures are isolated.
+    /// </summary>
+    public int DeliverToOnline(BasePacket packet, Character exclude = null)
+    {
+        if (packet == null)
+            return 0;
+
+        var online = ListOnlineForTests?.Invoke() ?? Array.Empty<Character>();
+        return DeliverToCharacters(online, packet, exclude);
+    }
+
+    /// <summary>
+    /// Fan-out <paramref name="packet"/> to characters on the same <see cref="SectorMap"/> instance
+    /// (reference equality — respects starting-area instancing). SS-04 null OwningConnection skipped.
+    /// </summary>
+    public int DeliverToMap(SectorMap map, BasePacket packet, Character exclude = null)
+    {
+        if (map == null || packet == null)
+            return 0;
+
+        var onMap = map.Objects.Values.OfType<Character>();
+        return DeliverToCharacters(onMap, packet, exclude);
+    }
+
+    private static int DeliverToCharacters(IEnumerable<Character> recipients, BasePacket packet, Character exclude)
+    {
+        var delivered = 0;
+        foreach (var character in recipients)
+        {
+            if (character == null)
+                continue;
+            if (exclude != null && ReferenceEquals(character, exclude))
+                continue;
+            if (character.OwningConnection == null)
+                continue;
+
+            try
+            {
+                character.OwningConnection.SendGamePacket(packet);
+                delivered++;
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteException(
+                    LogType.Error,
+                    $"ChatManager.Deliver: failed send to {character.Name}",
+                    ex);
+            }
+        }
+
+        return delivered;
+    }
+
     public void HandleChatPacket(TNLConnection connection, BinaryReader reader)
     {
         var packet = new ChatPacket();
         packet.Read(reader);
 
-        if (packet.Message.StartsWith('/'))
+        if (packet.Message != null && packet.Message.StartsWith('/'))
         {
             HandleChatCommand(connection, packet.Message);
             return;
@@ -44,6 +115,24 @@ public class ChatManager : Singleton<ChatManager>
 
         switch (packet.ChatType)
         {
+            case ChatType.GlobalPublic:
+            {
+                if (!TryNormalizeChatMessage(connection, packet.Message, out var message))
+                    return;
+
+                var character = connection.CurrentCharacter;
+                if (character == null)
+                    return;
+
+                ApplyChatIdentity(packet, character, message);
+                var count = DeliverToOnline(packet);
+                GameLog.Debug("ChatMessageSent",
+                    ("ChatType", nameof(ChatType.GlobalPublic)),
+                    ("CharacterId", character.ObjectId.Coid),
+                    ("RecipientCount", count));
+                break;
+            }
+
             case ChatType.ConvoyMessage:
                 ConvoyManager.Instance.BroadcastPacket(connection.CurrentCharacter, packet);
                 break;
@@ -53,6 +142,14 @@ public class ChatManager : Singleton<ChatManager>
                 break;
 
             case ChatType.PrivateMessage:
+            {
+                if (!TryNormalizeChatMessage(connection, packet.Message, out var message))
+                    return;
+
+                var character = connection.CurrentCharacter;
+                if (character != null)
+                    ApplyChatIdentity(packet, character, message);
+
                 var target = ObjectManager.Instance.GetCharacterByName(packet.PrivateRecipientName);
                 if (target == null)
                     break;
@@ -60,13 +157,17 @@ public class ChatManager : Singleton<ChatManager>
                 connection.SendGamePacket(packet);
                 TryDeliverPrivateMessage(target, () => target.OwningConnection.SendGamePacket(packet));
                 break;
+            }
+
+            case ChatType.LocalMessage:
+                // Client sealed path sends Local on sector Broadcast (0x2021), not Global Chat.
+                Logger.WriteLog(LogType.Debug, "Ignoring LocalMessage on Global Chat wire");
+                break;
 
             default:
                 Logger.WriteLog(LogType.Error, $"Unhandled ChatType {packet.ChatType} in HandleChat!");
                 break;
         }
-
-        // TODO: later: handle chat commands and send the chat packet to the proper recipient(s)
     }
 
     public void HandleBroadcastPacket(TNLConnection connection, BinaryReader reader)
@@ -74,15 +175,96 @@ public class ChatManager : Singleton<ChatManager>
         var packet = new BroadcastPacket();
         packet.Read(reader);
 
-        if (packet.Message.StartsWith('/'))
+        if (packet.Message != null && packet.Message.StartsWith('/'))
         {
             HandleChatCommand(connection, packet.Message);
             return;
         }
 
-        connection.SendGamePacket(packet);
+        switch (packet.ChatType)
+        {
+            case ChatType.LocalMessage:
+            {
+                if (!TryNormalizeChatMessage(connection, packet.Message, out var message))
+                    return;
 
-        // TODO: later: handle chat commands and send the chat packet to the proper recipient(s)
+                var character = connection.CurrentCharacter;
+                if (character?.Map == null)
+                {
+                    SendSystemNotice(connection, "You are not in a map.");
+                    return;
+                }
+
+                ApplyBroadcastIdentity(packet, character, message);
+                var count = DeliverToMap(character.Map, packet);
+                GameLog.Debug("ChatMessageSent",
+                    ("ChatType", nameof(ChatType.LocalMessage)),
+                    ("CharacterId", character.ObjectId.Coid),
+                    ("MapId", character.Map.ContinentId),
+                    ("InstanceSerial", character.Map.InstanceSerial),
+                    ("RecipientCount", count));
+                break;
+            }
+
+            // Sector / LFC / Trade and other non-Local Broadcast: echo to sender only
+            // until those channels are implemented (do not pretend full channel semantics).
+            default:
+                connection.SendGamePacket(packet);
+                break;
+        }
+    }
+
+    private static bool TryNormalizeChatMessage(TNLConnection connection, string raw, out string message)
+    {
+        message = string.IsNullOrWhiteSpace(raw) ? string.Empty : raw.Trim();
+        if (message.Length == 0)
+            return false;
+
+        var byteCount = Encoding.UTF8.GetByteCount(message);
+        if (byteCount > MaxChatMessageBytes)
+        {
+            Logger.WriteLog(
+                LogType.Debug,
+                $"Dropping oversize chat from {connection.Account?.Name}: {byteCount} bytes");
+            return false;
+        }
+
+        return true;
+    }
+
+    private static void ApplyChatIdentity(ChatPacket packet, Character character, string message)
+    {
+        packet.Message = message;
+        packet.MessageLength = (short)(Encoding.UTF8.GetByteCount(message) + 1);
+        packet.Sender = character.Name ?? character.OwningConnection?.Account?.Name ?? "Unknown";
+        packet.IsGM = character.GMLevel >= 1;
+        packet.PrivateRecipientName ??= string.Empty;
+    }
+
+    private static void ApplyBroadcastIdentity(BroadcastPacket packet, Character character, string message)
+    {
+        packet.Message = message;
+        packet.MessageLength = (short)(Encoding.UTF8.GetByteCount(message) + 1);
+        packet.Sender = character.Name ?? character.OwningConnection?.Account?.Name ?? "Unknown";
+        packet.IsGM = character.GMLevel >= 1;
+        packet.SenderCoid = unchecked((ulong)character.ObjectId.Coid);
+    }
+
+    private static void SendSystemNotice(TNLConnection connection, string message)
+    {
+        if (connection == null || string.IsNullOrEmpty(message))
+            return;
+
+        var resp = new BroadcastPacket
+        {
+            IsGM = false,
+            Sender = "System",
+            ChatType = ChatType.SystemMessage,
+            Message = message,
+            MessageLength = (short)(Encoding.UTF8.GetByteCount(message) + 1),
+            SenderCoid = unchecked((ulong)-1L)
+        };
+        connection.SendGamePacket(resp);
     }
 
     private void HandleChatCommand(TNLConnection connection, string command)

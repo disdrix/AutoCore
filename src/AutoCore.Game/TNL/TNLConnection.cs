@@ -1302,6 +1302,10 @@ private void HandlePacket(ByteBuffer buffer)
 
     public override void OnConnectionTerminated(TerminationReason reason, string reasonString)
     {
+        // Drop from single-session registry before character teardown so a concurrent
+        // login's KickOtherSessions snapshot cannot re-target this connection.
+        LoginManager.Instance.UnregisterSession(this);
+
         // Capture before EndCharacterSession clears CurrentCharacter so SessionEnded can
         // still name the character the session was for.
         var character = CurrentCharacter;

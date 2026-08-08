@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using AutoCore.Game.Constants;
 using AutoCore.Game.Diagnostics;
 using AutoCore.Game.Map;
@@ -41,17 +40,12 @@ public class GraphicsObject : ClonedObjectBase
     protected virtual bool RemoveFromMapOnDeath => true;
 
     /// <summary>
-    /// Pure map props need lazy combat ghosts so <see cref="GhostObject.HealthMask"/>
-    /// reaches the client target HP bar. Vehicles/creatures already use their own ghost
-    /// types and keep this false via <see cref="SimpleObject"/>.
-    /// <para>
-    /// Plain local ghosts previously AVd at client <c>0x005B0EFF</c> when scoped without a
-    /// materialised object. <see cref="ScopeGhostToMapPlayers"/> sends
-    /// <see cref="CreateSimpleObjectPacket"/> before <c>ObjectLocalScopeAlways</c> so
-    /// waiting-bind has a live iface. Still never mass-ghost at map load.
-    /// </para>
+    /// Plain <see cref="GhostObject"/> + local map TFID crashes the client at
+    /// <c>0x005B0EFF</c> (FUN_005b0ed0 null iface after waiting-bind). Map props stay
+    /// un-ghosted; server HP / delayed DestroyObject do not need a combat ghost.
+    /// Vehicles/creatures use their own ghost types and override as needed.
     /// </summary>
-    protected virtual bool GhostWhenDamagable => true;
+    protected virtual bool GhostWhenDamagable => false;
 
     public GraphicsObject(GraphicsObjectType objectType)
     {
@@ -129,8 +123,6 @@ public class GraphicsObject : ClonedObjectBase
         HP += restored;
         EnsureCombatGhost();
         Ghost?.SetMaskBits(GhostObject.HealthMask);
-
-        Diagnostics.PlayerCombatTrace.OnHeal(this, restored, "RestoreHealth");
 
         // Type-7 health% conditions (SCAB pad etc.) only re-eval on movement by default;
         // recheck collision volumes so full-heal gates fire while standing still.
@@ -331,56 +323,6 @@ public class GraphicsObject : ClonedObjectBase
     }
 
     /// <summary>
-    /// Map-prop create shell so the client materialises the local TFID before the plain
-    /// combat ghost binds (avoids AV 0x005B0EFF null iface on waiting-bind).
-    /// Does not require clonebase — RequestObject / combat scope use this path.
-    /// </summary>
-    public override void WriteToPacket(CreateSimpleObjectPacket packet)
-    {
-        EnsureHealthInitialized();
-
-        packet.CBID = CBID;
-        packet.ObjectId = ObjectId;
-        packet.CurrentHealth = GetCurrentHP();
-        packet.MaximumHealth = GetMaximumHP();
-        packet.Faction = Faction;
-        packet.TeamFaction = GetBareTeamFaction();
-        packet.CoidStore = -1;
-        packet.IsCorpse = IsCorpse;
-        packet.Position = Position;
-        packet.Rotation = Rotation;
-        packet.Scale = Scale != 0f ? Scale : 1f;
-        packet.Quantity = 1;
-        packet.Value = Value;
-        packet.CustomValue = CustomValue;
-        packet.IsIdentified = true;
-        packet.PossibleMissionItem = false;
-        packet.TempItem = false;
-        packet.WillEquip = false;
-        packet.IsInInventory = false;
-        packet.IsItemLink = false;
-        packet.IsBound = false;
-        packet.CustomizedName = string.Empty;
-        packet.MadeFromMemory = false;
-        packet.IsMail = false;
-        packet.IsKit = false;
-        packet.IsInfinite = false;
-        packet.RequiredLevel = RequiredLevel;
-        packet.RequiredCombat = RequiredCombat;
-        packet.RequiredPerception = RequiredPerception;
-        packet.RequiredTech = RequiredTech;
-        packet.RequiredTheory = RequiredTheory;
-
-        for (var i = 0; i < 5; ++i)
-        {
-            packet.Prefixes[i] = -1;
-            packet.PrefixLevels[i] = 0;
-            packet.Gadgets[i] = -1;
-            packet.GadgetLevels[i] = 0;
-        }
-    }
-
-    /// <summary>
     /// Called from <see cref="ClonedObjectBase.LoadCloneBase"/> after clonebase fields are ready.
     /// </summary>
     protected override void OnCloneBaseLoaded()
@@ -399,11 +341,11 @@ public class GraphicsObject : ClonedObjectBase
     {
         EnsureHealthInitialized();
         // Vehicles/creatures inherit SetInvincible → here, but they do not use plain GhostObject
-        // combat ghosts (GhostWhenDamagable=false on SimpleObject).
+        // combat ghosts (GhostWhenDamagable=false). Only log the path that can feed 0x005B0EFF.
         if (GhostWhenDamagable)
-            GhostObjectDiag.RecordEntity("BecameDamagable", this, extra: "masks=Health|HealthMax|Position");
+            GhostObjectDiag.RecordEntity("BecameDamagable", this, extra: "masks=Health|Position");
         EnsureCombatGhost();
-        Ghost?.SetMaskBits(GhostObject.HealthMask | GhostObject.HealthMaxMask | GhostObject.PositionMask);
+        Ghost?.SetMaskBits(GhostObject.HealthMask | GhostObject.PositionMask);
         ScopeGhostToMapPlayers();
     }
 
@@ -416,12 +358,6 @@ public class GraphicsObject : ClonedObjectBase
 
     /// <summary>Test hook: force scope/broadcast helpers to hit error logging paths.</summary>
     internal static bool ForceNetworkHelperFailureForTests { get; set; }
-
-    /// <summary>
-    /// Connections that already received CreateSimple + ObjectLocalScopeAlways for this prop.
-    /// Avoids create spam on every subsequent damage tick.
-    /// </summary>
-    private readonly HashSet<TNLConnection> _combatGhostScopedConnections = new();
 
     private void EnsureHealthInitialized()
     {
@@ -449,7 +385,6 @@ public class GraphicsObject : ClonedObjectBase
         if (created && Ghost != null)
         {
             GhostObjectDiag.RecordEntity("EnsureCombatGhost", this, extra: "created=1");
-            Ghost.SetMaskBits(GhostObject.HealthMask | GhostObject.HealthMaxMask | GhostObject.PositionMask);
             ScopeGhostToMapPlayers();
         }
         else if (Ghost != null)
@@ -472,20 +407,6 @@ public class GraphicsObject : ClonedObjectBase
                 if (ForceNetworkHelperFailureForTests)
                     throw new InvalidOperationException("test-forced scope failure");
 
-                // Create-before-scope: client waiting-bind needs a live object iface
-                // (vtbl+0x1C8) or plain GhostObject apply AVs at 0x005B0EFF.
-                if (_combatGhostScopedConnections.Add(conn))
-                {
-                    var create = new CreateSimpleObjectPacket();
-                    WriteToPacket(create);
-                    conn.SendGamePacket(create);
-                    GhostObjectDiag.RecordEntity(
-                        "SendCreate",
-                        this,
-                        playerCoid: character.ObjectId?.Coid ?? 0,
-                        extra: "via=ScopeGhostToMapPlayers CreateSimple");
-                }
-
                 // Always-scope so HP updates are not lost if the prop was created/made
                 // damagable after the player's initial scope query.
                 GhostObjectDiag.RecordEntity(
@@ -497,8 +418,6 @@ public class GraphicsObject : ClonedObjectBase
             }
             catch (Exception ex)
             {
-                // Allow retry after a failed create/scope (connection may recover).
-                _combatGhostScopedConnections.Remove(conn);
                 Logger.WriteLog(LogType.Error,
                     "ScopeGhostToMapPlayers failed coid={0}: {1}",
                     ObjectId.Coid,

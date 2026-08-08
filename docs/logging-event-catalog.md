@@ -65,10 +65,13 @@ AUTH- · NET- · INV- · ECO- · MIS- · SEC- · DB- · SRV-
 | MapTransferFailed | Info | Map | Transfer fail | DurationMs, Reason? | | | |
 | LoginTicketIssued | Info | Login | Ticket minted | AccountId, Username | | | |
 | LoginTicketExpired | Info | Login | Ticket sweep | AccountId | | | |
+| LoginTicketReplaced | Info | Login | Pending ticket overwritten on re-redirect | AccountId, Username | | | Single-session reconnect |
 | GlobalLoginSucceeded | Info | Login | Global accept | AccountId | | | |
 | GlobalLoginRejected | Warning | Login | Global reject | Reason | | AUTH-002 | |
+| GameSessionSuperseded | Info | Login | Older TNL session kicked by new login | AccountId, OldSessionId, NewSessionId, Reason | | | Process-local |
 | AuthLoginSucceeded | Info | Auth | Good password | AccountId, Username | | | Never log password |
 | AuthLoginFailed | Warning | Auth | Bad creds / locked | Reason | | AUTH-001 | |
+| AuthSessionSuperseded | Info | Auth | Older Auth TCP session kicked by new login | AccountId, OldSessionId, NewSessionId | | | |
 | AuthRedirectRequested | Info | Auth | Redirect to global | AccountId | | | |
 | CurrencyChanged | Info | Economy | Credits mutate | CharacterId, Reason, Before, Delta, After | yes | | Before+Delta=After |
 | ItemAdded | Info | Inventory | Cargo/locker upsert | CharacterId, Container, ItemCoid, ItemCbid, Quantity, X, Y | yes | | |
@@ -102,6 +105,7 @@ AUTH- · NET- · INV- · ECO- · MIS- · SEC- · DB- · SRV-
 | LootReceived | Info | Loot | Deliver/autoloot | CharacterId, ItemCoid?, Credits? | yes | | |
 | ChatCommandExecuted | Info | Chat | Any chat command | Command (first token) | yes | | Args at Debug only |
 | ChatCommandArgs | Debug | Chat | Command with args | Command, ArgCount | | | |
+| ChatMessageSent | Debug | Chat | Local/Global public fan-out | ChatType, CharacterId, RecipientCount, MapId?, InstanceSerial? | | | Message body not logged at Info |
 | AdminCommandExecuted | Info | Admin | GM command allowed | AccountId, CharacterId, GMLevel, Command | yes | | SS-28 |
 | AdminCommandDenied | Warning | Admin | GMLevel &lt; 1 | Command, GMLevel | | SEC-001 | SS-28 |
 | PlayerKicked | Info | Admin | GM `/kick` disconnected session | AccountId, CharacterId, Query, AdminAccountId?, AdminCharacterId? | yes | | Process-local |

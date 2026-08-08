@@ -15,11 +15,7 @@ using AutoCore.Game.Packets;
 using AutoCore.Game.Packets.Sector;
 using AutoCore.Game.Structures;
 using AutoCore.Game.TNL;
-using AutoCore.Game.TNL.Ghost;
 using AutoCore.Game.Tests.Inventory.Fakes;
-using System.Reflection;
-using global::TNL.Entities;
-using global::TNL.Utils;
 
 /// <summary>
 /// Map props are GraphicsObject (not SimpleObject/Creature). Combat must reduce HP and
@@ -71,7 +67,7 @@ public class GraphicsObjectDamageTests
     }
 
     [TestMethod]
-    public void SetInvincible_False_CreatesLazyCombatGhost()
+    public void SetInvincible_False_DoesNotCreatePlainGhostObject()
     {
         var fresh = new GraphicsObject(GraphicsObjectType.Graphics);
         fresh.InitializeHealthForTests(50);
@@ -79,72 +75,22 @@ public class GraphicsObjectDamageTests
 
         fresh.SetInvincible(false);
 
-        // Lazy combat ghost so HealthMask can reach the client target bar.
-        // Create-before-scope in ScopeGhostToMapPlayers avoids AV 0x005B0EFF.
-        Assert.IsNotNull(fresh.Ghost, "MakeNotInvincible must create plain GhostObject for HP bar sync");
+        // Plain GhostObject + local TFID → client AV 0x005B0EFF (FUN_005b0ed0 null iface).
+        // HP for map props is server-authoritative; client ram FX is local-only.
+        Assert.IsNull(fresh.Ghost, "MakeNotInvincible must not create plain GhostObject (client crash)");
         Assert.IsFalse(fresh.IsInvincible);
-        Assert.IsTrue(GhostHasDirtyMask(fresh.Ghost, GhostObject.HealthMask));
     }
 
     [TestMethod]
-    public void TakeDamage_CreatesCombatGhostAndDirtiesHealthMask()
+    public void TakeDamage_DoesNotCreatePlainGhostObject()
     {
         var fresh = new GraphicsObject(GraphicsObjectType.GraphicsPhysics);
         fresh.InitializeHealthForTests(80);
         Assert.IsNull(fresh.Ghost);
 
         Assert.AreEqual(25, fresh.TakeDamage(25));
-        Assert.IsNotNull(fresh.Ghost, "TakeDamage must CreateGhost so client HP bar can track server HP");
+        Assert.IsNull(fresh.Ghost, "TakeDamage must not CreateGhost — ram multi-kill was AV 0x005B0EFF");
         Assert.AreEqual(55, fresh.GetCurrentHP());
-        Assert.IsTrue(GhostHasDirtyMask(fresh.Ghost, GhostObject.HealthMask));
-    }
-
-    [TestMethod]
-    public void TakeDamage_OnMapWithPlayer_SendsCreateSimpleBeforeScopeAndPacksHp()
-    {
-        var (character, map) = CreatePlayerOnMap();
-        var prop = CreateDamagableProp(maxHp: 100);
-        prop.SetCoid(PropCoid, false);
-        prop.SetCbidForTests(7701);
-        prop.Position = new Vector3(3f, 0f, 4f);
-        prop.SetMap(map);
-        prop.SetInvincible(false);
-
-        Assert.IsNotNull(prop.Ghost);
-        var create = _sent.OfType<CreateSimpleObjectPacket>().FirstOrDefault(p => p.ObjectId?.Coid == PropCoid);
-        Assert.IsNotNull(create, "CreateSimpleObject must ship before ghost scope so waiting-bind has an iface");
-        Assert.AreEqual(100, create.CurrentHealth);
-        Assert.AreEqual(100, create.MaximumHealth);
-        Assert.AreEqual(7701, create.CBID);
-
-        _sent.Clear();
-        Assert.AreEqual(30, prop.TakeDamage(30));
-        Assert.AreEqual(70, prop.GetCurrentHP());
-        Assert.IsTrue(GhostHasDirtyMask(prop.Ghost!, GhostObject.HealthMask));
-
-        // Second damage must not spam another create for the same connection.
-        var createsAfterDamage = _sent.OfType<CreateSimpleObjectPacket>().Count(p => p.ObjectId?.Coid == PropCoid);
-        Assert.AreEqual(0, createsAfterDamage, "create is once-per-connection on first scope");
-
-        var stream = new BitStream(new byte[64], 64);
-        NetObject.PIsInitialUpdate = false;
-        prop.Ghost!.PackUpdate(null, GhostObject.HealthMask, stream);
-        stream.SetBitPosition(0);
-        Assert.IsTrue(stream.ReadFlag()); // HealthMask
-        Assert.AreEqual(70u, stream.ReadInt(18));
-        NetObject.PIsInitialUpdate = false;
-    }
-
-    [TestMethod]
-    public void SimpleObject_TakeDamage_DoesNotUseMapPropCombatGhostPath()
-    {
-        // Inventory / vehicle chassis inherit GraphicsObject but keep GhostWhenDamagable=false.
-        var item = new SimpleObject(GraphicsObjectType.Graphics);
-        item.InitializeHealthForTests(40);
-        Assert.IsNull(item.Ghost);
-
-        item.TakeDamage(5);
-        Assert.IsNull(item.Ghost, "SimpleObject must not auto-create plain combat ghosts");
     }
 
     [TestMethod]
@@ -371,13 +317,5 @@ public class GraphicsObjectDamageTests
         character.SetMap(map);
         vehicle.SetMap(map);
         return (character, map);
-    }
-
-    private static bool GhostHasDirtyMask(NetObject ghost, ulong mask)
-    {
-        var field = typeof(NetObject).GetField("_dirtyMaskBits", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.IsNotNull(field);
-        var bits = (ulong)field!.GetValue(ghost)!;
-        return (bits & mask) != 0;
     }
 }

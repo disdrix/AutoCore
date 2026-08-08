@@ -65,13 +65,39 @@ public class LoginManagerTests
     }
 
     [TestMethod]
-    public void ExpectLoginToGlobal_Success_ThenDuplicateFails()
+    public void ExpectLoginToGlobal_Success_ThenDuplicateReplacesTicket()
     {
         Assert.IsTrue(_login.ExpectLoginToGlobal(10, "alice", 0xABCDu));
         Assert.IsTrue(_login.HasPendingLoginForTests(10));
 
-        Assert.IsFalse(_login.ExpectLoginToGlobal(10, "alice", 0xABCDu));
+        // Second redirect must replace the pending ticket (kick-older reconnect path),
+        // not reject with "already has a pending login entry".
+        Assert.IsTrue(_login.ExpectLoginToGlobal(10, "alice", 0xEEEEu));
         Assert.IsTrue(_login.HasPendingLoginForTests(10));
+
+        // Only the replacement key is valid.
+        Assert.IsTrue(_login.LoginToGlobal(CreateClient(), new LoginRequestPacket
+        {
+            Username = "alice",
+            UserId = 10,
+            AuthKey = 0xEEEEu
+        }));
+    }
+
+    [TestMethod]
+    public void ExpectLoginToGlobal_ReplacedTicket_OldKeyFails()
+    {
+        Assert.IsTrue(_login.ExpectLoginToGlobal(11, "alice2", 0x1111u));
+        Assert.IsTrue(_login.ExpectLoginToGlobal(11, "alice2", 0x2222u));
+
+        Assert.IsFalse(_login.LoginToGlobal(CreateClient(), new LoginRequestPacket
+        {
+            Username = "alice2",
+            UserId = 11,
+            AuthKey = 0x1111u
+        }));
+        // Key mismatch consumes the pending entry (existing security behavior).
+        Assert.IsFalse(_login.HasPendingLoginForTests(11));
     }
 
     [TestMethod]
@@ -239,6 +265,134 @@ public class LoginManagerTests
         Assert.IsTrue(_login.LoginToSector(client, 51));
         Assert.AreEqual("sector-user", client.Account.Name);
         Assert.AreEqual((byte)3, client.Account.Level);
+    }
+
+    [TestMethod]
+    public void LoginToGlobal_WhenAccountAlreadyHasSession_DisconnectsOlderConnection()
+    {
+        var disconnected = new List<(TNLConnection Conn, string Reason)>();
+        _login.DisconnectSession = (c, r) => disconnected.Add((c, r));
+
+        Assert.IsTrue(_login.ExpectLoginToGlobal(60, "multi", 1001));
+        var older = CreateClient();
+        Assert.IsTrue(_login.LoginToGlobal(older, new LoginRequestPacket
+        {
+            Username = "multi",
+            UserId = 60,
+            AuthKey = 1001
+        }));
+        Assert.IsTrue(_login.HasActiveSessionForTests(60, older));
+
+        Assert.IsTrue(_login.ExpectLoginToGlobal(60, "multi", 1002));
+        var newer = CreateClient();
+        Assert.IsTrue(_login.LoginToGlobal(newer, new LoginRequestPacket
+        {
+            Username = "multi",
+            UserId = 60,
+            AuthKey = 1002
+        }));
+
+        Assert.AreEqual(1, disconnected.Count);
+        Assert.AreSame(older, disconnected[0].Conn);
+        StringAssert.Contains(disconnected[0].Reason.ToLowerInvariant(), "supersed");
+        Assert.IsFalse(_login.HasActiveSessionForTests(60, older));
+        Assert.IsTrue(_login.HasActiveSessionForTests(60, newer));
+        Assert.AreEqual(1, _login.GetActiveSessionCountForTests(60));
+    }
+
+    [TestMethod]
+    public void LoginToSector_AlongsideGlobal_KeepsBothRegistered()
+    {
+        // Retail keeps Global + Sector open for one client; sector entry must not kick Global.
+        var disconnected = new List<TNLConnection>();
+        _login.DisconnectSession = (c, _) => disconnected.Add(c);
+
+        Assert.IsTrue(_login.ExpectLoginToGlobal(61, "both", 2001));
+        var global = CreateClient();
+        Assert.IsTrue(_login.LoginToGlobal(global, new LoginRequestPacket
+        {
+            Username = "both",
+            UserId = 61,
+            AuthKey = 2001
+        }));
+
+        var sector = CreateClient();
+        Assert.IsTrue(_login.LoginToSector(sector, 61));
+
+        Assert.AreEqual(0, disconnected.Count);
+        Assert.IsTrue(_login.HasActiveSessionForTests(61, global));
+        Assert.IsTrue(_login.HasActiveSessionForTests(61, sector));
+        Assert.AreEqual(2, _login.GetActiveSessionCountForTests(61));
+    }
+
+    [TestMethod]
+    public void LoginToGlobal_WhenAccountHasSectorSession_DisconnectsAllOlder()
+    {
+        var disconnected = new List<TNLConnection>();
+        _login.DisconnectSession = (c, _) => disconnected.Add(c);
+
+        Assert.IsTrue(_login.ExpectLoginToGlobal(63, "world", 4001));
+        var global = CreateClient();
+        Assert.IsTrue(_login.LoginToGlobal(global, new LoginRequestPacket
+        {
+            Username = "world",
+            UserId = 63,
+            AuthKey = 4001
+        }));
+        var sector = CreateClient();
+        Assert.IsTrue(_login.LoginToSector(sector, 63));
+
+        Assert.IsTrue(_login.ExpectLoginToGlobal(63, "world", 4002));
+        var newer = CreateClient();
+        Assert.IsTrue(_login.LoginToGlobal(newer, new LoginRequestPacket
+        {
+            Username = "world",
+            UserId = 63,
+            AuthKey = 4002
+        }));
+
+        Assert.AreEqual(2, disconnected.Count);
+        CollectionAssert.Contains(disconnected, global);
+        CollectionAssert.Contains(disconnected, sector);
+        Assert.IsTrue(_login.HasActiveSessionForTests(63, newer));
+        Assert.AreEqual(1, _login.GetActiveSessionCountForTests(63));
+    }
+
+    [TestMethod]
+    public void UnregisterSession_RemovesActiveSession()
+    {
+        Assert.IsTrue(_login.ExpectLoginToGlobal(62, "unreg", 3001));
+        var client = CreateClient();
+        Assert.IsTrue(_login.LoginToGlobal(client, new LoginRequestPacket
+        {
+            Username = "unreg",
+            UserId = 62,
+            AuthKey = 3001
+        }));
+        Assert.IsTrue(_login.HasActiveSessionForTests(62, client));
+
+        _login.UnregisterSession(client);
+
+        Assert.IsFalse(_login.HasActiveSessionForTests(62, client));
+        Assert.AreEqual(0, _login.GetActiveSessionCountForTests(62));
+    }
+
+    [TestMethod]
+    public void LoginToGlobal_DoesNotDisconnectOtherAccounts()
+    {
+        var disconnected = new List<TNLConnection>();
+        _login.DisconnectSession = (c, _) => disconnected.Add(c);
+
+        Assert.IsTrue(_login.ExpectLoginToGlobal(70, "a", 1));
+        Assert.IsTrue(_login.ExpectLoginToGlobal(71, "b", 2));
+        var a = CreateClient();
+        var b = CreateClient();
+        Assert.IsTrue(_login.LoginToGlobal(a, new LoginRequestPacket { Username = "a", UserId = 70, AuthKey = 1 }));
+        Assert.IsTrue(_login.LoginToGlobal(b, new LoginRequestPacket { Username = "b", UserId = 71, AuthKey = 2 }));
+
+        Assert.AreEqual(0, disconnected.Count);
+        Assert.IsTrue(_login.HasActiveSessionForTests(70, a));
+        Assert.IsTrue(_login.HasActiveSessionForTests(71, b));
     }
 
     // Must match LoginManager.SessionTimeoutCheck (private).

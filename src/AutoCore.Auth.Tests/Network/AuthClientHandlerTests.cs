@@ -166,6 +166,94 @@ public class AuthClientHandlerTests
     }
 
     [TestMethod]
+    public void MsgLogin_SecondConnection_KicksExistingAuthClient()
+    {
+        var db = Guid.NewGuid().ToString("N");
+        SeedAccount(db, "alice", "secret", locked: false);
+
+        AuthServer.CreateAuthContext = () => CreateInMemory(db);
+        AuthClient.CreateAuthContext = () => CreateInMemory(db);
+
+        var server = new AuthServer();
+        var firstSent = new List<IBasePacket>();
+        var secondSent = new List<IBasePacket>();
+
+        var first = new AuthClient(server, oneTimeKey: 1, sessionId1: 11, sessionId2: 12)
+        {
+            TestSendHook = p => firstSent.Add(p)
+        };
+        var second = new AuthClient(server, oneTimeKey: 2, sessionId1: 21, sessionId2: 22)
+        {
+            TestSendHook = p => secondSent.Add(p)
+        };
+
+        server.Clients.Add(first);
+        server.Clients.Add(second);
+
+        try
+        {
+            first.HandlePacket(new LoginPacket { UserName = "alice", Password = "secret" });
+            Assert.AreEqual(ClientState.LoggedIn, first.State);
+            Assert.IsTrue(firstSent.OfType<LoginOkPacket>().Any());
+
+            second.HandlePacket(new LoginPacket { UserName = "alice", Password = "secret" });
+
+            Assert.AreEqual(ClientState.LoggedIn, second.State);
+            Assert.IsTrue(secondSent.OfType<LoginOkPacket>().Any());
+            Assert.IsTrue(firstSent.OfType<AccountKickedPacket>().Any(),
+                "Older Auth connection must receive AccountKicked.");
+            Assert.AreEqual(ClientState.Disconnected, first.State,
+                "Older Auth connection must be closed immediately.");
+        }
+        finally
+        {
+            server.Shutdown();
+        }
+    }
+
+    [TestMethod]
+    public void MsgLogin_DifferentAccounts_DoNotKickEachOther()
+    {
+        var db = Guid.NewGuid().ToString("N");
+        SeedAccount(db, "alice", "secret", locked: false);
+        SeedAccount(db, "bob", "secret", locked: false);
+
+        AuthServer.CreateAuthContext = () => CreateInMemory(db);
+        AuthClient.CreateAuthContext = () => CreateInMemory(db);
+
+        var server = new AuthServer();
+        var aliceSent = new List<IBasePacket>();
+        var bobSent = new List<IBasePacket>();
+
+        var alice = new AuthClient(server, oneTimeKey: 1, sessionId1: 11, sessionId2: 12)
+        {
+            TestSendHook = p => aliceSent.Add(p)
+        };
+        var bob = new AuthClient(server, oneTimeKey: 2, sessionId1: 21, sessionId2: 22)
+        {
+            TestSendHook = p => bobSent.Add(p)
+        };
+
+        server.Clients.Add(alice);
+        server.Clients.Add(bob);
+
+        try
+        {
+            alice.HandlePacket(new LoginPacket { UserName = "alice", Password = "secret" });
+            bob.HandlePacket(new LoginPacket { UserName = "bob", Password = "secret" });
+
+            Assert.AreEqual(ClientState.LoggedIn, alice.State);
+            Assert.AreEqual(ClientState.LoggedIn, bob.State);
+            Assert.IsFalse(aliceSent.OfType<AccountKickedPacket>().Any());
+            Assert.IsFalse(bobSent.OfType<AccountKickedPacket>().Any());
+        }
+        finally
+        {
+            server.Shutdown();
+        }
+    }
+
+    [TestMethod]
     public void MsgLogout_InvalidSession_DoesNotClose()
     {
         var db = Guid.NewGuid().ToString("N");

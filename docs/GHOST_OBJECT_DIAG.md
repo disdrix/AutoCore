@@ -4,11 +4,9 @@ Correlates **server plain-`GhostObject` lifecycle** with **client waiting-bind a
 (`FUN_005b0ed0` / crash IP `0x005B0EFF` after `"Assigned a ghost to waiting"`).
 
 **World loot** no longer creates plain `GhostObject`s (`LootManager.TrySpawnLootItem` —
-shared by `/loot` and creature/vehicle death). **Map-prop combat ghosts are lazy and
-create-before-scope:** `MakeNotInvincible` / `TakeDamage` → `EnsureCombatGhost` →
-`CreateSimpleObjectPacket` then `ObjectLocalScopeAlways`. That order is required so
-waiting-bind has a live object iface (`vtbl+0x1C8`); scoping a plain local ghost alone
-was AV `0x005B0EFF`. Still never mass-ghost props at map load.
+shared by `/loot` and creature/vehicle death). Remaining risk is **map-prop combat
+ghosts** (`MakeNotInvincible` / `TakeDamage` → `EnsureCombatGhost` →
+`ObjectLocalScopeAlways`) and any other `new GhostObject()` path with a local TFID.
 
 ### Rate limiting
 

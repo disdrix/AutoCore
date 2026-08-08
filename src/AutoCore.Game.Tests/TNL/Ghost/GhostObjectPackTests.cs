@@ -69,20 +69,7 @@ public class GhostObjectPackTests
         Assert.IsTrue(stream.ReadFlag()); // HealthMask
         Assert.AreEqual(40u, stream.ReadInt(18));
         Assert.IsFalse(stream.ReadFlag()); // not corpse
-        Assert.IsFalse(stream.ReadFlag()); // HealthMaxMask not set
         Assert.IsFalse(stream.ReadFlag()); // PositionMask not set
-    }
-
-    [TestMethod]
-    public void PackUpdate_HealthMaxMask_WritesMaximumHp()
-    {
-        var prop = MakeProp(coid: 55, global: false, hp: 40);
-        var stream = Pack(prop, GhostObject.HealthMaxMask, initial: false);
-
-        Assert.IsFalse(stream.ReadFlag()); // Health
-        Assert.IsTrue(stream.ReadFlag());  // HealthMax
-        Assert.AreEqual(40u, stream.ReadInt(18));
-        Assert.IsFalse(stream.ReadFlag()); // Position
     }
 
     [TestMethod]
@@ -112,7 +99,6 @@ public class GhostObjectPackTests
 
         var stream = Pack(prop, GhostObject.PositionMask, initial: false);
         Assert.IsFalse(stream.ReadFlag()); // Health
-        Assert.IsFalse(stream.ReadFlag()); // HealthMax
         Assert.IsTrue(stream.ReadFlag());  // Position
         stream.Read(out float x);
         stream.Read(out float y);

@@ -268,7 +268,7 @@ public class VehicleMapPropRamTests
     }
 
     [TestMethod]
-    public void Process_CreatesLazyCombatGhostOnKilledProp()
+    public void Process_DoesNotCreateGhostOnKilledProp()
     {
         const int propCbid = 9911;
         RegisterPhysicsProp(propCbid, minHp: 1, maxHp: 10, collidable: true);
@@ -278,8 +278,7 @@ public class VehicleMapPropRamTests
 
         Assert.IsTrue(VehicleMapPropRam.Process(vehicle) >= 1);
         Assert.IsTrue(prop.IsCorpse);
-        // Lazy combat ghost + create-before-scope so HP bar / corpse state can ship safely.
-        Assert.IsNotNull(prop.Ghost, "ram damage must create plain GhostObject for HP sync");
+        Assert.IsNull(prop.Ghost, "ram must not scope plain GhostObject (client AV 0x005B0EFF)");
         MapPropCorpseDespawn.FlushAllForTests();
     }
 

@@ -73,12 +73,9 @@ Live follow-up: after MakeNotInvincible, **Damage** packets were sent but object
 
 ### Fix
 
-- Mutable HP on `GraphicsObject`; death → leave map + `DestroyObject` / `InitCreateObject DoDeath`.
+- Mutable HP on `GraphicsObject`; death → leave map + `DestroyObject`.
 - **Lazy combat ghosts only** — `SetInvincible(false)` (MakeNotInvincible) or first `TakeDamage` creates/scopes a ghost via `ObjectLocalScopeAlways`.
-- **Create-before-scope** — `CreateSimpleObjectPacket` (with current/max HP) is sent once per connection **before** `ObjectLocalScopeAlways`, so client waiting-bind has a live iface (avoids AV `0x005B0EFF`).
-- Plain `GhostObject` packs `HealthMask` + `HealthMaxMask` so the target bar has current/max.
 - **Do not** ghost all map props at load (regression: filled client ghost slots → **all NPCs disappeared**).
-- `SimpleObject` / vehicles / creatures keep `GhostWhenDamagable = false` (own ghost types or no plain ghost).
 - Combat debug: `TakeDamage: GraphicsObject coid=… before→after/max dealt=…`.
 
 See `GraphicsObjectDamageTests`. **Restart `AutoCore.Launcher` after build.**

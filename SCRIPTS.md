@@ -31,6 +31,7 @@ Game-data tools default to `C:\Program Files (x86)\NetDevil\Auto Assault`; overr
 |--------|----------------|
 | [`init-databases.ps1`](scripts/init-databases.ps1) | Creates the MySQL databases required by AutoCore (auth/world/character, etc.) using local MySQL credentials. |
 | [`recreate-char-db.ps1`](scripts/recreate-char-db.ps1) | Drops and recreates the character database so schema can be reset cleanly during development. |
+| [`wipeplayers.ps1`](scripts/wipeplayers.ps1) | Truncates all character/player tables in `autocore_char` (chars, vehicles, inventory, missions, skills, clans, …) while keeping `account` rows and leaving `autocore_auth` untouched. Use `-Force` for non-interactive runs; also available as the Grok workflow `wipeplayers`. |
 | [`setup-client.ps1`](scripts/setup-client.ps1) | Adds or removes a Windows hosts-file entry so the retail Auto Assault client points at a local auth server (run as Administrator). |
 | [`tail-mission-log.ps1`](scripts/tail-mission-log.ps1) | Tails `server-live.log` and prints only mission-related diagnostic lines (MISSION-DIAG, AutoPatrol, grant/fail, pad hits, etc.). |
 

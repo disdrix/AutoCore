@@ -9,6 +9,7 @@ using AutoCore.Auth.Data;
 using AutoCore.Database.Auth;
 using AutoCore.Auth.Packets.Server;
 using AutoCore.Utils;
+using AutoCore.Utils.Logging;
 using AutoCore.Utils.Networking;
 using AutoCore.Utils.Reliability;
 using AutoCore.Utils.Server;
@@ -88,6 +89,45 @@ public partial class AuthServer : BaseServer, ILoopable
     {
         lock (ClientsToRemove)
             ClientsToRemove.Add(client);
+    }
+
+    /// <summary>
+    /// Single-session Auth: when <paramref name="except"/> logs in, every other live Auth
+    /// client bound to the same account is told <see cref="AccountKickedPacket"/> and closed.
+    /// </summary>
+    public void KickOtherSessions(uint accountId, AuthClient except)
+    {
+        List<AuthClient> toKick;
+        lock (Clients)
+        {
+            toKick = Clients
+                .Where(c =>
+                    !ReferenceEquals(c, except)
+                    && c.State != ClientState.Disconnected
+                    && c.Account != null
+                    && c.Account.Id == accountId)
+                .ToList();
+        }
+
+        foreach (var old in toKick)
+        {
+            try
+            {
+                old.SendPacket(new AccountKickedPacket((byte)FailReason.Kicked));
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteException(LogType.Error,
+                    $"KickOtherSessions: failed to send AccountKicked for account {accountId}", ex);
+            }
+
+            GameLog.Info("AuthSessionSuperseded",
+                ("AccountId", accountId),
+                ("OldSessionId", old.SessionId),
+                ("NewSessionId", except.SessionId));
+
+            old.Close();
+        }
     }
 
     /// <summary>Factory for Auth DB access during Setup; override in unit tests.</summary>
