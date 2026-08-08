@@ -33,6 +33,24 @@ public class SectorMapResidualCoverageTests
     }
 
     [TestMethod]
+    public void GetObjectByTfid_LocalAndGlobalShareCoid_ReturnsExactMatch()
+    {
+        var map = CreateMap(7706);
+        var local = new GraphicsObject(GraphicsObjectType.Graphics);
+        local.SetCoid(2, global: false);
+        local.SetMap(map);
+
+        var global = new GraphicsObject(GraphicsObjectType.Graphics);
+        global.SetCoid(2, global: true);
+        global.SetMap(map);
+
+        Assert.AreSame(local, map.GetObjectByTfid(new TFID(2, false)));
+        Assert.AreSame(global, map.GetObjectByTfid(new TFID(2, true)));
+        Assert.IsNull(map.GetObjectByTfid(new TFID(999, true)));
+        Assert.IsNull(map.GetObjectByTfid(null));
+    }
+
+    [TestMethod]
     public void GetOrMaterializeReaction_InvalidCoid_ReturnsNull()
     {
         var map = CreateMap(7702);

@@ -24,7 +24,16 @@ public static class MissionKillProgress
 
         var killer = ResolveKillerCharacter(victim);
         if (killer?.OwningConnection == null)
+        {
+            // Without this, an unattributable kill is indistinguishable from one that matched no
+            // objective — both leave no trace at all while the victim still dies and drops loot.
+            Logger.WriteLog(LogType.Debug,
+                "Kill progress: no credited killer for victim coid={0} cbid={1} murderer={2} — kill not counted",
+                victim.ObjectId?.Coid ?? -1,
+                victim.CBID,
+                victim.Murderer?.Coid ?? -1);
             return;
+        }
 
         var conn = killer.OwningConnection;
         var victimCbid = victim.CBID;
@@ -173,11 +182,16 @@ public static class MissionKillProgress
         ClonedObjectBase murdererObj = null;
         if (victim.Map != null)
         {
-            murdererObj = victim.Map.GetObjectByCoid(murderer.Coid)
-                ?? victim.Map.GetObject(murderer.Coid);
+            // Killers are global TFIDs while authored map entities are local, and both share one
+            // numeric COID space (a wiped character database restarts identity COIDs at 1). Match
+            // the exact TFID first — a COID-only scan can return the map prop that happens to
+            // carry the killer's COID, which silently drops kill credit.
+            murdererObj = victim.Map.GetObjectByTfid(murderer);
 
-            // Player vehicles are global TFID; also match by CurrentVehicle coid.
-            if (murdererObj is null)
+            // Player vehicles are global TFID; also match by CurrentVehicle coid. Run this
+            // whenever nothing resolved to a character, not just when nothing resolved at all,
+            // so a same-COID map object cannot short-circuit the real killer.
+            if (AsCharacter(murdererObj) is null)
             {
                 foreach (var player in victim.Map.Players)
                 {
@@ -191,24 +205,30 @@ public static class MissionKillProgress
                         return player;
                 }
             }
+
+            murdererObj ??= victim.Map.GetObjectByCoid(murderer.Coid)
+                ?? victim.Map.GetObject(murderer.Coid);
         }
 
-        if (murdererObj is null)
+        if (AsCharacter(murdererObj) is null)
         {
             try
             {
-                murdererObj = ObjectManager.Instance?.GetObject(murderer);
+                // Global-only registry, so it cannot collide with a local map COID.
+                murdererObj = ObjectManager.Instance?.GetObject(murderer) ?? murdererObj;
             }
             catch
             {
                 // ObjectManager may be uninitialized in unit tests.
-                murdererObj = null;
             }
         }
 
-        return murdererObj?.GetAsCharacter()
-            ?? murdererObj?.GetSuperCharacter(false);
+        return AsCharacter(murdererObj);
     }
+
+    /// <summary>The character behind an entity: the entity itself, or the driver of a vehicle.</summary>
+    private static Character AsCharacter(ClonedObjectBase obj)
+        => obj?.GetAsCharacter() ?? obj?.GetSuperCharacter(false);
 
     internal static bool TryMatchKillRequirement(
         MissionObjective objective,

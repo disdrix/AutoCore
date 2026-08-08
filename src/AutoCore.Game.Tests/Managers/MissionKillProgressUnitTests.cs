@@ -410,6 +410,150 @@ public class MissionKillProgressUnitTests
         Assert.AreEqual(character.ObjectId.Coid, resolved.ObjectId.Coid);
     }
 
+    [TestMethod]
+    public void ResolveKiller_LocalMapObjectSharesKillerCoid_ResolvesPlayer()
+    {
+        var (_, character, map) = CreateCollidingPlayer(out _);
+
+        var prop = new GraphicsObject(GraphicsObjectType.Graphics);
+        prop.InitializeHealthForTests(1);
+        prop.SetCoid(9301, false);
+        prop.SetMap(map);
+        prop.SetMurderer(character.CurrentVehicle);
+
+        var resolved = MissionKillProgress.ResolveKillerCharacter(prop);
+
+        Assert.IsNotNull(resolved, "killer must resolve to the player, not the same-coid map object");
+        Assert.AreEqual(character.ObjectId.Coid, resolved.ObjectId.Coid);
+    }
+
+    [TestMethod]
+    public void KillProp_KillerCoidCollidesWithLocalMapObject_CreditsProgress()
+    {
+        SeedKillCbid(7431);
+        var (_, character, map) = CreateCollidingPlayer(out _);
+        var quest = new CharacterQuest(MissionId, 0);
+        quest.PopulateFromAssets();
+        character.CurrentQuests.Add(quest);
+
+        var prop = new GraphicsObject(GraphicsObjectType.Graphics);
+        prop.InitializeHealthForTests(15);
+        prop.SetCbidForTests(7431);
+        prop.SetCoid(9301, false);
+        prop.SetMap(map);
+        prop.SetMurderer(character.CurrentVehicle);
+        prop.OnDeath(DeathType.Violent);
+
+        Assert.AreEqual(1, character.CurrentQuests[0].ObjectiveProgress[0]);
+        Assert.IsTrue(_sent.OfType<ObjectiveStatePacket>().Any());
+    }
+
+    [TestMethod]
+    public void ResolveKiller_KillerVehicleOffMap_FallsBackToPlayerScan()
+    {
+        var (_, character, map) = CreateCollidingPlayer(out _);
+        // Killer vehicle is not indexed on the map, so only the player scan can resolve it.
+        character.CurrentVehicle.SetMap(null);
+
+        var prop = new GraphicsObject(GraphicsObjectType.Graphics);
+        prop.InitializeHealthForTests(1);
+        prop.SetCoid(9302, false);
+        prop.SetMap(map);
+        prop.SetMurderer(character.CurrentVehicle);
+
+        var resolved = MissionKillProgress.ResolveKillerCharacter(prop);
+
+        Assert.IsNotNull(resolved);
+        Assert.AreEqual(character.ObjectId.Coid, resolved.ObjectId.Coid);
+    }
+
+    [TestMethod]
+    public void ResolveKiller_OnFootKillerOffMap_FallsBackToPlayerScan()
+    {
+        var map = CreateMapBare();
+        var character = new Character();
+        character.SetCoid(94301, true);
+        // Present as a player but not indexed in Objects: only the coid arm of the scan matches.
+        map.Players.Add(character);
+
+        var prop = new GraphicsObject(GraphicsObjectType.Graphics);
+        prop.InitializeHealthForTests(1);
+        prop.SetCoid(9303, false);
+        prop.SetMap(map);
+        prop.SetMurderer(character);
+
+        Assert.AreSame(character, MissionKillProgress.ResolveKillerCharacter(prop));
+    }
+
+    [TestMethod]
+    public void ResolveKiller_KillerOnlyInObjectManager_ResolvesFromGlobalRegistry()
+    {
+        var map = CreateMapBare();
+        var character = new Character();
+        character.SetCoid(94311, true);
+        var vehicle = new Vehicle();
+        vehicle.SetCoid(94312, true);
+        character.SetCurrentVehicleForTests(vehicle);
+
+        Assert.IsTrue(ObjectManager.Instance.Add(vehicle));
+        try
+        {
+            var prop = new GraphicsObject(GraphicsObjectType.Graphics);
+            prop.InitializeHealthForTests(1);
+            prop.SetCoid(9304, false);
+            prop.SetMap(map);
+            prop.SetMurderer(vehicle);
+
+            Assert.AreSame(character, MissionKillProgress.ResolveKillerCharacter(prop));
+        }
+        finally
+        {
+            ObjectManager.Instance.Remove(vehicle);
+        }
+    }
+
+    /// <summary>
+    /// Production shape after a character-database wipe: identity COIDs restart at 1, so the
+    /// player's global vehicle COID collides with an authored local map COID. Regression cover
+    /// for kill credit being dropped when killer resolution ignores the Global flag.
+    /// </summary>
+    private (TNLConnection Conn, Character Character, SectorMap Map) CreateCollidingPlayer(
+        out GraphicsObject decoy)
+    {
+        var continent = new ContinentObject
+        {
+            Id = ContId + 90,
+            MapFileName = "tm_killu_collide",
+            DisplayName = "test",
+            IsTown = false,
+            IsPersistent = true,
+        };
+        var map = SectorMap.CreateForTests(continent, new Vector4(0, 0, 0, 0));
+
+        // Authored map scenery enters first, exactly as InitializeLocalObjects does at map load.
+        decoy = new GraphicsObject(GraphicsObjectType.Graphics);
+        decoy.InitializeHealthForTests(1);
+        decoy.SetCbidForTests(2652);
+        decoy.SetCoid(2, false);
+        decoy.SetMap(map);
+
+        var connection = new TNLConnection();
+        connection.SetGhostFrom(true);
+        connection.SetGhostTo(false);
+
+        var character = new Character();
+        character.SetCoid(1, true);
+        character.SetOwningConnection(connection);
+        connection.CurrentCharacter = character;
+
+        var vehicle = new Vehicle();
+        vehicle.SetCoid(2, true);
+        character.SetCurrentVehicleForTests(vehicle);
+        character.SetMap(map);
+        vehicle.SetMap(map);
+        return (connection, character, map);
+    }
+
     private void SeedKillCbid(int cbid)
     {
         var obj = MissionObjective.CreateForTests(ObjectiveId, 0, MissionId, 1);

@@ -208,9 +208,19 @@ public class SectorMap
         return null;
     }
 
+    /// <summary>
+    /// Exact lookup honoring the Global flag. Player characters/vehicles are global TFIDs while
+    /// authored map entities are local, and the two share one numeric COID space — a fresh
+    /// character database restarts identity COIDs at 1, which overlaps authored map COIDs.
+    /// Prefer this over <see cref="GetObjectByCoid"/> whenever the caller holds a real TFID.
+    /// </summary>
+    public ClonedObjectBase GetObjectByTfid(TFID id)
+        => id != null && Objects.TryGetValue(id, out var value) ? value : null;
+
     public ClonedObjectBase GetObjectByCoid(long coid)
     {
-        // Search by COID only, ignoring the Global flag
+        // Search by COID only, ignoring the Global flag. Ambiguous when a global entity and an
+        // authored local one share a COID — use GetObjectByTfid when the caller has the TFID.
         foreach (var kvp in Objects)
         {
             if (kvp.Key.Coid == coid)
