@@ -9,6 +9,7 @@ using AutoCore.Game.TNL.Ghost;
 using AutoCore.Sector.Dev;
 using AutoCore.Sector.Config;
 using AutoCore.Utils;
+using AutoCore.Utils.Reliability;
 using AutoCore.Utils.Server;
 using AutoCore.Utils.Threading;
 using AutoCore.Utils.Timer;
@@ -91,18 +92,26 @@ public partial class SectorServer : BaseServer, ILoopable
             if (Interface == null)
                 return;
 
+            // SS-12: each tick stage is isolated. These calls were unguarded, so a failure in any
+            // one of them aborted the whole remaining tick — including Interface.Pulse(), which
+            // is what actually ships state to clients. The tick thread survived (SS-01) but that
+            // tick produced no network output at all.
+
             // Refresh spatial-grid cells for entities that moved since the last tick before any
             // scope queries run inside Pulse(), so interest management sees current positions.
-            MapManager.Instance.RebucketAllGrids();
+            Guard.Run("sector tick: RebucketAllGrids", MapManager.Instance.RebucketAllGrids);
 
             // NPC AI before Pulse so ApplyServerMove dirties PositionMask on the same tick that
             // CollapseDirtyList + ghost WritePacket run. Previously TickNpcs ran after Pulse, so
             // pose dirties waited a full MainLoopTime (100ms) and often looked like sparse snaps.
-            MapManager.Instance.TickNpcs(Environment.TickCount64, delta / 1000f);
+            Guard.Run("sector tick: TickNpcs",
+                () => MapManager.Instance.TickNpcs(Environment.TickCount64, delta / 1000f));
 
             // Hard guarantee: every pathing NPC re-enters the TNL dirty queue every tick.
             // Live WireDiag after rate floor still showed only ~4 pose packs per Gunny then silence.
-            var pathPoseDirty = MapManager.Instance.ForcePathVehiclePoseDirty();
+            var pathPoseDirty = 0;
+            Guard.Run("sector tick: ForcePathVehiclePoseDirty",
+                () => pathPoseDirty = MapManager.Instance.ForcePathVehiclePoseDirty());
 
             // Player pose dead reckoning between C2S VehicleMoved: keep-dirty rebroadcasts an
             // advancing pose so remote observers do not hard-snap to a frozen server position
@@ -118,7 +127,10 @@ public partial class SectorServer : BaseServer, ILoopable
             }
             SectorPlayerPoseTick.ProcessAll(poseEntries);
 
-            Interface.Pulse();
+            // Ghost pack/send. Several GhostObject.PackUpdate overrides throw by design (for
+            // example "PackUpdate for GhostObject without parent!"), so one malformed ghost must
+            // not take down the rest of the tick.
+            Guard.Run("sector tick: Interface.Pulse", Interface.Pulse);
 
             if ((Environment.TickCount64 / 2000) != _lastPathPoseDiagBucket)
             {

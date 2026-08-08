@@ -15,6 +15,7 @@ using AutoCore.Game.Packets.Sector;
 using AutoCore.Game.Structures;
 using AutoCore.Game.TNL.Ghost;
 using AutoCore.Utils;
+using AutoCore.Utils.Reliability;
 
 public class SectorMap
 {
@@ -1862,7 +1863,17 @@ public class SectorMap
         var childReactionsToTrigger = new List<List<long>>();
         var triggeredCount = 0;
 
-        foreach (var reactionCoid in reactions)
+        // SS-13: isolate per reaction. Reactions are the data-driven "scripting" surface — map
+        // content reaches an ~80-case switch in Reaction.TriggerIfPossible — so malformed or
+        // hostile content lands here. Previously one throwing reaction aborted the whole batch
+        // AND its queued child batch, silently dropping unrelated world logic.
+        Guard.ForEach(
+            reactions,
+            $"reaction trigger on map {MapData?.ContinentObject?.Id}",
+            reactionCoid => TriggerSingleReaction(reactionCoid),
+            describe: reactionCoid => $"reaction {reactionCoid}");
+
+        void TriggerSingleReaction(long reactionCoid)
         {
             var reaction = GetOrMaterializeReaction(reactionCoid);
             if (reaction == null)
@@ -1875,7 +1886,7 @@ public class SectorMap
             if (reaction == null)
             {
                 Logger.WriteLog(LogType.Error, $"Map {MapData.ContinentObject.Id} tried to trigger reaction {reactionCoid}, but the Reaction object isn't found!");
-                continue;
+                return;
             }
 
             //Logger.WriteLog(LogType.Debug, $"Processing reaction {reactionCoid} ({reaction.Template.ReactionType}), depth={depth}");
@@ -1939,11 +1950,13 @@ public class SectorMap
             }
         }
 
-        // Process child reactions after sending the parent reaction packets
-        foreach (var childReactions in childReactionsToTrigger)
-        {
-            triggeredCount += TriggerReactionsInternal(activator, childReactions, depth + 1);
-        }
+        // Process child reactions after sending the parent reaction packets.
+        // SS-13: isolate each child batch so one failing cascade branch does not drop its siblings.
+        Guard.ForEach(
+            childReactionsToTrigger,
+            $"child reaction batch (depth {depth + 1})",
+            childReactions => triggeredCount += TriggerReactionsInternal(activator, childReactions, depth + 1),
+            describe: childReactions => $"{childReactions?.Count ?? 0} child reaction(s)");
 
         if (SendGroupReactionCall && broadcastPacket is not null && broadcastPacket.Count > 0)
         {

@@ -10,6 +10,7 @@ using AutoCore.Game.Inventory;
 using AutoCore.Game.Packets.Sector;
 using AutoCore.Game.TNL;
 using AutoCore.Utils;
+using AutoCore.Utils.Reliability;
 
 public sealed class DevControlServer
 {
@@ -44,6 +45,9 @@ public sealed class DevControlServer
         Port = ((IPEndPoint)_listener.LocalEndpoint).Port;
         _loopTask = Task.Run(() => AcceptLoop(_cts.Token));
 
+        // SS-17: observe the accept loop. A fault here previously vanished until GC.
+        SafeTask.FireAndForget(_loopTask, $"dev control accept loop (port {Port})");
+
         Logger.WriteLog(LogType.Network, "Dev control API listening on http://127.0.0.1:{0}", Port);
     }
 
@@ -52,25 +56,57 @@ public sealed class DevControlServer
         if (!IsRunning)
             return;
 
-        _cts.Cancel();
-        _listener.Stop();
-        _listener = null;
+        // SS-17: order matters. Cancel and null the listener under a try/finally so a throw
+        // from Stop() cannot leave IsRunning permanently true with a dead listener.
+        try
+        {
+            _cts.Cancel();
+        }
+        catch (ObjectDisposedException)
+        {
+            // Already torn down.
+        }
+        finally
+        {
+            try
+            {
+                _listener?.Stop();
+            }
+            catch (SocketException ex)
+            {
+                Logger.WriteException(LogType.Warning, "stopping dev control listener", ex);
+            }
+
+            _listener = null;
+        }
 
         try
         {
             _loopTask?.Wait(TimeSpan.FromSeconds(2));
         }
-        catch
+        catch (AggregateException ex)
         {
+            // SS-17: was an empty bare catch, so a faulted accept loop was invisible on shutdown.
+            var real = ex.Flatten().InnerExceptions
+                .Where(inner => inner is not OperationCanceledException)
+                .ToList();
+
+            if (real.Count > 0)
+                Logger.WriteException(LogType.Warning, "dev control accept loop shutdown", ex);
         }
 
-        _cts.Dispose();
+        // The loop task may still be unwinding; disposing the CTS underneath it would race.
         _cts = null;
         _loopTask = null;
     }
 
     private async Task AcceptLoop(CancellationToken token)
     {
+        // SS-17: an unconditional `continue` on error spins at 100% CPU when the failure is
+        // persistent (for example the process is out of file handles). Back off, and give up
+        // after a bounded number of consecutive failures rather than retrying forever.
+        var backoff = new BackoffPolicy();
+
         while (!token.IsCancellationRequested)
         {
             TcpClient client;
@@ -88,11 +124,37 @@ public sealed class DevControlServer
             }
             catch (Exception ex)
             {
-                Logger.WriteLog(LogType.Error, "Dev control accept failed: {0}", ex.Message);
+                if (!backoff.TryRecordFailure(out var delay))
+                {
+                    Logger.WriteException(LogType.Error,
+                        $"dev control accept failed {backoff.MaxConsecutiveFailures} times consecutively; stopping the dev API",
+                        ex);
+                    break;
+                }
+
+                Logger.WriteException(LogType.Warning,
+                    $"dev control accept (attempt {backoff.ConsecutiveFailures}/{backoff.MaxConsecutiveFailures}, retrying in {delay.TotalMilliseconds:F0}ms)",
+                    ex);
+
+                try
+                {
+                    await Task.Delay(delay, token).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException)
+                {
+                    break;
+                }
+
                 continue;
             }
 
-            _ = Task.Run(() => HandleClient(client, token), token);
+            backoff.Reset();
+
+            // SS-17: per-connection handler, detached deliberately so a slow client cannot
+            // block the accept loop. Routed through SafeTask so its failures are observed.
+            SafeTask.FireAndForget(
+                Task.Run(() => HandleClient(client, token), token),
+                "dev control client handler");
         }
     }
 
@@ -112,13 +174,21 @@ public sealed class DevControlServer
         }
         catch (Exception ex)
         {
+            // SS-17: this failure was previously reported ONLY in the HTTP response, so if no
+            // client was reading it the error vanished entirely. Log it server-side first.
+            Logger.WriteException(LogType.Warning, "dev control request handling", ex);
+
             try
             {
                 using var stream = client.GetStream();
                 await DevHttpResponse.Json(500, new { error = ex.Message }).WriteAsync(stream, token).ConfigureAwait(false);
             }
-            catch
+            catch (Exception replyEx)
             {
+                // SS-17: was an empty bare catch. The peer is usually just gone; record it at
+                // Debug so a genuine write problem is still traceable.
+                Logger.WriteLog(LogType.Debug,
+                    $"Could not send dev control 500 response: {replyEx.GetType().Name}: {replyEx.Message}");
             }
         }
     }
@@ -166,6 +236,11 @@ public sealed class DevControlServer
         }
         catch (Exception ex)
         {
+            // Loopback-only dev API: returning the message is useful and not an exposure risk,
+            // but the failure must also be recorded server-side rather than existing only in a
+            // response body nobody may read.
+            Logger.WriteException(LogType.Warning, $"dev control endpoint {request.Method} {path}", ex);
+
             return DevHttpResponse.Json(400, new { error = ex.Message });
         }
     }

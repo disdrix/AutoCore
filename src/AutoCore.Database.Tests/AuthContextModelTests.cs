@@ -26,10 +26,56 @@ public class AuthContextModelTests
         Assert.IsNotNull(context.Model.FindEntityType(typeof(GlobalServer)));
     }
 
+    [TestCleanup]
+    public void ResetSeedPassword() => AuthContext.DefaultAdminPassword = null;
+
+    /// <summary>
+    /// SS-20: the seed used to create admin/admin at Level 255, validated and unlocked, on any
+    /// empty database — a live default administrator credential on a network-reachable auth
+    /// server. With no password explicitly configured, nothing may be seeded.
+    /// </summary>
     [TestMethod]
-    public void EnsureCreated_SeedsDefaultAdminAccount_WhenEmpty()
+    public void EnsureCreated_WithNoConfiguredPassword_SeedsNoAccount()
     {
         var options = TestHelpers.CreateInMemoryOptions<AuthContext>();
+        AuthContext.DefaultAdminPassword = null;
+
+        AuthContext.EnsureCreated(options);
+
+        using var context = new AuthContext(options);
+        Assert.AreEqual(
+            0,
+            context.Accounts.Count(),
+            "SS-20: no account may be created unless the operator supplied a password. " +
+            "A built-in default credential is not acceptable on a reachable server.");
+    }
+
+    /// <summary>
+    /// SS-20: a blank or whitespace password must be treated as "not configured", never as a
+    /// valid credential.
+    /// </summary>
+    [TestMethod]
+    public void EnsureCreated_WithBlankConfiguredPassword_SeedsNoAccount()
+    {
+        var options = TestHelpers.CreateInMemoryOptions<AuthContext>();
+        AuthContext.DefaultAdminPassword = "   ";
+
+        AuthContext.EnsureCreated(options);
+
+        using var context = new AuthContext(options);
+        Assert.AreEqual(0, context.Accounts.Count());
+    }
+
+    /// <summary>
+    /// SS-20: when the operator explicitly supplies a password, the admin account is seeded
+    /// with THAT password — never a built-in one.
+    /// </summary>
+    [TestMethod]
+    public void EnsureCreated_WithConfiguredPassword_SeedsAdminUsingIt()
+    {
+        var options = TestHelpers.CreateInMemoryOptions<AuthContext>();
+        AuthContext.DefaultAdminPassword = "operator-chosen-secret";
+
         AuthContext.EnsureCreated(options);
 
         using var context = new AuthContext(options);
@@ -39,7 +85,10 @@ public class AuthContextModelTests
         Assert.AreEqual((byte)255, admin.Level);
         Assert.IsTrue(admin.Validated);
         Assert.IsFalse(admin.Locked);
-        Assert.IsTrue(admin.CheckPassword("admin"));
+        Assert.IsTrue(admin.CheckPassword("operator-chosen-secret"));
+        Assert.IsFalse(
+            admin.CheckPassword("admin"),
+            "SS-20: the old built-in password must not work.");
         Assert.IsFalse(string.IsNullOrEmpty(admin.Salt));
         Assert.IsFalse(string.IsNullOrEmpty(admin.Password));
     }
@@ -48,6 +97,8 @@ public class AuthContextModelTests
     public void EnsureCreated_DoesNotDuplicateDefaultAccount()
     {
         var options = TestHelpers.CreateInMemoryOptions<AuthContext>();
+        AuthContext.DefaultAdminPassword = "operator-chosen-secret";
+
         AuthContext.EnsureCreated(options);
         AuthContext.EnsureCreated(options);
 

@@ -84,7 +84,7 @@ public static class WireIsolationLevers
             }
             catch (Exception ex)
             {
-                Logger.WriteLog(LogType.Error, $"WireIsolationLevers: error reading {file}: {ex.Message}");
+                Logger.WriteException(LogType.Error, $"WireIsolationLevers: error reading {file}", ex);
             }
         }
 

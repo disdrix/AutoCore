@@ -112,7 +112,7 @@ public static class LogFilters
         }
         catch (Exception ex)
         {
-            Logger.WriteLog(LogType.Error, $"LogFilters: error reading {file}: {ex.Message}");
+            Logger.WriteException(LogType.Error, $"LogFilters: error reading {file}", ex);
         }
     }
 

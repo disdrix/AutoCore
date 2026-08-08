@@ -1,0 +1,83 @@
+# AutoCore analyzer configuration.
+#
+# Added by the exception-safety audit (docs/exception-safety-audit.md). Scope is deliberately
+# narrow: the reliability rules that map to findings SS-01..SS-19, tuned so the signal is
+# actionable rather than a wall of style noise.
+#
+# Everything here is a WARNING. TreatWarningsAsErrors is off (see Directory.Build.props), so
+# nothing in this file can break the build.
+
+root = true
+
+[*.cs]
+
+################################################################################
+# Reliability rules this audit cares about
+################################################################################
+
+# CA2200: Rethrow to preserve stack details. Rethrowing with `throw ex;` resets the stack
+# trace and destroys the origin of the failure. The repo currently has zero of these — this
+# rule keeps it that way.
+dotnet_diagnostic.CA2200.severity = warning
+
+# CA2201: Do not raise reserved exception types (Exception, SystemException, ...). Throwing
+# bare `Exception` forces callers into catch-all handling, which is how swallowing starts.
+dotnet_diagnostic.CA2201.severity = warning
+
+# CA1065: Do not raise exceptions in unexpected locations (property getters, Equals,
+# GetHashCode, Dispose, static constructors, finalizers). SS-16 found finalizers calling
+# Shutdown(), where an escaping exception is uncatchable and kills the process.
+dotnet_diagnostic.CA1065.severity = warning
+
+# CA2016: Forward the CancellationToken to methods that take one. Cancellation that is not
+# threaded through is how shutdown hangs and background loops refuse to stop.
+dotnet_diagnostic.CA2016.severity = warning
+
+# CA2213: Disposable fields should be disposed.
+dotnet_diagnostic.CA2213.severity = warning
+
+# CA1816: Call GC.SuppressFinalize correctly.
+dotnet_diagnostic.CA1816.severity = warning
+
+# CA2215: Dispose methods should call base class dispose.
+dotnet_diagnostic.CA2215.severity = warning
+
+# CA1063: Implement IDisposable correctly.
+dotnet_diagnostic.CA1063.severity = warning
+
+# CA2008: Do not create tasks without passing a TaskScheduler.
+dotnet_diagnostic.CA2008.severity = warning
+
+################################################################################
+# Deliberately not enforced
+################################################################################
+
+# CA1031: Do not catch general exception types.
+#
+# Left as suggestion, NOT warning. A broad catch is exactly the right tool at an architectural
+# boundary whose job is to stop process termination — Guard.Run, SafeTask.FireAndForget, the
+# tick loop, the command loop. Promoting this to a warning would flag every deliberate
+# boundary and train people to suppress it, which is worse than not having the rule.
+# Boundaries are reviewed by hand against the SS-nn register instead.
+dotnet_diagnostic.CA1031.severity = suggestion
+
+# CA1848 / CA2254: LoggerMessage-delegate performance rules. These target
+# Microsoft.Extensions.Logging; AutoCore uses its own static Logger, so they do not apply.
+dotnet_diagnostic.CA1848.severity = none
+dotnet_diagnostic.CA2254.severity = none
+
+# CA1416: Platform compatibility. The servers are Windows-only by design (Console.Title,
+# console colour handling); this rule reports that as a portability defect.
+dotnet_diagnostic.CA1416.severity = none
+
+################################################################################
+# Test projects
+################################################################################
+
+[**/*.Tests/**/*.cs]
+
+# Tests intentionally construct broken state and swallow teardown failures.
+dotnet_diagnostic.CA1031.severity = none
+dotnet_diagnostic.CA2201.severity = none
+dotnet_diagnostic.CA1063.severity = none
+dotnet_diagnostic.CA2213.severity = none

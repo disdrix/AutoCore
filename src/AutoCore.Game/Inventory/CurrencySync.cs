@@ -1,4 +1,4 @@
-namespace AutoCore.Game.Inventory;
+﻿namespace AutoCore.Game.Inventory;
 
 using AutoCore.Game.Entities;
 using AutoCore.Game.Managers;
@@ -176,7 +176,7 @@ public static class CurrencySync
             }
             catch (Exception ex)
             {
-                Logger.WriteLog(LogType.Error, $"Failed to load credits: {ex.Message}");
+                Logger.WriteException(LogType.Error, $"Failed to load credits", ex);
                 return new CommandResult
                 {
                     Success = false,
@@ -239,7 +239,7 @@ public static class CurrencySync
                 catch (Exception reEx)
                 {
                     // Save already succeeded; surface in-memory balance if re-read fails.
-                    Logger.WriteLog(LogType.Error, $"Credits re-read after save failed: {reEx.Message}");
+                    Logger.WriteException(LogType.Error, "credits re-read after save", reEx);
                 }
             }
 
@@ -255,7 +255,7 @@ public static class CurrencySync
         }
         catch (Exception ex)
         {
-            Logger.WriteLog(LogType.Error, $"Failed to set credits: {ex.Message}");
+            Logger.WriteException(LogType.Error, $"Failed to set credits", ex);
             return new CommandResult
             {
                 Success = false,

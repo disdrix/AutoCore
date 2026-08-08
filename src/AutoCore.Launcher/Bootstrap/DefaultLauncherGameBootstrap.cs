@@ -21,6 +21,9 @@ public sealed class DefaultLauncherGameBootstrap : ILauncherGameBootstrap
         AuthContext.InitializeConnectionString(auth.AuthDatabaseConnectionString);
         CharContext.InitializeConnectionString(global.CharDatabaseConnectionString);
         WorldContext.InitializeConnectionString(global.WorldDatabaseConnectionString);
+
+        // SS-20: bootstrap admin password comes from configuration; there is no built-in default.
+        AuthContext.DefaultAdminPassword = auth.DefaultAdminPassword;
     }
 
     [ExcludeFromCodeCoverage(Justification = "Live MySQL EnsureCreated; orchestrator/DB contract covered via fakes + Database.Tests.")]

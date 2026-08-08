@@ -56,6 +56,66 @@ public class BaseServerTests
         Assert.IsFalse(server.IsRunning);
     }
 
+    /// <summary>
+    /// SS-08 tripwire: ProcessCommands is the foreground loop of all four executables. A
+    /// throwing console command must not end it, or the process stops accepting commands and
+    /// the ctrl-handler shutdown path never runs.
+    /// </summary>
+    [TestMethod]
+    public void ProcessCommands_WhenACommandThrows_LoopSurvivesAndKeepsProcessing()
+    {
+        var server = new ThrowingCommandServer(runningTicks: 3, throwOnTick: 1);
+
+        server.ProcessCommands();
+
+        Assert.AreEqual(
+            3,
+            server.Attempts,
+            "SS-08: the command loop must keep running after a command throws. It stopped " +
+            $"after {server.Attempts} of 3 iterations.");
+        Assert.IsTrue(server.SawWorkAfterFailure,
+            "Work scheduled after the failing command must still be processed.");
+    }
+
+    private sealed class ThrowingCommandServer : BaseServer
+    {
+        private readonly int _throwOnTick;
+        private int _runningTicks;
+
+        public ThrowingCommandServer(int runningTicks, int throwOnTick) : base("Throwing")
+        {
+            _runningTicks = runningTicks;
+            _throwOnTick = throwOnTick;
+        }
+
+        public int Attempts { get; private set; }
+        public bool SawWorkAfterFailure { get; private set; }
+
+        public override bool IsRunning
+        {
+            get
+            {
+                if (_runningTicks <= 0)
+                    return false;
+                _runningTicks--;
+                return true;
+            }
+        }
+
+        protected override void ProcessSingleCommand()
+        {
+            Attempts++;
+
+            if (Attempts == _throwOnTick)
+                throw new InvalidOperationException("SS-08 injected command failure");
+
+            if (Attempts > _throwOnTick)
+                SawWorkAfterFailure = true;
+        }
+
+        protected override int CommandLoopDelayMs => 0;
+    }
+
     [TestMethod]
     public void InitConsole_SetsTitleAndWritesBanner()
     {

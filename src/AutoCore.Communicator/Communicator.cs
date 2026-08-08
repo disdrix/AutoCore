@@ -190,15 +190,34 @@ public class Communicator
         AuthenticatingChildren.Add(new Communicator(socket, this));
     }
 
+    /// <summary>
+    /// Parses one inbound communicator message.
+    /// <para>
+    /// SS-11: every value read here is peer-controlled. This method previously threw on an
+    /// unknown opcode or a length mismatch, and because it runs on the socket receive task
+    /// that exception killed the connection's receive loop permanently. Malformed input is
+    /// expected input on a network boundary, so it is now validated and the offending
+    /// <i>message</i> is rejected — the connection survives, and the event is logged at
+    /// Warning with the peer identity.
+    /// </para>
+    /// </summary>
     private void OnSocketReceive(NonContiguousMemoryStream incomingStream, int length)
     {
         var startPosition = incomingStream.Position;
 
+        if (length < 1)
+        {
+            Logger.WriteLog(LogType.Warning,
+                $"Communicator({Type}) dropped a message from {DescribePeer()}: length {length} is too short to contain an opcode.");
+            return;
+        }
+
         using var br = new BinaryReader(incomingStream, Encoding.UTF8, true);
 
-        var opcode = (CommunicatorOpcode)br.ReadByte();
+        var rawOpcode = br.ReadByte();
+        var opcode = (CommunicatorOpcode)rawOpcode;
 
-        IOpcodedPacket<CommunicatorOpcode> packet = opcode switch
+        IOpcodedPacket<CommunicatorOpcode>? packet = opcode switch
         {
             CommunicatorOpcode.LoginRequest       => new LoginRequestPacket(),
             CommunicatorOpcode.LoginResponse      => new LoginResponsePacket(),
@@ -206,13 +225,34 @@ public class Communicator
             CommunicatorOpcode.RedirectResponse   => new RedirectResponsePacket(),
             CommunicatorOpcode.ServerInfoRequest  => new ServerInfoRequestPacket(),
             CommunicatorOpcode.ServerInfoResponse => new ServerInfoResponsePacket(),
-            _ => throw new Exception("Invalid opcode found in the Communicator's OnSocketReceive!")
+            _ => null
         };
 
-        packet.Read(br);
+        if (packet == null)
+        {
+            Logger.WriteLog(LogType.Warning,
+                $"Communicator({Type}) dropped a message from {DescribePeer()}: unknown opcode 0x{rawOpcode:X2}.");
+            return;
+        }
+
+        try
+        {
+            packet.Read(br);
+        }
+        catch (Exception ex) when (ex is EndOfStreamException or IOException or FormatException or ArgumentException)
+        {
+            Logger.WriteLog(LogType.Warning,
+                $"Communicator({Type}) dropped a truncated/malformed {opcode} from {DescribePeer()}: {ex.GetType().Name}: {ex.Message}");
+            return;
+        }
 
         if (startPosition + length != incomingStream.Position)
-            throw new Exception($"Over or under read of the incoming packet! Start position: {startPosition} | Length: {length} | Ending position: {incomingStream.Position}");
+        {
+            Logger.WriteLog(LogType.Warning,
+                $"Communicator({Type}) dropped a mis-sized {opcode} from {DescribePeer()}: " +
+                $"expected {length} bytes from position {startPosition}, reader ended at {incomingStream.Position}.");
+            return;
+        }
 
         switch (opcode)
         {
@@ -242,6 +282,19 @@ public class Communicator
         }
     }
 
+    /// <summary>Peer identity for diagnostics; never throws on a closed socket.</summary>
+    private string DescribePeer()
+    {
+        try
+        {
+            return Socket?.RemoteAddress?.ToString() ?? "<unknown peer>";
+        }
+        catch (Exception ex) when (ex is System.Net.Sockets.SocketException or ObjectDisposedException)
+        {
+            return "<disconnected peer>";
+        }
+    }
+
     private void OnSocketConnect()
     {
         if (OnConnect == null || OnServerInfoRequest == null)
@@ -261,17 +314,25 @@ public class Communicator
     private void SendPacket(IOpcodedPacket<CommunicatorOpcode> packet)
     {
         var buffer = ArrayPool<byte>.Shared.Rent(SendBufferSize);
-        var writer = new BinaryWriter(new MemoryStream(buffer, true));
 
-        packet.Write(writer);
+        // SS-16: the pooled buffer was returned only on the success path, so any throw from
+        // packet.Write or Socket.Send leaked it out of the pool permanently.
+        try
+        {
+            var writer = new BinaryWriter(new MemoryStream(buffer, true));
 
-        var length = (int)writer.BaseStream.Position;
-        if (TestSendOverride != null)
-            TestSendOverride(buffer, 0, length);
-        else
-            Socket.Send(buffer, 0, length);
+            packet.Write(writer);
 
-        ArrayPool<byte>.Shared.Return(buffer);
+            var length = (int)writer.BaseStream.Position;
+            if (TestSendOverride != null)
+                TestSendOverride(buffer, 0, length);
+            else
+                Socket.Send(buffer, 0, length);
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(buffer);
+        }
     }
 
     public void Close()

@@ -60,8 +60,7 @@ public sealed class CharacterWorldStatePersistence : ICharacterWorldStatePersist
         }
         catch (Exception ex)
         {
-            Logger.WriteLog(LogType.Error,
-                $"CharacterWorldStatePersistence.Save failed for character {snapshot.CharacterCoid}: {ex.Message}");
+            Logger.WriteException(LogType.Error, $"CharacterWorldStatePersistence.Save failed for character {snapshot.CharacterCoid}", ex);
             throw;
         }
     }

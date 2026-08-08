@@ -6,6 +6,7 @@ using System.Net.Sockets;
 namespace AutoCore.Utils.Networking;
 
 using AutoCore.Utils.Memory;
+using AutoCore.Utils.Reliability;
 
 public sealed class AsyncLengthedSocket : IDisposable
 {
@@ -64,39 +65,63 @@ public sealed class AsyncLengthedSocket : IDisposable
             Socket.Listen(backlog);
 
             ListenTask = DoListen();
+            SafeTask.FireAndForget(ListenTask, $"socket listen loop ({Describe(endPoint)})");
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is SocketException or ObjectDisposedException or InvalidOperationException)
         {
-            OnError?.Invoke();
+            RaiseError();
 
-            Console.WriteLine($"Unable to start listening on socket {Socket.LocalEndPoint}! Exception: {ex}");
+            Logger.WriteException(LogType.Error, $"start listening on {Describe(endPoint)}", ex);
         }
     }
 
+    /// <summary>
+    /// Accept loop.
+    /// <para>
+    /// SS-10: previously any error here — including a throwing <see cref="OnAccept"/> callback,
+    /// or a client aborting mid-handshake — escaped to a single outer catch that ended the loop
+    /// for good. The process stayed alive while silently refusing every subsequent connection.
+    /// Now terminal conditions exit cleanly, the accept callback is isolated, and transient
+    /// failures back off and retry a bounded number of times before escalating.
+    /// </para>
+    /// </summary>
     private async Task DoListen()
     {
         Debug.Assert(OnAccept != null, "No callback is set to handle incoming socket connections!");
 
-        try
+        var token = CloseCancellationTokenSource.Token;
+        var backoff = new BackoffPolicy();
+
+        while (!token.IsCancellationRequested)
         {
-            while (true)
+            Socket socket;
+
+            try
             {
-                try
-                {
-                    var socket = await Socket.AcceptAsync(CloseCancellationTokenSource.Token);
-
-                    OnAccept?.Invoke(new AsyncLengthedSocket(socket, HeaderSize));
-                }
-                catch (TaskCanceledException)
-                {
-                }
+                socket = await Socket.AcceptAsync(token);
             }
-        }
-        catch (Exception ex)
-        {
-            OnError?.Invoke();
+            catch (OperationCanceledException)
+            {
+                break; // Shutdown; not a failure.
+            }
+            catch (ObjectDisposedException)
+            {
+                break; // Listener closed underneath us; nothing left to accept on.
+            }
+            catch (Exception ex)
+            {
+                if (!TryBackoff(backoff, ex, $"accept on {DescribeLocal()}", token))
+                    break;
 
-            Console.WriteLine($"Error while listening on socket {Socket.LocalEndPoint}! Exception: {ex}");
+                continue;
+            }
+
+            backoff.Reset();
+
+            // A throwing accept handler must fail that connection only, never the listener.
+            Guard.Run(
+                $"accept callback for {Describe(SafeRemoteEndPoint(socket))}",
+                () => OnAccept?.Invoke(new AsyncLengthedSocket(socket, HeaderSize)));
         }
     }
 
@@ -111,12 +136,17 @@ public sealed class AsyncLengthedSocket : IDisposable
 
             ReceiveTask = DoReceive();
             SendTask = DoSend();
-        }
-        catch (Exception ex)
-        {
-            OnError?.Invoke();
 
-            Console.WriteLine($"Unable to start communicating on socket {Socket.RemoteEndPoint}! Exception: {ex}");
+            // SS-17: these were bare fire-and-forget assignments. Nothing ever observed them,
+            // so a fault in either pump was invisible until GC finalized the task.
+            SafeTask.FireAndForget(ReceiveTask, $"socket receive loop ({DescribeRemote()})");
+            SafeTask.FireAndForget(SendTask, $"socket send loop ({DescribeRemote()})");
+        }
+        catch (Exception ex) when (ex is SocketException or ObjectDisposedException or InvalidOperationException)
+        {
+            RaiseError();
+
+            Logger.WriteException(LogType.Error, $"start communicating on {DescribeRemote()}", ex);
         }
     }
 
@@ -125,12 +155,13 @@ public sealed class AsyncLengthedSocket : IDisposable
         try
         {
             ConnectTask = DoConnect(remote);
+            SafeTask.FireAndForget(ConnectTask, $"socket connect ({Describe(remote)})");
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is SocketException or ObjectDisposedException or InvalidOperationException)
         {
-            OnError?.Invoke();
+            RaiseError();
 
-            Console.WriteLine($"Unable to connect to socket at {remote}! Exception: {ex}");
+            Logger.WriteException(LogType.Error, $"connect to {Describe(remote)}", ex);
         }
     }
 
@@ -165,42 +196,67 @@ public sealed class AsyncLengthedSocket : IDisposable
         try
         {
             await Socket.ConnectAsync(remote, CloseCancellationTokenSource.Token);
-
-            OnConnect?.Invoke();
         }
-        catch (TaskCanceledException)
+        catch (OperationCanceledException)
         {
+            return; // Shutdown during connect; not a failure.
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is SocketException or ObjectDisposedException)
         {
-            OnError?.Invoke();
+            RaiseError();
 
-            Console.WriteLine($"Error while connecting on address {remote}! Exception: {ex}");
+            Logger.WriteException(LogType.Warning, $"connect to {Describe(remote)}", ex);
+            return;
         }
+
+        // Isolated separately: a throwing OnConnect handler is a consumer bug, not a
+        // connection failure, and must not be reported as one.
+        Guard.Run($"connect callback for {Describe(remote)}", () => OnConnect?.Invoke());
     }
 
+    /// <summary>
+    /// Receive/framing loop.
+    /// <para>
+    /// SS-11: <see cref="OnReceive"/> is where packet parsing happens, so malformed peer input
+    /// throws here (unknown opcode, over/under-read). That previously escaped to a single outer
+    /// catch which ended the receive loop permanently — the socket stayed open but the
+    /// connection was deaf forever. Now the handler is isolated per packet, and the packet is
+    /// always consumed so a malformed one cannot be re-parsed in a hot loop.
+    /// </para>
+    /// </summary>
     private async Task DoReceive()
     {
         var receiveBuffer = ArrayPool<byte>.Shared.Rent(MaxPacketSize);
+        var token = CloseCancellationTokenSource.Token;
 
         try
         {
-            while (Running)
+            while (Running && !token.IsCancellationRequested)
             {
                 int received;
 
                 try
                 {
-                    received = await Socket.ReceiveAsync(receiveBuffer, CloseCancellationTokenSource.Token);
+                    received = await Socket.ReceiveAsync(receiveBuffer, token);
                 }
-                catch (TaskCanceledException)
+                catch (OperationCanceledException)
                 {
                     break;
+                }
+                catch (Exception ex) when (ex is SocketException or ObjectDisposedException)
+                {
+                    // Peer reset or local teardown: the connection is gone, not retryable.
+                    Logger.WriteLog(LogType.Debug,
+                        $"Receive ended on {DescribeRemote()}: {ex.GetType().Name}: {ex.Message}");
+
+                    RaiseDisconnect();
+                    Close();
+                    return;
                 }
 
                 if (received == 0)
                 {
-                    OnDisconnect?.Invoke();
+                    RaiseDisconnect();
 
                     Close();
                     return;
@@ -208,30 +264,63 @@ public sealed class AsyncLengthedSocket : IDisposable
 
                 ReceiveStream.Write(receiveBuffer, 0, received);
 
-                var dataSize = PeekIncomingPacketDataSize();
-                if (dataSize == -1)
-                    continue;
-
-                if (ReceiveStream.AvailableBytesToRead >= dataSize + HeaderSizeInBytes)
-                {
-                    ReceiveStream.RemoveBytes(HeaderSizeInBytes);
-
-                    OnReceive?.Invoke(ReceiveStream, dataSize);
-
-                    ReceiveStream.RemoveBytes(dataSize);
-                }
-
+                DrainCompletePackets();
             }
-        }
-        catch (Exception ex)
-        {
-            OnError?.Invoke();
-
-            Console.WriteLine($"Error while receiving on socket {Socket.RemoteEndPoint}! Exception: {ex}");
         }
         finally
         {
             ArrayPool<byte>.Shared.Return(receiveBuffer);
+        }
+    }
+
+    /// <summary>
+    /// Dispatches every whole packet currently buffered.
+    /// <para>
+    /// Loops rather than handling one packet per receive: a single TCP read can carry several
+    /// packets, and the original code only ever dispatched the first, leaving the rest stalled
+    /// until more bytes happened to arrive.
+    /// </para>
+    /// </summary>
+    private void DrainCompletePackets()
+    {
+        while (true)
+        {
+            var dataSize = PeekIncomingPacketDataSize();
+
+            if (dataSize == -1)
+                return; // Header not yet complete.
+
+            // SS-11: the length prefix is attacker-controlled. A negative or oversized value
+            // would corrupt the stream bookkeeping (RemoveBytes with a negative count) or let a
+            // peer claim an unbounded payload. Framing cannot be resynchronised after a bad
+            // length, so the connection is dropped rather than guessed at.
+            if (dataSize < 0 || dataSize > MaxDataSize)
+            {
+                Logger.WriteLog(LogType.Warning,
+                    $"Dropping connection {DescribeRemote()}: declared packet size {dataSize} is outside 0..{MaxDataSize}.");
+
+                RaiseError();
+                Close();
+                return;
+            }
+
+            if (ReceiveStream.AvailableBytesToRead < dataSize + HeaderSizeInBytes)
+                return; // Body not yet complete.
+
+            ReceiveStream.RemoveBytes(HeaderSizeInBytes);
+
+            try
+            {
+                Guard.Run(
+                    $"packet handler ({DescribeRemote()}, {dataSize} bytes)",
+                    () => OnReceive?.Invoke(ReceiveStream, dataSize));
+            }
+            finally
+            {
+                // Always consume the packet — including when the handler threw or read only
+                // part of it. Otherwise the same malformed packet is re-parsed forever.
+                ReceiveStream.RemoveBytes(dataSize);
+            }
         }
     }
 
@@ -245,7 +334,17 @@ public sealed class AsyncLengthedSocket : IDisposable
 
         try
         {
-            ReceiveStream.Read(sizeHolder, 0, HeaderSizeInBytes);
+            // CA2022: Stream.Read may return fewer bytes than requested. NonContiguousMemoryStream
+            // is an in-memory buffer and the caller already checked AvailableBytesToRead, so a
+            // short read here means the stream's invariant broke — assert it rather than
+            // silently decoding a partial header.
+            var headerRead = ReceiveStream.Read(sizeHolder, 0, HeaderSizeInBytes);
+            if (headerRead != HeaderSizeInBytes)
+            {
+                Logger.WriteLog(LogType.Warning,
+                    $"Short header read on {DescribeRemote()}: wanted {HeaderSizeInBytes} bytes, got {headerRead}.");
+                return -1;
+            }
 
             var packetSize = HeaderSize switch
             {
@@ -271,31 +370,46 @@ public sealed class AsyncLengthedSocket : IDisposable
     private async Task DoSend()
     {
         var sendBuffer = ArrayPool<byte>.Shared.Rent(MaxPacketSize);
+        var token = CloseCancellationTokenSource.Token;
 
         try
         {
-            while (Running)
+            while (Running && !token.IsCancellationRequested)
             {
                 if (SendStream.AvailableBytesToRead > 0)
                 {
                     var sizeToSend = Math.Min(MaxPacketSize, SendStream.AvailableBytesToRead);
 
-                    SendStream.Read(sendBuffer, 0, sizeToSend);
+                    // CA2022: never send more than was actually read — a short read would
+                    // otherwise transmit stale pooled-buffer bytes to the peer.
+                    sizeToSend = SendStream.Read(sendBuffer, 0, sizeToSend);
+
+                    if (sizeToSend <= 0)
+                        continue;
 
                     int sentBytes;
 
                     try
                     {
-                        sentBytes = await Socket.SendAsync(new ArraySegment<byte>(sendBuffer, 0, sizeToSend), CloseCancellationTokenSource.Token);
+                        sentBytes = await Socket.SendAsync(new ArraySegment<byte>(sendBuffer, 0, sizeToSend), token);
                     }
-                    catch (TaskCanceledException)
+                    catch (OperationCanceledException)
                     {
                         break;
+                    }
+                    catch (Exception ex) when (ex is SocketException or ObjectDisposedException)
+                    {
+                        Logger.WriteLog(LogType.Debug,
+                            $"Send ended on {DescribeRemote()}: {ex.GetType().Name}: {ex.Message}");
+
+                        RaiseError();
+                        Close();
+                        return;
                     }
 
                     if (sentBytes == 0)
                     {
-                        OnError?.Invoke();
+                        RaiseError();
 
                         Close();
                         return;
@@ -307,19 +421,20 @@ public sealed class AsyncLengthedSocket : IDisposable
                 {
                     try
                     {
-                        await SendDelaySemaphore.WaitAsync(CloseCancellationTokenSource.Token);
+                        await SendDelaySemaphore.WaitAsync(token);
                     }
-                    catch (TaskCanceledException)
+                    catch (OperationCanceledException)
                     {
+                        // SS-10: this catch used to be empty. With Running still true that is
+                        // an unbounded hot spin on a cancelled token; break out instead.
+                        break;
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        break;
                     }
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            OnError?.Invoke();
-
-            Console.WriteLine($"Error while sending on socket {Socket.RemoteEndPoint}! Exception: {ex}");
         }
         finally
         {
@@ -343,16 +458,27 @@ public sealed class AsyncLengthedSocket : IDisposable
         }
         catch (ObjectDisposedException)
         {
+            // Already torn down; cancellation is moot.
+        }
+        catch (AggregateException ex)
+        {
+            // Cancel() surfaces exceptions thrown by callbacks registered on the token.
+            Logger.WriteException(LogType.Warning, $"cancelling socket operations for {DescribeRemote()}", ex);
         }
 
-        CloseCancellationTokenSource.Dispose();
+        // SS-10: the CTS is deliberately NOT disposed here. The receive/send/listen loops may
+        // still be awaiting on its token, and disposing underneath them raced into
+        // ObjectDisposedException on a shutdown path. A CTS with no timer or linked
+        // registrations holds no unmanaged resources, so letting the GC reclaim it is safe.
 
         try
         {
             Socket.Close();
         }
-        catch (Exception)
+        catch (Exception ex) when (ex is SocketException or ObjectDisposedException)
         {
+            // Was already closed or never opened; nothing further to release.
+            Logger.WriteLog(LogType.Debug, $"Socket close: {ex.GetType().Name}: {ex.Message}");
         }
 
         ReceiveStream?.Dispose();
@@ -360,4 +486,71 @@ public sealed class AsyncLengthedSocket : IDisposable
     }
 
     public void Dispose() => Close();
+
+    /// <summary>
+    /// Applies the backoff policy to a transient loop failure.
+    /// </summary>
+    /// <returns><c>false</c> when the loop must stop: either the retry budget is exhausted or
+    /// shutdown was requested during the delay.</returns>
+    private bool TryBackoff(BackoffPolicy backoff, Exception ex, string operation, CancellationToken token)
+    {
+        if (!backoff.TryRecordFailure(out var delay))
+        {
+            Logger.WriteException(LogType.Fatal,
+                $"{operation} failed {backoff.MaxConsecutiveFailures} times consecutively; giving up",
+                ex);
+
+            RaiseError();
+            return false;
+        }
+
+        Logger.WriteException(LogType.Warning,
+            $"{operation} (attempt {backoff.ConsecutiveFailures}/{backoff.MaxConsecutiveFailures}, retrying in {delay.TotalMilliseconds:F0}ms)",
+            ex);
+
+        try
+        {
+            Task.Delay(delay, token).GetAwaiter().GetResult();
+        }
+        catch (OperationCanceledException)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private void RaiseError() => Guard.Run($"OnError callback ({DescribeRemote()})", () => OnError?.Invoke());
+
+    private void RaiseDisconnect() =>
+        Guard.Run($"OnDisconnect callback ({DescribeRemote()})", () => OnDisconnect?.Invoke());
+
+    /// <summary>Endpoint description for diagnostics; never throws on a closed socket.</summary>
+    private string DescribeRemote() => Describe(SafeRemoteEndPoint(Socket));
+
+    private string DescribeLocal()
+    {
+        try
+        {
+            return Describe(Socket.LocalEndPoint);
+        }
+        catch (Exception ex) when (ex is SocketException or ObjectDisposedException)
+        {
+            return "<unavailable>";
+        }
+    }
+
+    private static EndPoint SafeRemoteEndPoint(Socket socket)
+    {
+        try
+        {
+            return socket?.RemoteEndPoint;
+        }
+        catch (Exception ex) when (ex is SocketException or ObjectDisposedException)
+        {
+            return null;
+        }
+    }
+
+    private static string Describe(EndPoint endPoint) => endPoint?.ToString() ?? "<unknown endpoint>";
 }

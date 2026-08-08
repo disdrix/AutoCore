@@ -41,7 +41,7 @@ public static class HkVehicleDataCache
             }
             catch (Exception ex)
             {
-                Logger.WriteLog(LogType.Error, $"HkVehicleDataCache: skip cbid={kvp.Key}: {ex.Message}");
+                Logger.WriteException(LogType.Error, $"HkVehicleDataCache: skip cbid={kvp.Key}", ex);
             }
         }
 

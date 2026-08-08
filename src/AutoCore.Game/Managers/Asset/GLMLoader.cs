@@ -26,7 +26,7 @@ public class GLMLoader
             }
             catch (Exception e)
             {
-                Logger.WriteLog(LogType.Error, $"Failed to load GLM file '{filePath}': {e.Message}");
+                Logger.WriteException(LogType.Error, $"Failed to load GLM file '{filePath}'", e);
                 failCount++;
             }
         }

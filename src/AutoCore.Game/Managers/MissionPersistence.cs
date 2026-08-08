@@ -1,4 +1,4 @@
-namespace AutoCore.Game.Managers;
+﻿namespace AutoCore.Game.Managers;
 
 using System.Diagnostics.CodeAnalysis;
 using AutoCore.Database.Char;
@@ -7,6 +7,7 @@ using AutoCore.Game.Entities;
 using AutoCore.Game.Structures;
 using AutoCore.Utils;
 using AutoCore.Utils.Memory;
+using AutoCore.Utils.Reliability;
 
 /// <summary>
 /// Server-authoritative mission-state persistence. Mutation hooks enqueue a latest-wins snapshot;
@@ -153,9 +154,13 @@ public class MissionPersistence : Singleton<MissionPersistence>
         ThreadPool.QueueUserWorkItem(_ =>
         {
             var persisted = 0;
+
+            // SS-19: an exception escaping a ThreadPool callback is an UNHANDLED exception on a
+            // pool thread, which terminates the process. The try/finally here cleared the
+            // scheduling flag but did not catch, so any throw from the flush was fatal.
             try
             {
-                persisted = FlushPending();
+                Guard.Run("mission persistence background flush", () => persisted = FlushPending());
             }
             finally
             {
@@ -282,7 +287,7 @@ public class MissionPersistence : Singleton<MissionPersistence>
         }
         catch (Exception ex)
         {
-            Logger.WriteLog(LogType.Error, "Mission: failed to clear coid={0}: {1}", coid, ex.Message);
+            Logger.WriteException(LogType.Error, $"Mission: clear coid={coid}", ex);
         }
     }
 
@@ -300,7 +305,7 @@ public class MissionPersistence : Singleton<MissionPersistence>
         }
         catch (Exception ex)
         {
-            Logger.WriteLog(LogType.Error, "Mission: failed to clear active missions coid={0}: {1}", coid, ex.Message);
+            Logger.WriteException(LogType.Error, $"Mission: clear active missions coid={coid}", ex);
         }
     }
 }

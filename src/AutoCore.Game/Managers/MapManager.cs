@@ -8,6 +8,7 @@ using AutoCore.Game.Structures;
 using AutoCore.Game.TNL.Ghost;
 using AutoCore.Utils;
 using AutoCore.Utils.Memory;
+using AutoCore.Utils.Reliability;
 
 public class MapManager : Singleton<MapManager>
 {
@@ -63,7 +64,7 @@ public class MapManager : Singleton<MapManager>
             }
             catch (Exception ex)
             {
-                Logger.WriteLog(LogType.Error, $"Failed to setup map {continentObject.Id}: {ex.Message}");
+                Logger.WriteException(LogType.Error, $"Failed to setup map {continentObject.Id}", ex);
                 failedCount++;
             }
         }
@@ -87,8 +88,13 @@ public class MapManager : Singleton<MapManager>
     /// </summary>
     public void RebucketAllGrids()
     {
-        foreach (var map in SectorMaps.Values)
-            map.Grid.RebucketSweep();
+        // SS-12: isolate per map so one bad grid cannot skip re-bucketing for every other map,
+        // which would leave interest queries reading stale positions server-wide.
+        Guard.ForEach(
+            SectorMaps.ToArray(),
+            "grid rebucket sweep",
+            entry => entry.Value.Grid.RebucketSweep(),
+            describe: entry => $"map {entry.Key}");
     }
 
     /// <summary>
@@ -100,11 +106,17 @@ public class MapManager : Singleton<MapManager>
     /// <param name="deltaSeconds">Elapsed time since the previous tick, in seconds.</param>
     public void TickNpcs(long nowMs, float deltaSeconds)
     {
-        foreach (var map in SectorMaps.Values)
-        {
-            if (map.PlayerCount > 0)
-                Npc.NpcTicker.Tick(map, nowMs, deltaSeconds);
-        }
+        // SS-12: isolate per map. NpcTicker already isolates individual NPCs, but a failure in
+        // map-level setup must not stop the remaining maps from ticking their AI.
+        Guard.ForEach(
+            SectorMaps.ToArray(),
+            "NPC map tick",
+            entry =>
+            {
+                if (entry.Value.PlayerCount > 0)
+                    Npc.NpcTicker.Tick(entry.Value, nowMs, deltaSeconds);
+            },
+            describe: entry => $"map {entry.Key}");
     }
 
     /// <summary>
@@ -287,7 +299,7 @@ public class MapManager : Singleton<MapManager>
         }
         catch (Exception ex)
         {
-            Logger.WriteLog(LogType.Error, $"Failed to transfer character to map {continentId}: {ex.Message}");
+            Logger.WriteException(LogType.Error, $"Failed to transfer character to map {continentId}", ex);
             return false;
         }
     }

@@ -10,6 +10,7 @@ using AutoCore.Database.Auth;
 using AutoCore.Auth.Packets.Server;
 using AutoCore.Utils;
 using AutoCore.Utils.Networking;
+using AutoCore.Utils.Reliability;
 using AutoCore.Utils.Server;
 using AutoCore.Utils.Threading;
 using AutoCore.Utils.Timer;
@@ -43,7 +44,13 @@ public partial class AuthServer : BaseServer, ILoopable
         Logger.WriteLog(LogType.Initialize, "The Auth server has been initialized!");
     }
 
-    ~AuthServer() => Shutdown();
+    /// <summary>
+    /// SS-16: a finalizer runs on the GC finalizer thread, where an escaping exception is
+    /// <b>uncatchable and terminates the process</b>. Shutdown() closes sockets and stops the
+    /// main loop, any of which can throw during teardown, so it is isolated here.
+    /// Explicit <see cref="Shutdown"/> from the exit handler remains the normal path.
+    /// </summary>
+    ~AuthServer() => Guard.Run("AuthServer finalizer shutdown", Shutdown);
 
     public void Setup(AuthConfig? config)
     {

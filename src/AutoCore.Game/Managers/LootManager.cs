@@ -682,7 +682,7 @@ public class LootManager : Singleton<LootManager>
         }
         catch (Exception ex)
         {
-            Logger.WriteLog(LogType.Error, $"LootManager: GiveCredits failed: {ex.Message}");
+            Logger.WriteException(LogType.Error, $"LootManager: GiveCredits", ex);
         }
     }
 
@@ -1149,7 +1149,7 @@ public class LootManager : Singleton<LootManager>
             }
             catch (Exception ex)
             {
-                Logger.WriteLog(LogType.Error, $"LootManager.BroadcastPacketToMap: Failed to send packet to character {character.Name}: {ex.Message}");
+                Logger.WriteException(LogType.Error, $"LootManager.BroadcastPacketToMap: Failed to send packet to character {character.Name}", ex);
             }
         }
     }

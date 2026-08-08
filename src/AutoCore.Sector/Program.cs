@@ -12,6 +12,7 @@ using AutoCore.Game.Managers;
 using AutoCore.Sector.Config;
 using AutoCore.Sector.Network;
 using AutoCore.Utils;
+using AutoCore.Utils.Reliability;
 using Microsoft.Extensions.Configuration;
 
 public class Program : ExitableProgram
@@ -23,7 +24,26 @@ public class Program : ExitableProgram
     /// <see cref="SectorConfigValidation"/> unit tests; live Main is a deliberate §4 exclusion.
     /// </summary>
     [ExcludeFromCodeCoverage(Justification = "Process host entry — binds shared ports/DB; validated via SectorConfigValidation.")]
-    public static void Main()
+    public static int Main()
+    {
+        // SS-07: register last-resort diagnostics before anything can fail.
+        CrashHandler.Install("Sector");
+
+        try
+        {
+            Run();
+            return 0;
+        }
+        catch (Exception ex)
+        {
+            // Startup failures (invalid config, DB unreachable, missing assets) are genuinely
+            // unrecoverable and must still terminate — but diagnosably.
+            Logger.WriteException(LogType.Fatal, "Sector server startup", ex);
+            return 1;
+        }
+    }
+
+    private static void Run()
     {
         Initialize(ExitHandlerProc);
 
@@ -34,6 +54,10 @@ public class Program : ExitableProgram
         var configRoot = builder.Build();
         var config = SectorConfigValidation.Bind(configRoot);
         SectorConfigValidation.Validate(config);
+
+        // SS-07: Sector declared LoggerConfig but never applied it, so its configured file
+        // logging was silently inert and crash diagnostics went to the console only.
+        Logger.UpdateConfig(config.LoggerConfig);
 
         CharContext.InitializeConnectionString(config.CharDatabaseConnectionString);
         WorldContext.InitializeConnectionString(config.WorldDatabaseConnectionString);
@@ -92,11 +116,13 @@ public class Program : ExitableProgram
     [ExcludeFromCodeCoverage(Justification = "Process-exit handler tied to live Server singleton.")]
     private static bool ExitHandlerProc(byte sig)
     {
-        Logger.WriteLog(LogType.Error, "Shutting down the server...");
+        Logger.WriteLog(LogType.Initialize, "Shutting down the server...");
 
-        Server.Shutdown();
+        // SS-07: this runs on the console control-handler thread. An exception escaping here
+        // is unhandled and would turn an orderly shutdown into a crash.
+        Guard.Run("Sector server shutdown", Server.Shutdown);
 
-        Logger.WriteLog(LogType.Error, "Server shutdown completed!");
+        Logger.WriteLog(LogType.Initialize, "Server shutdown completed!");
 
         Logger.WriteLog(LogType.Error, "Press any key to exit...");
 

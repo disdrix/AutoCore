@@ -275,7 +275,7 @@ public sealed class InventoryPersistence : IInventoryPersistence
         }
         catch (Exception ex)
         {
-            Logger.WriteLog(LogType.Error, $"{operation} failed: {ex.Message}");
+            Logger.WriteException(LogType.Error, $"{operation}", ex);
             throw;
         }
     }

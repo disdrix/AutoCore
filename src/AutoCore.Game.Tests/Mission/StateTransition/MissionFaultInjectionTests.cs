@@ -144,4 +144,80 @@ public class MissionFaultInjectionTests
         Assert.AreEqual(1, queue.Flush((_, _, op) => kinds.Add(op.Kind)));
         CollectionAssert.AreEqual(new[] { QuestPersistKind.Complete }, kinds);
     }
+
+    /// <summary>
+    /// SS-14 tripwire: a permanently failing write must be abandoned after a bounded number of
+    /// attempts. It previously re-queued itself on every flush forever, with no logging, so the
+    /// queue never drained and nothing surfaced the problem.
+    /// </summary>
+    [TestMethod]
+    [TestCategory("MissionCritical")]
+    public void PersistFailure_IsRetriedThenDeadLettered_NotRetriedForever()
+    {
+        var queue = new MissionPersistenceQueue();
+        queue.Enqueue(1, MissionId, QuestPersistOp.Upsert(0, 0, Array.Empty<byte>()));
+
+        var attempts = 0;
+
+        // Flush far more times than the retry budget to prove the loop terminates.
+        for (var i = 0; i < MissionPersistenceQueue.MaxPersistAttempts + 10; i++)
+        {
+            queue.Flush((_, _, _) =>
+            {
+                attempts++;
+                throw new TimeoutException("db permanently unavailable");
+            });
+        }
+
+        Assert.AreEqual(
+            MissionPersistenceQueue.MaxPersistAttempts,
+            attempts,
+            "SS-14: the write must be attempted exactly MaxPersistAttempts times, then abandoned. " +
+            $"It was attempted {attempts} times, meaning retries are unbounded.");
+
+        Assert.AreEqual(
+            0,
+            queue.PendingCount,
+            "A dead-lettered write must leave the queue, otherwise the queue never drains.");
+
+        Assert.AreEqual(
+            1,
+            queue.DeadLetteredCount,
+            "The abandoned write must be counted so the loss is observable.");
+    }
+
+    /// <summary>
+    /// SS-14: a transient failure must not consume the whole retry budget — a later success
+    /// resets it, so an occasional blip never accumulates into a dead-letter.
+    /// </summary>
+    [TestMethod]
+    [TestCategory("MissionCritical")]
+    public void PersistFailure_ThenSuccess_ResetsTheRetryBudget()
+    {
+        var queue = new MissionPersistenceQueue();
+        queue.Enqueue(1, MissionId, QuestPersistOp.Upsert(0, 0, Array.Empty<byte>()));
+
+        // Fail once, then succeed.
+        Assert.AreEqual(0, queue.Flush((_, _, _) => throw new TimeoutException("blip")));
+        Assert.AreEqual(1, queue.Flush((_, _, _) => { }));
+        Assert.AreEqual(0, queue.DeadLetteredCount);
+
+        // The same key must now get a full budget again.
+        queue.Enqueue(1, MissionId, QuestPersistOp.Upsert(0, 0, Array.Empty<byte>()));
+
+        var attempts = 0;
+        for (var i = 0; i < MissionPersistenceQueue.MaxPersistAttempts + 2; i++)
+        {
+            queue.Flush((_, _, _) =>
+            {
+                attempts++;
+                throw new TimeoutException("db permanently unavailable");
+            });
+        }
+
+        Assert.AreEqual(
+            MissionPersistenceQueue.MaxPersistAttempts,
+            attempts,
+            "A successful write must reset the failure count for that key.");
+    }
 }

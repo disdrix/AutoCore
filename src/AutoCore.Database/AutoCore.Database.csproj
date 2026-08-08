@@ -9,4 +9,12 @@
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="5.0.2" />
   </ItemGroup>
 
+  <!--
+    SS-15: schema-migration failures must be reported rather than swallowed, which needs the
+    shared Logger. AutoCore.Utils has no project references, so this dependency is acyclic.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\AutoCore.Utils\AutoCore.Utils.csproj" />
+  </ItemGroup>
+
 </Project>

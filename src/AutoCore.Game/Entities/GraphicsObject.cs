@@ -511,7 +511,7 @@ public class GraphicsObject : ClonedObjectBase
             }
             catch (Exception ex)
             {
-                Logger.WriteLog(LogType.Error, "BroadcastDeath failed for coid={0}: {1}", objectId.Coid, ex.Message);
+                Logger.WriteException(LogType.Error, $"BroadcastDeath for coid={objectId.Coid}", ex);
             }
         }
     }

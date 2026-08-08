@@ -226,7 +226,7 @@ public static class ServerConfig
         }
         catch (Exception ex)
         {
-            Logger.WriteLog(LogType.Error, $"ServerConfig: error reading {file}: {ex.Message}");
+            Logger.WriteException(LogType.Error, $"ServerConfig: error reading {file}", ex);
         }
     }
 

@@ -224,6 +224,135 @@ public class AsyncLengthedSocketLifecycleTests
         try { accepted?.Dispose(); } catch (ObjectDisposedException) { }
     }
 
+    /// <summary>
+    /// SS-10 tripwire: the accept callback runs inside the listener loop. A throwing callback
+    /// previously escaped to the loop's outer catch, permanently ending the accept loop — the
+    /// process stayed alive but stopped accepting any further connections.
+    /// </summary>
+    [TestMethod]
+    public void Loopback_WhenAcceptCallbackThrows_ListenerKeepsAcceptingLaterConnections()
+    {
+        var accepts = 0;
+        var secondAccepted = new ManualResetEventSlim(false);
+        var acceptedSockets = new List<AsyncLengthedSocket>();
+
+        using var server = new AsyncLengthedSocket(AsyncLengthedSocket.HeaderSizeType.Dword);
+        server.OnError = () => { };
+        server.OnAccept = accepted =>
+        {
+            var n = Interlocked.Increment(ref accepts);
+
+            lock (acceptedSockets)
+                acceptedSockets.Add(accepted);
+
+            if (n == 1)
+                throw new InvalidOperationException("SS-10 injected accept-callback failure");
+
+            secondAccepted.Set();
+        };
+
+        server.StartListening(new IPEndPoint(IPAddress.Loopback, 0), backlog: 8);
+        var port = GetLocalPort(server);
+
+        using (var first = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+            first.Connect(new IPEndPoint(IPAddress.Loopback, port));
+
+        // Give the listener a moment to process the failing accept before the second attempt.
+        Thread.Sleep(100);
+
+        using (var second = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+            second.Connect(new IPEndPoint(IPAddress.Loopback, port));
+
+        Assert.IsTrue(
+            secondAccepted.Wait(TimeSpan.FromSeconds(5)),
+            "SS-10: the listener must keep accepting after an accept callback threw. " +
+            $"Accept callback ran {Volatile.Read(ref accepts)} time(s); the second connection was never accepted.");
+
+        lock (acceptedSockets)
+            foreach (var s in acceptedSockets)
+            {
+                try { s.Dispose(); } catch (ObjectDisposedException) { }
+            }
+    }
+
+    /// <summary>
+    /// SS-11 tripwire: the receive callback is where packet parsing happens, and malformed
+    /// peer input throws there (bad opcode, over/under-read). That previously escaped to the
+    /// receive loop's outer catch and killed the connection's receive loop for good, leaving
+    /// the socket open but permanently deaf.
+    /// </summary>
+    [TestMethod]
+    public void Loopback_WhenReceiveCallbackThrows_ConnectionKeepsReceivingLaterPackets()
+    {
+        var receives = 0;
+        var secondPayload = new ManualResetEventSlim(false);
+        byte[] lastPayload = null;
+        var acceptedReady = new ManualResetEventSlim(false);
+        AsyncLengthedSocket accepted = null;
+
+        using var server = new AsyncLengthedSocket(AsyncLengthedSocket.HeaderSizeType.Dword, countHeaderSize: true);
+        server.OnError = () => { };
+        server.OnAccept = s =>
+        {
+            accepted = s;
+            s.OnError = () => { };
+            s.OnReceive = (stream, size) =>
+            {
+                var n = Interlocked.Increment(ref receives);
+
+                var buffer = new byte[size];
+                stream.Read(buffer, 0, size);
+
+                if (n == 1)
+                    throw new InvalidOperationException("SS-11 injected malformed-packet failure");
+
+                lastPayload = buffer;
+                secondPayload.Set();
+            };
+            s.Start();
+            acceptedReady.Set();
+        };
+
+        server.StartListening(new IPEndPoint(IPAddress.Loopback, 0), backlog: 8);
+        var port = GetLocalPort(server);
+
+        using var client = new AsyncLengthedSocket(AsyncLengthedSocket.HeaderSizeType.Dword, countHeaderSize: true);
+        var connected = new ManualResetEventSlim(false);
+        client.OnError = () => { };
+        client.OnConnect = () => { client.Start(); connected.Set(); };
+        client.ConnectAsync(new IPEndPoint(IPAddress.Loopback, port));
+
+        Assert.IsTrue(connected.Wait(TimeSpan.FromSeconds(3)), "client connect");
+        Assert.IsTrue(acceptedReady.Wait(TimeSpan.FromSeconds(3)), "server accept");
+
+        client.Send(new byte[] { 1, 2, 3 }, 0, 3);
+        Thread.Sleep(100);
+        client.Send(new byte[] { 7, 8, 9 }, 0, 3);
+
+        Assert.IsTrue(
+            secondPayload.Wait(TimeSpan.FromSeconds(5)),
+            "SS-11: the connection must keep receiving after a receive callback threw. " +
+            $"Receive callback ran {Volatile.Read(ref receives)} time(s); the second packet never arrived.");
+
+        CollectionAssert.AreEqual(new byte[] { 7, 8, 9 }, lastPayload);
+
+        try { accepted?.Dispose(); } catch (ObjectDisposedException) { }
+    }
+
+    /// <summary>
+    /// SS-10: Close must tolerate being called more than once — peer disconnect, Dispose and
+    /// error paths all reach it.
+    /// </summary>
+    [TestMethod]
+    public void Close_IsIdempotent()
+    {
+        var s = new AsyncLengthedSocket(AsyncLengthedSocket.HeaderSizeType.Dword);
+
+        s.Close();
+        s.Close();
+        s.Dispose();
+    }
+
     private static int GetLocalPort(AsyncLengthedSocket socket)
     {
         var prop = typeof(AsyncLengthedSocket).GetProperty(

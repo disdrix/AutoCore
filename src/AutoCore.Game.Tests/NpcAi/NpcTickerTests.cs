@@ -220,6 +220,62 @@ public class NpcTickerTests
         Assert.AreNotEqual(4f + SpawnPoint.CreaturePhysicsFootOffset, snapped.Y, 0.001f);
     }
 
+    /// <summary>
+    /// SS-12 tripwire: one NPC whose map path contains a corrupt (null) waypoint must not stop
+    /// the other NPCs on the map from being ticked. Before per-entity isolation, the NRE from
+    /// the bad path aborted the whole foreach — every NPC ordered after it silently froze, and
+    /// because MapManager.TickNpcs looped maps unguarded too, so did every later map.
+    /// </summary>
+    [TestMethod]
+    public void NpcTicker_WhenOneNpcPathIsCorrupt_OtherNpcsStillTick()
+    {
+        const long goodPathCoid = 84110;
+        const long badPathCoid = 84120;
+        const long firstCoid = 84101;
+        const long throwingCoid = 84102;
+        const long lastCoid = 84103;
+
+        var map = CreateMap();
+
+        // Healthy two-point path the survivors walk along.
+        var goodPath = SeedMapPath(map, goodPathCoid, reverse: false);
+        goodPath.Points.Add(new MapPathTemplate.MapPathPoint
+        {
+            Position = new Vector3(100f, 0f, 0f),
+            AcceptDistance = 1f,
+        });
+
+        // Corrupt path: a null waypoint, which is what a malformed .fam produces.
+        var badPath = SeedMapPath(map, badPathCoid, reverse: false);
+        badPath.Points.Add(null);
+
+        var first = PlaceNpcVehicle(map, firstCoid, new Vector3(0f, 0f, 0f), npcAi: true);
+        first.CoidCurrentPath = goodPathCoid;
+
+        var throwing = PlaceNpcVehicle(map, throwingCoid, new Vector3(0f, 0f, 0f), npcAi: true);
+        throwing.CoidCurrentPath = badPathCoid;
+
+        var last = PlaceNpcVehicle(map, lastCoid, new Vector3(0f, 0f, 0f), npcAi: true);
+        last.CoidCurrentPath = goodPathCoid;
+
+        var firstStart = first.Position;
+        var lastStart = last.Position;
+
+        // Must not throw: the corrupt NPC is isolated.
+        NpcTicker.Tick(map, nowMs: 1000L, dt: 0.1f);
+
+        Assert.AreNotEqual(
+            firstStart.X,
+            first.Position.X,
+            "The NPC ordered before the corrupt one should have moved along its path.");
+
+        Assert.AreNotEqual(
+            lastStart.X,
+            last.Position.X,
+            "SS-12: the NPC ordered AFTER the corrupt one must still be ticked. One bad NPC " +
+            "must not freeze the rest of the map's AI.");
+    }
+
     private static SectorMap CreateMap()
     {
         var continent = new ContinentObject

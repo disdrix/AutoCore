@@ -28,7 +28,10 @@ public class SectorConfigTests
 
         Assert.IsNull(game.PublicAddress);
         Assert.AreEqual(0, game.Port);
-        Assert.IsTrue(game.EnableDevControl);
+        Assert.IsFalse(
+            game.EnableDevControl,
+            "SS-21: the dev-control API exposes unauthenticated /chat-command execution. It must " +
+            "be opted into per deployment, not enabled by default.");
         Assert.AreEqual(27999, game.DevControlPort);
         Assert.IsFalse(game.AllowVersionMismatch);
         Assert.AreEqual(0, game.ExpectedVersion);

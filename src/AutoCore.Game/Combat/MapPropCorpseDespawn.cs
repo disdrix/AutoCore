@@ -1,4 +1,4 @@
-namespace AutoCore.Game.Combat;
+﻿namespace AutoCore.Game.Combat;
 
 using System.Collections.Generic;
 using System.Linq;
@@ -154,7 +154,7 @@ public static class MapPropCorpseDespawn
         }
         catch (Exception ex)
         {
-            Logger.WriteLog(LogType.Error, "MapPropCorpseDespawn.Finalize failed: {0}", ex.Message);
+            Logger.WriteException(LogType.Error, "MapPropCorpseDespawn.Finalize", ex);
         }
     }
 }

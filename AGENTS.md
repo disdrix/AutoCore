@@ -126,3 +126,48 @@ Completion requirements:
 * Relevant existing tests pass.
 * Coverage impact is acceptable.
 * Any remaining risks or skipped checks are documented clearly.
+
+## Exception safety and crash resistance
+
+The register of findings, fixes and accepted risk is **[`docs/exception-safety-audit.md`](docs/exception-safety-audit.md)**. Read it before changing an entry point, a loop, a packet handler, or anything that detaches work.
+
+### Use the shared primitives
+
+`src/AutoCore.Utils/Reliability/` — do not hand-roll these:
+
+| Need | Use |
+|---|---|
+| Isolate one unit of work at a boundary | `Guard.Run(operation, work)` |
+| Isolate each item in a loop | `Guard.ForEach(items, operation, work, describe)` |
+| Detach work from the caller | `SafeTask.FireAndForget(task, operation)` |
+| Survive transient failures in a loop | `new BackoffPolicy(...)` |
+| Process-global last-resort diagnostics | `CrashHandler.Install(subsystem)` (already wired in all four `Main`s) |
+
+### Rules
+
+* **Boundaries, not blankets.** A broad catch belongs at an architectural boundary whose job is to stop process termination — a tick stage, a per-entity loop, a packet handler, a command handler, detached work. Do not wrap ordinary business logic: handle expected failures specifically, close to the operation, and let unexpected ones reach a boundary.
+* **Never add an empty `catch`.** If a failure is genuinely ignorable, log it at `Debug` and say why in a comment. The only sanctioned exception-swallowing site in the repo is `Logger.EmergencyReport`, and it is documented as such.
+* **Detached work must be observed.** A bare `_ = SomethingAsync()` hides faults until GC. An exception escaping a `ThreadPool` callback or a thread entry point **terminates the process**.
+* **Preserve the diagnosis.** Use `Logger.WriteException(type, operation, ex)` — it keeps the type, stack trace and inner-exception chain. `ex.Message` alone throws away everything that makes a production failure findable. Never `throw ex;` (use `throw;`); when wrapping, pass the original as the inner exception.
+* **Retries are bounded.** No infinite retry loops. Use `BackoffPolicy`, and dead-letter with an Error log when the budget is exhausted. A bare `continue` on error is a 100%-CPU spin when the failure is persistent.
+* **Treat peer and file input as hostile.** Validate lengths, opcodes and enum values *before* they become exceptions. Malformed input should reject the message and log at `Warning` — it is expected input at a boundary, not a server fault.
+* **Let the unrecoverable escape.** `OperationCanceledException` (control flow) and `OutOfMemoryException` (unsafe to continue) propagate through `Guard` by design. Startup failures still terminate the process — diagnosably.
+* **Clean up with `finally`/`using`.** Pooled buffers (`ArrayPool`), transactions and streams must be released on the failure path too.
+
+### Severity ladder
+
+`LogType.Debug` development detail · `Initialize`/`Network`/`Command` normal state · `Warning` recoverable abnormal condition · `Error` operation failed, process healthy · `Fatal` process or subsystem cannot continue.
+
+Never log passwords, tokens, keys, or other credentials.
+
+### Adding a finding
+
+Continue the **`SS-nn`** series:
+
+1. Allocate the next id and add a row to `docs/exception-safety-audit.md`.
+2. Cite the id in the production comment explaining why the boundary exists.
+3. Add a tripwire test whose XML doc names the id, then **revert the fix and confirm the test fails**. A guard with no failing test proves nothing.
+
+### Static analysis
+
+`src/Directory.Build.props` + `src/.editorconfig` enable .NET analyzers as **warnings only** — `TreatWarningsAsErrors` is off and `<Nullable>` is untouched, so analysis cannot break the build. Fix what you surface or record it in the audit; do not blanket-suppress. CA1031 (broad catch) is intentionally a *suggestion*, because flagging every deliberate boundary would train people to suppress it.

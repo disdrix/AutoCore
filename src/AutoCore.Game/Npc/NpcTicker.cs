@@ -7,6 +7,7 @@ using AutoCore.Game.Entities;
 using AutoCore.Game.Map;
 using AutoCore.Game.Structures;
 using AutoCore.Game.TNL.Ghost;
+using AutoCore.Utils.Reliability;
 
 /// <summary>
 /// Adapter that drives the pure <see cref="NpcPathFollower"/> over a map's live NPC AI entities.
@@ -21,6 +22,15 @@ public static class NpcTicker
     /// <summary>Fallback patrol speed (u/s) for foot creatures when the clonebase has none.</summary>
     internal const float DefaultFootSpeed = 2.5f;
 
+    /// <summary>
+    /// Advances every NPC on the map.
+    /// <para>
+    /// SS-12: each NPC is isolated. Previously this was a bare <c>foreach</c>, so one bad NPC
+    /// aborted every remaining NPC on this map — and, because <c>MapManager.TickNpcs</c> loops
+    /// maps without isolation either, every remaining map too. A single corrupt entity could
+    /// therefore freeze AI server-wide while the tick itself kept running.
+    /// </para>
+    /// </summary>
     public static void Tick(SectorMap map, long nowMs, float dt)
     {
         if (map == null)
@@ -28,14 +38,39 @@ public static class NpcTicker
 
         // Snapshot: a fired arrival reaction can mutate NpcAiEntities mid-iteration.
         var entities = map.NpcAiEntities.ToArray();
-        foreach (var entity in entities)
+
+        Guard.ForEach(
+            entities,
+            "NPC tick",
+            entity => TickEntity(map, entity, nowMs, dt),
+            describe: DescribeEntity);
+    }
+
+    /// <summary>Identifies an NPC in diagnostics without ever throwing.</summary>
+    private static string DescribeEntity(ClonedObjectBase entity)
+    {
+        if (entity == null)
+            return "null";
+
+        try
+        {
+            return $"{entity.GetType().Name} coid={entity.ObjectId.Coid}";
+        }
+        catch (Exception ex)
+        {
+            return $"<describe failed: {ex.GetType().Name}>";
+        }
+    }
+
+    private static void TickEntity(SectorMap map, ClonedObjectBase entity, long nowMs, float dt)
+    {
         {
             if (entity == null || entity.IsCorpse)
-                continue;
+                return;
 
             var npcAi = GetNpcAi(entity);
             if (npcAi == null)
-                continue;
+                return;
 
             // Combat brain first: aggro scan (idle), fire, bounded pursuit lunge (engage/combat).
             NpcCombatAi.Tick(map, entity, nowMs, dt);
@@ -45,10 +80,10 @@ public static class NpcTicker
             // walking home, fleeing, or lunging at its target this tick. Pathless NPCs have no path and
             // fall through the TryGetMapPath check below.
             if (npcAi.ReturningHome || nowMs < npcAi.FleeUntilMs || npcAi.PursuingThisTick)
-                continue;
+                return;
 
             if (!map.TryGetMapPath(GetPathCoid(entity), out var path) || path.Points.Count == 0)
-                continue;
+                return;
 
             // Captured before WaitUntilMs is overwritten below: true exactly when this tick took
             // NpcPathFollower.Step's hold-in-place branch (nowMs still short of the wait deadline).

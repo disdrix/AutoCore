@@ -1,6 +1,7 @@
 namespace AutoCore.Game.Managers;
 
 using System.Collections.Concurrent;
+using AutoCore.Utils;
 
 /// <summary>Intent for a pending mission-row write (latest-wins per character+mission).</summary>
 public enum QuestPersistKind
@@ -47,9 +48,26 @@ public readonly struct QuestPersistOp
 /// </summary>
 public sealed class MissionPersistenceQueue
 {
+    /// <summary>
+    /// How many times a single failing write is retried before it is dead-lettered.
+    /// <para>
+    /// SS-14: retries must be bounded. A permanently failing write (schema mismatch, a row that
+    /// violates a constraint) previously re-queued itself on every flush forever, silently, so
+    /// the queue never drained and nothing ever reported the problem.
+    /// </para>
+    /// </summary>
+    public const int MaxPersistAttempts = 5;
+
     private readonly ConcurrentDictionary<(long Coid, int MissionId), QuestPersistOp> _pending = new();
+    private readonly ConcurrentDictionary<(long Coid, int MissionId), int> _attempts = new();
 
     public int PendingCount => _pending.Count;
+
+    /// <summary>
+    /// Writes abandoned after <see cref="MaxPersistAttempts"/> consecutive failures. Non-zero
+    /// means mission progress was lost and the cause is in the error log.
+    /// </summary>
+    public int DeadLetteredCount { get; private set; }
 
     /// <summary>Record or replace the pending op for (coid, missionId).</summary>
     public void Enqueue(long coid, int missionId, QuestPersistOp op)
@@ -82,9 +100,33 @@ public sealed class MissionPersistenceQueue
             {
                 persist(key.Coid, key.MissionId, op);
                 ++drained;
+                _attempts.TryRemove(key, out _);
             }
-            catch
+            catch (Exception ex) when (ex is not OperationCanceledException and not OutOfMemoryException)
             {
+                var attempt = _attempts.AddOrUpdate(key, 1, (_, previous) => previous + 1);
+
+                if (attempt >= MaxPersistAttempts)
+                {
+                    // SS-14: dead-letter rather than retry forever. The mutation is lost, so this
+                    // is an error, not a warning — it must be visible in production logs.
+                    _attempts.TryRemove(key, out _);
+                    DeadLetteredCount++;
+
+                    Logger.WriteException(
+                        LogType.Error,
+                        $"mission persist coid={key.Coid} mission={key.MissionId} kind={op.Kind} " +
+                        $"failed {attempt} times; abandoning write (progress lost)",
+                        ex);
+                    continue;
+                }
+
+                Logger.WriteException(
+                    LogType.Warning,
+                    $"mission persist coid={key.Coid} mission={key.MissionId} kind={op.Kind} " +
+                    $"failed (attempt {attempt}/{MaxPersistAttempts}); will retry on next flush",
+                    ex);
+
                 // Do not lose a mission mutation on a transient DB failure. Preserve a newer
                 // operation if one arrived while this write was in flight.
                 _pending.TryAdd(key, op);
@@ -94,7 +136,11 @@ public sealed class MissionPersistenceQueue
         return drained;
     }
 
-    public void Clear() => _pending.Clear();
+    public void Clear()
+    {
+        _pending.Clear();
+        _attempts.Clear();
+    }
 
     /// <summary>Drop pending ops for a single character (used by /clearAllMissions).</summary>
     public void RemoveForCharacter(long coid)

@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using AutoCore.Game.Packets.Sector;
 using AutoCore.Game.TNL;
 using AutoCore.Utils;
+using AutoCore.Utils.Reliability;
 
 /// <summary>
 /// Soft-pedals client-facing mission UI traffic after dialog deliver turn-in.
@@ -58,7 +59,10 @@ public static class MissionClientSoftPedal
             return;
         }
 
-        _ = RunDelayedAsync(action, delayMs);
+        // SS-17: detached deliberately (the caller must not block on the soft-pedal delay).
+        // Routed through SafeTask so a fault is observed even if RunDelayedAsync's own guard
+        // is ever narrowed.
+        SafeTask.FireAndForget(RunDelayedAsync(action, delayMs), "mission client soft-pedal delayed work");
     }
 
     private static async Task RunDelayedAsync(Action action, int delayMs)

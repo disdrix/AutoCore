@@ -22,6 +22,7 @@ using AutoCore.Game.Physics.Vehicle;
 using AutoCore.Game.Structures;
 using AutoCore.Game.TNL.Ghost;
 using AutoCore.Utils;
+using AutoCore.Utils.Reliability;
 
 public class Vehicle : SimpleObject
 {
@@ -565,14 +566,73 @@ public class Vehicle : SimpleObject
                 _lastCombatMsgByAttackerMs[key] = now;
             }
 
-            foreach (var conn in connections)
-                conn.SendGamePacket(packet, skipOpcode: true);
+            // SS-24: isolate per connection. One bad connection used to abort the send for every
+            // other player in scope, and the outer catch then hid that it had happened at all.
+            Guard.ForEach(
+                connections,
+                "combat packet send",
+                conn => conn.SendGamePacket(packet, skipOpcode: true),
+                describe: DescribeConnection,
+                onError: (_, ex) => NoteCombatSendFailure(ex));
         }
-        catch
+        catch (Exception ex) when (ex is not OperationCanceledException and not OutOfMemoryException)
         {
-            // never let combat networking break the fire loop
+            // Never let combat networking break the fire loop — but never hide it either.
+            NoteCombatSendFailure(ex);
         }
     }
+
+    private static string DescribeConnection(TNL.TNLConnection connection)
+    {
+        try
+        {
+            return $"coid={connection?.GetPlayerCOID()}";
+        }
+        catch (Exception ex)
+        {
+            return $"<describe failed: {ex.GetType().Name}>";
+        }
+    }
+
+    private static long _combatSendFailures;
+    private static long _lastCombatSendWarnMs;
+
+    /// <summary>Combat packet sends that failed since process start.</summary>
+    internal static long CombatSendFailureCount => Interlocked.Read(ref _combatSendFailures);
+
+    /// <summary>Test seam: clears combat-send failure tracking.</summary>
+    internal static void ResetCombatSendFailureTrackingForTests()
+    {
+        Interlocked.Exchange(ref _combatSendFailures, 0);
+        Interlocked.Exchange(ref _lastCombatSendWarnMs, 0);
+    }
+
+    /// <summary>
+    /// Records a failed combat send.
+    /// <para>
+    /// SS-24: this path used to be a bare <c>catch</c> with no logging, so "my shots don't
+    /// register" reports arrived with zero server-side evidence. Firing is a hot path, so the
+    /// warning is throttled and carries the accumulated count rather than logging per shot.
+    /// </para>
+    /// </summary>
+    private static void NoteCombatSendFailure(Exception ex)
+    {
+        var total = Interlocked.Increment(ref _combatSendFailures);
+        var now = Environment.TickCount64;
+        var last = Interlocked.Read(ref _lastCombatSendWarnMs);
+
+        if (last != 0 && now - last < CombatSendWarnIntervalMs)
+            return;
+
+        Interlocked.Exchange(ref _lastCombatSendWarnMs, now);
+
+        Logger.WriteException(
+            LogType.Warning,
+            $"combat packet send (total failures since start: {total}; further failures suppressed for {CombatSendWarnIntervalMs}ms)",
+            ex);
+    }
+
+    private const int CombatSendWarnIntervalMs = 5000;
     #endregion
 
     public Vehicle()

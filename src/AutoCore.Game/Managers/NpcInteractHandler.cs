@@ -11,6 +11,7 @@ using AutoCore.Game.Packets.Sector;
 using AutoCore.Game.Structures;
 using AutoCore.Game.TNL;
 using AutoCore.Utils;
+using AutoCore.Utils.Reliability;
 
 /// <summary>
 /// NPC/world-object interact (UseObject 0x2072) and mission dialog response (0x206E).
@@ -87,7 +88,10 @@ public static class NpcInteractHandler
             return;
         }
 
-        _ = RunDelayedWorkAsync(action, delayMs, token);
+        // SS-17: detached deliberately (the caller must not block on the interact delay).
+        // Routed through SafeTask so a fault is observed even if RunDelayedWorkAsync's own
+        // guard is ever narrowed.
+        SafeTask.FireAndForget(RunDelayedWorkAsync(action, delayMs, token), "NPC interact delayed work");
     }
 
     private static async Task RunDelayedWorkAsync(Action action, int delayMs, CancellationToken token)

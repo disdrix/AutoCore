@@ -3,6 +3,7 @@
 namespace AutoCore.Database.Char;
 
 using AutoCore.Database.Char.Models;
+using AutoCore.Utils;
 
 public class CharContext : DbContext
 {
@@ -273,16 +274,64 @@ public class CharContext : DbContext
             """);
     }
 
+    /// <summary>
+    /// MySQL error numbers meaning "this object already exists", which is the expected and
+    /// harmless outcome when re-running idempotent DDL against an already-upgraded database.
+    /// </summary>
+    private static readonly HashSet<int> DuplicateObjectErrorNumbers = new()
+    {
+        1050, // ER_TABLE_EXISTS_ERROR
+        1060, // ER_DUP_FIELDNAME  — ALTER TABLE ADD COLUMN has no IF NOT EXISTS in MySQL
+        1061, // ER_DUP_KEYNAME
+        1022, // ER_DUP_KEY
+        1091, // ER_CANT_DROP_FIELD_OR_KEY
+        1826, // ER_FK_DUP_NAME
+    };
+
+    /// <summary>
+    /// Runs one idempotent schema-migration statement.
+    /// <para>
+    /// SS-15: this used to be a bare <c>catch</c> commented "already exists". A permission
+    /// error, a dropped connection or a SQL syntax error was therefore indistinguishable from
+    /// the benign case, and startup continued on a <b>silently incomplete schema</b> — which
+    /// surfaces later as confusing runtime query failures. Only genuine duplicate-object errors
+    /// are now treated as expected; everything else is reported.
+    /// </para>
+    /// </summary>
     private void TryExecute(string sql)
     {
         try
         {
             Database.ExecuteSqlRaw(sql);
         }
-        catch
+        catch (MySqlConnector.MySqlException ex) when (DuplicateObjectErrorNumbers.Contains(ex.Number))
         {
-            // Column/table already exists on upgraded databases.
+            // Expected: column/table already exists on an upgraded database.
         }
+        catch (InvalidOperationException)
+        {
+            // Non-relational provider (the in-memory provider used by unit tests) does not
+            // support raw SQL. Schema is created by the provider itself there.
+        }
+        catch (Exception ex)
+        {
+            // Anything else means the schema may now be incomplete. Say so loudly rather than
+            // letting queries fail mysteriously later.
+            Logger.WriteException(
+                LogType.Error,
+                $"character schema migration failed; schema may be incomplete. Statement: {Summarize(sql)}",
+                ex);
+        }
+    }
+
+    /// <summary>First line of a SQL statement, for log context without dumping whole DDL blocks.</summary>
+    private static string Summarize(string sql)
+    {
+        if (string.IsNullOrWhiteSpace(sql))
+            return "<empty>";
+
+        var firstLine = sql.TrimStart().Split('\n')[0].Trim();
+        return firstLine.Length > 120 ? firstLine[..120] + "..." : firstLine;
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)

@@ -75,16 +75,15 @@ public class LoggerTests
         Assert.IsTrue(content.Contains("Logging system startup!", StringComparison.Ordinal));
     }
 
+    /// <summary>
+    /// SS-06: every declared LogType must be loggable. The logger is called from inside
+    /// catch blocks, so a throw here escapes the handler that was containing a failure.
+    /// </summary>
     [TestMethod]
-    public void WriteLog_AllStandardTypes_DoNotThrow()
+    public void WriteLog_AllDeclaredTypes_DoNotThrow()
     {
         foreach (LogType type in Enum.GetValues(typeof(LogType)))
-        {
-            if (type is LogType.ExportData or LogType.File)
-                continue;
-
             Logger.WriteLog(type, $"message for {type}");
-        }
     }
 
     [TestMethod]
@@ -131,19 +130,171 @@ public class LoggerTests
         Logger.WriteLog(LogType.Command, "value={0} flag={1}", 7, true);
     }
 
+    /// <summary>
+    /// SS-06: ExportData previously fell through the switch to a default that threw
+    /// ArgumentOutOfRangeException, making the type unusable and able to throw out of a
+    /// catch block. It must log its payload verbatim, with no timestamp/prefix decoration.
+    /// </summary>
     [TestMethod]
-    public void WriteLog_ExportData_ThrowsBecauseNotHandledInSwitch()
+    public void WriteLog_ExportData_DoesNotThrow_AndWritesPayloadUndecorated()
     {
-        // Production switch has no ExportData case; falls to default and throws.
-        Assert.ThrowsException<ArgumentOutOfRangeException>(
-            () => Logger.WriteLog(LogType.ExportData, "payload"));
+        _tempLogPath = Path.Combine(Path.GetTempPath(), $"autocore-logger-{Guid.NewGuid():N}.txt");
+        Logger.UpdateConfig(new Logger.LoggerConfig
+        {
+            LogToFile = true,
+            LogFilePath = _tempLogPath,
+            IsDebugMode = true
+        });
+
+        Logger.WriteLog(LogType.ExportData, "raw-export-payload-xyz");
+        Logger.UpdateConfig(new Logger.LoggerConfig { LogToFile = false });
+
+        var line = File.ReadAllLines(_tempLogPath)
+            .First(l => l.Contains("raw-export-payload-xyz", StringComparison.Ordinal));
+
+        Assert.AreEqual(
+            "raw-export-payload-xyz",
+            line,
+            "SS-06: ExportData must be written verbatim with no timestamp or [prefix] decoration.");
     }
 
+    /// <summary>
+    /// SS-06: an out-of-range LogType must degrade to a usable default, never throw.
+    /// </summary>
     [TestMethod]
-    public void WriteLog_InvalidEnum_Throws()
+    public void WriteLog_UnknownLogType_DoesNotThrow()
     {
-        Assert.ThrowsException<ArgumentOutOfRangeException>(
-            () => Logger.WriteLog((LogType)999, "bad"));
+        Logger.WriteLog((LogType)999, "bad-type-but-must-still-log");
+    }
+
+    /// <summary>
+    /// SS-06: the severity ladder needs Warning and Fatal so recoverable abnormal
+    /// conditions and unsurvivable ones are distinguishable in production logs.
+    /// </summary>
+    [TestMethod]
+    public void WriteLog_WarningAndFatal_AreDeclared_AndDoNotThrow()
+    {
+        Logger.WriteLog(LogType.Warning, "recoverable abnormal condition");
+        Logger.WriteLog(LogType.Fatal, "subsystem cannot continue");
+    }
+
+    /// <summary>
+    /// SS-06: UpdateConfig opened a FileStream unguarded, so an unwritable path threw
+    /// out of startup. It must degrade to console-only logging instead.
+    /// </summary>
+    [TestMethod]
+    public void UpdateConfig_WithUnwritablePath_DoesNotThrow_AndLoggingStillWorks()
+    {
+        var unwritable = Path.Combine(
+            Path.GetTempPath(),
+            $"autocore-missing-{Guid.NewGuid():N}",
+            "nested",
+            "log.txt");
+
+        Logger.UpdateConfig(new Logger.LoggerConfig
+        {
+            LogToFile = true,
+            LogFilePath = unwritable,
+            IsDebugMode = true
+        });
+
+        Logger.WriteLog(LogType.Error, "must still reach the console after file open failed");
+    }
+
+    /// <summary>
+    /// SS-06: WriteException must preserve the exception type, message, stack trace and
+    /// the full inner-exception chain. 105 sites previously logged only ex.Message.
+    /// </summary>
+    [TestMethod]
+    public void WriteException_PreservesTypeMessageStackAndInnerChain()
+    {
+        _tempLogPath = Path.Combine(Path.GetTempPath(), $"autocore-logger-{Guid.NewGuid():N}.txt");
+        Logger.UpdateConfig(new Logger.LoggerConfig
+        {
+            LogToFile = true,
+            LogFilePath = _tempLogPath,
+            IsDebugMode = true
+        });
+
+        Exception captured;
+        try
+        {
+            try
+            {
+                throw new InvalidOperationException("inner-cause-marker");
+            }
+            catch (Exception inner)
+            {
+                throw new ApplicationException("outer-wrapper-marker", inner);
+            }
+        }
+        catch (Exception ex)
+        {
+            captured = ex;
+        }
+
+        Logger.WriteException(LogType.Error, "SaveCharacter(coid=42)", captured);
+        Logger.UpdateConfig(new Logger.LoggerConfig { LogToFile = false });
+
+        var content = File.ReadAllText(_tempLogPath);
+
+        Assert.IsTrue(content.Contains("SaveCharacter(coid=42)", StringComparison.Ordinal),
+            "Operation context must be logged so the failure can be located.");
+        Assert.IsTrue(content.Contains("ApplicationException", StringComparison.Ordinal),
+            "Outer exception type must be preserved.");
+        Assert.IsTrue(content.Contains("outer-wrapper-marker", StringComparison.Ordinal),
+            "Outer exception message must be preserved.");
+        Assert.IsTrue(content.Contains("InvalidOperationException", StringComparison.Ordinal),
+            "Inner exception type must be preserved.");
+        Assert.IsTrue(content.Contains("inner-cause-marker", StringComparison.Ordinal),
+            "Inner exception message must be preserved.");
+        Assert.IsTrue(content.Contains(nameof(WriteException_PreservesTypeMessageStackAndInnerChain), StringComparison.Ordinal),
+            "Stack trace must be preserved (the throwing test method should appear in it).");
+    }
+
+    /// <summary>
+    /// SS-06: the writer is a static shared by the tick thread and every socket task.
+    /// Concurrent writes must not throw or corrupt the writer.
+    /// </summary>
+    [TestMethod]
+    public void WriteLog_ConcurrentWritersFromManyThreads_DoNotThrow()
+    {
+        _tempLogPath = Path.Combine(Path.GetTempPath(), $"autocore-logger-{Guid.NewGuid():N}.txt");
+        Logger.UpdateConfig(new Logger.LoggerConfig
+        {
+            LogToFile = true,
+            LogFilePath = _tempLogPath,
+            IsDebugMode = true
+        });
+
+        var failures = new System.Collections.Concurrent.ConcurrentBag<Exception>();
+
+        Parallel.For(0, 200, i =>
+        {
+            try
+            {
+                Logger.WriteLog(LogType.Network, $"concurrent-line-{i}");
+            }
+            catch (Exception ex)
+            {
+                failures.Add(ex);
+            }
+        });
+
+        Logger.UpdateConfig(new Logger.LoggerConfig { LogToFile = false });
+
+        Assert.AreEqual(
+            0,
+            failures.Count,
+            $"SS-06: concurrent WriteLog must never throw, but {failures.Count} call(s) did. " +
+            $"First: {failures.FirstOrDefault()}");
+
+        var written = File.ReadAllLines(_tempLogPath)
+            .Count(l => l.Contains("concurrent-line-", StringComparison.Ordinal));
+        Assert.AreEqual(
+            200,
+            written,
+            "Every concurrent log line must appear exactly once and on its own line.");
     }
 
     [TestMethod]

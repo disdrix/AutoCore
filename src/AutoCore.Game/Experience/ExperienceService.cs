@@ -59,6 +59,60 @@ public sealed class ExperienceService : Singleton<ExperienceService>
     /// <summary>When false, skips SendGamePacket (tests without connection).</summary>
     internal bool SendPacketsOnGrant { get; set; } = true;
 
+    private static long _fallbackCount;
+    private static readonly HashSet<string> WarnedFallbacks = new();
+
+    /// <summary>
+    /// How many experience/credit lookups have fallen back to the built-in retail sample tables
+    /// instead of live asset data.
+    /// <para>
+    /// SS-22: a non-zero value in production means players are being awarded XP, credits or quest
+    /// rewards computed from approximations in <c>docs/XP.md</c> rather than the real tables. That
+    /// used to happen <b>silently</b> — every lookup here swallowed asset failures with a bare
+    /// <c>catch</c> commented "Asset manager not initialized in unit tests", so a genuine asset
+    /// problem in production produced quietly wrong progression that nobody could detect.
+    /// </para>
+    /// </summary>
+    public static long FallbackCount => Interlocked.Read(ref _fallbackCount);
+
+    /// <summary>Test seam: clears fallback tracking so counts are per-test.</summary>
+    internal static void ResetFallbackTrackingForTests()
+    {
+        Interlocked.Exchange(ref _fallbackCount, 0);
+        lock (WarnedFallbacks)
+            WarnedFallbacks.Clear();
+    }
+
+    /// <summary>
+    /// Records that a lookup degraded to the built-in table. Warns once per lookup kind: these
+    /// run per kill and per quest turn-in, so per-call logging would flood the log.
+    /// </summary>
+    private static void NoteFallback(string lookup, Exception ex = null)
+    {
+        Interlocked.Increment(ref _fallbackCount);
+
+        bool firstTime;
+        lock (WarnedFallbacks)
+            firstTime = WarnedFallbacks.Add(lookup);
+
+        if (!firstTime)
+            return;
+
+        if (ex != null)
+        {
+            Logger.WriteException(
+                LogType.Warning,
+                $"experience lookup '{lookup}' (falling back to built-in retail table; awarded values may be wrong)",
+                ex);
+            return;
+        }
+
+        Logger.WriteLog(
+            LogType.Warning,
+            $"Experience lookup '{lookup}' returned no asset data; falling back to the built-in " +
+            "retail table. Awarded values may be wrong — check that XP assets loaded.");
+    }
+
     /// <summary>Reset injectables between tests.</summary>
     internal void ResetForTests()
     {
@@ -210,7 +264,7 @@ public sealed class ExperienceService : Singleton<ExperienceService>
             }
             catch (Exception ex)
             {
-                Logger.WriteLog(LogType.Error, $"GiveXp persist failed coid={coid}: {ex.Message}");
+                Logger.WriteException(LogType.Error, $"GiveXp persist failed coid={coid}", ex);
                 return GiveXpResult.Fail($"Persist failed: {ex.Message}");
             }
         }
@@ -599,11 +653,13 @@ public sealed class ExperienceService : Singleton<ExperienceService>
             if (fromAssets > 0)
                 return fromAssets;
         }
-        catch
+        catch (Exception ex) when (ex is not OperationCanceledException and not OutOfMemoryException)
         {
-            // Asset manager not initialized in unit tests.
+            NoteFallback(nameof(GetThreshold), ex);
+            return DefaultRetailThreshold(level);
         }
 
+        NoteFallback(nameof(GetThreshold));
         return DefaultRetailThreshold(level);
     }
 
@@ -616,8 +672,9 @@ public sealed class ExperienceService : Singleton<ExperienceService>
         {
             return AssetManager.Instance.GetExperienceLevel(level);
         }
-        catch
+        catch (Exception ex) when (ex is not OperationCanceledException and not OutOfMemoryException)
         {
+            NoteFallback(nameof(GetLevelRow), ex);
             return null;
         }
     }
@@ -633,11 +690,13 @@ public sealed class ExperienceService : Singleton<ExperienceService>
             if (fromAssets > 0)
                 return fromAssets;
         }
-        catch
+        catch (Exception ex) when (ex is not OperationCanceledException and not OutOfMemoryException)
         {
-            // Asset manager not initialized in unit tests.
+            NoteFallback(nameof(GetCreatureXp), ex);
+            return DefaultCreatureXp(creatureLevel);
         }
 
+        NoteFallback(nameof(GetCreatureXp));
         return DefaultCreatureXp(creatureLevel);
     }
 
@@ -652,11 +711,13 @@ public sealed class ExperienceService : Singleton<ExperienceService>
             if (fromAssets > 0f)
                 return fromAssets;
         }
-        catch
+        catch (Exception ex) when (ex is not OperationCanceledException and not OutOfMemoryException)
         {
-            // Asset manager not initialized in unit tests.
+            NoteFallback(nameof(GetQuestFrac), ex);
+            return DefaultQuestFrac(index);
         }
 
+        NoteFallback(nameof(GetQuestFrac));
         return DefaultQuestFrac(index);
     }
 
@@ -671,11 +732,13 @@ public sealed class ExperienceService : Singleton<ExperienceService>
             if (fromAssets > 0f)
                 return fromAssets;
         }
-        catch
+        catch (Exception ex) when (ex is not OperationCanceledException and not OutOfMemoryException)
         {
-            // Asset manager not initialized in unit tests.
+            NoteFallback(nameof(GetQuestCreditsFrac), ex);
+            return DefaultQuestCreditsFrac(index);
         }
 
+        NoteFallback(nameof(GetQuestCreditsFrac));
         return DefaultQuestCreditsFrac(index);
     }
 
@@ -690,11 +753,13 @@ public sealed class ExperienceService : Singleton<ExperienceService>
             if (fromAssets > 0)
                 return fromAssets;
         }
-        catch
+        catch (Exception ex) when (ex is not OperationCanceledException and not OutOfMemoryException)
         {
-            // Asset manager not initialized in unit tests.
+            NoteFallback(nameof(GetQuestBaseCredits), ex);
+            return DefaultQuestBaseCredits(targetLevel);
         }
 
+        NoteFallback(nameof(GetQuestBaseCredits));
         return DefaultQuestBaseCredits(targetLevel);
     }
 
@@ -707,8 +772,9 @@ public sealed class ExperienceService : Singleton<ExperienceService>
         {
             return AssetManager.Instance.GetContinentAreaXpLevel(continentId, areaId);
         }
-        catch
+        catch (Exception ex) when (ex is not OperationCanceledException and not OutOfMemoryException)
         {
+            NoteFallback(nameof(GetAreaXpLevel), ex);
             return 0;
         }
     }

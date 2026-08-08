@@ -22,12 +22,21 @@ public class LoginManager : Singleton<LoginManager>
     {
         Timer.Add("LoginSessionExpire", SessionTimeoutCheck, true, () =>
         {
-            var toRemove = new List<uint>();
-
-            toRemove.AddRange(GlobalLogins.Where(gl => gl.Value.ExpireTime < DateTime.Now).Select(gl => gl.Key));
-
+            // SS-23: select AND remove under the same lock. The selection used to enumerate
+            // outside it, so a login arriving mid-enumeration threw "Collection was modified"
+            // and aborted the whole pass — leaving expired sessions in place, which then makes
+            // players who reconnect look like they are already logged in. The window scales
+            // with the number of live sessions, so it is effectively invisible in a small test
+            // and routine once player count rises.
             lock (GlobalLogins)
             {
+                var now = DateTime.Now;
+
+                var toRemove = GlobalLogins
+                    .Where(gl => gl.Value.ExpireTime < now)
+                    .Select(gl => gl.Key)
+                    .ToList();
+
                 foreach (var rem in toRemove)
                     GlobalLogins.Remove(rem);
             }

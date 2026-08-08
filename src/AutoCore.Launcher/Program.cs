@@ -9,6 +9,7 @@ using AutoCore.Launcher.Bootstrap;
 using AutoCore.Sector.Network;
 using AutoCore.Utils;
 using AutoCore.Utils.Commands;
+using AutoCore.Utils.Reliability;
 
 public class Program : ExitableProgram
 {
@@ -25,7 +26,27 @@ public class Program : ExitableProgram
     /// covered by LauncherConfigValidator unit tests; live Main is a deliberate §4 exclusion.
     /// </summary>
     [ExcludeFromCodeCoverage(Justification = "Process host entry — binds shared ports/DB; validated via LauncherConfigValidator.")]
-    public static void Main()
+    public static int Main()
+    {
+        // SS-07: register last-resort diagnostics before anything can fail. This process hosts
+        // Auth, Global and Sector together, so an unhandled exception here takes down all three.
+        CrashHandler.Install("Launcher");
+
+        try
+        {
+            Run();
+            return 0;
+        }
+        catch (Exception ex)
+        {
+            // Startup failures (invalid config, DB unreachable, missing assets) are genuinely
+            // unrecoverable and must still terminate — but diagnosably.
+            Logger.WriteException(LogType.Fatal, "Launcher startup", ex);
+            return 1;
+        }
+    }
+
+    private static void Run()
     {
         // Disable scope trimming so commands remain scoped (auth.exit, global.exit, sector.exit)
         CommandProcessor.UseScopes();
@@ -74,20 +95,23 @@ public class Program : ExitableProgram
     [ExcludeFromCodeCoverage(Justification = "Process-exit handler tied to live server hosts.")]
     private static bool ExitHandlerProc(byte sig)
     {
-        Logger.WriteLog(LogType.Error, "Shutting down the servers...");
+        Logger.WriteLog(LogType.Initialize, "Shutting down the servers...");
 
+        // SS-07: this runs on the console control-handler thread. Each server is isolated so a
+        // failure shutting one down still lets the other two release their ports and sockets.
         if (SectorHost is not null && GlobalHost is not null && AuthHost is not null)
         {
-            LauncherShutdownCoordinator.Shutdown(SectorHost, GlobalHost, AuthHost);
+            Guard.Run("Launcher shutdown", () =>
+                LauncherShutdownCoordinator.Shutdown(SectorHost, GlobalHost, AuthHost));
         }
         else
         {
-            SectorServer.Shutdown();
-            GlobalServer.Shutdown();
-            AuthServer.Shutdown();
+            Guard.Run("Sector server shutdown", SectorServer.Shutdown);
+            Guard.Run("Global server shutdown", GlobalServer.Shutdown);
+            Guard.Run("Auth server shutdown", AuthServer.Shutdown);
         }
 
-        Logger.WriteLog(LogType.Error, "Server shutdowns completed!");
+        Logger.WriteLog(LogType.Initialize, "Server shutdowns completed!");
 
         Logger.WriteLog(LogType.Error, "Press any key to exit...");
 

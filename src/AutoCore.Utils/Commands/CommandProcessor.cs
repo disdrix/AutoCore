@@ -1,6 +1,7 @@
 ﻿namespace AutoCore.Utils.Commands;
 
 using AutoCore.Utils;
+using AutoCore.Utils.Reliability;
 
 public static class CommandProcessor
 {
@@ -31,7 +32,10 @@ public static class CommandProcessor
 
         if (Commands.TryGetValue(parts[0], out var value))
         {
-            value(parts);
+            // SS-08: a console command is operator-supplied input executed on the server's
+            // main thread. Isolate the handler so a bad argument fails the command, not the
+            // command loop. The failure is logged with its full stack trace.
+            Guard.Run($"command '{parts[0]}'", () => value(parts));
             return;
         }
 

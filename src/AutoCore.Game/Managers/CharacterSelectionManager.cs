@@ -309,7 +309,16 @@ public class CharacterSelectionManager : Singleton<CharacterSelectionManager>
             {
                 context.Database.ExecuteSqlRaw("SET FOREIGN_KEY_CHECKS = 1;");
             }
-            catch {}
+            catch (Exception restoreEx)
+            {
+                // SS-15: was an empty catch. Failing to restore FOREIGN_KEY_CHECKS leaves this
+                // connection with referential integrity disabled, so it must be visible even
+                // though the original failure below is the more important one.
+                AutoCore.Utils.Logger.WriteException(
+                    AutoCore.Utils.LogType.Warning,
+                    "restoring FOREIGN_KEY_CHECKS after failed character creation",
+                    restoreEx);
+            }
 
             try
             {

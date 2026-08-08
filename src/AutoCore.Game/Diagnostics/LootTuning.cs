@@ -101,7 +101,7 @@ public static class LootTuning
         }
         catch (Exception ex)
         {
-            Logger.WriteLog(LogType.Error, $"LootTuning: error reading {file}: {ex.Message}");
+            Logger.WriteException(LogType.Error, $"LootTuning: error reading {file}", ex);
         }
     }
 

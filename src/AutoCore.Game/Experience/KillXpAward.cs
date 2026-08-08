@@ -33,8 +33,14 @@ public static class KillXpAward
             var murdererObj = ObjectManager.Instance.GetObject(victim.Murderer);
             killer = murdererObj?.GetSuperCharacter(false);
         }
-        catch
+        catch (Exception ex) when (ex is not OperationCanceledException and not OutOfMemoryException)
         {
+            // SS-22: was a silent `return`. Dropping kill XP is player-visible ("I killed it and
+            // got nothing") and previously left no server-side trace at all.
+            Logger.WriteException(
+                LogType.Warning,
+                $"resolving killer for kill XP (victim coid={victim.ObjectId.Coid}, murderer={victim.Murderer}); kill XP dropped",
+                ex);
             return;
         }
 
@@ -85,9 +91,14 @@ public static class KillXpAward
                 return pct > 0f ? pct : 1f;
             }
         }
-        catch
+        catch (Exception ex) when (ex is not OperationCanceledException and not OutOfMemoryException)
         {
-            // fall through
+            // SS-22: was a silent fall-through to 1f. A clonebase lookup failure here changes the
+            // XP multiplier, so it must be visible rather than quietly awarding the default.
+            Logger.WriteException(
+                LogType.Warning,
+                $"resolving XP percent for creature CBID={creature?.CBID}; using default multiplier 1.0",
+                ex);
         }
 
         return 1f;

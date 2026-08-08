@@ -620,8 +620,13 @@ public class CommunicatorHandlerTests
 
     #region Malformed / framing
 
+    /// <summary>
+    /// SS-11: the opcode is a peer-controlled byte. This used to throw from the socket receive
+    /// task, which permanently killed that connection's receive loop. The message must be
+    /// rejected instead, leaving the connection usable.
+    /// </summary>
     [TestMethod]
-    public void InvalidOpcode_Throws()
+    public void InvalidOpcode_IsRejectedWithoutThrowing()
     {
         var client = new Communicator(CommunicatorType.Client);
         using var stream = new NonContiguousMemoryStream();
@@ -629,12 +634,16 @@ public class CommunicatorHandlerTests
         stream.Write(payload, 0, payload.Length);
         stream.Position = 0;
 
-        Assert.ThrowsException<Exception>(() => client.ProcessReceivedPacket(stream, payload.Length));
+        client.ProcessReceivedPacket(stream, payload.Length);
+
         client.Close();
     }
 
+    /// <summary>
+    /// SS-11: a declared length longer than the body must be rejected, not thrown on.
+    /// </summary>
     [TestMethod]
-    public void MalformedLength_OverRead_Throws()
+    public void MalformedLength_OverRead_IsRejectedWithoutThrowing()
     {
         var client = new Communicator(CommunicatorType.Client);
         var packet = new LoginResponsePacket { Success = true };
@@ -644,20 +653,18 @@ public class CommunicatorHandlerTests
         stream.Write(bytes, 0, bytes.Length);
         stream.Position = 0;
 
-        // Claim a longer length than the actual payload → under-read detection (position < start+length)
-        // Actually OnSocketReceive checks: startPosition + length != incomingStream.Position
-        // After reading 2 bytes, position=2; if length=10, 0+10 != 2 → throws
-        var ex = Assert.ThrowsException<Exception>(() => client.ProcessReceivedPacket(stream, bytes.Length + 8));
-        StringAssert.Contains(ex.Message, "Over or under read");
+        // Claim a longer length than the payload actually consumes.
+        client.ProcessReceivedPacket(stream, bytes.Length + 8);
+
         client.Close();
     }
 
+    /// <summary>
+    /// SS-11: a declared length shorter than the body must be rejected, not thrown on.
+    /// </summary>
     [TestMethod]
-    public void MalformedLength_UnderRead_Throws()
+    public void MalformedLength_UnderRead_IsRejectedWithoutThrowing()
     {
-        // Extra trailing bytes after a valid packet body with length that doesn't match full read
-        // Write LoginResponse (2 bytes) + extra padding, but report length = total so position ends short of length? 
-        // If we report length smaller than bytes consumed, we get over-read.
         var client = new Communicator(CommunicatorType.Client);
         var packet = new LoginResponsePacket { Success = true };
         var bytes = PacketTestHelper.WritePacket(packet);
@@ -666,15 +673,17 @@ public class CommunicatorHandlerTests
         stream.Write(bytes, 0, bytes.Length);
         stream.Position = 0;
 
-        // length=1 but packet.Read consumes Success after opcode → actually opcode read in OnSocketReceive,
-        // then packet.Read reads Success → position=2, length=1 → 0+1 != 2 → over-read
-        var ex = Assert.ThrowsException<Exception>(() => client.ProcessReceivedPacket(stream, 1));
-        StringAssert.Contains(ex.Message, "Over or under read");
+        client.ProcessReceivedPacket(stream, 1);
+
         client.Close();
     }
 
+    /// <summary>
+    /// SS-11: a peer disconnecting mid-packet leaves a truncated body. That must be rejected,
+    /// not surfaced as an EndOfStreamException that kills the receive loop.
+    /// </summary>
     [TestMethod]
-    public void DisconnectMidRead_TruncatedPayload_Throws()
+    public void DisconnectMidRead_TruncatedPayload_IsRejectedWithoutThrowing()
     {
         var client = new Communicator(CommunicatorType.Client);
         // Partial RedirectRequest (opcode + 2 bytes of AccountId only)
@@ -684,8 +693,51 @@ public class CommunicatorHandlerTests
         stream.Write(partial, 0, partial.Length);
         stream.Position = 0;
 
-        Assert.ThrowsException<EndOfStreamException>(() =>
-            client.ProcessReceivedPacket(stream, partial.Length));
+        client.ProcessReceivedPacket(stream, partial.Length);
+
+        client.Close();
+    }
+
+    [TestMethod]
+    public void EmptyFrame_IsRejectedWithoutThrowing()
+    {
+        var client = new Communicator(CommunicatorType.Client);
+        using var stream = new NonContiguousMemoryStream();
+
+        client.ProcessReceivedPacket(stream, 0);
+
+        client.Close();
+    }
+
+    /// <summary>
+    /// SS-11 tripwire: the canonical survival shape. A good message, then a malformed one that
+    /// is rejected, then another good message that must still be delivered.
+    /// </summary>
+    [TestMethod]
+    public void AfterMalformedMessage_LaterValidMessagesAreStillProcessed()
+    {
+        var client = new Communicator(CommunicatorType.Client);
+        var responses = new List<bool>();
+        client.OnLoginResponse = s => responses.Add(s);
+
+        Deliver(client, new LoginResponsePacket { Success = true });
+
+        using (var bad = new NonContiguousMemoryStream())
+        {
+            var payload = new byte[] { 0xFF }; // unknown opcode
+            bad.Write(payload, 0, payload.Length);
+            bad.Position = 0;
+            client.ProcessReceivedPacket(bad, payload.Length);
+        }
+
+        Deliver(client, new LoginResponsePacket { Success = true });
+
+        CollectionAssert.AreEqual(
+            new[] { true, true },
+            responses,
+            "SS-11: a malformed message must not stop later valid messages from being " +
+            $"processed. Got {responses.Count} response(s).");
+
         client.Close();
     }
 

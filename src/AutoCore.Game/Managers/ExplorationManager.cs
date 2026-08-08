@@ -10,6 +10,7 @@ using AutoCore.Game.Managers.Asset;
 using AutoCore.Game.Packets.Sector;
 using AutoCore.Utils;
 using AutoCore.Utils.Memory;
+using AutoCore.Utils.Reliability;
 
 /// <summary>
 /// Server-authoritative map exploration: sample terrain TGA area ids from vehicle position,
@@ -274,9 +275,12 @@ public class ExplorationManager : Singleton<ExplorationManager>
 
         ThreadPool.QueueUserWorkItem(_ =>
         {
+            // SS-19: an exception escaping a ThreadPool callback is an UNHANDLED exception on a
+            // pool thread, which terminates the process. The try/finally here cleared the
+            // scheduling flag but did not catch, so any throw from the flush was fatal.
             try
             {
-                FlushPendingExplorations();
+                Guard.Run("exploration background flush", () => FlushPendingExplorations());
             }
             finally
             {

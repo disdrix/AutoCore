@@ -20,6 +20,7 @@ using AutoCore.Game.Managers;
 using AutoCore.Game.Packets;
 using AutoCore.Game.TNL.Ghost;
 using AutoCore.Utils;
+using AutoCore.Utils.Reliability;
 
 public partial class TNLConnection : GhostConnection
 {
@@ -722,22 +723,55 @@ public partial class TNLConnection : GhostConnection
     [ExcludeFromCodeCoverage(Justification = "Live TNL inbound dispatch; handlers unit-tested via InvokeHandler + TestPacketSink.")]
     private void HandlePacket(ByteBuffer buffer)
     {
-        var rawBytes = new byte[buffer.GetBufferSize()];
-        Array.Copy(buffer.GetBuffer(), rawBytes, rawBytes.Length);
+        // SS-11: everything below is client-controlled. This prologue used to sit OUTSIDE the
+        // try that guards the dispatch switch, so a frame shorter than four bytes threw
+        // EndOfStreamException from ReadUInt32 straight past the handler guard and into TNL's
+        // RPC dispatch.
+        byte[] rawBytes;
+        BinaryReader reader;
+        uint rawOpcode;
+        GameOpcode gameOpcode;
 
-        var reader = new BinaryReader(new MemoryStream(rawBytes));
-        var rawOpcode = reader.ReadUInt32();
-        var gameOpcode = (GameOpcode)rawOpcode;
+        try
+        {
+            var size = buffer.GetBufferSize();
 
-        if (gameOpcode == GameOpcode.InventoryGrab)
-            InventoryGrabDebugLog.RecordIncoming(rawBytes);
-        else
-            InventoryDropDebugLog.RecordIncomingIfTossRelated(gameOpcode, rawBytes);
+            if (size < sizeof(uint))
+            {
+                Logger.WriteLog(LogType.Warning,
+                    "Dropping {0}-byte packet from client: too short to contain an opcode.", size);
+                return;
+            }
 
-        // Check if the opcode is a valid enum value
+            rawBytes = new byte[size];
+            Array.Copy(buffer.GetBuffer(), rawBytes, rawBytes.Length);
+
+            reader = new BinaryReader(new MemoryStream(rawBytes));
+            rawOpcode = reader.ReadUInt32();
+            gameOpcode = (GameOpcode)rawOpcode;
+        }
+        catch (Exception ex)
+        {
+            Logger.WriteException(LogType.Warning, "reading inbound packet header", ex);
+            return;
+        }
+
+        // Diagnostic capture must never be able to drop a real packet.
+        Guard.Run("inbound packet debug capture", () =>
+        {
+            if (gameOpcode == GameOpcode.InventoryGrab)
+                InventoryGrabDebugLog.RecordIncoming(rawBytes);
+            else
+                InventoryDropDebugLog.RecordIncomingIfTossRelated(gameOpcode, rawBytes);
+        });
+
+        // Check if the opcode is a valid enum value. An undefined opcode is client input, not a
+        // server fault: log once at Warning and drop, rather than falling through to the
+        // switch's default and logging a second Error for the same packet.
         if (!Enum.IsDefined(typeof(GameOpcode), gameOpcode))
         {
-            Logger.WriteLog(LogType.Error, "Unknown GameOpcode received from client: 0x{0:X} ({1})", rawOpcode, rawOpcode);
+            Logger.WriteLog(LogType.Warning, "Unknown GameOpcode received from client: 0x{0:X} ({1})", rawOpcode, rawOpcode);
+            return;
         }
 
         switch (gameOpcode)
@@ -967,8 +1001,9 @@ public partial class TNLConnection : GhostConnection
         }
         catch (Exception e)
         {
-            Logger.WriteLog(LogType.Error, "Caught exception while handling packets!");
-            Logger.WriteLog(LogType.Error, "Exception: {0}", e);
+            // Per-packet isolation: one bad packet fails that packet only. The connection and
+            // the sector tick both continue.
+            Logger.WriteException(LogType.Error, $"handling inbound packet {gameOpcode}", e);
         }
     }
     #endregion
@@ -1242,8 +1277,7 @@ public partial class TNLConnection : GhostConnection
         }
         catch (Exception ex)
         {
-            Logger.WriteLog(LogType.Error,
-                $"EndCharacterSession: failed to persist world state for coid {character.ObjectId.Coid}: {ex.Message}");
+            Logger.WriteException(LogType.Error, $"EndCharacterSession: failed to persist world state for coid {character.ObjectId.Coid}", ex);
         }
 
         // Drain any pending mission writes so a fast logout cannot outrun the background flush.
@@ -1256,8 +1290,7 @@ public partial class TNLConnection : GhostConnection
         }
         catch (Exception ex)
         {
-            Logger.WriteLog(LogType.Error,
-                $"EndCharacterSession: failed to flush mission state for coid {character.ObjectId.Coid}: {ex.Message}");
+            Logger.WriteException(LogType.Error, $"EndCharacterSession: failed to flush mission state for coid {character.ObjectId.Coid}", ex);
         }
 
         // SS-04: drop ownership before teardown so chat/send paths cannot use a dead connection.

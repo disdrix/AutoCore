@@ -1,4 +1,4 @@
-namespace AutoCore.Game.TNL;
+﻿namespace AutoCore.Game.TNL;
 
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -432,7 +432,7 @@ public partial class TNLConnection
         }
         catch (Exception ex)
         {
-            Logger.WriteLog(LogType.Error, "HandleUseObjectPacket: parse failed: {0}", ex.Message);
+            Logger.WriteException(LogType.Warning, "HandleUseObjectPacket: parse", ex);
             return;
         }
 
@@ -448,7 +448,7 @@ public partial class TNLConnection
         }
         catch (Exception ex)
         {
-            Logger.WriteLog(LogType.Error, "HandleStoreTransactionRequestPacket: parse failed: {0}", ex.Message);
+            Logger.WriteException(LogType.Warning, "HandleStoreTransactionRequestPacket: parse", ex);
             return;
         }
 
@@ -476,7 +476,7 @@ public partial class TNLConnection
         }
         catch (Exception ex)
         {
-            Logger.WriteLog(LogType.Error, "HandleAutoPatrolPacket: parse failed: {0}", ex.Message);
+            Logger.WriteException(LogType.Warning, "HandleAutoPatrolPacket: parse", ex);
             return;
         }
 
@@ -494,7 +494,7 @@ public partial class TNLConnection
         }
         catch (Exception ex)
         {
-            Logger.WriteLog(LogType.Error, "HandleFailMissionPacket: parse failed: {0}", ex.Message);
+            Logger.WriteException(LogType.Warning, "HandleFailMissionPacket: parse", ex);
             return;
         }
 
@@ -513,7 +513,7 @@ public partial class TNLConnection
         }
         catch (Exception ex)
         {
-            Logger.WriteLog(LogType.Error, "HandleMissionDialogResponse: Failed to parse packet: {0}", ex.Message);
+            Logger.WriteException(LogType.Warning, "HandleMissionDialogResponse: parse", ex);
             return;
         }
 
@@ -538,7 +538,7 @@ public partial class TNLConnection
         }
         catch (Exception ex)
         {
-            Logger.WriteLog(LogType.Error, "HandleRequestObject: parse failed: {0}", ex.Message);
+            Logger.WriteException(LogType.Warning, "HandleRequestObject: parse", ex);
             return;
         }
 
@@ -657,7 +657,7 @@ public partial class TNLConnection
         }
         catch (Exception ex)
         {
-            Logger.WriteLog(LogType.Error, "HandleFiringPacket: {0}", ex.Message);
+            Logger.WriteException(LogType.Warning, "HandleFiringPacket", ex);
         }
     }
 

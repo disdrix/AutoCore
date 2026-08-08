@@ -1,0 +1,24 @@
+<Project>
+
+  <!--
+    Repository-wide build defaults.
+
+    Added by the exception-safety audit (docs/exception-safety-audit.md) to give the reliability
+    rules automated enforcement. Deliberately WARNINGS ONLY:
+
+      * TreatWarningsAsErrors stays OFF, so enabling analysis can never break the build.
+      * <Nullable> is NOT set here. AutoCore.Game / Utils / Sector have it disabled and turning
+        it on across ~59k lines is a separate piece of work; the projects that already opt in
+        keep their own setting.
+
+    Per-rule severities live in src/.editorconfig.
+  -->
+  <PropertyGroup>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <AnalysisMode>Default</AnalysisMode>
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+</Project>

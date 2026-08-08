@@ -411,7 +411,7 @@ public class ChatManager : Singleton<ChatManager>
                 }
                 catch (System.Exception ex)
                 {
-                    Logger.WriteLog(LogType.Error, $"Failed to send damage packet: {ex.Message}");
+                    Logger.WriteException(LogType.Error, $"Failed to send damage packet", ex);
                 }
 
                 // Check if target died
@@ -511,7 +511,7 @@ public class ChatManager : Singleton<ChatManager>
                 }
                 catch (System.Exception ex)
                 {
-                    Logger.WriteLog(LogType.Error, $"Failed XP command: {ex.Message}");
+                    Logger.WriteException(LogType.Error, $"Failed XP command", ex);
                     respPacket.Message = $"Failed XP command: {ex.Message}";
                 }
                 break;
@@ -553,7 +553,7 @@ public class ChatManager : Singleton<ChatManager>
                 }
                 catch (System.Exception ex)
                 {
-                    Logger.WriteLog(LogType.Error, $"Failed to set level: {ex.Message}");
+                    Logger.WriteException(LogType.Error, $"Failed to set level", ex);
                     respPacket.Message = $"Failed to set level: {ex.Message}";
                 }
                 break;
@@ -607,7 +607,7 @@ public class ChatManager : Singleton<ChatManager>
                 }
                 catch (System.Exception ex)
                 {
-                    Logger.WriteLog(LogType.Error, $"Failed to send mana packet: {ex.Message}");
+                    Logger.WriteException(LogType.Error, $"Failed to send mana packet", ex);
                     respPacket.Message = $"Failed to set mana: {ex.Message}";
                 }
                 break;
@@ -635,7 +635,7 @@ public class ChatManager : Singleton<ChatManager>
                 }
                 catch (System.Exception ex)
                 {
-                    Logger.WriteLog(LogType.Error, $"Failed to send tech packet: {ex.Message}");
+                    Logger.WriteException(LogType.Error, $"Failed to send tech packet", ex);
                     respPacket.Message = $"Failed to set tech: {ex.Message}";
                 }
                 break;
@@ -665,7 +665,7 @@ public class ChatManager : Singleton<ChatManager>
                 }
                 catch (System.Exception ex)
                 {
-                    Logger.WriteLog(LogType.Error, $"Failed to send combat packet: {ex.Message}");
+                    Logger.WriteException(LogType.Error, $"Failed to send combat packet", ex);
                     respPacket.Message = $"Failed to set combat: {ex.Message}";
                 }
                 break;
@@ -695,7 +695,7 @@ public class ChatManager : Singleton<ChatManager>
                 }
                 catch (System.Exception ex)
                 {
-                    Logger.WriteLog(LogType.Error, $"Failed to send theory packet: {ex.Message}");
+                    Logger.WriteException(LogType.Error, $"Failed to send theory packet", ex);
                     respPacket.Message = $"Failed to set theory: {ex.Message}";
                 }
                 break;
@@ -725,7 +725,7 @@ public class ChatManager : Singleton<ChatManager>
                 }
                 catch (System.Exception ex)
                 {
-                    Logger.WriteLog(LogType.Error, $"Failed to send perception packet: {ex.Message}");
+                    Logger.WriteException(LogType.Error, $"Failed to send perception packet", ex);
                     respPacket.Message = $"Failed to set perception: {ex.Message}";
                 }
                 break;
@@ -756,7 +756,7 @@ public class ChatManager : Singleton<ChatManager>
                 }
                 catch (System.Exception ex)
                 {
-                    Logger.WriteLog(LogType.Error, $"Failed to send attribute points packet: {ex.Message}");
+                    Logger.WriteException(LogType.Error, $"Failed to send attribute points packet", ex);
                     respPacket.Message = $"Failed to set attribute points: {ex.Message}";
                 }
                 break;
@@ -789,7 +789,7 @@ public class ChatManager : Singleton<ChatManager>
                 }
                 catch (System.Exception ex)
                 {
-                    Logger.WriteLog(LogType.Error, $"Failed to send research points packet: {ex.Message}");
+                    Logger.WriteException(LogType.Error, $"Failed to send research points packet", ex);
                     respPacket.Message = $"Failed to set research points: {ex.Message}";
                 }
                 break;

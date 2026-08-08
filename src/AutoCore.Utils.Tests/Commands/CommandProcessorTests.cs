@@ -180,4 +180,41 @@ public class CommandProcessorTests
         Assert.IsFalse(CommandProcessor.UseScopes());
         Assert.IsFalse(TrimScope);
     }
+
+    /// <summary>
+    /// SS-08 tripwire: a console command handler runs on the server's main thread. A throwing
+    /// handler must fail that command only, not propagate into the command loop.
+    /// </summary>
+    [TestMethod]
+    public void Execute_WhenHandlerThrows_DoesNotPropagate()
+    {
+        CommandProcessor.RegisterCommand("ut_cp_throws", _ =>
+            throw new InvalidOperationException("SS-08 injected command failure"));
+        Track("ut_cp_throws");
+
+        CommandProcessor.Execute("ut_cp_throws");
+    }
+
+    /// <summary>
+    /// SS-08: a failing command must not prevent later commands from working.
+    /// </summary>
+    [TestMethod]
+    public void Execute_AfterAHandlerThrows_LaterCommandsStillRun()
+    {
+        var laterRan = false;
+
+        CommandProcessor.RegisterCommand("ut_cp_bad", _ =>
+            throw new InvalidOperationException("SS-08 injected command failure"));
+        Track("ut_cp_bad");
+
+        CommandProcessor.RegisterCommand("ut_cp_good", _ => laterRan = true);
+        Track("ut_cp_good");
+
+        CommandProcessor.Execute("ut_cp_bad");
+        CommandProcessor.Execute("ut_cp_good");
+
+        Assert.IsTrue(
+            laterRan,
+            "SS-08: a command issued after a failing one must still execute.");
+    }
 }

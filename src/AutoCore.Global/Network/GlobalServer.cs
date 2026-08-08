@@ -7,6 +7,7 @@ using AutoCore.Global.Config;
 using AutoCore.Game.Managers;
 using AutoCore.Game.TNL;
 using AutoCore.Utils;
+using AutoCore.Utils.Reliability;
 using AutoCore.Utils.Server;
 using AutoCore.Utils.Threading;
 using AutoCore.Utils.Timer;
@@ -33,7 +34,13 @@ public partial class GlobalServer : BaseServer, ILoopable
         RegisterCommands();
     }
 
-    ~GlobalServer() => Shutdown();
+    /// <summary>
+    /// SS-16: a finalizer runs on the GC finalizer thread, where an escaping exception is
+    /// <b>uncatchable and terminates the process</b>. Shutdown() takes a lock and closes
+    /// sockets, either of which can throw during teardown, so it is isolated here.
+    /// Explicit <see cref="Shutdown"/> from the exit handler remains the normal path.
+    /// </summary>
+    ~GlobalServer() => Guard.Run("GlobalServer finalizer shutdown", Shutdown);
 
     public void Setup(GlobalConfig config)
     {
