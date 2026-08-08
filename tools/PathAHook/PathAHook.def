@@ -1,3 +1,0 @@
-LIBRARY PathAHook
-EXPORTS
-    SetupPathAHook=_SetupPathAHook@4

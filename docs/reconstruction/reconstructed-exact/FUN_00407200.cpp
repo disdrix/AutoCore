@@ -1,4 +1,0 @@
-// Scaffold twin — see StdTree_InsertAndRebalance_Isnil21_Inferred.cpp
-// Stable ID: aa_00407200  VA: 0x00407200  Wave: WQ9I-B 2026-08-05
-
-#include "StdTree_InsertAndRebalance_Isnil21_Inferred.cpp"

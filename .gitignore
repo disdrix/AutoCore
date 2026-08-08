@@ -221,6 +221,10 @@ UpgradeLog*.htm
 *.ldf
 *.ndf
 
+# Private / local-only MySQL dumps (committed starter dumps live in sql/*.sql)
+sql/local/
+sql/*.local.sql
+
 # Business Intelligence projects
 *.rdl.data
 *.bim.layout
@@ -290,7 +294,6 @@ __pycache__/
 src/AutoCore.sln
 src/AutoCore.sln
 /.claude
-/Documentation
 
 # Git worktrees (local isolated checkouts)
 .worktrees/
@@ -301,15 +304,19 @@ tmp/
 /src/mcps
 src/.mcp.json
 src/.claude/settings.local.json
-/docs/agents
-/docs/reconstruction
-/.grok/workflows
-# Discord bot secrets (local only � copy from appsettings.discord.example.json)
+
+# Discord bot secrets (local only — copy from appsettings.discord.example.json)
 src/AutoCore.Launcher/appsettings.discord.json
 **/appsettings.discord.env.json
-tools/
-tmp-map/
-docs/
+
+# Local-only / tooling (keep on disk, do not track)
+# src/ stays tracked — it is the product codebase.
+.grok/
+.config/
+.cursor/
 Documentation/
-AutoCore.DevTool/
+docs/
+tmp-map/
+tools/
 scripts/
+AutoCore.DevTool/

@@ -1,2 +1,0 @@
-=== bulk 380 (20 addrs) ===
-  request attempt=1 n=20
