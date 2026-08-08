@@ -1,76 +1,42 @@
 // =============================================================================
-// Named_CalleeOf_Named_CalleeOf_Named_CalleeOf_Named_CalleeOf_Mis_00401f40
+// RETIRED scaffold — Named_CalleeOf_*Mis_00401f40
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00401f40
-// Callee of Named_CalleeOf_Named_CalleeOf_Named_CalleeOf_Mission_Attempting
-// Address:   0x00401f40  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00401f40
+// Retired:   2026-08-05 MEGA-079 dual seal
 // =============================================================================
+//
+// This chain-of-caller plate name is RETIRED.
+// Canonical reconstruction:
+//   StdTree_Buynode_StringByte_Isnil2D_Inferred
+//   docs/reconstruction/reconstructed-exact/StdTree_Buynode_StringByte_Isnil2D_Inferred.cpp
+//
+// Ghidra symbol twin:
+//   docs/reconstruction/reconstructed-exact/FUN_00401f40.cpp
+//
+// Evidence: pure MSVC _Tree buynode (string+byte / isnil@+0x2d / size 0x30);
+// not a mission product method. See dual A/B reviews for aa_00401f40.
 
-// PURPOSE (auto): Called from Named_CalleeOf_Named_CalleeOf_Named_CalleeOf_Mission_Attempting: mission/objective helper with no high-value strings in clean/raw. Role inferred from parent name only; refine when decompile strings or xrefs improve.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~19 non-empty decompiler lines.
-//  - Control keywords: if×1, return×1.
-//  - Notable callees: FUN_00401f40, FUN_00401fe0.
-//  - Return sites: 1.
+struct StringByteVal;
+struct NodeIsnil2D_StringByte;
 
-/*
- * Behavioral notes:
- * Callee of Named_CalleeOf_Named_CalleeOf_Named_CalleeOf_Mission_Attempting
- * Xref/callee-driven rename (parent seed scan)
- *
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+extern "C" NodeIsnil2D_StringByte* __stdcall StdTree_Buynode_StringByte_Isnil2D_Inferred(
+    NodeIsnil2D_StringByte* left,
+    NodeIsnil2D_StringByte* parent,
+    NodeIsnil2D_StringByte* right,
+    const StringByteVal* value,
+    std::uint8_t color);
 
-void * Named_CalleeOf_Named_CalleeOf_Named_CalleeOf_Named_CalleeOf_Mis_00401f40(uint32_t /* width from decompiler */ param_1)
-
-
-
+// Retired alias — forwards to promoted name (do not use in new ports).
+extern "C" NodeIsnil2D_StringByte* __stdcall
+Named_CalleeOf_Named_CalleeOf_Named_CalleeOf_Named_CalleeOf_Mis_00401f40(
+    NodeIsnil2D_StringByte* left,
+    NodeIsnil2D_StringByte* parent,
+    NodeIsnil2D_StringByte* right,
+    const StringByteVal* value,
+    std::uint8_t color)
 {
-
-  void *pvVar1;
-
-  uint32_t /* width from decompiler */ in_stack_00000014;
-
-  void *local_10;
-
-  uint8_t *puStack_c;
-
-  uint32_t /* width from decompiler */ local_8;
-
-  
-
-  local_8 = 0xffffffff;
-
-  puStack_c = &LAB_009bc811;
-
-  local_10 = ExceptionList;
-
-  ExceptionList = &local_10;
-
-  pvVar1 = operator_new(0x30);
-
-  local_8 = 1;
-
-  if (pvVar1 != (void *)0x0) {
-
-    FUN_00401fe0(pvVar1,param_1,in_stack_00000014);
-
-  }
-
-  ExceptionList = local_10;
-
-  return pvVar1;
-
+  return StdTree_Buynode_StringByte_Isnil2D_Inferred(left, parent, right, value, color);
 }

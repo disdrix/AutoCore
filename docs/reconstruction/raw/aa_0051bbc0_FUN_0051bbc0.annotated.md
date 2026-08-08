@@ -1,35 +1,41 @@
-# Annotated low-level: FUN_0051bbc0
+﻿# Annotated low-level: Map_FreeSubtree_Isnil29 (FUN_0051bbc0)
 
 | Field | Value |
 |---|---|
 | Stable ID | `aa_0051bbc0` |
-| VA | `0x0051bbc0` |
-| System | unknown |
-| Date | 2026-07-23 |
+| VA | `0x0051bbc0`–`0x0051bbf4` (**53 B**) |
+| System | STL map free-subtree (isnil@+0x29) |
+| Date | 2026-08-04 WQ9E-H |
+| Canonical | `Map_FreeSubtree_Isnil29` |
 
 ## Machine-level notes
 
-- Source: raw capture for `aa_0051bbc0`.
-- Prefer assembly when decompiler conflicts.
-- Recover types for still-generic parameters via callers/xrefs.
-- Map DAT_* globals and FUN_* callees in follow-up waves.
+- Decompiler **wrong/incomplete**: omits left-walk loop; marks operator_delete noreturn.
+- Bytes: right-recursive free + left iterate + RET 4; isnil @ +0x29.
+- ECX = tree_base threaded (unused in body); stack = node*.
+- Sole external caller: Map_EraseRange full-clear (`0x0051c7dc`).
 
-## Pseudocode (annotated copy of raw)
+## Byte-corrected pseudocode
 
 ```c
-void FUN_0051bbc0(void *param_1)
-
-{
-  if (*(char *)((int)param_1 + 0x29) == '\0') {
-    FUN_0051bbc0(*(undefined4 *)((int)param_1 + 8));
-                    /* WARNING: Subroutine does not return */
-    operator_delete(param_1);
-  }
-  return;
+void __fastcall Map_FreeSubtree_Isnil29(void *tree_base, void *node)
+{
+  if (*(char *)((int)node + 0x29) != 0)
+    return;
+  for (;;) {
+    Map_FreeSubtree_Isnil29(tree_base, *(void **)((int)node + 8));
+    {
+      void *left = *(void **)node;
+      operator_delete(node);
+      node = left;
+    }
+    if (*(char *)((int)node + 0x29) != 0)
+      break;
+  }
 }
 ```
 
 ## Open questions
 
-- Confirm calling convention and full signature against callers.
-- Recover meaningful types for still-generic parameters.
+- Product map`<K,V>` type / value size.
+- Whether all hosts of Map_EraseRange share value layout.

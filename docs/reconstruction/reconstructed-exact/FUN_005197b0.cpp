@@ -1,10 +1,10 @@
-// =============================================================================
+﻿// =============================================================================
 // FUN_005197b0
 // -----------------------------------------------------------------------------
 // Stable ID: aa_005197b0
 // Address:   0x005197b0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// System:    factions (see EnsureFactionsLookupLoaded.cpp)
+// Generated: 2026-07-23 scaffold; refined 2026-08-04 WQ9R-F → EnsureFactionsLookupLoaded
 // Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
 // Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
 // =============================================================================
@@ -17,8 +17,8 @@
 
 // READABILITY (auto CF):
 //  - Body size: ~111 non-empty decompiler lines.
-//  - Control keywords: if×11, return×4, do×3, while×3, goto×2.
-//  - Notable callees: WideCharToMultiByte×2, free×2, lstrlenW×2, malloc×2, FUN_004048c0, FUN_004048e0, FUN_005197b0, FUN_0051d290.
+//  - Control keywords: ifÃ—11, returnÃ—4, doÃ—3, whileÃ—3, gotoÃ—2.
+//  - Notable callees: WideCharToMultiByteÃ—2, freeÃ—2, lstrlenWÃ—2, mallocÃ—2, FUN_004048c0, FUN_004048e0, FUN_005197b0, FUN_0051d290.
 //  - Strings: "VOG_DEBUG_STOP".
 //  - Return sites: 4.
 
@@ -258,3 +258,4 @@ LAB_005199fc:
   } while( true );
 
 }
+

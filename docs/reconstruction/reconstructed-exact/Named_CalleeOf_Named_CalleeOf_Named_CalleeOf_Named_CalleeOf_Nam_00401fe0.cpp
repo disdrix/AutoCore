@@ -1,3 +1,8 @@
+﻿// =============================================================================
+// RETIRED SCAFFOLD — do not use as canonical name
+// Replaced by: StdTree_NodeCtor_StringByte_Isnil2D_Inferred (R10-004 dual 2026-08-05)
+// Stable ID: aa_00401fe0  VA: 0x00401fe0
+// =============================================================================
 // =============================================================================
 // Named_CalleeOf_Named_CalleeOf_Named_CalleeOf_Named_CalleeOf_Nam_00401fe0
 // -----------------------------------------------------------------------------
@@ -15,7 +20,7 @@
 
 // READABILITY (auto CF):
 //  - Body size: ~20 non-empty decompiler lines.
-//  - Control keywords: return×1.
+//  - Control keywords: returnÃ—1.
 //  - Notable callees: FUN_00401fe0, FUN_00402040.
 //  - Return sites: 1.
 
@@ -76,3 +81,4 @@ Named_CalleeOf_Named_CalleeOf_Named_CalleeOf_Named_CalleeOf_Nam_00401fe0(uint32_
   return param_3;
 
 }
+

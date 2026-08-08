@@ -1,142 +1,73 @@
 // =============================================================================
-// FUN_00520dc0
+// FUN_00520dc0  (machine twin of CVOGCharacter_CleanupDraggingObject)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00520dc0
-// Address:   0x00520dc0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00520dc0 – 0x00520f39  (autoassault.exe, image base 0x400000)
+// System:    inventory-transfer
+// Generated: 2026-08-05 MEGA-001 dual seal
+// Exactness: Ghidra-symbol twin; prefer named clean for port notes.
+// See:       CVOGCharacter_CleanupDraggingObject.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00520dc0 @ 0x00520dc0
-// Stable ID: aa_00520dc0
-// Embedded strings (evidence for future rename):
-//   - "CVOGCharacter::CleanupDraggingObject"
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~52 non-empty decompiler lines.
-//  - Control keywords: if×6, return×2, goto×2.
-//  - Notable callees: FUN_005714e0×2, FUN_00571620×2, FUN_00786990×2, FUN_004fabc0, FUN_00502e90, FUN_00520dc0, FUN_00786a00.
-//  - Strings: "CVOGCharacter::CleanupDraggingObject".
-//  - Return sites: 2.
+extern "C" {
+  std::uint32_t __thiscall FUN_00786a00(void* prof, const char* name);
+  void          __fastcall FUN_00786990(void* prof);
+  char __thiscall FUN_005714e0(void* grid, void* item, std::uint8_t* outX, std::uint8_t* outY,
+                               char allowStack, int page);
+  char __thiscall FUN_00571620(void* grid, void* item, std::uint32_t x, std::uint32_t y,
+                               std::uint32_t qty);
+  unsigned __thiscall FUN_004fabc0(void* host, void* item, int* outOpt);
+  void* __thiscall FUN_00502e90(void* host, void* item);
+}
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+extern void* DAT_00afa27c;
 
-uint32_t /* width from decompiler */ __fastcall FUN_00520dc0(int param_1)
-
-
-
+// ECX=this; RET 4; AL bool — assembly-corrected (not raw decompiler)
+bool __thiscall FUN_00520dc0(void* param_1 /*, std::uint32_t unused */)
 {
+  FUN_00786a00(DAT_00afa27c, "CVOGCharacter::CleanupDraggingObject");
 
-  int *piVar1;
-
-  char cVar2;
-
-  uint32_t /* width from decompiler */ uVar3;
-
-  int iVar4;
-
-  uint local_18;
-
-  uint local_14;
-
-  int iStack_10;
-
-  void *local_c;
-
-  uint8_t *puStack_8;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
-
-  local_4 = 0xffffffff;
-
-  puStack_8 = &LAB_009a37f7;
-
-  local_c = ExceptionList;
-
-  ExceptionList = &local_c;
-
-  FUN_00786a00("CVOGCharacter::CleanupDraggingObject");
-
-  piVar1 = *(int **)(param_1 + 0xcd0);
-
-  local_4 = 0;
-
-  if (piVar1 == (int *)0x0) {
-
-    local_4 = 0xffffffff;
-
-    FUN_00786990();
-
-    ExceptionList = local_c;
-
-    return 0;
-
+  void* piVar1 = *reinterpret_cast<void**>(reinterpret_cast<char*>(param_1) + 0xCD0);
+  if (piVar1 == nullptr) {
+    FUN_00786990(DAT_00afa27c);
+    return false;
   }
 
-  local_14 = local_14 & 0xffffff00;
+  std::uint8_t local_14 = 0;
+  std::uint8_t local_18 = 0;
 
-  local_18 = local_18 & 0xffffff00;
-
-  cVar2 = FUN_005714e0(piVar1,&local_14,&local_18,1,0xffffffff);
-
-  if (cVar2 != '\0') {
-
-    uVar3 = (**(code **)(*piVar1 + 0x25c))();
-
-    cVar2 = FUN_00571620(piVar1,local_14,local_18,uVar3);
-
-    if (cVar2 != '\0') goto LAB_00520f0a;
-
+  void* host = *reinterpret_cast<void**>(reinterpret_cast<char*>(param_1) + 0x250);
+  void* cargo = *reinterpret_cast<void**>(reinterpret_cast<char*>(host) + 0x2B0);
+  if (FUN_005714e0(cargo, piVar1, &local_14, &local_18, 1, -1) != 0) {
+    auto** vtbl = *reinterpret_cast<void***>(piVar1);
+    using QtyFn = std::uint32_t(__thiscall*)(void*);
+    std::uint32_t uVar3 = reinterpret_cast<QtyFn>(vtbl[0x25C / 4])(piVar1);
+    if (FUN_00571620(cargo, piVar1, local_14, local_18, uVar3) != 0)
+      goto LAB_00520f0a;
   }
 
-  cVar2 = FUN_005714e0(piVar1,&local_14,&local_18,1,0xffffffff);
-
-  if (cVar2 != '\0') {
-
-    uVar3 = (**(code **)(*piVar1 + 0x25c))();
-
-    cVar2 = FUN_00571620(piVar1,local_14,local_18,uVar3);
-
-    if (cVar2 != '\0') goto LAB_00520f0a;
-
+  void* locker = *reinterpret_cast<void**>(reinterpret_cast<char*>(param_1) + 0xCBC);
+  if (FUN_005714e0(locker, piVar1, &local_14, &local_18, 1, -1) != 0) {
+    auto** vtbl = *reinterpret_cast<void***>(piVar1);
+    using QtyFn = std::uint32_t(__thiscall*)(void*);
+    std::uint32_t uVar3 = reinterpret_cast<QtyFn>(vtbl[0x25C / 4])(piVar1);
+    if (FUN_00571620(locker, piVar1, local_14, local_18, uVar3) != 0)
+      goto LAB_00520f0a;
   }
 
-  iStack_10 = 0;
-
-  iVar4 = FUN_004fabc0(piVar1,&iStack_10);
-
-  if ((iStack_10 == 0) &&
-
-     ((((iVar4 == 0 || (iVar4 == 1)) || (iVar4 == 10)) || ((iVar4 == 0xd || (iVar4 == 0xf)))))) {
-
-    FUN_00502e90(piVar1);
-
+  {
+    int iStack_10 = 0;
+    unsigned iVar4 = FUN_004fabc0(host, piVar1, &iStack_10);
+    if (iStack_10 == 0 &&
+        (iVar4 == 0 || iVar4 == 1 || iVar4 == 10 || iVar4 == 0xD || iVar4 == 0xF)) {
+      FUN_00502e90(host, piVar1);
+    }
   }
 
 LAB_00520f0a:
-
-  *(uint32_t /* width from decompiler */ *)(param_1 + 0xcd0) = 0;
-
-  local_4 = 0xffffffff;
-
-  FUN_00786990();
-
-  ExceptionList = local_c;
-
-  return 1;
-
+  *reinterpret_cast<void**>(reinterpret_cast<char*>(param_1) + 0xCD0) = nullptr;
+  FUN_00786990(DAT_00afa27c);
+  return true;
 }

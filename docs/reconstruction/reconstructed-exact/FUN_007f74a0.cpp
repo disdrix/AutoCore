@@ -1,154 +1,39 @@
 // =============================================================================
-// FUN_007f74a0
+// FUN_007f74a0  (machine twin of ActionMap_ClearAllSlotBindFields_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_007f74a0
 // Address:   0x007f74a0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// System:    input-drive-control
+// Generated: 2026-07-23 scaffold; dual seal refine 2026-08-05 MEGA-019
 // Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Bit-for-bit vs retail EXE: DEFERRED.
+// Canonical named twin: ActionMap_ClearAllSlotBindFields_Inferred.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_007f74a0 @ 0x007f74a0
-// Stable ID: aa_007f74a0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <stdint.h>
 
-// READABILITY (auto CF):
-//  - Body size: ~59 non-empty decompiler lines.
-//  - Control keywords: do×4, while×4, return×1.
-//  - Notable callees: FUN_007f74a0.
-//  - Return sites: 1.
-
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void FUN_007f74a0(void)
-
-
-
+// ESI = ActionMap*; void; bare RET. See named twin for plate + tables.
+void FUN_007f74a0(uint8_t* actionMap /* ESI */)
 {
+  static const uint32_t kCount[4] = { 5, 6, 0x78, 0x14 };
+  static const uint32_t kKey0[4]  = { 0x06, 0x10A, 0x242, 0x1AA2 };
+  static const uint32_t kKey1[4]  = { 0x08, 0x10C, 0x244, 0x1AA4 };
+  static const uint32_t kMod0[4]  = { 0x30, 0x134, 0x26C, 0x1ACC };
+  static const uint32_t kMod1[4]  = { 0x32, 0x136, 0x26E, 0x1ACE };
+  static const uint32_t kClB[4]   = { 0x0A, 0x10E, 0x246, 0x1AA6 };
+  static const uint32_t kClA[4]   = { 0x0B, 0x10F, 0x247, 0x1AA7 };
+  static const uint32_t kFlag[4]  = { 0x0C, 0x110, 0x248, 0x1AA8 };
 
-  uint16_t *puVar1;
-
-  int iVar2;
-
-  int unaff_ESI;
-
-  
-
-  puVar1 = (uint16_t *)(unaff_ESI + 0x32);
-
-  iVar2 = 5;
-
-  do {
-
-    puVar1[-0x15] = 0;
-
-    *puVar1 = 0;
-
-    puVar1[-0x16] = 0;
-
-    puVar1[-1] = 0;
-
-    *(uint8_t *)((int)puVar1 + -0x27) = 0;
-
-    *(uint8_t *)(puVar1 + -0x14) = 0;
-
-    *(uint8_t *)(puVar1 + -0x13) = 0;
-
-    puVar1 = puVar1 + 0x1a;
-
-    iVar2 = iVar2 + -1;
-
-  } while (iVar2 != 0);
-
-  puVar1 = (uint16_t *)(unaff_ESI + 0x136);
-
-  iVar2 = 6;
-
-  do {
-
-    puVar1[-0x15] = 0;
-
-    *puVar1 = 0;
-
-    puVar1[-0x16] = 0;
-
-    puVar1[-1] = 0;
-
-    *(uint8_t *)((int)puVar1 + -0x27) = 0;
-
-    *(uint8_t *)(puVar1 + -0x14) = 0;
-
-    *(uint8_t *)(puVar1 + -0x13) = 0;
-
-    puVar1 = puVar1 + 0x1a;
-
-    iVar2 = iVar2 + -1;
-
-  } while (iVar2 != 0);
-
-  puVar1 = (uint16_t *)(unaff_ESI + 0x26e);
-
-  iVar2 = 0x78;
-
-  do {
-
-    puVar1[-0x15] = 0;
-
-    *puVar1 = 0;
-
-    puVar1[-0x16] = 0;
-
-    puVar1[-1] = 0;
-
-    *(uint8_t *)((int)puVar1 + -0x27) = 0;
-
-    *(uint8_t *)(puVar1 + -0x14) = 0;
-
-    *(uint8_t *)(puVar1 + -0x13) = 0;
-
-    puVar1 = puVar1 + 0x1a;
-
-    iVar2 = iVar2 + -1;
-
-  } while (iVar2 != 0);
-
-  puVar1 = (uint16_t *)(unaff_ESI + 0x1ace);
-
-  iVar2 = 0x14;
-
-  do {
-
-    puVar1[-0x15] = 0;
-
-    *puVar1 = 0;
-
-    puVar1[-0x16] = 0;
-
-    puVar1[-1] = 0;
-
-    *(uint8_t *)((int)puVar1 + -0x27) = 0;
-
-    *(uint8_t *)(puVar1 + -0x14) = 0;
-
-    *(uint8_t *)(puVar1 + -0x13) = 0;
-
-    puVar1 = puVar1 + 0x1a;
-
-    iVar2 = iVar2 + -1;
-
-  } while (iVar2 != 0);
-
-  return;
-
+  for (uint32_t mode = 0; mode < 4u; ++mode) {
+    for (uint32_t i = 0; i < kCount[mode]; ++i) {
+      uint8_t* slot = actionMap + i * 0x34u;
+      *(uint16_t*)(slot + kKey0[mode]) = 0;
+      *(uint16_t*)(slot + kKey1[mode]) = 0;
+      *(uint16_t*)(slot + kMod0[mode]) = 0;
+      *(uint16_t*)(slot + kMod1[mode]) = 0;
+      slot[kClB[mode]]  = 0;
+      slot[kClA[mode]]  = 0;
+      slot[kFlag[mode]] = 0;
+    }
+  }
 }

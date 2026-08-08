@@ -4,40 +4,59 @@
 |---|---|
 | **Stable ID** | `aa_0090dab0` |
 | **Canonical name** | `FUN_0090dab0` |
-| **Address** | `0x0090dab0` |
+| **Named alias** | `Client_Input_DismissUiWindowTable5_Inferred` |
+| **Address** | `0x0090dab0`–`0x0090dad5` (**38 B** / `0x26`) |
 | **Module** | `autoassault.exe` (image base `0x400000`) |
-| **System** | unknown |
-| **Completion status** | **Partial scaffold** — raw/annotated/clean present; refine + dual review for important units |
-| **Bit-for-bit / runtime / diff** | Open (deferred / not run) |
+| **System** | input-drive-control |
+| **Completion status** | **Dual sealed MEGA-097** — accept-with-gaps |
+| **Bit-for-bit / runtime / diff** | Open (terminal false; no Launcher) |
 
 ## Alias
 
-Human name: `Named_CalleeOf_Client_Input_OnKeyDown_MatchAction_0090dab0` (callee of `Client_Input_OnKeyDown_MatchAction`)
+- Human: `Client_Input_DismissUiWindowTable5_Inferred`
+- Retired scaffold: `Named_CalleeOf_Client_Input_OnKeyDown_MatchAction_0090dab0`
 
 ## Purpose
 
-Reconstructed from Ghidra decompile. See clean source and annotated notes for body.
+ESC UI-cancel nested helper of `Client_Input_OnKeyDown_MatchAction`: walk 5-slot global UI window table `DAT_00d09a38` and dismiss each active window via `FUN_0090d400`, notifying the client host in **EAX**.
 
-## Signature (decompiler-derived)
+## Signature (disasm-sealed)
 
 ```c
-void FUN_0090dab0(void)
+// EAX = client host*; no stack args; bare RET
+void FUN_0090dab0(void /* host in EAX */);
 ```
+
+| Formal | Source | Conf |
+|---|---|---|
+| host | EAX → EDI | High |
+| stack | none | High |
+| return | void (`C3`) | High |
 
 ## Artifacts
 
-- Raw: `docs/reconstruction/raw/aa_0090dab0_FUN_0090dab0.md`
+- Raw (+ MEGA-097 re-verify): `docs/reconstruction/raw/aa_0090dab0_FUN_0090dab0.md`
 - Annotated: `docs/reconstruction/raw/aa_0090dab0_FUN_0090dab0.annotated.md`
-- Clean: `docs/reconstruction/reconstructed-exact/FUN_0090dab0.cpp`
+- Clean named: `docs/reconstruction/reconstructed-exact/Client_Input_DismissUiWindowTable5_Inferred.cpp`
+- Clean twin: `docs/reconstruction/reconstructed-exact/FUN_0090dab0.cpp`
+- Named record: `docs/reconstruction/functions/aa_0090dab0_Client_Input_DismissUiWindowTable5_Inferred.md`
+- Dual A: `docs/reconstruction/reviews/A_aa_0090dab0_Client_Input_DismissUiWindowTable5_Inferred.md`
+- Dual B: `docs/reconstruction/reviews/B_aa_0090dab0_Client_Input_DismissUiWindowTable5_Inferred.md`
 
 ## Callers / callees
 
-(Populate from Ghidra xrefs in follow-up.)
+| Direction | Targets |
+|---|---|
+| Callers | `Client_Input_OnKeyDown_MatchAction` @ `0x00911030` (xrefs `0x00911075`, `0x00911893`) |
+| Callees | `FUN_0090d400` @ `0x0090d400` |
 
 ## Confidence
 
 | Claim | Level |
 |---|---|
-| Control flow from decompiler | High |
-| Parameter semantic names | Probable / Tentative until caller pass |
-| Types | Tentative |
+| Control flow (5-slot walk + call) | **High** |
+| ABI EAX-host / bare RET | **High** |
+| Table bounds / count 5 | **High** |
+| ESC parent role | **High** |
+| Product window / vtbl English | **Low** (gaps) |
+| Runtime | **Open** |

@@ -1,58 +1,23 @@
 // =============================================================================
-// Named_CalleeOf_Named_CalleeOf_Drive_i_d_shopveh_2d_wnd_list_veh_0083a860
+// RETIRED scaffold — Named_CalleeOf_Named_CalleeOf_Drive_i_d_shopveh_2d_wnd_list_veh_0083a860
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0083a860
-// Callee of Named_CalleeOf_Drive_i_d_shopveh_2d_wnd_list_vehicle_xml
-// Address:   0x0083a860  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x0083a860
+// Wave:      WQ9L-I OWN-ONLY dual 2026-08-05
+// Note:      Scaffold name was xref-depth chain only. Authority is the named
+//            clean with sealed EAX=host / EBX=list_i / AL=bool ABI.
+// Authority: ShopVehList_HasSlotBoundObjAtListIndex_EaxHost_Ebx_Inferred.cpp
+// Twin:      FUN_0083a860.cpp
 // =============================================================================
 
-// PURPOSE (auto): Called from Named_CalleeOf_Drive_i_d_shopveh_2d_wnd_list_vehicle_xml: drive/input helper with no high-value strings in clean/raw. Role inferred from parent name only; refine when decompile strings or xrefs improve.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~10 non-empty decompiler lines.
-//  - Control keywords: return×2, if×1.
-//  - Notable callees: FUN_0083a7d0, FUN_0083a860.
-//  - Return sites: 2.
+extern "C" std::uint8_t ShopVehList_HasSlotBoundObjAtListIndex_EaxHost_Ebx_Inferred(
+    void *host, int list_i);
 
-/*
- * Behavioral notes:
- * Callee of Named_CalleeOf_Drive_i_d_shopveh_2d_wnd_list_vehicle_xml
- * Xref/callee-driven rename (parent seed scan)
- *
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-bool Named_CalleeOf_Named_CalleeOf_Drive_i_d_shopveh_2d_wnd_list_veh_0083a860(void)
-
-
-
+// Retired alias — portable form only (register ABI not expressible as C formals).
+extern "C" std::uint8_t Named_CalleeOf_Named_CalleeOf_Drive_i_d_shopveh_2d_wnd_list_veh_0083a860(
+    void *host, int list_i)
 {
-
-  uint32_t /* width from decompiler */ in_EAX;
-
-  int iVar1;
-
-  
-
-  iVar1 = FUN_0083a7d0(in_EAX);
-
-  if (iVar1 != 0) {
-
-    return *(int *)(iVar1 + 0x508) != 0;
-
-  }
-
-  return false;
-
+  return ShopVehList_HasSlotBoundObjAtListIndex_EaxHost_Ebx_Inferred(host, list_i);
 }

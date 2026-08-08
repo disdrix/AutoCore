@@ -1,52 +1,31 @@
 // =============================================================================
-// FUN_00401c30
+// FUN_00401c30 — clean twin of StdVector_DwordSize_EaxVec_Inferred
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00401c30
-// Address:   0x00401c30  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00401c30–0x00401c42  (autoassault.exe, image base 0x400000)
+// Canonical: StdVector_DwordSize_EaxVec_Inferred
+// Generated: MEGA-082 dual A/B seal 2026-08-05
+// Exactness: Behavior-preserving rewrite. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00401c30 @ 0x00401c30
-// Stable ID: aa_00401c30
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
-
-// READABILITY (auto CF):
-//  - Body size: ~8 non-empty decompiler lines.
-//  - Control keywords: return×2, if×1.
-//  - Notable callees: FUN_00401c30.
-//  - Return sites: 2.
-
 /*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ * Machine twin kept under Ghidra name for path stability.
+ * Prefer StdVector_DwordSize_EaxVec_Inferred.cpp for ports.
  *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
+ * ABI: EAX = vec; bare RET; size in EAX.
+ * Formula: begin@+4 null → 0; else (end@+8 - begin) >> 2.
  */
 
-int FUN_00401c30(void)
+#include <cstdint>
 
-
-
+int FUN_00401c30(void* vec /*EAX*/)
 {
-
-  int in_EAX;
-
-  
-
-  if (*(int *)(in_EAX + 4) == 0) {
-
+  const auto* base = reinterpret_cast<const uint8_t*>(vec);
+  const int begin = *reinterpret_cast<const int*>(base + 4);
+  if (begin == 0) {
     return 0;
-
   }
-
-  return *(int *)(in_EAX + 8) - *(int *)(in_EAX + 4) >> 2;
-
+  const int end = *reinterpret_cast<const int*>(base + 8);
+  return (end - begin) >> 2;
 }

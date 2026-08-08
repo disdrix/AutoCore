@@ -1,3 +1,4 @@
+﻿// RETIRED 2026-08-05 R10-023: use StdVector_PodCopyElement_0x10_Inferred.cpp / FUN_00409f70.cpp
 // =============================================================================
 // Named_CalleeOf_Named_CalleeOf_Named_CalleeOf_Named_CalleeOf_Cli_00409f70
 // -----------------------------------------------------------------------------
@@ -15,7 +16,7 @@
 
 // READABILITY (auto CF):
 //  - Body size: ~11 non-empty decompiler lines.
-//  - Control keywords: if×1, return×1.
+//  - Control keywords: ifÃ—1, returnÃ—1.
 //  - Notable callees: FUN_00409f70.
 //  - Return sites: 1.
 

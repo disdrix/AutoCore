@@ -1,87 +1,33 @@
 // =============================================================================
-// FUN_0040b3b0
+// FUN_0040b3b0  (scaffold twin → StdTree_ConstructEmpty_Isnil19_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0040b3b0
-// Address:   0x0040b3b0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x0040b3b0–0x0040b40a exclusive (90 B / 0x5A)
+// System:    MSVC std::_Tree empty construct — isnil@+0x19 / node 0x1c
+// Generated: 2026-08-05 R13-017 dual seal (scaffold 2026-07-23)
+// Exactness: Behavior-preserving rewrite of decompiler CF + sealed bytes.
+// Bit-for-bit vs retail EXE: DEFERRED.
+// Canonical: StdTree_ConstructEmpty_Isnil19_Inferred.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0040b3b0 @ 0x0040b3b0
-// Stable ID: aa_0040b3b0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~20 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_0040b3b0, FUN_0040bfc0.
-//  - Return sites: 1.
+// Forward to named clean plate (identical body).
+extern "C" void* __stdcall StdTree_ConstructEmpty_Isnil19_Inferred(void* shell);
 
-// READABILITY:
-// Control-flow (from raw @ 0x0040b3b0; evidence only — no invented semantics):
-//  - Entry: `int FUN_0040b3b0(int param_1)`.
-//  - Calls: FUN_0040bfc0().
-//  - Returns (1 site(s)): `param_1`.
-//  - Assign `local_4 = 0xffffffff`.
-//  - Assign `local_c = ExceptionList`.
-
-
-
+extern "C" void* __stdcall FUN_0040b3b0(void* shell)
+{
+  return StdTree_ConstructEmpty_Isnil19_Inferred(shell);
+}
 
 /*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ * Sealed CF (assembly):
+ *   SEH setup (LAB_009bda98)
+ *   ESI = [ESP+0x14]  // shell*
+ *   EAX = CALL FUN_0040bfc0  // residual buyhead 0x1c
+ *   [ESI+4] = EAX;  byte [EAX+0x19] = 1
+ *   head L/P/R = self; [ESI+8] = 0
+ *   EAX = ESI; ADD ESP,0xC; RET 4
  *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
+ * Reject: thiscall, void, isnil29/31 families, freelist, product MissionTracker English as unit name.
  */
-
-int FUN_0040b3b0(int param_1)
-
-
-
-{
-
-  int iVar1;
-
-  void *local_c;
-
-  uint8_t *puStack_8;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
-
-  local_4 = 0xffffffff;
-
-  puStack_8 = &LAB_009bda98;
-
-  local_c = ExceptionList;
-
-  ExceptionList = &local_c;
-
-  iVar1 = FUN_0040bfc0();
-
-  *(int *)(param_1 + 4) = iVar1;
-
-  *(uint8_t *)(iVar1 + 0x19) = 1;
-
-  *(int *)(*(int *)(param_1 + 4) + 4) = *(int *)(param_1 + 4);
-
-  *(uint32_t /* width from decompiler */ *)*(uint32_t /* width from decompiler */ *)(param_1 + 4) = *(uint32_t /* width from decompiler */ *)(param_1 + 4);
-
-  *(int *)(*(int *)(param_1 + 4) + 8) = *(int *)(param_1 + 4);
-
-  *(uint32_t /* width from decompiler */ *)(param_1 + 8) = 0;
-
-  ExceptionList = local_c;
-
-  return param_1;
-
-}

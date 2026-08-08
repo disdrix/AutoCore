@@ -1,11 +1,14 @@
 // =============================================================================
+// RETIRED SCAFFOLD (R10-016) — do not use as canonical name
+// Canonical: Character_FormatLevelRaceClassLine_Inferred
+// See: reconstructed-exact/Character_FormatLevelRaceClassLine_Inferred.cpp
 // Named_CalleeOf_Skill_Combat_Fighting_and_driving_ability_Affect_0092e710
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0092e710
-// Callee of Skill_Combat_Fighting_and_driving_ability_Affects_Weap
+// Callee of Skill_Combat_Fighting_and_driving_ability_Affects_Weap  (parent-seed noise)
 // Address:   0x0092e710  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// System:    missions-progression / character display UI
+// Generated: 2026-07-23 from raw capture (scaffold; RETIRED 2026-08-05 R10-016)
 // Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
 // Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
 // =============================================================================

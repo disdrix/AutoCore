@@ -1,86 +1,44 @@
 // =============================================================================
-// FUN_00578ac0
+// FUN_00578ac0  (scaffold twin of Skill_HB_ClearPtrVectorAt6b0_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00578ac0
-// Address:   0x00578ac0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00578ac0 – 0x00578b28 inclusive (0x69 B)
+// Module:    autoassault.exe (image base 0x400000)
+// System:    skills-abilities
+// Generated: 2026-08-05 MEGA-014 (assembly-corrected; Ghidra symbol retained)
+// Exactness: Behavior-preserving. Prefer named clean source for ports.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00578ac0 @ 0x00578ac0
-// Stable ID: aa_00578ac0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~25 non-empty decompiler lines.
-//  - Control keywords: if×3, return×3, do×1, while×1.
-//  - Notable callees: FUN_004b99c0, FUN_00578ac0.
-//  - Return sites: 3.
+extern "C" void __fastcall FUN_004b99c0(void* elem /* ECX */);
+extern "C" void __cdecl operator_delete(void* p);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __fastcall FUN_00578ac0(int param_1)
-
-
-
+// Ghidra symbol retained for xref continuity. Meaningful name:
+//   Skill_HB_ClearPtrVectorAt6b0_Inferred
+void __fastcall FUN_00578ac0(void* param_1 /* ECX = skill HB this */)
 {
+  auto* base = reinterpret_cast<std::uint8_t*>(param_1);
 
-  void *pvVar1;
+  auto** puVar2 = *reinterpret_cast<void***>(base + 0x6b0);
+  auto** end    = *reinterpret_cast<void***>(base + 0x6b4);
 
-  uint32_t /* width from decompiler */ *puVar2;
-
-  
-
-  puVar2 = *(uint32_t /* width from decompiler */ **)(param_1 + 0x6b0);
-
-  if (puVar2 != *(uint32_t /* width from decompiler */ **)(param_1 + 0x6b4)) {
-
+  if (puVar2 != end) {
     do {
-
-      pvVar1 = (void *)*puVar2;
-
-      if (pvVar1 != (void *)0x0) {
-
-        FUN_004b99c0();
-
-                    /* WARNING: Subroutine does not return */
-
+      void* pvVar1 = *puVar2;
+      if (pvVar1 != nullptr) {
+        FUN_004b99c0(pvVar1);
         operator_delete(pvVar1);
-
       }
-
       puVar2 = puVar2 + 1;
-
-    } while (puVar2 != *(uint32_t /* width from decompiler */ **)(param_1 + 0x6b4));
-
+    } while (puVar2 != *reinterpret_cast<void***>(base + 0x6b4));
   }
 
-  if (*(void **)(param_1 + 0x6b0) == (void *)0x0) {
+  void* buf = *reinterpret_cast<void**>(base + 0x6b0);
+  if (buf != nullptr)
+    operator_delete(buf);
 
-    *(uint32_t /* width from decompiler */ *)(param_1 + 0x6b0) = 0;
-
-    *(uint32_t /* width from decompiler */ *)(param_1 + 0x6b4) = 0;
-
-    *(uint32_t /* width from decompiler */ *)(param_1 + 0x6b8) = 0;
-
-    return;
-
-  }
-
-                    /* WARNING: Subroutine does not return */
-
-  operator_delete(*(void **)(param_1 + 0x6b0));
-
+  *reinterpret_cast<std::uint32_t*>(base + 0x6b0) = 0;
+  *reinterpret_cast<std::uint32_t*>(base + 0x6b4) = 0;
+  *reinterpret_cast<std::uint32_t*>(base + 0x6b8) = 0;
 }

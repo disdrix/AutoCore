@@ -1,72 +1,36 @@
 // =============================================================================
-// FUN_00401d30
+// FUN_00401d30  (Ghidra alias of BasicStringFlag_CtorFromStringAndChar_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00401d30
-// Address:   0x00401d30  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00401d30–0x00401d83 inclusive (84 B / 0x54)
+// Module:    autoassault.exe, image base 0x400000
+// Preferred: BasicStringFlag_CtorFromStringAndChar_Inferred
+// Wave:      MEGA-065 OWN-ONLY dual 2026-08-05
+// Exactness: Behavior-preserving; see named clean for full notes.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00401d30 @ 0x00401d30
-// Stable ID: aa_00401d30
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~18 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_00401d30.
-//  - Return sites: 1.
+struct BasicString_0x1c {
+    std::uint8_t raw[0x1C];
+};
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+struct BasicStringFlag {
+    BasicString_0x1c str;
+    std::uint8_t     flag;
+};
 
-basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> *
+extern "C" BasicString_0x1c* __thiscall
+BasicString_CopyCtor(BasicString_0x1c* self, const BasicString_0x1c* other);
 
-FUN_00401d30(basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> *param_1,
-
-            basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> *param_2,
-
-            basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> *param_3)
-
-
-
+// Ghidra name — same body / ABI as named clean.
+// Stack: dest*, src string*, char*; EAX=dest; RET 0xC.
+extern "C" BasicStringFlag* __stdcall FUN_00401d30(
+    BasicStringFlag* dest,
+    const BasicString_0x1c* src,
+    const std::uint8_t* flag_src)
 {
-
-  void *local_c;
-
-  uint8_t *puStack_8;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
-
-  local_4 = 0xffffffff;
-
-  puStack_8 = &LAB_009bbfb9;
-
-  local_c = ExceptionList;
-
-  ExceptionList = &local_c;
-
-  std::basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>::
-
-  basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>(param_1,param_2);
-
-  param_1[0x1c] = *param_3;
-
-  ExceptionList = local_c;
-
-  return param_1;
-
+    BasicString_CopyCtor(&dest->str, src);
+    dest->flag = *flag_src;
+    return dest;
 }

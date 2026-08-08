@@ -2,144 +2,121 @@
 // CVOGCharacter_CleanupDraggingObject
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00520dc0
-// Address:   0x00520dc0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00520dc0 – 0x00520f39  (autoassault.exe, image base 0x400000)
+// Size:      378 B (0x17A)
+// System:    inventory-transfer
+// Generated: 2026-08-05 MEGA-001 dual seal (assembly-corrected)
+// Exactness: Behavior-preserving rewrite of retail CF. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED.
+// =============================================================================
+//
+// PURPOSE:
+//   Product method CVOGCharacter::CleanupDraggingObject (plate string
+//   @ 0x009cf0b0). If character has a dragging object at +0xCD0:
+//     1) try place into cargo grid *( *(this+0x250)+0x2B0 )
+//     2) else try place into locker grid *(this+0xCBC)
+//     3) else TryEquip on host *(this+0x250); on select status codes call
+//        FUN_00502e90 equip switch
+//   Always null +0xCD0 after non-null path. Return false if no drag object.
+//
+// ABI (sealed):
+//   ECX = this (CVOGCharacter*)
+//   stack: 4 B present (body never loads); RET 4
+//   AL = bool (0 = no drag; 1 = cleaned)
+//
+// Decompiler traps corrected here:
+//   - FindFree/Place use InventoryGrid* in ECX, not the drag item
+//   - TryEquip / FUN_00502e90 use host at this+0x250 in ECX
+//   - Path A cargo vs Path B locker are distinct ECX sources
+//
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for CVOGCharacter_CleanupDraggingObject @ 0x00520dc0
-// Stable ID: aa_00520dc0
-// Embedded strings (evidence for future rename):
-//   - "CVOGCharacter::CleanupDraggingObject"
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~52 non-empty decompiler lines.
-//  - Control keywords: if×6, return×2, goto×2.
-//  - Notable callees: FUN_005714e0×2, FUN_00571620×2, FUN_00786990×2, FUN_004fabc0, FUN_00502e90, CVOGCharacter_CleanupDraggingObject, FUN_00786a00.
-//  - Strings: "CVOGCharacter::CleanupDraggingObject".
-//  - Return sites: 2.
+// Prior dual / plate names (bodies not redefined here)
+extern "C" {
+  std::uint32_t __thiscall Profiler_EnterNamedZone(void* prof, const char* name); // FUN_00786a00
+  void          __fastcall Profiler_Leave(void* prof);                            // FUN_00786990
+  // InventoryGrid_FindFreeForItem — ret 0x14
+  char __thiscall InventoryGrid_FindFreeForItem(
+      void* grid, void* item, std::uint8_t* outX, std::uint8_t* outY,
+      char allowStackMerge, int pageIndex);                                       // FUN_005714e0
+  // InventoryGrid_PlaceItemFootprint — stack item,x,y,qty (see dual)
+  char __thiscall InventoryGrid_PlaceItemFootprint(
+      void* grid, void* item, std::uint32_t x, std::uint32_t y, std::uint32_t qty); // FUN_00571620
+  // Character_TryEquipItem — ret 8
+  unsigned __thiscall Character_TryEquipItem(
+      void* host, void* item, int* outOpt);                                       // FUN_004fabc0
+  void* __thiscall FUN_00502e90(void* host, void* item);                           // menu_equip switch
+}
 
-/*
- * Behavioral notes:
- * Plate-driven rename evidence: "CVOGCharacter::CleanupDraggingObject"
- * Domain alias of FUN_00520dc0 (FUN_* retained)
- *
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+extern void* DAT_00afa27c;   // profiler singleton (thiscall/fastcall target)
+extern void* ExceptionList;
+extern void* LAB_009a37f7;   // SEH handler plate
 
-uint32_t /* width from decompiler */ __fastcall CVOGCharacter_CleanupDraggingObject(int param_1)
+// -----------------------------------------------------------------------------
+// Retail control flow
+// -----------------------------------------------------------------------------
 
-
-
+// MSVC thiscall: ECX=this; one unread stack dword; RET 4; AL bool
+bool __thiscall CVOGCharacter_CleanupDraggingObject(void* self /*, std::uint32_t unused */)
 {
+  // SEH frame (LAB_009a37f7) omitted in C form; present in retail.
 
-  int *piVar1;
+  Profiler_EnterNamedZone(DAT_00afa27c, "CVOGCharacter::CleanupDraggingObject");
 
-  char cVar2;
-
-  uint32_t /* width from decompiler */ uVar3;
-
-  int iVar4;
-
-  uint local_18;
-
-  uint local_14;
-
-  int iStack_10;
-
-  void *local_c;
-
-  uint8_t *puStack_8;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
-
-  local_4 = 0xffffffff;
-
-  puStack_8 = &LAB_009a37f7;
-
-  local_c = ExceptionList;
-
-  ExceptionList = &local_c;
-
-  FUN_00786a00("CVOGCharacter::CleanupDraggingObject");
-
-  piVar1 = *(int **)(param_1 + 0xcd0);
-
-  local_4 = 0;
-
-  if (piVar1 == (int *)0x0) {
-
-    local_4 = 0xffffffff;
-
-    FUN_00786990();
-
-    ExceptionList = local_c;
-
-    return 0;
-
+  void* drag = *reinterpret_cast<void**>(reinterpret_cast<char*>(self) + 0xCD0);
+  if (drag == nullptr) {
+    Profiler_Leave(DAT_00afa27c);
+    return false;
   }
 
-  local_14 = local_14 & 0xffffff00;
+  std::uint8_t outX = 0;
+  std::uint8_t outY = 0;
 
-  local_18 = local_18 & 0xffffff00;
-
-  cVar2 = FUN_005714e0(piVar1,&local_14,&local_18,1,0xffffffff);
-
-  if (cVar2 != '\0') {
-
-    uVar3 = (**(code **)(*piVar1 + 0x25c))();
-
-    cVar2 = FUN_00571620(piVar1,local_14,local_18,uVar3);
-
-    if (cVar2 != '\0') goto LAB_00520f0a;
-
+  // Path A: cargo grid via host+0x2B0
+  void* host = *reinterpret_cast<void**>(reinterpret_cast<char*>(self) + 0x250);
+  void* cargoGrid = *reinterpret_cast<void**>(reinterpret_cast<char*>(host) + 0x2B0);
+  if (InventoryGrid_FindFreeForItem(cargoGrid, drag, &outX, &outY, 1, -1) != 0) {
+    auto** vtbl = *reinterpret_cast<void***>(drag);
+    using QtyFn = std::uint32_t(__thiscall*)(void*);
+    std::uint32_t qty = reinterpret_cast<QtyFn>(vtbl[0x25C / 4])(drag);
+    if (InventoryGrid_PlaceItemFootprint(
+            cargoGrid, drag,
+            static_cast<std::uint32_t>(outX),
+            static_cast<std::uint32_t>(outY),
+            qty) != 0) {
+      goto clear_drag;
+    }
   }
 
-  cVar2 = FUN_005714e0(piVar1,&local_14,&local_18,1,0xffffffff);
-
-  if (cVar2 != '\0') {
-
-    uVar3 = (**(code **)(*piVar1 + 0x25c))();
-
-    cVar2 = FUN_00571620(piVar1,local_14,local_18,uVar3);
-
-    if (cVar2 != '\0') goto LAB_00520f0a;
-
+  // Path B: personal / locker grid at character+0xCBC
+  void* lockerGrid = *reinterpret_cast<void**>(reinterpret_cast<char*>(self) + 0xCBC);
+  if (InventoryGrid_FindFreeForItem(lockerGrid, drag, &outX, &outY, 1, -1) != 0) {
+    auto** vtbl = *reinterpret_cast<void***>(drag);
+    using QtyFn = std::uint32_t(__thiscall*)(void*);
+    std::uint32_t qty = reinterpret_cast<QtyFn>(vtbl[0x25C / 4])(drag);
+    if (InventoryGrid_PlaceItemFootprint(
+            lockerGrid, drag,
+            static_cast<std::uint32_t>(outX),
+            static_cast<std::uint32_t>(outY),
+            qty) != 0) {
+      goto clear_drag;
+    }
   }
 
-  iStack_10 = 0;
-
-  iVar4 = FUN_004fabc0(piVar1,&iStack_10);
-
-  if ((iStack_10 == 0) &&
-
-     ((((iVar4 == 0 || (iVar4 == 1)) || (iVar4 == 10)) || ((iVar4 == 0xd || (iVar4 == 0xf)))))) {
-
-    FUN_00502e90(piVar1);
-
+  // Path C: equip fallback
+  {
+    int outFlag = 0;
+    unsigned code = Character_TryEquipItem(host, drag, &outFlag);
+    if (outFlag == 0 &&
+        (code == 0u || code == 1u || code == 0xAu || code == 0xDu || code == 0xFu)) {
+      FUN_00502e90(host, drag);
+    }
   }
 
-LAB_00520f0a:
-
-  *(uint32_t /* width from decompiler */ *)(param_1 + 0xcd0) = 0;
-
-  local_4 = 0xffffffff;
-
-  FUN_00786990();
-
-  ExceptionList = local_c;
-
-  return 1;
-
+clear_drag:
+  *reinterpret_cast<void**>(reinterpret_cast<char*>(self) + 0xCD0) = nullptr;
+  Profiler_Leave(DAT_00afa27c);
+  return true;
 }

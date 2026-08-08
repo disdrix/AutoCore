@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // FUN_007ffef0
 // -----------------------------------------------------------------------------
 // Stable ID: aa_007ffef0
@@ -9,7 +9,7 @@
 // Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_007ffef0 @ 0x007ffef0
+// PURPOSE: Prefer Client_CombatChat_EmitEventLine_Inferred (WQ9D-I dual 2026-08-04). Scaffold twin retained.
 // Stable ID: aa_007ffef0
 // Embedded strings (evidence for future rename):
 //   - "Dodges"
@@ -22,8 +22,8 @@
 
 // READABILITY (auto CF):
 //  - Body size: ~479 non-empty decompiler lines.
-//  - Control keywords: if×55, return×11, goto×9, for×8, do×8, while×8, switch×1.
-//  - Notable callees: FUN_007a6de0×40, sprintf×16, FUN_0040aff0×4, FUN_005749d0×4, Object_ResolveFromTFID×4, TFID_EqualsObjectId×2, TFID_NotEquals×2, FUN_007a69d0.
+//  - Control keywords: ifÃ—55, returnÃ—11, gotoÃ—9, forÃ—8, doÃ—8, whileÃ—8, switchÃ—1.
+//  - Notable callees: FUN_007a6de0Ã—40, sprintfÃ—16, FUN_0040aff0Ã—4, FUN_005749d0Ã—4, Object_ResolveFromTFIDÃ—4, TFID_EqualsObjectIdÃ—2, TFID_NotEqualsÃ—2, FUN_007a69d0.
 //  - Strings: "Dodges"; "%s %s!"; "Misses"; "%s %s %s!".
 //  - Return sites: 11.
 

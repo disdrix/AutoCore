@@ -1,140 +1,97 @@
 // =============================================================================
-// FUN_0060e800
+// FUN_0060e800 — twin of CVOGObjectiveRequirement_Patrol_EventAction_Inferred
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0060e800
 // Address:   0x0060e800  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    missions-progression
+// Generated: 2026-08-05 MEGA-031 (machine-name twin; prefer named clean)
+// Exactness: Behavior-preserving rewrite. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED
+// =============================================================================
+//
+// Named clean:
+//   docs/reconstruction/reconstructed-exact/CVOGObjectiveRequirement_Patrol_EventAction_Inferred.cpp
+//
+// PURPOSE (brief): Patrol vtable+0x04 event Action — AutoComplete/AutoFail
+// distance + AutoFail flag; events 0x0B / 0x0C; RET 0x1C; FailMission no drain.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0060e800 @ 0x0060e800
-// Stable ID: aa_0060e800
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
+#include <cmath>
 
-// READABILITY (auto CF):
-//  - Body size: ~52 non-empty decompiler lines.
-//  - Control keywords: if×9, return×3, goto×1.
-//  - Notable callees: CONCAT31, CVOGReaction_FailMission, FUN_0060e800, SQRT.
-//  - Return sites: 3.
+static constexpr float DAT_00aaa688 = 5.0f;
+extern "C" float g_flOne;
+extern "C" std::uint32_t __thiscall CVOGReaction_FailMission(int character, std::uint32_t missionId);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-uint __thiscall FUN_0060e800(int param_1,int param_2,int param_3,float *param_4)
-
-
-
+// Ghidra machine name twin — same body as named clean.
+std::uint8_t __thiscall FUN_0060e800(
+    int* param_1,
+    int param_2,
+    int param_3,
+    int param_4,
+    int /*param_5*/,
+    int /*param_6*/,
+    int /*param_7*/,
+    int* in_stack_entity)
 {
-
-  float *pfVar1;
-
-  float fVar2;
-
-  float fVar3;
-
-  float fVar4;
-
-  uint uVar5;
-
-  int iVar6;
-
-  int *in_stack_0000001c;
-
-  
-
-  if (param_4 == (float *)0xc) {
-
-    if (*(char *)(param_1 + 0x18) != '\0') {
-
-      uVar5 = CVOGReaction_FailMission(**(uint32_t /* width from decompiler */ **)(*(int *)(param_1 + 4) + 0x14c));
-
-      return uVar5 & 0xffffff00;
-
+  if (param_4 == 0x0C) {
+    if (*(char*)((char*)param_1 + 0x18) != 0) {
+      auto* mid = *reinterpret_cast<std::uint32_t**>(*(int*)((char*)param_1 + 4) + 0x14c);
+      CVOGReaction_FailMission(param_2, *mid);
+      return 0;
     }
-
+    return 0;
   }
 
-  else if ((param_4 == (float *)0xb) && (in_stack_0000001c != (int *)0x0)) {
+  if (param_4 != 0x0B || in_stack_entity == nullptr) {
+    return 0;
+  }
 
-    param_4 = (float *)(int)*(float *)(param_3 + 4 + (uint)*(byte *)(param_1 + 8) * 4);
+  int targetCount = *(int*)((char*)param_1 + 0xd0);
+  int laps = *(int*)((char*)param_1 + 0x24);
+  unsigned slot = *(unsigned char*)((char*)param_1 + 8);
+  float* pf = reinterpret_cast<float*>(param_3 + 4 + (int)slot * 4);
+  int padCount = (int)*pf;
+  if (padCount >= laps * targetCount) {
+    return 0;
+  }
 
-    if ((int)param_4 < *(int *)(param_1 + 0x24) * *(int *)(param_1 + 0xd0)) {
+  int idx = padCount % targetCount;
+  if (in_stack_entity[0x58] != *(int*)((char*)param_1 + 0x30 + idx * 8) ||
+      in_stack_entity[0x59] != *(int*)((char*)param_1 + 0x34 + idx * 8)) {
+    return 0;
+  }
 
-      iVar6 = (int)param_4 % *(int *)(param_1 + 0xd0);
+  (*(void(__thiscall**)(int*))(*in_stack_entity + 0x144))(in_stack_entity);
+  float fVar2 = *(float*)((char*)in_stack_entity + 0x80);
+  float fVar3 = *(float*)((char*)in_stack_entity + 0x84);
+  float fVar4 = *(float*)((char*)in_stack_entity + 0x88);
 
-      param_4 = (float *)in_stack_0000001c[0x58];
+  int base = *(int*)(*(int*)(param_2 + 4) + 4);
+  int* complex = reinterpret_cast<int*>(base + 4 + param_2);
+  float* playerPos = (*(float*(__thiscall**)(int*))(*complex + 0x1a0))(complex);
 
-      if ((param_4 == *(float **)(param_1 + 0x30 + iVar6 * 8)) &&
+  fVar2 = std::sqrt((fVar2 - playerPos[0]) * (fVar2 - playerPos[0]) +
+                    (fVar3 - playerPos[1]) * (fVar3 - playerPos[1]) +
+                    (fVar4 - playerPos[2]) * (fVar4 - playerPos[2]));
 
-         (in_stack_0000001c[0x59] == *(int *)(param_1 + 0x34 + iVar6 * 8))) {
+  if (*(char*)((char*)param_1 + 0x10) != 0 &&
+      fVar2 < *(float*)((char*)param_1 + 0x14) + DAT_00aaa688) {
+    *pf = *pf + g_flOne;
+    return 1;
+  }
 
-        (**(code **)(*in_stack_0000001c + 0x144))();
-
-        fVar2 = (float)in_stack_0000001c[0x20];
-
-        fVar3 = (float)in_stack_0000001c[0x21];
-
-        fVar4 = (float)in_stack_0000001c[0x22];
-
-        param_4 = (float *)(**(code **)(*(int *)(*(int *)(*(int *)(param_2 + 4) + 4) + 4 + param_2)
-
-                                       + 0x1a0))();
-
-        fVar2 = SQRT((fVar2 - *param_4) * (fVar2 - *param_4) +
-
-                     (fVar3 - param_4[1]) * (fVar3 - param_4[1]) +
-
-                     (fVar4 - param_4[2]) * (fVar4 - param_4[2]));
-
-        if ((*(char *)(param_1 + 0x10) != '\0') &&
-
-           (fVar2 < *(float *)(param_1 + 0x14) + DAT_00aaa688)) {
-
-          pfVar1 = (float *)(param_3 + 4 + (uint)*(byte *)(param_1 + 8) * 4);
-
-          *pfVar1 = *(float *)(param_3 + 4 + (uint)*(byte *)(param_1 + 8) * 4) + g_flOne;
-
-          return CONCAT31((int3)((uint)pfVar1 >> 8),1);
-
-        }
-
-        if (*(char *)(param_1 + 0x18) != '\0') {
-
-          if (fVar2 <= *(float *)(param_1 + 0x1c) - DAT_00aaa688) {
-
-            param_4 = (float *)(**(code **)(*(int *)(*(int *)(*(int *)(param_2 + 4) + 4) + 4 +
-
-                                                    param_2) + 0x198))();
-
-            if ((char)param_4 == '\0') goto LAB_0060e9c8;
-
-          }
-
-          param_4 = (float *)CVOGReaction_FailMission
-
-                                       (**(uint32_t /* width from decompiler */ **)(*(int *)(param_1 + 4) + 0x14c));
-
-        }
-
+  if (*(char*)((char*)param_1 + 0x18) != 0) {
+    if (fVar2 > *(float*)((char*)param_1 + 0x1c) - DAT_00aaa688) {
+      auto* mid = *reinterpret_cast<std::uint32_t**>(*(int*)((char*)param_1 + 4) + 0x14c);
+      CVOGReaction_FailMission(param_2, *mid);
+    } else {
+      char gate = (*(char(__thiscall**)(int*))(*complex + 0x198))(complex);
+      if (gate != 0) {
+        auto* mid = *reinterpret_cast<std::uint32_t**>(*(int*)((char*)param_1 + 4) + 0x14c);
+        CVOGReaction_FailMission(param_2, *mid);
       }
-
     }
-
   }
-
-LAB_0060e9c8:
-
-  return (uint)param_4 & 0xffffff00;
-
+  return 0;
 }

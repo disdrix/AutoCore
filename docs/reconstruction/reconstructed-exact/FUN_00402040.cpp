@@ -1,70 +1,44 @@
 // =============================================================================
-// FUN_00402040
+// FUN_00402040  (alias of BasicStringFlag_CopyCtor_EdiSrc_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00402040
-// Address:   0x00402040  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00402040–0x0040208c inclusive (77 B / 0x4D)
+// Module:    autoassault.exe, image base 0x400000
+// System:    missions-progression partition parent; unit = shared aggregate copy-ctor
+// Wave:      MEGA-080 OWN-ONLY dual 2026-08-05
+// Exactness: Behavior-preserving rewrite of decompiler + disassemble_function +
+//            read_memory. Not modernization. Bit-for-bit / runtime: DEFERRED.
+// Canonical: docs/reconstruction/reconstructed-exact/BasicStringFlag_CopyCtor_EdiSrc_Inferred.cpp
 // =============================================================================
-
-// PURPOSE (auto): Scaffold unit for FUN_00402040 @ 0x00402040
-// Stable ID: aa_00402040
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
-
-// READABILITY (auto CF):
-//  - Body size: ~17 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_00402040.
-//  - Return sites: 1.
 
 /*
  * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
+ * - Copy-construct { basic_string<char> @+0 (0x1c); uint8_t flag @+0x1c }.
+ * - ABI: stack dest*; EDI = const source*; return dest* in EAX; RET 4.
+ * - Sole callee: IAT [0x009c62ec] basic_string copy-ctor.
+ * - SEH LAB_009bbfb9; callers FUN_00401fe0 / FUN_00980160.
  */
 
-basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> *
+#include <cstdint>
 
-FUN_00402040(basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> *param_1)
+struct BasicString_0x1c {
+    std::uint8_t raw[0x1C];
+};
 
+struct BasicStringFlag {
+    BasicString_0x1c str;
+    std::uint8_t     flag;
+};
 
+extern "C" BasicString_0x1c* __thiscall
+BasicString_CopyCtor(BasicString_0x1c* self, const BasicString_0x1c* other);
 
+// Ghidra FUN_00402040 — register ABI still applies (EDI = source).
+extern "C" BasicStringFlag* FUN_00402040(
+    BasicStringFlag* dest /* stack */,
+    const BasicStringFlag* src /* EDI */)
 {
-
-  basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> *unaff_EDI;
-
-  void *local_c;
-
-  uint8_t *puStack_8;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
-
-  local_4 = 0xffffffff;
-
-  puStack_8 = &LAB_009bbfb9;
-
-  local_c = ExceptionList;
-
-  ExceptionList = &local_c;
-
-  std::basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>::
-
-  basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>(param_1,unaff_EDI);
-
-  param_1[0x1c] = unaff_EDI[0x1c];
-
-  ExceptionList = local_c;
-
-  return param_1;
-
+    BasicString_CopyCtor(&dest->str, &src->str);
+    dest->flag = src->flag;
+    return dest;
 }

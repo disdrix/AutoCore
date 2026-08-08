@@ -1,54 +1,53 @@
 // =============================================================================
-// FUN_00440ab0
+// FUN_00440ab0  — twin of StdTree_FreeSubtree_Isnil3D_DestroyVal0C_Inferred
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00440ab0
 // Address:   0x00440ab0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Wave:      MEGA-130 OWN-ONLY dual 2026-08-05
+// Exactness: Behavior-preserving rewrite; left-walk from bytes.
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00440ab0 @ 0x00440ab0
-// Stable ID: aa_00440ab0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~10 non-empty decompiler lines.
-//  - Control keywords: return×2, if×1.
-//  - Notable callees: FUN_00440ab0×2, FUN_00442720.
-//  - Return sites: 2.
+struct StdTreeNode_Isnil3D {
+  StdTreeNode_Isnil3D* left;    // +0x00
+  StdTreeNode_Isnil3D* parent;  // +0x04
+  StdTreeNode_Isnil3D* right;   // +0x08
+  // value @ +0x0C; isnil @ +0x3D
+};
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+struct StdTreeHost_Shell {
+  uint32_t _pad0;
+  StdTreeNode_Isnil3D* head;
+  uint32_t size;
+};
 
-void FUN_00440ab0(void *param_1)
+extern "C" void StdTree_Node_DestroyVal0C_Via40770_Inferred(StdTreeNode_Isnil3D* node /*EAX*/);
+extern "C" void __cdecl operator_delete(void* p);
 
-
-
+// ECX = tree host; stack = node*; RET 4; void.
+extern "C" void __fastcall FUN_00440ab0(StdTreeHost_Shell* tree_host,
+                                        StdTreeNode_Isnil3D* node)
 {
-
-  if (*(char *)((int)param_1 + 0x3d) == '\0') {
-
-    FUN_00440ab0(*(uint32_t /* width from decompiler */ *)((int)param_1 + 8));
-
-    FUN_00442720();
-
-                    /* WARNING: Subroutine does not return */
-
-    operator_delete(param_1);
-
+  if (*reinterpret_cast<uint8_t*>(reinterpret_cast<char*>(node) + 0x3d) != 0) {
+    return;
   }
 
-  return;
+  for (;;) {
+    StdTreeNode_Isnil3D* right =
+        *reinterpret_cast<StdTreeNode_Isnil3D**>(reinterpret_cast<char*>(node) + 8);
+    FUN_00440ab0(tree_host, right);
 
+    StdTreeNode_Isnil3D* left =
+        *reinterpret_cast<StdTreeNode_Isnil3D**>(reinterpret_cast<char*>(node) + 0);
+
+    StdTree_Node_DestroyVal0C_Via40770_Inferred(node);
+    operator_delete(node);
+    node = left;
+
+    if (*reinterpret_cast<uint8_t*>(reinterpret_cast<char*>(node) + 0x3d) != 0) {
+      break;
+    }
+  }
 }

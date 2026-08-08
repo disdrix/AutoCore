@@ -1,74 +1,36 @@
-// =============================================================================
-// FUN_0040afb0
+﻿// =============================================================================
+// FUN_0040afb0  (machine-name twin of Host_LookupObjectByKey_PairTable30_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0040afb0
 // Address:   0x0040afb0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    interaction-activation
+// Generated: 2026-08-05 MEGA-028 (clean twin; keep FUN_* path for inventory)
+// Exactness: Behavior-preserving rewrite of decompiler control flow.
+// Bit-for-bit vs retail EXE: DEFERRED.
+// Named clean: Host_LookupObjectByKey_PairTable30_Inferred.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0040afb0 @ 0x0040afb0
-// Stable ID: aa_0040afb0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// ABI: __thiscall; ECX=host; stack out*, key; EAX=out; RET 8
+// Layout: host+0x30 pair base {int key; void* value}, host+0x34 count
 
-// READABILITY (auto CF):
-//  - Body size: ~19 non-empty decompiler lines.
-//  - Control keywords: if×2, return×2, do×1, while×1.
-//  - Notable callees: FUN_0040afb0.
-//  - Return sites: 2.
-
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __thiscall FUN_0040afb0(int param_1,int *param_2,int param_3)
-
-
-
+void* __thiscall FUN_0040afb0(void* host, void** outObject, int key)
 {
+    int i = 0;
+    int count = *(int*)((char*)host + 0x34);
 
-  int iVar1;
+    if (0 < count) {
+        int* table = *(int**)((char*)host + 0x30);
+        int* pairCursor = table;
+        do {
+            if (*pairCursor == key) {
+                *outObject = (void*)table[i * 2 + 1];
+                return outObject;
+            }
+            i = i + 1;
+            pairCursor = pairCursor + 2;
+        } while (i < count);
+    }
 
-  int *piVar2;
-
-  
-
-  iVar1 = 0;
-
-  if (0 < *(int *)(param_1 + 0x34)) {
-
-    piVar2 = *(int **)(param_1 + 0x30);
-
-    do {
-
-      if (*piVar2 == param_3) {
-
-        *param_2 = (*(int **)(param_1 + 0x30))[iVar1 * 2 + 1];
-
-        return;
-
-      }
-
-      iVar1 = iVar1 + 1;
-
-      piVar2 = piVar2 + 2;
-
-    } while (iVar1 < *(int *)(param_1 + 0x34));
-
-  }
-
-  *param_2 = 0;
-
-  return;
-
+    *outObject = 0;
+    return outObject;
 }

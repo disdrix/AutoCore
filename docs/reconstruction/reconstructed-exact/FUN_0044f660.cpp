@@ -1,42 +1,19 @@
 // =============================================================================
-// FUN_0044f660
+// FUN_0044f660  — twin of Object_GetFieldAtPlus8_Inferred (aa_0044f660)
 // -----------------------------------------------------------------------------
-// Stable ID: aa_0044f660
 // Address:   0x0044f660  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Wave:      R10-027 OWN-ONLY dual 2026-08-05
+// Exactness: Behavior-preserving rewrite of decompiler control flow.
+// Bit-for-bit vs retail EXE: DEFERRED.
+// Canonical named unit: Object_GetFieldAtPlus8_Inferred.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0044f660 @ 0x0044f660
-// Stable ID: aa_0044f660
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~4 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_0044f660.
-//  - Return sites: 1.
+extern "C" uint32_t __fastcall Object_GetFieldAtPlus8_Inferred(void* self);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-uint32_t /* width from decompiler */ __fastcall FUN_0044f660(int param_1)
-
-
-
+// Ghidra name alias — identical body to named reconstruction.
+extern "C" uint32_t __fastcall FUN_0044f660(void* self)
 {
-
-  return *(uint32_t /* width from decompiler */ *)(param_1 + 8);
-
+  return Object_GetFieldAtPlus8_Inferred(self);
 }

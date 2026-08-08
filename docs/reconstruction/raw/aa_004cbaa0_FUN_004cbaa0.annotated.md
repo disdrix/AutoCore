@@ -1,77 +1,73 @@
-# Annotated low-level: FUN_004cbaa0
+# Annotated low-level: StdTree_EraseRange_Isnil29_Inferred
 
 | Field | Value |
 |---|---|
 | Stable ID | `aa_004cbaa0` |
-| VA | `0x004cbaa0` |
-| System | unknown |
-| Date | 2026-07-23 |
+| VA | `0x004cbaa0`–`0x004cbb54` exclusive (**180 B**) |
+| Ghidra | `FUN_004cbaa0` |
+| Canonical | `StdTree_EraseRange_Isnil29_Inferred` |
+| Prior alias | `Named_CalleeOf_Named_VOG_DEBUG_STOP_004cbaa0` (**narrow**) |
+| System | STL map/set range erase (isnil@+0x29; pairs with `StdTree_EraseAndRebalance_Isnil29`) |
+| Date | 2026-08-04 (WQ9F-C OWN dual; raw 2026-07-23 re-verified) |
 
 ## Machine-level notes
 
-- Source: raw capture for `aa_004cbaa0`.
-- Prefer assembly when decompiler conflicts.
-- Recover types for still-generic parameters via callers/xrefs.
-- Map DAT_* globals and FUN_* callees in follow-up waves.
+- Live decompile CF ≡ raw; both exits **`C2 0C 00`**.
+- Full clear: `first==*head && last==head` → free-subtree `FUN_004cb550(root)` then head reset + size 0.
+- Partial: isnil@+0x29 in-order successor, then `StdTree_EraseAndRebalance_Isnil29` with **`mov ecx,edi`** (map shell).
+- **Do not merge** with `Map_EraseRange` / `_B` (different free + single-erase callees) despite identical CF shape and 180 B size.
 
-## Pseudocode (annotated copy of raw)
+## Pseudocode (annotated)
 
 ```c
-void __thiscall FUN_004cbaa0(int param_1,undefined4 *param_2,int *param_3,int *param_4)
-
-{
-  char cVar1;
-  int *piVar2;
-  int *piVar3;
-  int *piVar4;
-  int *piVar5;
-  int *piVar6;
-  
-  piVar4 = param_4;
-  piVar6 = *(int **)(param_1 + 4);
-  piVar3 = param_3;
-  if ((param_3 == (int *)*piVar6) && (param_4 == piVar6)) {
-    FUN_004cb550(piVar6[1]);
-    *(int *)(*(int *)(param_1 + 4) + 4) = *(int *)(param_1 + 4);
-    *(undefined4 *)(param_1 + 8) = 0;
-    *(undefined4 *)*(undefined4 *)(param_1 + 4) = *(undefined4 *)(param_1 + 4);
-    *(int *)(*(int *)(param_1 + 4) + 8) = *(int *)(param_1 + 4);
-    *param_2 = **(undefined4 **)(param_1 + 4);
-    return;
-  }
-  while (piVar3 != piVar4) {
-    piVar6 = piVar3;
-    if (*(char *)((int)piVar3 + 0x29) == '\0') {
-      piVar6 = (int *)piVar3[2];
-      if (*(char *)((int)piVar6 + 0x29) == '\0') {
-        cVar1 = *(char *)(*piVar6 + 0x29);
-        piVar2 = (int *)*piVar6;
-        while (cVar1 == '\0') {
-          cVar1 = *(char *)(*piVar2 + 0x29);
-          piVar6 = piVar2;
-          piVar2 = (int *)*piVar2;
-        }
-      }
-      else {
-        cVar1 = *(char *)(piVar3[1] + 0x29);
-        piVar5 = (int *)piVar3[1];
-        piVar2 = piVar3;
-        while ((piVar6 = piVar5, cVar1 == '\0' && (piVar2 == (int *)piVar6[2]))) {
-          cVar1 = *(char *)(piVar6[1] + 0x29);
-          piVar5 = (int *)piVar6[1];
-          piVar2 = piVar6;
-        }
-      }
-    }
-    FUN_004cb740(&param_3,piVar3);
-    piVar3 = piVar6;
-  }
-  *param_2 = piVar3;
-  return;
+// __thiscall; ECX = MapShell*; stack outIt*, first, last; RET 0x0C
+void StdTree_EraseRange_Isnil29_Inferred(
+    MapShell_Isnil29 *map,
+    MapNode_Isnil29 **outIt,
+    MapNode_Isnil29 *first,
+    MapNode_Isnil29 *last)
+{
+  MapNode_Isnil29 *head = map->head; // +0x04
+
+  // Full clear [begin, end)
+  if (first == head->left && last == head) {
+    FUN_004cb550(head->parent); // free non-nil subtree (isnil@+0x29)
+    head->parent = head;
+    map->size = 0;              // +0x08
+    head->left = head;
+    head->right = head;
+    *outIt = head->left;
+    return; // ret 0x0c
+  }
+
+  while (first != last) {
+    MapNode_Isnil29 *succ = first;
+    if (first->isnil == 0) {
+      // MSVC tree successor (isnil@+0x29)
+      succ = first->right;
+      if (succ->isnil == 0) {
+        MapNode_Isnil29 *l = succ->left;
+        while (l->isnil == 0) { succ = l; l = l->left; }
+      } else {
+        MapNode_Isnil29 *p = first->parent;
+        MapNode_Isnil29 *cur = first;
+        while (p->isnil == 0 && cur == p->right) {
+          cur = p; p = p->parent;
+        }
+        succ = p;
+      }
+    }
+    // bytes: push node; lea out; push out; mov ecx,map; call 004cb740
+    StdTree_EraseAndRebalance_Isnil29_Inferred(map, &first, first);
+    first = succ;
+  }
+  *outIt = first;
+  return; // ret 0x0c
 }
 ```
 
-## Open questions
+## Gaps
 
-- Confirm calling convention and full signature against callers.
-- Recover meaningful types for still-generic parameters.
+1. Product demangle of map value_type (shared with erase/insert isnil29 family).
+2. Full free-subtree algebra of `FUN_004cb550` (decomp may drop left recurse).
+3. Runtime / bit-exact / differential.

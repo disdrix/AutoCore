@@ -1,94 +1,13 @@
 // =============================================================================
-// FUN_00834520
-// -----------------------------------------------------------------------------
-// Stable ID: aa_00834520
-// Address:   0x00834520  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// FUN_00834520 — twin of CWndVehicle_CompleteDtor (aa_00834520)
+// Wave: WQ9J-B 2026-08-05. Prefer named clean CWndVehicle_CompleteDtor.cpp.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00834520 @ 0x00834520
-// Stable ID: aa_00834520
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~29 non-empty decompiler lines.
-//  - Control keywords: if×1, return×1.
-//  - Notable callees: FUN_0076c4d0, FUN_0078ca80, FUN_00833d50, FUN_00834520.
-//  - Return sites: 1.
+extern "C" void __fastcall CWndVehicle_CompleteDtor(uint32_t* self);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __fastcall FUN_00834520(uint32_t /* width from decompiler */ *param_1)
-
-
-
+extern "C" void __fastcall FUN_00834520(uint32_t* self)
 {
-
-  int iVar1;
-
-  undefined **local_14;
-
-  int local_10;
-
-  void *pvStack_c;
-
-  uint8_t *puStack_8;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
-
-  puStack_8 = &LAB_009b4563;
-
-  pvStack_c = ExceptionList;
-
-  ExceptionList = &pvStack_c;
-
-  *param_1 = &PTR_FUN_00a6fbcc;
-
-  local_4 = 0;
-
-  iVar1 = param_1[0xaa];
-
-  if (iVar1 != 0) {
-
-    *(uint8_t *)(iVar1 + 0x48) = 1;
-
-    *(uint32_t /* width from decompiler */ *)(iVar1 + 0x44) = *(uint32_t /* width from decompiler */ *)(iVar1 + 0x40);
-
-    FUN_0076c4d0();
-
-    local_14 = &PTR_LAB_00a9f4d8;
-
-    local_10 = iVar1;
-
-    (**(code **)(**(int **)(iVar1 + 8) + 0x20))(&local_14);
-
-    (**(code **)(**(int **)(iVar1 + 8) + 0x10))(0);
-
-  }
-
-  FUN_00833d50();
-
-  local_4 = 0xffffffff;
-
-  FUN_0078ca80();
-
-  ExceptionList = pvStack_c;
-
-  return;
-
+  CWndVehicle_CompleteDtor(self);
 }

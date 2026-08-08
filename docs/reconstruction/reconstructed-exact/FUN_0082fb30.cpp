@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // FUN_0082fb30
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0082fb30
@@ -9,7 +9,7 @@
 // Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0082fb30 @ 0x0082fb30
+// PURPOSE: Prefer UI_InteractionMenu_AddConvoyInviteOrKick_Inferred (WQ9D-I dual 2026-08-04). Scaffold twin retained.
 // Stable ID: aa_0082fb30
 // Embedded strings (evidence for future rename):
 //   - "i_m_int_2d_btn_generic.xml"
@@ -19,8 +19,8 @@
 
 // READABILITY (auto CF):
 //  - Body size: ~34 non-empty decompiler lines.
-//  - Control keywords: if×6, return×2.
-//  - Notable callees: FUN_00574880×2, FUN_005749d0, FUN_0082fb30.
+//  - Control keywords: ifÃ—6, returnÃ—2.
+//  - Notable callees: FUN_00574880Ã—2, FUN_005749d0, FUN_0082fb30.
 //  - Strings: "i_m_int_2d_btn_generic.xml"; "Invite To Convoy"; "Kick From Convoy".
 //  - Return sites: 2.
 

@@ -1,34 +1,43 @@
-# Annotated low-level: FUN_0040aff0
+# Annotated low-level: Object_CopyTfid16At228_Inferred (`FUN_0040aff0`)
 
 | Field | Value |
 |---|---|
 | Stable ID | `aa_0040aff0` |
 | VA | `0x0040aff0` |
-| System | unknown |
-| Date | 2026-07-23 |
+| System | identity / TFID |
+| Date | 2026-07-23 scaffold; **2026-08-04 WQ9R-B dual seal** |
+
+---
 
 ## Machine-level notes
 
-- Source: raw capture for `aa_0040aff0`.
-- Prefer assembly when decompiler conflicts.
-- Recover types for still-generic parameters via callers/xrefs.
-- Map DAT_* globals and FUN_* callees in follow-up waves.
+- **ABI:** `__thiscall`; ECX = object with TFID at `+0x228`; stack `TFID_16* out`; **`ret 4`**.
+- **Body:** 38 bytes; leaf; four sequential dword copies (16 B).
+- **Return:** EAX = `out` (entry load preserved).
+- Prefer these bytes if decompiler invents width/return noise.
 
-## Pseudocode (annotated copy of raw)
+## Annotated pseudocode
 
 ```c
-void __thiscall FUN_0040aff0(int param_1,undefined4 *param_2)
-
-{
-  *param_2 = *(undefined4 *)(param_1 + 0x228);
-  param_2[1] = *(undefined4 *)(param_1 + 0x22c);
-  param_2[2] = *(undefined4 *)(param_1 + 0x230);
-  param_2[3] = *(undefined4 *)(param_1 + 0x234);
-  return;
+// Object_CopyTfid16At228_Inferred
+// Copy 16-byte TFID identity blob from this+0x228 into *out.
+// __thiscall; ret 4; returns out in EAX.
+void __thiscall Object_CopyTfid16At228_Inferred(void *thisObj, uint32_t *out /* TFID_16 */)
+{
+  // thisObj += 0x228 in register; then:
+  out[0] = *(uint32_t *)((char *)thisObj + 0x228); // dwCoidLo-ish
+  out[1] = *(uint32_t *)((char *)thisObj + 0x22c); // dwCoidHi-ish
+  out[2] = *(uint32_t *)((char *)thisObj + 0x230); // bGlobal + pads
+  out[3] = *(uint32_t *)((char *)thisObj + 0x234); // pad word
 }
 ```
 
-## Open questions
+## Call-site pattern
 
-- Confirm calling convention and full signature against callers.
-- Recover meaningful types for still-generic parameters.
+Typical: obtain identity/owner via `vtbl+0x214` / `vtbl+0x1d8`, then copy TFID and feed `TFID_EqualsObjectId` / `TFID_NotEquals` / `FUN_004bb0d0`.
+
+## Open
+
+- Product/PDB symbol.
+- Exact formal type of `this` (identity interface vs full CVOGObject — field offset sealed either way).
+- Runtime / bit-exact.

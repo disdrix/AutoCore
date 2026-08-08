@@ -1,46 +1,27 @@
 // =============================================================================
-// FUN_00570f50
+// FUN_00570f50  (Ghidra scaffold twin of named clean)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00570f50
-// Address:   0x00570f50  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00570f50 – 0x00570f62  (19 B / 0x13)
+// Named:     InventoryGrid_RemoveAllAndReEmptyCells_Inferred
+// System:    inventory-transfer
+// Wave:      R10-013 OWN-ONLY dual (2026-08-05)
+// Exactness: Behavior-preserving rewrite of decompiler control flow.
+//            Assembly seals LEA ECX,[this+0x2c] before List_RemoveAll.
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00570f50 @ 0x00570f50
-// Stable ID: aa_00570f50
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// PURPOSE: Thin re-empty of InventoryGrid — List_RemoveAll(grid+0x2c) then
+//          InventoryGrid_AllocateCellArray_Inferred(grid) via tail-JMP.
+// Twin:    FUN_00570f70 does full item walk/detach before RemoveAll+Allocate.
 
-// READABILITY (auto CF):
-//  - Body size: ~6 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_004bc580, FUN_00570f50, InventoryGrid_AllocateCellArray_Inferred.
-//  - Return sites: 1.
+void __fastcall List_RemoveAll(void* list);                                 // 0x004bc580
+void __fastcall InventoryGrid_AllocateCellArray_Inferred(void* grid);       // 0x00570720
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __fastcall FUN_00570f50(void *param_1)
-
-
-
+void __fastcall FUN_00570f50(void* param_1 /* InventoryGrid* this / ECX */)
 {
-
-  FUN_004bc580();
-
+  // Decompiler drops list this; assembly: LEA ECX,[ESI+0x2c]
+  List_RemoveAll((void*)((char*)param_1 + 0x2c));
   InventoryGrid_AllocateCellArray_Inferred(param_1);
-
   return;
-
 }

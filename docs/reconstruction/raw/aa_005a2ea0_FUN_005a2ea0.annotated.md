@@ -1,178 +1,69 @@
-# Annotated low-level: FUN_005a2ea0
+# Annotated low-level: FUN_005a2ea0 → StdTree_EraseAndRebalance_Isnil21_Inferred
 
 | Field | Value |
 |---|---|
 | Stable ID | `aa_005a2ea0` |
-| VA | `0x005a2ea0` |
-| System | unknown |
-| Date | 2026-07-23 |
+| VA | `0x005a2ea0`–`0x005a3155` inclusive (**694 B** / `0x2B6`) |
+| System | skills-abilities / STL map-set helpers (isnil@+0x21 family) |
+| Date | 2026-08-05 (R12-030 OWN dual; scaffold 2026-07-23) |
+| Canonical name | `StdTree_EraseAndRebalance_Isnil21_Inferred` |
+| Parent dual | `0x005a27f0` StdTree_Rrotate_Isnil21_Inferred (R11-007) |
+| Terminal | **false** |
 
 ## Machine-level notes
 
-- Source: raw capture for `aa_005a2ea0`.
-- Prefer assembly when decompiler conflicts.
-- Recover types for still-generic parameters via callers/xrefs.
-- Map DAT_* globals and FUN_* callees in follow-up waves.
+- Source: raw capture + R12-030 live re-verify.
+- Prefer assembly / `read_memory` when decompiler conflicts (false noreturn on `operator_delete`; missing size-- / `*outIt` / `ret 8`).
+- Layout: color@**+0x20**, isnil@**+0x21**, node **0x28**, head@map+4, size@map+8.
+- ABI: `__thiscall` ECX=map; two stack args; **`ret 8`**.
+- Role: single-node MSVC `_Tree::erase(const_iterator)` — not range, not insert, not Val12/isnil29.
 
-## Pseudocode (annotated copy of raw)
+## Algorithm (annotated)
+
+1. **SEH** frame (`LAB_009a6342`); `EBP = ECX` (map).
+2. If `node->isnil (+0x21) != 0` → throw `"invalid map/set<T> iterator"` via `DAT_00acc34c`.
+3. **`FUN_004e12c0`** — advance out-iterator / capture successor (isnil21 nextnode).
+4. **Splice** replacement child; reattach parent/root; fix head leftmost (`FUN_004cb2c0`) / rightmost (`FUN_00421a60`).
+5. Decompiler "unreachable" blocks in mid-body are the **two-child successor-swap** plate (live in asm; same family as peer erase clones).
+6. If erased **color black** (`+0x20 == 1`) → RB fixup with **Lrotate `0050e9f0`** / **Rrotate `005a27f0`**.
+7. **`operator_delete(node)`** only (no value dtor / no secondary heap free in this body).
+8. **Byte-sealed:** if size>0 then `--size`; `*outIt = successor`; `ADD ESP,0x54`; **`RET 8`**.
+
+## Call sites
+
+| Site | Notes |
+|---|---|
+| `FUN_005a3860` @ `005a38ff` | EraseRange while begin≠end; `MOV ECX,EDI`; parent `ret 0xC` |
+| Orphan @ `005a052b` | Unrecovered function body (~`005a04d0`–`005a053d`); `MOV ECX,EDI`; parent `ret 4`; DATA slot `009d7f0c` |
+
+## Pseudocode (annotated copy of raw + epilogue correction)
 
 ```c
-/* WARNING: Removing unreachable block (ram,0x005a2fc0) */
-/* WARNING: Removing unreachable block (ram,0x005a2fd0) */
-/* WARNING: Removing unreachable block (ram,0x005a2fd9) */
-/* WARNING: Removing unreachable block (ram,0x005a2fdc) */
-/* WARNING: Removing unreachable block (ram,0x005a2fcc) */
-/* WARNING: Removing unreachable block (ram,0x005a2fea) */
-/* WARNING: Removing unreachable block (ram,0x005a2ff7) */
-/* WARNING: Removing unreachable block (ram,0x005a3002) */
-/* WARNING: Removing unreachable block (ram,0x005a2ffe) */
-/* WARNING: Removing unreachable block (ram,0x005a2ff2) */
-/* WARNING: Removing unreachable block (ram,0x005a3005) */
-
-void __thiscall FUN_005a2ea0(int param_1,undefined4 param_2,int *param_3)
-
-{
-  undefined4 *puVar1;
-  int iVar2;
-  int *piVar3;
-  undefined4 uVar4;
-  int *piVar5;
-  int *piVar6;
-  basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> local_50 [28];
-  undefined **local_34 [3];
-  basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> local_28 [28];
-  void *pvStack_c;
-  undefined1 *puStack_8;
-  int local_4;
-  
-  local_4 = 0xffffffff;
-  puStack_8 = &LAB_009a6342;
-  pvStack_c = ExceptionList;
-  if (*(char *)((int)param_3 + 0x21) != '\0') {
-    ExceptionList = &pvStack_c;
-    std::basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>::
-    basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>
-              (local_50,"invalid map/set<T> iterator");
-    local_4 = 0;
-    exception::exception((exception *)local_34);
-    local_4._0_1_ = 1;
-    local_34[0] = &PTR_FUN_009c7628;
-    std::basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>::
-    basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>(local_28,local_50);
-    local_4 = (uint)local_4._1_3_ << 8;
-    local_34[0] = &PTR_FUN_009c7640;
-                    /* WARNING: Subroutine does not return */
-    _CxxThrowException(local_34,(ThrowInfo *)&DAT_00acc34c);
-  }
-  ExceptionList = &pvStack_c;
-  FUN_004e12c0();
-  piVar6 = (int *)*param_3;
-  if (*(char *)((int)piVar6 + 0x21) == '\0') {
-    if (*(char *)(param_3[2] + 0x21) == '\0') {
-      piVar6 = (int *)param_3[2];
-    }
-  }
-  else {
-    piVar6 = (int *)param_3[2];
-  }
-  piVar5 = (int *)param_3[1];
-  if (*(char *)((int)piVar6 + 0x21) == '\0') {
-    piVar6[1] = (int)piVar5;
-  }
-  if (*(int **)(*(int *)(param_1 + 4) + 4) == param_3) {
-    *(int **)(*(int *)(param_1 + 4) + 4) = piVar6;
-  }
-  else if ((int *)*piVar5 == param_3) {
-    *piVar5 = (int)piVar6;
-  }
-  else {
-    piVar5[2] = (int)piVar6;
-  }
-  puVar1 = *(undefined4 **)(param_1 + 4);
-  if ((int *)*puVar1 == param_3) {
-    piVar3 = piVar5;
-    if (*(char *)((int)piVar6 + 0x21) == '\0') {
-      piVar3 = (int *)FUN_004cb2c0(piVar6);
-    }
-    *puVar1 = piVar3;
-  }
-  iVar2 = *(int *)(param_1 + 4);
-  if (*(int **)(iVar2 + 8) == param_3) {
-    if (*(char *)((int)piVar6 + 0x21) == '\0') {
-      uVar4 = FUN_00421a60(piVar6);
-      *(undefined4 *)(iVar2 + 8) = uVar4;
-    }
-    else {
-      *(int **)(iVar2 + 8) = piVar5;
-    }
-  }
-  if ((char)param_3[8] == '\x01') {
-    if (piVar6 != *(int **)(*(int *)(param_1 + 4) + 4)) {
-      do {
-        piVar3 = piVar5;
-        if ((char)piVar6[8] != '\x01') break;
-        piVar5 = (int *)*piVar3;
-        if (piVar6 == piVar5) {
-          piVar5 = (int *)piVar3[2];
-          if ((char)piVar5[8] == '\0') {
-            *(undefined1 *)(piVar5 + 8) = 1;
-            *(undefined1 *)(piVar3 + 8) = 0;
-            FUN_0050e9f0(piVar3);
-            piVar5 = (int *)piVar3[2];
-          }
-          if (*(char *)((int)piVar5 + 0x21) == '\0') {
-            if ((*(char *)(*piVar5 + 0x20) != '\x01') || (*(char *)(piVar5[2] + 0x20) != '\x01')) {
-              if (*(char *)(piVar5[2] + 0x20) == '\x01') {
-                *(undefined1 *)(*piVar5 + 0x20) = 1;
-                *(undefined1 *)(piVar5 + 8) = 0;
-                FUN_005a27f0(piVar5);
-                piVar5 = (int *)piVar3[2];
-              }
-              *(char *)(piVar5 + 8) = (char)piVar3[8];
-              *(undefined1 *)(piVar3 + 8) = 1;
-              *(undefined1 *)(piVar5[2] + 0x20) = 1;
-              FUN_0050e9f0(piVar3);
-              break;
-            }
-LAB_005a30d2:
-            *(undefined1 *)(piVar5 + 8) = 0;
-          }
-        }
-        else {
-          if ((char)piVar5[8] == '\0') {
-            *(undefined1 *)(piVar5 + 8) = 1;
-            *(undefined1 *)(piVar3 + 8) = 0;
-            FUN_005a27f0(piVar3);
-            piVar5 = (int *)*piVar3;
-          }
-          if (*(char *)((int)piVar5 + 0x21) == '\0') {
-            if ((*(char *)(piVar5[2] + 0x20) == '\x01') && (*(char *)(*piVar5 + 0x20) == '\x01'))
-            goto LAB_005a30d2;
-            if (*(char *)(*piVar5 + 0x20) == '\x01') {
-              *(undefined1 *)(piVar5[2] + 0x20) = 1;
-              *(undefined1 *)(piVar5 + 8) = 0;
-              FUN_0050e9f0(piVar5);
-              piVar5 = (int *)*piVar3;
-            }
-            *(char *)(piVar5 + 8) = (char)piVar3[8];
-            *(undefined1 *)(piVar3 + 8) = 1;
-            *(undefined1 *)(*piVar5 + 0x20) = 1;
-            FUN_005a27f0(piVar3);
-            break;
-          }
-        }
-        piVar5 = (int *)piVar3[1];
-        piVar6 = piVar3;
-      } while (piVar3 != *(int **)(*(int *)(param_1 + 4) + 4));
-    }
-    *(undefined1 *)(piVar6 + 8) = 1;
-  }
-                    /* WARNING: Subroutine does not return */
-  operator_delete(param_3);
+// __thiscall  RET 8
+void StdTree_EraseAndRebalance_Isnil21_Inferred(
+    /*ECX*/ MapShell_Isnil21 *map,
+    MapNode_Isnil21 **outIt,
+    MapNode_Isnil21 *node)
+{
+  // SEH omitted
+  if (node->isnil != 0)
+    throw invalid_map_set_iterator; // "invalid map/set<T> iterator"
+
+  FUN_004e12c0(/* successor prep on out-it / node shadow */);
+
+  // unlink + extremity fix (min 004cb2c0 / max 00421a60)
+  // if erased black: RB with 0050e9f0 / 005a27f0
+  // (see raw for full splice/RB CF; two-child swap in "unreachable" blocks)
+
+  operator_delete(node);
+  if (map->size > 0) map->size -= 1;
+  *outIt = successor; // sealed in epilogue bytes
+  // ret 8
 }
 ```
 
 ## Open questions
 
-- Confirm calling convention and full signature against callers.
-- Recover meaningful types for still-generic parameters.
+- Product demangle for map `value_type` of `FUN_005a3860` / orphan host.
+- Full recovery of orphan function at `005a04d0` (vtable/data `009d7f0c`).
+- Runtime / bit-exact / differential.

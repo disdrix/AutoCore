@@ -1,70 +1,42 @@
 // =============================================================================
-// FUN_008aa510
+// FUN_008aa510  (twin of MissionDialog_StampResponseSlot_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_008aa510
 // Address:   0x008aa510  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    missions-progression / mission dialog chrome
+// Wave:      MEGA-046 (2026-08-05)
+// Exactness: Behavior-preserving rewrite of decompiler control flow.
+// Bit-for-bit vs retail EXE: DEFERRED. Runtime / differential: OPEN.
+// Canonical named clean: MissionDialog_StampResponseSlot_Inferred.cpp
+// =============================================================================
+//
+// PURPOSE: see MissionDialog_StampResponseSlot_Inferred.cpp
+// ABI: EDI=dialog, ESI=slot, EDX=caption, stack tfidLo/tfidHi, RET 8
+// Body: 75 B / 0x4B @ 0x008aa510–0x008aa55b exclusive
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_008aa510 @ 0x008aa510
-// Stable ID: aa_008aa510
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~17 non-empty decompiler lines.
-//  - Control keywords: if×2, return×1.
-//  - Notable callees: FUN_008aa510.
-//  - Return sites: 1.
+// Decompiler-shaped twin (unaff_ESI / unaff_EDI are image register formals).
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __fastcall
-
-FUN_008aa510(uint32_t /* width from decompiler */ param_1,uint32_t /* width from decompiler */ param_2,uint32_t /* width from decompiler */ param_3,uint32_t /* width from decompiler */ param_4)
-
-
-
+void __fastcall FUN_008aa510(
+    uint32_t /*param_1 unused*/,
+    uint32_t param_2,
+    uint32_t param_3,
+    uint32_t param_4)
 {
-
   int *piVar1;
-
   int unaff_ESI;
-
   int unaff_EDI;
 
-  
-
   if ((-1 < unaff_ESI) && (unaff_ESI < *(int *)(unaff_EDI + 0x510))) {
-
     piVar1 = *(int **)(unaff_EDI + 0x708 + unaff_ESI * 4);
-
     if (piVar1 != (int *)0x0) {
-
-      (**(code **)(*piVar1 + 0x1d8))(param_2,1,1);
-
+      (**(code **)(*piVar1 + 0x1d8))(param_2, 1, 1);
       (**(code **)(**(int **)(unaff_EDI + 0x708 + unaff_ESI * 4) + 0x34c))();
-
     }
-
-    *(uint32_t /* width from decompiler */ *)(unaff_EDI + 0x518 + unaff_ESI * 8) = param_3;
-
-    *(uint32_t /* width from decompiler */ *)(unaff_EDI + 0x51c + unaff_ESI * 8) = param_4;
-
+    *(uint32_t *)(unaff_EDI + 0x518 + unaff_ESI * 8) = param_3;
+    *(uint32_t *)(unaff_EDI + 0x51c + unaff_ESI * 8) = param_4;
   }
-
   return;
-
 }

@@ -1,59 +1,27 @@
 // =============================================================================
-// FUN_00406e50
+// FUN_00406e50 — scaffold alias
+// Named plate: StdVector_UninitializedFillN_Elem0x28_Inferred
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00406e50
 // Address:   0x00406e50  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Body:      0x00406e50–0x00406e6c (28 B / 0x1c); ret 4
+// Dual A/B:  accept-with-gaps (2026-08-04 WQ9G-H)
+// See:       StdVector_UninitializedFillN_Elem0x28_Inferred.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00406e50 @ 0x00406e50
-// Stable ID: aa_00406e50
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~7 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_00406e50, FUN_00409d40.
-//  - Return sites: 1.
+extern "C" void FUN_00409d40(
+    /*ECX*/ const void* value,
+    /*stack*/ void* dest,
+    /*stack*/ int count);
 
-// READABILITY:
-// Control-flow (from raw @ 0x00406e50; evidence only — no invented semantics):
-//  - Entry: `int FUN_00406e50(void)`.
-//  - Calls: FUN_00409d40().
-//  - Returns (1 site(s)): `unaff_EDI + unaff_ESI * 0x28`.
-
-
-
-
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-int FUN_00406e50(void)
-
-
-
+// Decompiler lost EDI=dst / ESI=count; recovered ABI in named plate.
+extern "C" void* FUN_00406e50(const void* value)
 {
-
-  int unaff_ESI;
-
-  int unaff_EDI;
-
-  
-
-  FUN_00409d40();
-
-  return unaff_EDI + unaff_ESI * 0x28;
-
+  void* dst = nullptr; // EDI
+  int count = 0;       // ESI
+  (void)value;
+  FUN_00409d40(value, dst, count);
+  return reinterpret_cast<uint8_t*>(dst) + static_cast<size_t>(count) * 0x28u;
 }

@@ -1,44 +1,15 @@
 // =============================================================================
-// FUN_00416110
-// -----------------------------------------------------------------------------
-// Stable ID: aa_00416110
-// Address:   0x00416110  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// FUN_00416110 — Ghidra alias twin of Class_00a9bbe8_CompleteDtor_Inferred
+// VA 0x00416110; see Class_00a9bbe8_CompleteDtor_Inferred.cpp for sealed body.
+// Wave: WQ9I-G 2026-08-05
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00416110 @ 0x00416110
-// Stable ID: aa_00416110
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~5 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_00416110.
-//  - Return sites: 1.
+extern "C" void* PTR_LAB_00a9bbe8;
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void FUN_00416110(uint32_t /* width from decompiler */ *param_1)
-
-
-
+// Stack obj*; ret 4. SEH elided. Installs class vftable only.
+extern "C" void FUN_00416110(uint32_t* param_1)
 {
-
-  *param_1 = &PTR_LAB_00a9bbe8;
-
-  return;
-
+  *param_1 = reinterpret_cast<uint32_t>(&PTR_LAB_00a9bbe8);
 }

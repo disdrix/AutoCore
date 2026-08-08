@@ -1,39 +1,40 @@
-# Function record: FUN_0061fdf0
+# Function record: FUN_0061fdf0 (scaffold)
 
 | Field | Value |
 |---|---|
 | **Stable ID** | `aa_0061fdf0` |
-| **Canonical name** | `FUN_0061fdf0` |
+| **Canonical name** | `CVOGHBSkill_Virus_OnHeartBeat` (prefer named record) |
+| **Ghidra name** | `FUN_0061fdf0` |
 | **Address** | `0x0061fdf0` |
 | **Module** | `autoassault.exe` (image base `0x400000`) |
-| **System** | unknown |
-| **Completion status** | **Partial scaffold** — raw/annotated/clean present; refine + dual review for important units |
-| **Bit-for-bit / runtime / diff** | Open (deferred / not run) |
+| **System** | skills-abilities |
+| **Completion status** | **Dual residual sealed 2026-08-04 WQ9R-B** |
+| **Bit-for-bit / runtime / diff** | Open |
+
+## Alias
+
+**Named:** `CVOGHBSkill_Virus_OnHeartBeat` — RTTI Confirmed class.
 
 ## Purpose
 
-Reconstructed from Ghidra decompile. See clean source and annotated notes for body.
+Virus skill HB OnHeartBeat: ally gather + spawn children. See named record.
 
 ## Signature (decompiler-derived)
 
 ```c
-void __thiscall FUN_0061fdf0(int *param_1,uint32_t /* width from decompiler */ *param_2)
+void __thiscall FUN_0061fdf0(int *param_1, uint32_t *param_2)
 ```
 
 ## Artifacts
 
-- Raw: `docs/reconstruction/raw/aa_0061fdf0_FUN_0061fdf0.md`
-- Annotated: `docs/reconstruction/raw/aa_0061fdf0_FUN_0061fdf0.annotated.md`
-- Clean: `docs/reconstruction/reconstructed-exact/FUN_0061fdf0.cpp`
-
-## Callers / callees
-
-(Populate from Ghidra xrefs in follow-up.)
+- Named: `docs/reconstruction/functions/aa_0061fdf0_CVOGHBSkill_Virus_OnHeartBeat.md`
+- Raw / annotated / clean under `aa_0061fdf0` / `CVOGHBSkill_Virus_OnHeartBeat`
 
 ## Confidence
 
 | Claim | Level |
 |---|---|
-| Control flow from decompiler | High |
-| Parameter semantic names | Probable / Tentative until caller pass |
-| Types | Tentative |
+| Control flow | **High** |
+| Class name RTTI | **Confirmed** |
+| OnHeartBeat slot | **High** |
+| Nested helper product names | Tentative / residual |

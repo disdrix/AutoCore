@@ -140,3 +140,40 @@ LAB_004cbc66:
   } while( true );
 }
 ```
+---
+
+## Re-verify append — 2026-08-04 WQ9E-E (OWN-ONLY dual)
+
+| Field | Value |
+|---|---|
+| **Tool** | Ghidra MCP `batch_decompile` / `decompile_function` + `analyze_function_complete` + `get_function_by_address` + `get_function_xrefs` + `read_memory`. **No** `disassemble_bytes`. |
+| **Live decompile** | **≡ raw CF** (RB fixup loop + Lrotate call + inlined Rrotate side); `*outIt` on black-root exit sealed |
+| **Body** | `0x004cbb60`–`0x004cbd4b` exclusive (**491 B** / `0x1EB`); Ghidra lists end `0x004cbd4a`; terminal **`C2 10 00`**; pad `CC` |
+| **ABI (bytes)** | **`__thiscall`**; ECX = map shell*; stack `Node** outIt`, `char addLeft`, `Node* where`, `Val24* value`; **RET 0x10** |
+| **Semantics** | MSVC `_Tree` **always-insert + RB rebalance** for **isnil@+0x29** nodes: |
+| | 1. if `size > 0xAAAAAA8` → throw `"map/set<T> too long"` / `DAT_00acc388` |
+| | 2. `FUN_005a2de0(head, where, head, value, color=0)` — buynode **0x30**, copies **6 dwords** value @ node+0x10..+0x27, color@+0x28, isnil=0 @+0x29 |
+| | 3. `size++`; link left/right of `where` (or empty-tree triple extremum); update leftmost/rightmost |
+| | 4. while parent red: uncle recolor or L/R rotate (`FUN_004192a0` / `FUN_004192f0`; one Lrotate path inlined in decompile) |
+| | 5. root black; `*outIt = newNode`; return |
+| **Max-size constant** | `0xAAAAAA8` — matches ~`(size_t)-1 / 0x18` family (24-byte value) |
+| **Callers (3 funcs / 11 xrefs)** | `FUN_004cbe20` (2), `FUN_004cbee0` (2), `FUN_004cc220` (7) |
+| **Callees** | `FUN_005a2de0` (buynode), `FUN_004192a0` (Lrotate isnil29), `FUN_004192f0` (Rrotate isnil29), throw path |
+| **Twins / peers** | Val12 insert `StdTree_InsertAndRebalance_Val12` @ `0x005ae4e0` (isnil@+0x19, max `0x15555553`); erase twin OWN `0x004cb740` |
+| **Named** | `StdTree_InsertAndRebalance_Isnil29_Inferred` |
+| **Prior alias** | `Named_CalleeOf_…_CVOGHBAIBase_GetTargetFromAggro_004cbb60` — **narrow** |
+| **Terminal** | false |
+
+### Entry hex (32 B)
+
+```
+64a1000000006aff68421e9a00506489250000000083ec44578bf9817f08a9aa
+```
+
+(`81 7F 08 A9 AA AA 0A` → `cmp dword [edi+8], 0x0AAAAAA9` shape; decompile uses `0xaaaaaa8 < size`)
+
+### Exit hex (RET 16 + pad)
+
+```
+83c450c21000cccccccccc
+```

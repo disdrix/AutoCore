@@ -1,52 +1,21 @@
 // =============================================================================
-// FUN_00416350
+// FUN_00416350  (twin of Class_00a7000c_ScalarDeletingDtor_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00416350
 // Address:   0x00416350  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Wave:      WQ9I-H OWN-ONLY dual 2026-08-05
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00416350 @ 0x00416350
-// Stable ID: aa_00416350
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~9 non-empty decompiler lines.
-//  - Control keywords: return×2, if×1.
-//  - Notable callees: FUN_00416350, FUN_00832fa0.
-//  - Return sites: 2.
+extern "C" void __fastcall FUN_00832fa0(void* self);
+extern "C" void __cdecl operator_delete(void* p);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void * __thiscall FUN_00416350(void *param_1,byte param_2)
-
-
-
+extern "C" void* __thiscall FUN_00416350(void* self, uint8_t flags)
 {
-
-  FUN_00832fa0();
-
-  if ((param_2 & 1) != 0) {
-
-                    /* WARNING: Subroutine does not return */
-
-    operator_delete(param_1);
-
+  FUN_00832fa0(self);
+  if ((flags & 1u) != 0u) {
+    operator_delete(self);
   }
-
-  return param_1;
-
+  return self;
 }

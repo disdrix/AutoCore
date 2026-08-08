@@ -1,68 +1,57 @@
 // =============================================================================
-// FUN_00402ae0
+// FUN_00402ae0  — scaffold twin of StdMap_Find_Tfid_Isnil29_EaxMap_Inferred
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00402ae0
-// Address:   0x00402ae0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00402ae0–0x00402b2f  (80 B; autoassault.exe base 0x400000)
+// Wave:      MEGA-083 OWN-ONLY dual 2026-08-05
+// Canonical: StdMap_Find_Tfid_Isnil29_EaxMap_Inferred.cpp
+// Exactness: Behavior-preserving rewrite of decompiler control flow + bytes ABI.
+// Bit-for-bit / runtime / diff: OPEN
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00402ae0 @ 0x00402ae0
-// Stable ID: aa_00402ae0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~16 non-empty decompiler lines.
-//  - Control keywords: if×2, return×2.
-//  - Notable callees: FUN_00402ae0, FUN_00403e50.
-//  - Return sites: 2.
+struct KeyU32I32 {
+  uint32_t lo;
+  int32_t  hi;
+};
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+struct Node_Isnil29 {
+  Node_Isnil29* left;
+  Node_Isnil29* parent;
+  Node_Isnil29* right;
+  uint32_t key_lo; // +0x10
+  int32_t  key_hi; // +0x14
+};
 
-int * FUN_00402ae0(int *param_1)
+struct MapHost_Head4 {
+  uint32_t _pad0;
+  Node_Isnil29* head;
+};
 
+extern "C" Node_Isnil29* __fastcall FUN_00403e50(
+    MapHost_Head4* map, const KeyU32I32* pKey);
 
-
+// Prefer named unit: StdMap_Find_Tfid_Isnil29_EaxMap_Inferred
+// ABI: EAX=map, EDI=pKey, stack outIt, RET 4
+extern "C" Node_Isnil29** FUN_00402ae0(
+    MapHost_Head4* map /*EAX*/,
+    const KeyU32I32* pKey /*EDI*/,
+    Node_Isnil29** outIt /*stack*/)
 {
+  Node_Isnil29* lb = FUN_00403e50(map, pKey);
+  Node_Isnil29* head = map->head;
 
-  int in_EAX;
-
-  int iVar1;
-
-  uint *unaff_EDI;
-
-  
-
-  iVar1 = FUN_00403e50();
-
-  if (iVar1 != *(int *)(in_EAX + 4)) {
-
-    if ((*(int *)(iVar1 + 0x14) <= (int)unaff_EDI[1]) &&
-
-       ((*(int *)(iVar1 + 0x14) < (int)unaff_EDI[1] || (*(uint *)(iVar1 + 0x10) <= *unaff_EDI)))) {
-
-      *param_1 = iVar1;
-
-      return param_1;
-
+  if (lb != head) {
+    const int32_t node_hi =
+        *reinterpret_cast<int32_t*>(reinterpret_cast<char*>(lb) + 0x14);
+    const uint32_t node_lo =
+        *reinterpret_cast<uint32_t*>(reinterpret_cast<char*>(lb) + 0x10);
+    if (node_hi <= pKey->hi && (node_hi < pKey->hi || node_lo <= pKey->lo)) {
+      *outIt = lb;
+      return outIt;
     }
-
   }
-
-  *param_1 = *(int *)(in_EAX + 4);
-
-  return param_1;
-
+  *outIt = head;
+  return outIt;
 }

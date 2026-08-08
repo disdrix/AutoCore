@@ -1,72 +1,53 @@
-// =============================================================================
-// FUN_004e2b80
+﻿// =============================================================================
+// FUN_004e2b80  (twin of StdTree_Buynode_Val16_Isnil21_Inline_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_004e2b80
-// Address:   0x004e2b80  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x004e2b80–0x004e2bce inclusive (79 B / 0x4F)
+// System:    MSVC std::_Tree node buy — Val16 / isnil@+0x21 / inline
+// Generated: 2026-08-05 R13-004 dual seal (scaffold 2026-07-23)
+// Exactness: Behavior-preserving rewrite of decompiler CF + sealed bytes.
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
+//
+// Canonical name: StdTree_Buynode_Val16_Isnil21_Inline_Inferred
+// Dual: reviews/A|B_aa_004e2b80_StdTree_Buynode_Val16_Isnil21_Inline_Inferred.md
+// Named clean: StdTree_Buynode_Val16_Isnil21_Inline_Inferred.cpp
+// Scaffold retired: Named_CalleeOf_*CVOGReaction*_004e2b80
 
-// PURPOSE (auto): Scaffold unit for FUN_004e2b80 @ 0x004e2b80
-// Stable ID: aa_004e2b80
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
+#include <cstddef>
 
-// READABILITY (auto CF):
-//  - Body size: ~18 non-empty decompiler lines.
-//  - Control keywords: if×1, return×1.
-//  - Notable callees: FUN_004e2b80.
-//  - Return sites: 1.
+struct NodeIsnil21 {
+  NodeIsnil21* left;     // +0x00
+  NodeIsnil21* parent;   // +0x04
+  NodeIsnil21* right;    // +0x08
+  // +0x0C unused on construct path
+  std::uint32_t val[4];  // +0x10 .. +0x1C
+  std::uint8_t color;    // +0x20
+  std::uint8_t isnil;    // +0x21
+};
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+extern "C" void* operator_new(std::size_t size);
 
-void FUN_004e2b80(uint32_t /* width from decompiler */ param_1,uint32_t /* width from decompiler */ param_2,uint32_t /* width from decompiler */ param_3,uint32_t /* width from decompiler */ *param_4,
-
-                 uint8_t param_5)
-
-
-
+// __stdcall RET 0x14; EAX = node* | null
+extern "C" NodeIsnil21* __stdcall FUN_004e2b80(
+    NodeIsnil21* left,
+    NodeIsnil21* parent,
+    NodeIsnil21* right,
+    const std::uint32_t* value4,
+    std::uint8_t color)
 {
-
-  uint32_t /* width from decompiler */ *puVar1;
-
-  
-
-  puVar1 = operator_new(0x28);
-
-  if (puVar1 != (uint32_t /* width from decompiler */ *)0x0) {
-
-    *puVar1 = param_1;
-
-    puVar1[1] = param_2;
-
-    puVar1[2] = param_3;
-
-    puVar1[4] = *param_4;
-
-    puVar1[5] = param_4[1];
-
-    puVar1[6] = param_4[2];
-
-    puVar1[7] = param_4[3];
-
-    *(uint8_t *)(puVar1 + 8) = param_5;
-
-    *(uint8_t *)((int)puVar1 + 0x21) = 0;
-
+  auto* node = static_cast<NodeIsnil21*>(operator_new(0x28));
+  if (node != nullptr) {
+    node->left = left;
+    node->parent = parent;
+    node->right = right;
+    node->val[0] = value4[0];
+    node->val[1] = value4[1];
+    node->val[2] = value4[2];
+    node->val[3] = value4[3];
+    node->color = color;
+    node->isnil = 0;
   }
-
-  return;
-
+  return node;
 }

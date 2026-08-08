@@ -11,6 +11,9 @@
 
 // PURPOSE (auto): Scaffold unit for UI_arena_console_tab_tournament @ 0x00878300
 // Stable ID: aa_00878300
+// RETIRED AS CANONICAL (R13-010 2026-08-05): under-specific first-string plate.
+// Canonical name: UI_ArenaConsole_CreateChildWidgets_Inferred
+// See: UI_ArenaConsole_CreateChildWidgets_Inferred.cpp + dual A/B + r13 report.
 // Embedded strings (evidence for future rename):
 //   - "i_d_arena/i_d_arena_console_tab_tournament.xml"
 //   - "i_d_arena/i_d_arena_console_tab_advanced.xml"

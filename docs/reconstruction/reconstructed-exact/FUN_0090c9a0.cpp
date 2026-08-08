@@ -1,244 +1,115 @@
 // =============================================================================
-// FUN_0090c9a0
+// FUN_0090c9a0  (machine twin of MedalUi_ApplyAchievementSlotButton_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0090c9a0
-// Address:   0x0090c9a0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x0090c9a0 – 0x0090cbbb  (autoassault.exe, image base 0x400000)
+// System:    missions-progression / Medal UI
+// Generated: 2026-08-05 MEGA-095 dual
+// Exactness: Behavior-preserving; ABI corrected from listing (not void).
+// Named twin: MedalUi_ApplyAchievementSlotButton_Inferred.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0090c9a0 @ 0x0090c9a0
-// Stable ID: aa_0090c9a0
-// Embedded strings (evidence for future rename):
-//   - "i_d_a_2d_btn_achievement.xml"
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// See MedalUi_ApplyAchievementSlotButton_Inferred.cpp for full annotated port.
+// This twin retains the Ghidra symbol as the machine entry symbol.
 
-// READABILITY (auto CF):
-//  - Body size: ~103 non-empty decompiler lines.
-//  - Control keywords: if×2, do×2, while×2, return×1.
-//  - Notable callees: FUN_007b5dd0, FUN_0090c9a0.
-//  - Strings: "i_d_a_2d_btn_achievement.xml".
-//  - Return sites: 1.
+#include <cstdint>
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+struct UiHost;
+struct UiWidget;
+struct MedalDef;
 
-void FUN_0090c9a0(void)
+extern "C" void* __cdecl operator_new(unsigned size);
+extern "C" UiWidget* __stdcall FUN_007b5dd0(void* mem, int zero_flag);
 
+extern float DAT_00d1e818;
+extern float DAT_00d1e81c;
+extern float DAT_00aaa678;
+extern float DAT_00aaa67c;
+extern char  DAT_00a2c53c[];
+extern char  DAT_00a2c540;
 
-
+// Retail: ESI=host, EBX=slotIndex, stack medalDef + earnedFlag, RET 8
+void FUN_0090c9a0(
+    UiHost* host,
+    int slotIndex,
+    MedalDef* medalDef,
+    std::uint32_t earnedFlag)
 {
-
-  char cVar1;
-
-  int iVar2;
-
-  uint32_t /* width from decompiler */ *puVar3;
-
-  int iVar4;
-
-  float *pfVar5;
-
-  int *piVar6;
-
-  char *pcVar7;
-
-  uint32_t /* width from decompiler */ uVar8;
-
-  int unaff_EBX;
-
-  int *unaff_ESI;
-
-  uint32_t /* width from decompiler */ *puVar9;
-
-  float fVar10;
-
-  uint32_t /* width from decompiler */ *puStack_16c;
-
-  uint32_t /* width from decompiler */ uStack_168;
-
-  int iStack_164;
-
-  char *pcStack_160;
-
-  int iStack_15c;
-
-  uint32_t /* width from decompiler */ uStack_158;
-
-  uint8_t *puStack_154;
-
-  uint8_t *puStack_150;
-
-  char *pcStack_14c;
-
-  int iStack_148;
-
-  uint8_t local_13c [4];
-
-  char acStack_138 [4];
-
-  uint8_t auStack_134 [20];
-
-  uint8_t auStack_120 [216];
-
-  void *pvStack_48;
-
-  char cStack_34;
-
-  uint8_t *puStack_24;
-
-  void *pvStack_c;
-
-  uint8_t *puStack_8;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
-
-  local_4 = 0xffffffff;
-
-  puStack_8 = &LAB_009b3aab;
-
-  pvStack_c = ExceptionList;
-
-  ExceptionList = &pvStack_c;
-
-  local_13c = (uint8_t  [4])operator_new(0x488);
-
-  local_4 = 0;
-
-  if (local_13c == (uint8_t  [4])0x0) {
-
-    iStack_148 = 0;
-
-  }
-
-  else {
-
-    iStack_148 = 0x90c9e2;
-
-    iStack_148 = FUN_007b5dd0();
-
-  }
-
-  local_4 = 0xffffffff;
-
-  unaff_ESI[unaff_EBX + 0x150] = iStack_148;
-
-  pcStack_14c = (char *)0x90ca05;
-
-  (**(code **)(*unaff_ESI + 0xa8))();
-
-  pcStack_14c = "i_d_a_2d_btn_achievement.xml";
-
-  puStack_150 = (uint8_t *)0x90ca16;
-
-  (**(code **)(*(int *)unaff_ESI[unaff_EBX + 0x150] + 0x28))();
-
-  puStack_150 = auStack_120;
-
-  puStack_154 = (uint8_t *)0x90ca38;
-
-  iVar4 = (**(code **)(*(int *)unaff_ESI[unaff_EBX + 0x150] + 0x134))();
-
-  puStack_154 = local_13c;
-
-  fVar10 = (float)DAT_00d1e81c * (float)(((int)*(float *)(iVar4 + 4) + 0x1f) * (unaff_EBX / 3)) *
-
-           DAT_00aaa678;
-
-  uStack_158 = 0x90ca73;
-
-  pfVar5 = (float *)(**(code **)(*(int *)unaff_ESI[unaff_EBX + 0x150] + 0x134))();
-
-  pcStack_14c = (char *)(int)((float)DAT_00d1e818 * (float)(((int)*pfVar5 + 0x28) * (unaff_EBX % 3))
-
-                             * DAT_00aaa67c);
-
-  uStack_158 = 0;
-
-  iStack_15c = 1;
-
-  pcStack_160 = acStack_138;
-
-  iStack_164 = 0x90cab5;
-
-  iVar4 = (**(code **)(*(int *)unaff_ESI[unaff_EBX + 0x150] + 0x120))();
-
-  iVar4 = *(int *)(iVar4 + 4);
-
-  iStack_164 = 0;
-
-  uStack_168 = 1;
-
-  puStack_16c = (uint32_t /* width from decompiler */ *)local_13c;
-
-  piVar6 = (int *)(**(code **)(*(int *)unaff_ESI[unaff_EBX + 0x150] + 0x120))();
-
-  pcStack_160 = (char *)(*piVar6 + iStack_164);
-
-  *(uint8_t *)(unaff_EBX + 0x510 + (int)unaff_ESI) = *puStack_24;
-
-  pcVar7 = *(char **)(puStack_24 + 0x10);
-
-  iVar2 = -(int)pcVar7;
-
-  do {
-
-    cVar1 = *pcVar7;
-
-    pcVar7[(int)(acStack_138 + iVar2)] = cVar1;
-
-    pcVar7 = pcVar7 + 1;
-
-  } while (cVar1 != '\0');
-
-  puVar3 = (uint32_t /* width from decompiler */ *)(local_13c + 3);
-
-  do {
-
-    puVar9 = puVar3;
-
-    puVar3 = (uint32_t /* width from decompiler */ *)((int)puVar9 + 1);
-
-  } while (*(char *)((int)puVar9 + 1) != '\0');
-
-  *(uint32_t /* width from decompiler */ *)((int)puVar9 + 1) = DAT_00a2c53c;
-
-  *(uint8_t *)((int)puVar9 + 5) = DAT_00a2c540;
-
-  iStack_15c = iVar4 + (int)fVar10;
-
-  (**(code **)(*(int *)unaff_ESI[unaff_EBX + 0x150] + 0x50))(acStack_138,0,0);
-
-  (**(code **)(*(int *)unaff_ESI[unaff_EBX + 0x150] + 0x118))(&puStack_16c);
-
-  (**(code **)(*(int *)unaff_ESI[unaff_EBX + 0x150] + 0x34c))();
-
-  (**(code **)(*(int *)unaff_ESI[unaff_EBX + 0x150] + 0x74))(unaff_EBX + 0x9c43);
-
-  if (cStack_34 == '\0') {
-
-    iVar4 = *(int *)unaff_ESI[unaff_EBX + 0x150];
-
-    uVar8 = (**(code **)(iVar4 + 0x164))(2);
-
-    (**(code **)(iVar4 + 0x154))(0,uVar8);
-
-  }
-
-  ExceptionList = pvStack_48;
-
-  return;
-
+    void* raw = operator_new(0x488);
+    UiWidget* widget = raw ? FUN_007b5dd0(raw, 0) : nullptr;
+
+    *reinterpret_cast<UiWidget**>(
+        reinterpret_cast<std::uint8_t*>(host) + 0x540 + slotIndex * 4) = widget;
+
+    auto hostVtbl = *reinterpret_cast<std::uintptr_t**>(host);
+    using FnHost = void(__thiscall*)(UiHost*, UiWidget*);
+    (*reinterpret_cast<FnHost*>(reinterpret_cast<std::uint8_t*>(hostVtbl) + 0xa8))
+        (host, widget);
+
+    auto wVtbl = *reinterpret_cast<std::uintptr_t**>(widget);
+    using FnLoad = void(__thiscall*)(UiWidget*, const char*);
+    (*reinterpret_cast<FnLoad*>(reinterpret_cast<std::uint8_t*>(wVtbl) + 0x28))
+        (widget, "i_d_a_2d_btn_achievement.xml");
+
+    using FnSize = float*(__thiscall*)(UiWidget*, void*);
+    auto getSize = *reinterpret_cast<FnSize*>(
+        reinterpret_cast<std::uint8_t*>(wVtbl) + 0x134);
+    float scratch[8];
+    const int row = slotIndex / 3;
+    const int col = slotIndex % 3;
+    float* sy = getSize(widget, scratch);
+    int dy = (int)((float)DAT_00d1e81c *
+                   (float)(((int)sy[1] + 0x1f) * row) * DAT_00aaa678);
+    float* sx = getSize(widget, scratch);
+    int dx = (int)((float)DAT_00d1e818 *
+                   (float)(((int)sx[0] + 0x28) * col) * DAT_00aaa67c);
+
+    using FnOrigin = int*(__thiscall*)(UiWidget*, void*, int, int);
+    auto getOrigin = *reinterpret_cast<FnOrigin*>(
+        reinterpret_cast<std::uint8_t*>(wVtbl) + 0x120);
+    int* oy = getOrigin(widget, scratch, 1, 0);
+    int posY = oy[1] + dy;
+    int* ox = getOrigin(widget, scratch, 1, 0);
+    int posX = ox[0] + dx;
+    int pos[2] = { posX, posY };
+
+    *(reinterpret_cast<std::uint8_t*>(host) + 0x510 + slotIndex) =
+        *reinterpret_cast<std::uint8_t*>(medalDef);
+
+    char nameBuf[0x100];
+    const char* src = *reinterpret_cast<const char**>(
+        reinterpret_cast<std::uint8_t*>(medalDef) + 0x10);
+    char* dst = nameBuf;
+    char c;
+    do {
+        c = *src++;
+        *dst++ = c;
+    } while (c != '\0');
+    dst = nameBuf;
+    while (*dst) ++dst;
+    *reinterpret_cast<std::uint32_t*>(dst) =
+        *reinterpret_cast<std::uint32_t*>(DAT_00a2c53c);
+    dst[4] = DAT_00a2c540;
+
+    using FnName = void(__thiscall*)(UiWidget*, char*, int, int);
+    (*reinterpret_cast<FnName*>(reinterpret_cast<std::uint8_t*>(wVtbl) + 0x50))
+        (widget, nameBuf, 0, 0);
+    using FnPos = void(__thiscall*)(UiWidget*, int*);
+    (*reinterpret_cast<FnPos*>(reinterpret_cast<std::uint8_t*>(wVtbl) + 0x118))
+        (widget, pos);
+    using FnRef = void(__thiscall*)(UiWidget*);
+    (*reinterpret_cast<FnRef*>(reinterpret_cast<std::uint8_t*>(wVtbl) + 0x34c))
+        (widget);
+    using FnId = void(__thiscall*)(UiWidget*, int);
+    (*reinterpret_cast<FnId*>(reinterpret_cast<std::uint8_t*>(wVtbl) + 0x74))
+        (widget, slotIndex + 0x9c43);
+
+    if ((std::uint8_t)earnedFlag == 0) {
+        using FnMode = void*(__thiscall*)(UiWidget*, int);
+        using FnApply = void(__thiscall*)(UiWidget*, int, void*);
+        void* mode = (*reinterpret_cast<FnMode*>(
+            reinterpret_cast<std::uint8_t*>(wVtbl) + 0x164))(widget, 2);
+        (*reinterpret_cast<FnApply*>(
+            reinterpret_cast<std::uint8_t*>(wVtbl) + 0x154))(widget, 0, mode);
+    }
 }

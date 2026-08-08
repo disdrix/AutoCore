@@ -1,138 +1,30 @@
-// =============================================================================
-// FUN_004cbee0
+﻿// =============================================================================
+// FUN_004cbee0  (named: StdMap_InsertOrFind_PairKey_Isnil29_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_004cbee0
-// Address:   0x004cbee0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x004cbee0
+// Body:      0x004cbee0–0x004cbfb2 exclusive (210 B)
+// System:    MSVC map insert-or-find isnil@+0x29 pair key
+// Agent:     WQ9F-D 2026-08-04
+// Prefer:    StdMap_InsertOrFind_PairKey_Isnil29_Inferred.cpp
+// Terminal:  false
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_004cbee0 @ 0x004cbee0
-// Stable ID: aa_004cbee0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~51 non-empty decompiler lines.
-//  - Control keywords: if×5, return×3, do×1, while×1.
-//  - Notable callees: FUN_004cbb60×2, FUN_004cb4f0, FUN_004cbee0.
-//  - Return sites: 3.
+struct MapShell_Isnil29_Pair;
+struct InsertPair_Isnil29_Pair;
+struct Val_PairKey_Isnil29;
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+void __thiscall StdMap_InsertOrFind_PairKey_Isnil29_Inferred(
+    MapShell_Isnil29_Pair *map,
+    InsertPair_Isnil29_Pair *out,
+    const Val_PairKey_Isnil29 *value);
 
-void __thiscall FUN_004cbee0(int param_1,uint32_t /* width from decompiler */ *param_2,uint *param_3)
-
-
-
+void __thiscall FUN_004cbee0(
+    MapShell_Isnil29_Pair *map,
+    InsertPair_Isnil29_Pair *out,
+    const Val_PairKey_Isnil29 *value)
 {
-
-  uint32_t /* width from decompiler */ uVar1;
-
-  bool bVar2;
-
-  uint *puVar3;
-
-  uint32_t /* width from decompiler */ *puVar4;
-
-  uint32_t /* width from decompiler */ *puVar5;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
-
-  puVar3 = param_3;
-
-  puVar5 = *(uint32_t /* width from decompiler */ **)(param_1 + 4);
-
-  bVar2 = true;
-
-  local_4 = 1;
-
-  if (*(char *)((int)puVar5[1] + 0x29) == '\0') {
-
-    puVar4 = (uint32_t /* width from decompiler */ *)puVar5[1];
-
-    do {
-
-      puVar5 = puVar4;
-
-      if (((int)puVar5[5] < (int)param_3[1]) ||
-
-         (((int)puVar5[5] <= (int)param_3[1] && ((uint)puVar5[4] <= *param_3)))) {
-
-        puVar4 = (uint32_t /* width from decompiler */ *)puVar5[2];
-
-        bVar2 = false;
-
-        local_4 = 0;
-
-      }
-
-      else {
-
-        puVar4 = (uint32_t /* width from decompiler */ *)*puVar5;
-
-        bVar2 = true;
-
-        local_4 = 1;
-
-      }
-
-    } while (*(char *)((int)puVar4 + 0x29) == '\0');
-
-  }
-
-  param_3 = puVar5;
-
-  if (bVar2) {
-
-    if (puVar5 == (uint32_t /* width from decompiler */ *)**(int **)(param_1 + 4)) {
-
-      puVar5 = (uint32_t /* width from decompiler */ *)FUN_004cbb60(&param_3,1,puVar5,puVar3);
-
-      uVar1 = *puVar5;
-
-      *(uint8_t *)(param_2 + 1) = 1;
-
-      *param_2 = uVar1;
-
-      return;
-
-    }
-
-    FUN_004cb4f0();
-
-  }
-
-  if (((int)param_3[5] <= (int)puVar3[1]) &&
-
-     (((int)param_3[5] < (int)puVar3[1] || (param_3[4] < *puVar3)))) {
-
-    puVar5 = (uint32_t /* width from decompiler */ *)FUN_004cbb60(&param_3,local_4,puVar5,puVar3);
-
-    *param_2 = *puVar5;
-
-    *(uint8_t *)(param_2 + 1) = 1;
-
-    return;
-
-  }
-
-  *(uint8_t *)(param_2 + 1) = 0;
-
-  *param_2 = param_3;
-
-  return;
-
+  StdMap_InsertOrFind_PairKey_Isnil29_Inferred(map, out, value);
 }

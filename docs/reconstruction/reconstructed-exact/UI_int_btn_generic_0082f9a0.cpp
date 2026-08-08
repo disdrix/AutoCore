@@ -1,3 +1,7 @@
+﻿// RETIRED by MEGA-075 (2026-08-05): role name is UI_InteractionMenu_AddFriendsToggle.
+// Keep this file only as a redirect stub; do not treat as canonical clean.
+// Canonical: UI_InteractionMenu_AddFriendsToggle.cpp
+// Ghidra twin: FUN_0082f9a0.cpp
 // =============================================================================
 // UI_int_btn_generic_0082f9a0
 // -----------------------------------------------------------------------------
@@ -19,7 +23,7 @@
 
 // READABILITY (auto CF):
 //  - Body size: ~30 non-empty decompiler lines.
-//  - Control keywords: if×5, return×2.
+//  - Control keywords: ifÃ—5, returnÃ—2.
 //  - Notable callees: FUN_00573a30, UI_int_btn_generic_0082f9a0.
 //  - Strings: "i_m_int_2d_btn_generic.xml"; "Remove from Friends"; "Add to Friends".
 //  - Return sites: 2.
@@ -101,3 +105,4 @@ void UI_int_btn_generic_0082f9a0(void)
   return;
 
 }
+

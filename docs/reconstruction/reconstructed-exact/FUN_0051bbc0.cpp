@@ -1,52 +1,20 @@
-// =============================================================================
-// FUN_0051bbc0
+﻿// =============================================================================
+// FUN_0051bbc0  (clean twin — Ghidra name)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0051bbc0
-// Address:   0x0051bbc0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Canonical: Map_FreeSubtree_Isnil29
+// Dual A/B:  2026-08-04 WQ9E-H
+// Exactness: Byte-corrected (decompiler left-walk incomplete).
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0051bbc0 @ 0x0051bbc0
-// Stable ID: aa_0051bbc0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~9 non-empty decompiler lines.
-//  - Control keywords: return×2, if×1.
-//  - Notable callees: FUN_0051bbc0×2.
-//  - Return sites: 2.
+struct MapNode_Isnil29;
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+extern "C" void __fastcall Map_FreeSubtree_Isnil29(void *tree_base,
+                                                   MapNode_Isnil29 *node);
 
-void FUN_0051bbc0(void *param_1)
-
-
-
+extern "C" void __fastcall FUN_0051bbc0(void *tree_base, MapNode_Isnil29 *node)
 {
-
-  if (*(char *)((int)param_1 + 0x29) == '\0') {
-
-    FUN_0051bbc0(*(uint32_t /* width from decompiler */ *)((int)param_1 + 8));
-
-                    /* WARNING: Subroutine does not return */
-
-    operator_delete(param_1);
-
-  }
-
-  return;
-
+  Map_FreeSubtree_Isnil29(tree_base, node);
 }

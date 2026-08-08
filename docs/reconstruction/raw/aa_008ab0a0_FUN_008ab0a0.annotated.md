@@ -1,125 +1,98 @@
-# Annotated low-level: FUN_008ab0a0
+﻿# Annotated low-level: FUN_008ab0a0 → Client_NpcMissionDialog_InitRuntimeFields_Inferred
 
 | Field | Value |
 |---|---|
 | Stable ID | `aa_008ab0a0` |
-| VA | `0x008ab0a0` |
-| System | unknown |
-| Date | 2026-07-23 |
+| VA | `0x008ab0a0`–`0x008ab33d` (670 B / `0x29E`) |
+| System | `missions-progression` |
+| Date | 2026-08-05 (R11-035 dual) |
+| Canonical (inferred) | `Client_NpcMissionDialog_InitRuntimeFields_Inferred` |
+| Ghidra | `FUN_008ab0a0` |
+| Parent | `Client_NpcMissionDialogHost_Ctor_Inferred` (`0x008ac3f0`) |
+| Classification | leaf |
+| Terminal | false |
+
+---
 
 ## Machine-level notes
 
-- Source: raw capture for `aa_008ab0a0`.
-- Prefer assembly when decompiler conflicts.
-- Recover types for still-generic parameters via callers/xrefs.
-- Map DAT_* globals and FUN_* callees in follow-up waves.
+- **ABI:** ECX = `NpcMissionDialogHost*`; no stack formals; plain `RET`.
+- **Leaf:** no CALL; only stores + SSE loads of float constants.
+- **Role:** mid-ctor field pack — zeros widget/chrome pointers, writes `−1` into TFID/id slots (response bank + reward bank), installs three default float4s, clears turn-in byte `+0x64c`.
+- **Call order in parent ctor:** base `FUN_0087b890` → vtbl install / early fields → **this** → `NDUIWindow_ReloadInterface("i_d_npc.xml")` → `UI_MissionDialog_BuildResponseButtons_Inferred` → vtbl+0x34C.
+- **Also published** at mission-dialog vtbl `0x00a4a51c` + **0x3AC** (`DAT` @ `0x00a4a8c8`).
+- Prefer assembly when decompiler shows `void` return / empty prototype — body is pure stores.
 
-## Pseudocode (annotated copy of raw)
+## Pseudocode (annotated)
 
 ```c
-void __fastcall FUN_008ab0a0(int param_1)
-
-{
-  float fVar1;
-  undefined4 uVar2;
-  undefined4 uVar3;
-  
-  *(undefined4 *)(param_1 + 0x4b8) = 0;
-  *(undefined4 *)(param_1 + 0x4bc) = 0;
-  *(undefined4 *)(param_1 + 0x4b4) = 0;
-  *(undefined4 *)(param_1 + 0x504) = 0;
-  *(undefined4 *)(param_1 + 0x508) = 0;
-  *(undefined4 *)(param_1 + 0x680) = 0;
-  *(undefined4 *)(param_1 + 0x684) = 0;
-  *(undefined4 *)(param_1 + 0x688) = 0;
-  *(undefined4 *)(param_1 + 0x690) = 0;
-  *(undefined4 *)(param_1 + 0x694) = 0;
-  *(undefined4 *)(param_1 + 0x6d8) = 0;
-  *(undefined4 *)(param_1 + 0x6dc) = 0;
-  *(undefined4 *)(param_1 + 0x6e0) = 0;
-  *(undefined4 *)(param_1 + 0x68c) = 0;
-  *(undefined4 *)(param_1 + 0x6e4) = 0;
-  *(undefined4 *)(param_1 + 0x6e8) = 0;
-  *(undefined4 *)(param_1 + 0x700) = 0;
-  *(undefined4 *)(param_1 + 0x6ec) = 0;
-  *(undefined4 *)(param_1 + 0x6f0) = 0;
-  *(undefined4 *)(param_1 + 0x6f4) = 0;
-  *(undefined4 *)(param_1 + 0x6f8) = 0;
-  *(undefined4 *)(param_1 + 0x6fc) = 0;
-  *(undefined4 *)(param_1 + 0x644) = 0;
-  *(undefined4 *)(param_1 + 0x558) = 0xffffffff;
-  *(undefined4 *)(param_1 + 0x55c) = 0xffffffff;
-  *(undefined4 *)(param_1 + 0x6a8) = 0;
-  *(undefined4 *)(param_1 + 0x6b8) = 0;
-  *(undefined4 *)(param_1 + 0x6c8) = 0;
-  *(undefined4 *)(param_1 + 0x698) = 0;
-  *(undefined4 *)(param_1 + 0x560) = 0xffffffff;
-  *(undefined4 *)(param_1 + 0x564) = 0xffffffff;
-  *(undefined4 *)(param_1 + 0x6ac) = 0;
-  *(undefined4 *)(param_1 + 0x6bc) = 0;
-  *(undefined4 *)(param_1 + 0x6cc) = 0;
-  *(undefined4 *)(param_1 + 0x69c) = 0;
-  *(undefined4 *)(param_1 + 0x568) = 0xffffffff;
-  *(undefined4 *)(param_1 + 0x56c) = 0xffffffff;
-  *(undefined4 *)(param_1 + 0x6b0) = 0;
-  *(undefined4 *)(param_1 + 0x6c0) = 0;
-  *(undefined4 *)(param_1 + 0x6d0) = 0;
-  *(undefined4 *)(param_1 + 0x6a0) = 0;
-  *(undefined4 *)(param_1 + 0x570) = 0xffffffff;
-  *(undefined4 *)(param_1 + 0x574) = 0xffffffff;
-  *(undefined4 *)(param_1 + 0x6b4) = 0;
-  *(undefined4 *)(param_1 + 0x6c4) = 0;
-  *(undefined4 *)(param_1 + 0x6d4) = 0;
-  *(undefined4 *)(param_1 + 0x6a4) = 0;
-  *(undefined4 *)(param_1 + 0x510) = 0;
-  *(undefined4 *)(param_1 + 0x518) = 0xffffffff;
-  *(undefined4 *)(param_1 + 0x51c) = 0xffffffff;
-  *(undefined4 *)(param_1 + 0x708) = 0;
-  *(undefined4 *)(param_1 + 0x520) = 0xffffffff;
-  *(undefined4 *)(param_1 + 0x524) = 0xffffffff;
-  *(undefined4 *)(param_1 + 0x70c) = 0;
-  *(undefined4 *)(param_1 + 0x528) = 0xffffffff;
-  *(undefined4 *)(param_1 + 0x52c) = 0xffffffff;
-  *(undefined4 *)(param_1 + 0x710) = 0;
-  *(undefined4 *)(param_1 + 0x530) = 0xffffffff;
-  *(undefined4 *)(param_1 + 0x534) = 0xffffffff;
-  *(undefined4 *)(param_1 + 0x714) = 0;
-  *(undefined4 *)(param_1 + 0x538) = 0xffffffff;
-  *(undefined4 *)(param_1 + 0x53c) = 0xffffffff;
-  *(undefined4 *)(param_1 + 0x718) = 0;
-  *(undefined4 *)(param_1 + 0x540) = 0xffffffff;
-  *(undefined4 *)(param_1 + 0x544) = 0xffffffff;
-  *(undefined4 *)(param_1 + 0x71c) = 0;
-  *(undefined4 *)(param_1 + 0x548) = 0xffffffff;
-  *(undefined4 *)(param_1 + 0x54c) = 0xffffffff;
-  *(undefined4 *)(param_1 + 0x720) = 0;
-  *(undefined4 *)(param_1 + 0x550) = 0xffffffff;
-  *(undefined4 *)(param_1 + 0x554) = 0xffffffff;
-  *(undefined4 *)(param_1 + 0x724) = 0;
-  *(undefined4 *)(param_1 + 0x578) = 0xffffffff;
-  *(undefined4 *)(param_1 + 0x57c) = 0xffffffff;
-  uVar3 = DAT_00aaa7e8;
-  uVar2 = DAT_00a0f71c;
-  *(undefined4 *)(param_1 + 0x594) = 0;
-  *(undefined4 *)(param_1 + 0x598) = 0;
-  *(undefined4 *)(param_1 + 0x59c) = 0;
-  fVar1 = g_flOne;
-  *(undefined4 *)(param_1 + 0x5a0) = uVar2;
-  *(undefined4 *)(param_1 + 0x584) = 0;
-  *(float *)(param_1 + 0x588) = fVar1;
-  *(undefined4 *)(param_1 + 0x58c) = 0;
-  *(undefined4 *)(param_1 + 0x590) = uVar3;
-  *(undefined4 *)(param_1 + 0x5a4) = 0;
-  *(float *)(param_1 + 0x5a8) = fVar1;
-  uVar2 = DAT_00aaa7e4;
-  *(undefined4 *)(param_1 + 0x5ac) = 0;
-  *(undefined4 *)(param_1 + 0x5b0) = uVar2;
-  *(undefined1 *)(param_1 + 0x64c) = 0;
-  return;
+// thiscall: ECX = NpcMissionDialogHost* host
+void Client_NpcMissionDialog_InitRuntimeFields_Inferred(NpcMissionDialogHost *host)
+{
+  // --- zero scalar / chrome / list widget pointers ---
+  host->field_4b4 = 0;   // +0x4b4
+  host->field_4b8 = 0;   // +0x4b8
+  host->field_4bc = 0;   // +0x4bc
+  host->field_504 = 0;   // +0x504
+  host->field_508 = 0;   // +0x508
+  // +0x680..+0x700: title/list/chrome widget ptrs (zero pack)
+  host->w_680 = host->w_684 = host->w_688 = host->w_68c = 0;
+  host->w_690 = host->w_694 = 0;
+  host->w_6d8 = host->w_6dc = host->w_6e0 = 0;
+  host->w_6e4 = host->w_6e8 = host->w_6ec = 0;
+  host->w_6f0 = host->w_6f4 = host->w_6f8 = host->w_6fc = 0;
+  host->w_700 = 0;
+  host->field_644 = 0;   // +0x644
+  host->chromeMode_510 = 0; // +0x510 (panel chrome mode; later ApplyPanelMode)
+
+  // --- 4× reward/chrome id banks: TFID pairs = -1; related ptrs = 0 ---
+  // slots i=0..3 at +0x558+i*8 / +0x698+i*4 / +0x6a8+i*4 / +0x6b8+i*4 / +0x6c8+i*4
+  for (int i = 0; i < 4; ++i) {
+    *(int *)((char *)host + 0x558 + i * 8) = -1;
+    *(int *)((char *)host + 0x55c + i * 8) = -1;
+    *(int *)((char *)host + 0x698 + i * 4) = 0; // chrome grid column (ApplyPanelMode hide bank)
+    *(int *)((char *)host + 0x6a8 + i * 4) = 0;
+    *(int *)((char *)host + 0x6b8 + i * 4) = 0;
+    *(int *)((char *)host + 0x6c8 + i * 4) = 0;
+  }
+
+  // --- 8× response button TFID pairs + widget slots (pre-BuildResponseButtons) ---
+  // same banks as MissionDialog_ClearResponseButtonSlots_Inferred (+0x518 / +0x708)
+  for (int i = 0; i < 8; ++i) {
+    *(int *)((char *)host + 0x518 + i * 8) = -1;
+    *(int *)((char *)host + 0x51c + i * 8) = -1;
+    *(int *)((char *)host + 0x708 + i * 4) = 0;
+  }
+  *(int *)((char *)host + 0x578) = -1;
+  *(int *)((char *)host + 0x57c) = -1;
+
+  // --- three float4 defaults (SSE; constants from image) ---
+  // +0x594 = (0, 0, 0, 0.6f)     DAT_00a0f71c
+  // +0x584 = (0, 1.0f, 0, 0.157f) g_flOne + DAT_00aaa7e8
+  // +0x5a4 = (0, 1.0f, 0, 0.549f) g_flOne + DAT_00aaa7e4
+  float *q594 = (float *)((char *)host + 0x594);
+  q594[0] = 0.f; q594[1] = 0.f; q594[2] = 0.f; q594[3] = 0.6f;
+  float *q584 = (float *)((char *)host + 0x584);
+  q584[0] = 0.f; q584[1] = 1.f; q584[2] = 0.f; q584[3] = 0.157f;
+  float *q5a4 = (float *)((char *)host + 0x5a4);
+  q5a4[0] = 0.f; q5a4[1] = 1.f; q5a4[2] = 0.f; q5a4[3] = 0.549f;
+
+  // turn-in / deliver mode flag (NAMING_REGISTRY dialogTurnInMode)
+  *(unsigned char *)((char *)host + 0x64c) = 0;
 }
 ```
 
+## Cross-links
+
+| Related unit | VA | Relation |
+|---|---|---|
+| `Client_NpcMissionDialogHost_Ctor_Inferred` | `0x008ac3f0` | sole CALL site |
+| `MissionDialog_ClearResponseButtonSlots_Inferred` | `0x008aa560` | same +0x518/+0x708 banks (destroy path) |
+| `UI_MissionDialog_BuildResponseButtons_Inferred` | `0x008ac110` | runs after this in ctor |
+| `Client_NpcMissionDialog_ApplyPanelMode_Inferred` | `0x008ab550` | uses +0x510/+0x648/+0x698.. chrome |
+
 ## Open questions
 
-- Confirm calling convention and full signature against callers.
-- Recover meaningful types for still-generic parameters.
+- Product name for vtbl+0x3AC method.
+- Float4 bank English (color channels vs layout scales).
+- Runtime confirmation of turn-in clear interaction with `FUN_008aa760`.

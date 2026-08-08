@@ -1,52 +1,29 @@
 // =============================================================================
-// FUN_004130d0
+// FUN_004130d0  (scaffold twin of CVOGDialog_ScalarDeletingDtor)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_004130d0
-// Address:   0x004130d0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x004130d0–0x004130ee exclusive (30 B / 0x1E)
+// Module:    autoassault.exe (image base 0x400000)
+// System:    missions-progression / CVOGDialog
+// Wave:      R12-010 OWN-ONLY dual 2026-08-05
+// Canonical: CVOGDialog_ScalarDeletingDtor
+// Exactness: Behavior-preserving rewrite of decompiler CF + full-body bytes.
+// Bit-for-bit vs retail EXE: DEFERRED.
+// Terminal:  false
+// =============================================================================
+// Prefer named clean: CVOGDialog_ScalarDeletingDtor.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_004130d0 @ 0x004130d0
-// Stable ID: aa_004130d0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~9 non-empty decompiler lines.
-//  - Control keywords: return×2, if×1.
-//  - Notable callees: FUN_004130d0, FUN_0087b7d0.
-//  - Return sites: 2.
+extern "C" void __thiscall FUN_0087b7d0(void* self);
+extern "C" void operator_delete(void* p);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void * __thiscall FUN_004130d0(void *param_1,byte param_2)
-
-
-
+extern "C" void* __thiscall FUN_004130d0(void* param_1, uint8_t param_2)
 {
-
-  FUN_0087b7d0();
-
-  if ((param_2 & 1) != 0) {
-
-                    /* WARNING: Subroutine does not return */
-
+  FUN_0087b7d0(param_1);
+  if ((param_2 & 1u) != 0u) {
     operator_delete(param_1);
-
   }
-
   return param_1;
-
 }

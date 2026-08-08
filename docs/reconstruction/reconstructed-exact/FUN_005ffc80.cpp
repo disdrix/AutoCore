@@ -1,42 +1,20 @@
 // =============================================================================
-// FUN_005ffc80
+// FUN_005ffc80  — scaffold twin of EmptyStub_Ret4
 // -----------------------------------------------------------------------------
 // Stable ID: aa_005ffc80
 // Address:   0x005ffc80  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// System:    shared / multi-domain nop leaf
+// Generated: 2026-07-23 scaffold; dual A/B seal 2026-08-05 R11-009
 // Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
 // Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
 // =============================================================================
+// Prefer named clean: EmptyStub_Ret4.cpp
+// Body: c2 04 00 (ret 4). Decompiler void(void) is ABI-incomplete.
 
-// PURPOSE (auto): Scaffold unit for FUN_005ffc80 @ 0x005ffc80
-// Stable ID: aa_005ffc80
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
-
-// READABILITY (auto CF):
-//  - Body size: ~4 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_005ffc80.
-//  - Return sites: 1.
-
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+void EmptyStub_Ret4(void * /*ignored_stack_arg*/);
 
 void FUN_005ffc80(void)
-
-
-
 {
-
+  // Machine body is ret 4; decompiler elides stack cleanup.
   return;
-
 }

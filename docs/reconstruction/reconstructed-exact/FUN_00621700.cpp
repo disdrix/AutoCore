@@ -1,130 +1,81 @@
 // =============================================================================
-// FUN_00621700
+// FUN_00621700  (scaffold twin → CVOGHBSkill_OnDoHit_Execute_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00621700
 // Address:   0x00621700  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    skills-abilities
+// Generated: 2026-07-23 scaffold; refined 2026-08-05 R11-018 dual
+// Exactness: Behavior-preserving rewrite of decompiler control flow.
+// Bit-for-bit vs retail EXE: DEFERRED
+// Canonical: reconstructed-exact/CVOGHBSkill_OnDoHit_Execute_Inferred.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00621700 @ 0x00621700
-// Stable ID: aa_00621700
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// PURPOSE: CVOGHBSkill_OnDoHit vtbl+0x2C multi-target arm — resolve TFID table
+// entries, construct 0x6c0 OnDoHit HBs, Enqueue+Start (or dtor on no owner).
+// Class RTTI Confirmed: .?AVCVOGHBSkill_OnDoHit@@
+// ABI: six stack args, ret 0x18, return 1; ECX unused.
 
-// READABILITY (auto CF):
-//  - Body size: ~47 non-empty decompiler lines.
-//  - Control keywords: if×4, do×1, return×1, goto×1, while×1.
-//  - Notable callees: CONCAT31, CVOGHBBase_Start, CVOGHBList_Enqueue, FUN_005788d0, FUN_00621700.
-//  - Return sites: 1.
+#include <cstdint>
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+struct CVOGHBBase {
+  void *pVTable;
+  char _pad[0x14];
+  void *pOwnerObject; // +0x18
+};
 
-uint32_t /* width from decompiler */
+extern "C" {
+void *CVOGReaction_ResolveObjectTarget(void *ctx, unsigned char bGlobal,
+                                       uint32_t coidLo, uint32_t coidHi);
+void *CVOGHBSkillBase_ctor(void *self, void *a, void *b, void *c, void *d,
+                           void *e, void *f);
+void CVOGHBList_Enqueue(void *list, void *action);
+void CVOGHBBase_Start(void *action);
+void *operator_new(uint32_t size);
+extern void *PTR_FUN_009d15c4;
+}
 
-FUN_00621700(uint32_t /* width from decompiler */ param_1,uint32_t /* width from decompiler */ param_2,int param_3,int param_4,uint32_t /* width from decompiler */ param_5,
-
-            uint32_t /* width from decompiler */ param_6)
-
-
-
+uint32_t FUN_00621700(void *param_1, void *param_2, int param_3, int param_4,
+                      void *param_5, void *param_6)
 {
-
   int *piVar1;
-
-  int iVar2;
-
+  void *iVar2;
   CVOGHBBase *pAction;
+  char local_d = 0;
 
-  char local_d;
+  // SEH frame (LAB_009a891b) omitted
 
-  void *local_c;
-
-  uint8_t *puStack_8;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
-
-  local_4 = 0xffffffff;
-
-  puStack_8 = &LAB_009a891b;
-
-  local_c = ExceptionList;
-
-  local_d = '\0';
-
-  ExceptionList = &local_c;
-
-LAB_00621730:
-
-  do {
-
-    piVar1 = (int *)(local_d * 0x10 + param_4);
-
-    if (((*piVar1 == -1) && (piVar1[1] == -1)) && ((char)piVar1[2] == '\0')) {
-
-      ExceptionList = local_c;
-
+  for (;;) {
+    piVar1 = reinterpret_cast<int *>(local_d * 0x10 + param_4);
+    if (((*piVar1 == -1) && (piVar1[1] == -1)) &&
+        (static_cast<char>(piVar1[2]) == '\0')) {
       return 1;
-
     }
 
-    iVar2 = CVOGReaction_ResolveObjectTarget
+    // Image: ECX = *(param_3 + 0xe4e8); stack bGlobal/coidLo/coidHi
+    iVar2 = CVOGReaction_ResolveObjectTarget(
+        *reinterpret_cast<void **>(param_3 + 0xe4e8),
+        *reinterpret_cast<unsigned char *>(reinterpret_cast<char *>(piVar1) + 8),
+        static_cast<uint32_t>(*piVar1),
+        static_cast<uint32_t>(piVar1[1]));
 
-                      (CONCAT31((int3)((uint)piVar1 >> 8),(char)piVar1[2]),*piVar1,piVar1[1]);
-
-    if (iVar2 != 0) {
-
-      pAction = operator_new(0x6c0);
-
-      local_4 = 0;
-
-      if (pAction == (CVOGHBBase *)0x0) {
-
-        pAction = (CVOGHBBase *)0x0;
-
-      }
-
-      else {
-
-        FUN_005788d0(param_1,param_2,param_3,iVar2,param_5,param_6);
-
+    if (iVar2 != nullptr) {
+      pAction = static_cast<CVOGHBBase *>(operator_new(0x6c0));
+      if (pAction != nullptr) {
+        CVOGHBSkillBase_ctor(pAction, param_1, param_2,
+                             reinterpret_cast<void *>(param_3), iVar2, param_5,
+                             param_6);
         pAction->pVTable = &PTR_FUN_009d15c4;
-
       }
 
-      local_4 = 0xffffffff;
-
-      if (pAction->pOwnerObject != (void *)0x0) {
-
-        CVOGHBList_Enqueue(*(void **)(param_3 + 0xe4ec),pAction);
-
+      if (pAction->pOwnerObject != nullptr) {
+        CVOGHBList_Enqueue(*reinterpret_cast<void **>(param_3 + 0xe4ec),
+                           pAction);
         CVOGHBBase_Start(pAction);
-
-        local_d = local_d + '\x01';
-
-        goto LAB_00621730;
-
+      } else {
+        (*reinterpret_cast<void(__thiscall **)(CVOGHBBase *, int)>(
+            pAction->pVTable))(pAction, 1);
       }
-
-      (**(code **)pAction->pVTable)(1);
-
     }
-
-    local_d = local_d + '\x01';
-
-  } while( true );
-
+    local_d = static_cast<char>(local_d + 1);
+  }
 }

@@ -1,126 +1,85 @@
 // =============================================================================
-// FUN_00441960
+// FUN_00441960  (Ghidra-symbol twin of StdTree_EraseRange_Isnil11_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00441960
-// Address:   0x00441960  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00441960 – 0x00441a11 inclusive (178 B / 0xB2)
+// Named clean: StdTree_EraseRange_Isnil11_Inferred.cpp  ← prefer for port work
+// Wave:      2026-08-05 MEGA-136 OWN dual seal
+// Scaffold:  Named_CalleeOf_Named_gfxUIWindow_00441960  RETIRED
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00441960 @ 0x00441960
-// Stable ID: aa_00441960
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~45 non-empty decompiler lines.
-//  - Control keywords: if×3, while×3, return×2.
-//  - Notable callees: FUN_00440d20, FUN_00441960, FUN_004477a0.
-//  - Return sites: 2.
+struct MapNode_Isnil11 {
+  MapNode_Isnil11 *left;
+  MapNode_Isnil11 *parent;
+  MapNode_Isnil11 *right;
+};
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+struct MapShell_Isnil11 {
+  void *proxy;
+  MapNode_Isnil11 *head;
+  uint32_t size;
+};
 
-uint32_t /* width from decompiler */ * FUN_00441960(uint32_t /* width from decompiler */ *param_1,int *param_2,int *param_3)
+extern "C" void __fastcall StdTree_FreeSubtree_Isnil11_Inferred(
+    void *tree_base, MapNode_Isnil11 *node);
+extern "C" void FUN_004477a0(
+    MapShell_Isnil11 *map, MapNode_Isnil11 **outIt, MapNode_Isnil11 *node);
 
-
-
+static uint8_t isnil11(const MapNode_Isnil11 *n)
 {
+  return *reinterpret_cast<const uint8_t *>(reinterpret_cast<const char *>(n) + 0x11);
+}
 
-  char cVar1;
-
-  int *piVar2;
-
-  int *piVar3;
-
-  int unaff_EDI;
-
-  
-
-  piVar2 = *(int **)(unaff_EDI + 4);
-
-  if ((param_2 == (int *)*piVar2) && (param_3 == piVar2)) {
-
-    FUN_00440d20(piVar2[1]);
-
-    *(int *)(*(int *)(unaff_EDI + 4) + 4) = *(int *)(unaff_EDI + 4);
-
-    *(uint32_t /* width from decompiler */ *)(unaff_EDI + 8) = 0;
-
-    *(uint32_t /* width from decompiler */ *)*(uint32_t /* width from decompiler */ *)(unaff_EDI + 4) = *(uint32_t /* width from decompiler */ *)(unaff_EDI + 4);
-
-    *(int *)(*(int *)(unaff_EDI + 4) + 8) = *(int *)(unaff_EDI + 4);
-
-    *param_1 = **(uint32_t /* width from decompiler */ **)(unaff_EDI + 4);
-
-    return param_1;
-
-  }
-
-  while (param_2 != param_3) {
-
-    if (*(char *)((int)param_2 + 0x11) == '\0') {
-
-      piVar2 = (int *)param_2[2];
-
-      if (*(char *)((int)piVar2 + 0x11) == '\0') {
-
-        cVar1 = *(char *)(*piVar2 + 0x11);
-
-        param_2 = piVar2;
-
-        piVar2 = (int *)*piVar2;
-
-        while (cVar1 == '\0') {
-
-          cVar1 = *(char *)(*piVar2 + 0x11);
-
-          param_2 = piVar2;
-
-          piVar2 = (int *)*piVar2;
-
-        }
-
-      }
-
-      else {
-
-        cVar1 = *(char *)(param_2[1] + 0x11);
-
-        piVar3 = (int *)param_2[1];
-
-        piVar2 = param_2;
-
-        while ((param_2 = piVar3, cVar1 == '\0' && (piVar2 == (int *)param_2[2]))) {
-
-          cVar1 = *(char *)(param_2[1] + 0x11);
-
-          piVar3 = (int *)param_2[1];
-
-          piVar2 = param_2;
-
-        }
-
-      }
-
+static MapNode_Isnil11 *successor_isnil11(MapNode_Isnil11 *node)
+{
+  if (isnil11(node) != 0)
+    return node;
+  MapNode_Isnil11 *right = node->right;
+  if (isnil11(right) == 0) {
+    MapNode_Isnil11 *succ = right;
+    MapNode_Isnil11 *left = right->left;
+    while (isnil11(left) == 0) {
+      succ = left;
+      left = left->left;
     }
+    return succ;
+  }
+  MapNode_Isnil11 *parent = node->parent;
+  MapNode_Isnil11 *cur = node;
+  while (isnil11(parent) == 0 && cur == parent->right) {
+    cur = parent;
+    parent = parent->parent;
+  }
+  return parent;
+}
 
-    FUN_004477a0();
+// Ghidra name. EDI = map; stack outIt/first/last; RET 0xC; EAX = outIt*.
+extern "C" MapNode_Isnil11 **FUN_00441960(
+    MapShell_Isnil11 *map,       // EDI
+    MapNode_Isnil11 **outIt,
+    MapNode_Isnil11 *first,
+    MapNode_Isnil11 *last)
+{
+  MapNode_Isnil11 *head = map->head;
 
+  if (first == head->left && last == head) {
+    StdTree_FreeSubtree_Isnil11_Inferred(map, head->parent);
+    head->parent = head;
+    map->size = 0;
+    head->left = head;
+    head->right = head;
+    *outIt = head->left;
+    return outIt;
   }
 
-  *param_1 = param_2;
-
-  return param_1;
-
+  while (first != last) {
+    MapNode_Isnil11 *node = first;
+    MapNode_Isnil11 *succ = successor_isnil11(first);
+    FUN_004477a0(map, &first, node);
+    first = succ;
+  }
+  *outIt = first;
+  return outIt;
 }

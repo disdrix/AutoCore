@@ -3,41 +3,35 @@
 | Field | Value |
 |---|---|
 | **Stable ID** | `aa_004cbaa0` |
-| **Canonical name** | `FUN_004cbaa0` |
-| **Address** | `0x004cbaa0` |
+| **Canonical name** | `StdTree_EraseRange_Isnil29_Inferred` |
+| **Ghidra name** | `FUN_004cbaa0` |
+| **Address** | `0x004cbaa0`–`0x004cbb54` exclusive (**180 B**) |
 | **Module** | `autoassault.exe` (image base `0x400000`) |
-| **System** | unknown |
-| **Completion status** | **Partial scaffold** — raw/annotated/clean present; refine + dual review for important units |
-| **Bit-for-bit / runtime / diff** | Open (deferred / not run) |
-
-## Alias
-
-Human name: `Named_CalleeOf_Named_VOG_DEBUG_STOP_004cbaa0` (callee of `Named_VOG_DEBUG_STOP`)
+| **System** | STL / map-set (isnil@+0x29) |
+| **Completion status** | **accept-with-gaps** — dual A/B 2026-08-04 WQ9F-C; see named record |
+| **Bit-for-bit / runtime / diff** | Open |
 
 ## Purpose
 
-Reconstructed from Ghidra decompile. See clean source and annotated notes for body.
+MSVC map/set **range erase** for isnil@+0x29 nodes via free-subtree `FUN_004cb550` + single erase `StdTree_EraseAndRebalance_Isnil29_Inferred`.
 
-## Signature (decompiler-derived)
+## Signature
 
 ```c
-void __thiscall FUN_004cbaa0(int param_1,uint32_t /* width from decompiler */ *param_2,int *param_3,int *param_4)
+void __thiscall FUN_004cbaa0(void *map, void **outIt, void *first, void *last); // RET 0x0C
 ```
 
 ## Artifacts
 
+- Named record: `docs/reconstruction/functions/aa_004cbaa0_StdTree_EraseRange_Isnil29_Inferred.md`
 - Raw: `docs/reconstruction/raw/aa_004cbaa0_FUN_004cbaa0.md`
 - Annotated: `docs/reconstruction/raw/aa_004cbaa0_FUN_004cbaa0.annotated.md`
-- Clean: `docs/reconstruction/reconstructed-exact/FUN_004cbaa0.cpp`
-
-## Callers / callees
-
-(Populate from Ghidra xrefs in follow-up.)
+- Clean: `docs/reconstruction/reconstructed-exact/StdTree_EraseRange_Isnil29_Inferred.cpp`
+- Dual A/B: `reviews/A|B_aa_004cbaa0_StdTree_EraseRange_Isnil29_Inferred.md`
 
 ## Confidence
 
 | Claim | Level |
 |---|---|
-| Control flow from decompiler | High |
-| Parameter semantic names | Probable / Tentative until caller pass |
-| Types | Tentative |
+| Control flow | **High** |
+| Canonical name | **Inferred** structural |

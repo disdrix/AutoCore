@@ -1,154 +1,110 @@
 // =============================================================================
-// FUN_00522060
+// FUN_00522060  — twin of Character_CountType1aCraftableBatches
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00522060
-// Address:   0x00522060  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00522060–0x00522203 inclusive (420 B / 0x1A4)
+// Module:    autoassault.exe (image base 0x400000)
+// System:    inventory-transfer
+// Generated: 2026-08-05 MEGA-002 dual seal (machine-name twin)
+// Exactness: Behavior-preserving; see named clean for full commentary.
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
+//
+// Prefer: docs/reconstruction/reconstructed-exact/Character_CountType1aCraftableBatches.cpp
+// Retired: Named_CalleeOf_Inv_Client_ValidateCraftAffordability_00522060.cpp
+//
+// ABI: __thiscall RET 0x10; ECX=character; stack item*, out*, mode, simpleFlag; AL bool.
 
-// PURPOSE (auto): Scaffold unit for FUN_00522060 @ 0x00522060
-// Stable ID: aa_00522060
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~59 non-empty decompiler lines.
-//  - Control keywords: if×12, return×4, do×1, while×1.
-//  - Notable callees: FUN_005711c0×6, FUN_00599dd0×3, FUN_00522060.
-//  - Return sites: 4.
+extern int __thiscall InventoryGrid_CountItemsByCbid(void *grid, int itemCbid, char includeBroken);
+extern char __fastcall ItemDef_CountConfiguredModSlots_Inferred(void *blob);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-bool __thiscall FUN_00522060(int param_1,int param_2,int *param_3,char param_4,char param_5)
-
-
-
+bool __thiscall FUN_00522060(
+    void *param_1,
+    void *param_2,
+    int *param_3,
+    char param_4,
+    char param_5)
 {
-
-  int iVar1;
-
-  int iVar2;
-
-  int iVar3;
-
-  
+  void *cargoHolder;
+  void *cargo;
+  void *locker;
+  std::uint8_t *blob;
+  int primaryCbid;
+  int primaryHave;
+  int cost;
+  int nSlots;
+  int minHave;
+  int i;
+  int slotCbid;
+  int secondaryHave;
+  char modeNot2;
 
   *param_3 = 0;
 
-  if ((((*(int *)(param_1 + 0x250) == 0) || (*(int *)(*(int *)(param_1 + 0x250) + 0x2b0) == 0)) ||
-
-      (*(int *)(param_1 + 0xcbc) == 0)) || (*(int *)(param_2 + 0x38) != 0x1a)) {
-
+  cargoHolder = *reinterpret_cast<void **>(reinterpret_cast<char *>(param_1) + 0x250);
+  if (cargoHolder == nullptr) {
     return false;
-
+  }
+  cargo = *reinterpret_cast<void **>(reinterpret_cast<char *>(cargoHolder) + 0x2b0);
+  if (cargo == nullptr) {
+    return false;
+  }
+  locker = *reinterpret_cast<void **>(reinterpret_cast<char *>(param_1) + 0xcbc);
+  if (locker == nullptr) {
+    return false;
+  }
+  if (*reinterpret_cast<int *>(reinterpret_cast<char *>(param_2) + 0x38) != 0x1a) {
+    return false;
   }
 
-  iVar2 = *(int *)(param_2 + 0x3c);
-
-  if (iVar2 == 0) {
-
+  blob = *reinterpret_cast<std::uint8_t **>(reinterpret_cast<char *>(param_2) + 0x3c);
+  if (blob == nullptr) {
     return false;
-
   }
 
-  if (param_5 != '\0') {
+  modeNot2 = static_cast<char>(param_4 != 2);
 
-    iVar1 = FUN_005711c0(*(uint32_t /* width from decompiler */ *)(iVar2 + 0x4c0),0);
-
-    *param_3 = iVar1;
-
-    iVar2 = FUN_005711c0(*(uint32_t /* width from decompiler */ *)(iVar2 + 0x4c0),0);
-
-    *param_3 = *param_3 + iVar2;
-
+  if (param_5 != 0) {
+    int simpleCbid = *reinterpret_cast<int *>(blob + 0x4c0);
+    *param_3 = InventoryGrid_CountItemsByCbid(cargo, simpleCbid, 0);
+    *param_3 += InventoryGrid_CountItemsByCbid(locker, simpleCbid, 0);
     return *param_3 != 0;
-
   }
 
-  if ((param_4 != '\x01') && ('\0' < *(char *)(iVar2 + 0x4d4))) {
-
-    iVar1 = FUN_005711c0(*(uint32_t /* width from decompiler */ *)(iVar2 + 0x4d0),0);
-
-    iVar3 = FUN_005711c0(*(uint32_t /* width from decompiler */ *)(iVar2 + 0x4d0),0);
-
-    if ((int)*(char *)(iVar2 + 0x4d4) <= iVar1 + iVar3) {
-
-      *param_3 = *param_3 + (iVar1 + iVar3) / (int)*(char *)(iVar2 + 0x4d4);
-
+  if (param_4 != 1 && *reinterpret_cast<char *>(blob + 0x4d4) > 0) {
+    primaryCbid = *reinterpret_cast<int *>(blob + 0x4d0);
+    primaryHave = InventoryGrid_CountItemsByCbid(cargo, primaryCbid, 0);
+    primaryHave += InventoryGrid_CountItemsByCbid(locker, primaryCbid, 0);
+    cost = static_cast<int>(*reinterpret_cast<char *>(blob + 0x4d4));
+    if (primaryHave >= cost) {
+      *param_3 += primaryHave / cost;
     }
-
   }
 
-  if (param_4 != '\x02') {
-
-    iVar1 = FUN_00599dd0();
-
-    if (0 < iVar1) {
-
-      _param_4 = -1;
-
-      param_2 = 0;
-
-      iVar1 = FUN_00599dd0();
-
-      if (0 < iVar1) {
-
-        _param_5 = (int *)(iVar2 + 0x498);
-
-        do {
-
-          iVar2 = *_param_5;
-
-          if (iVar2 != -1) {
-
-            iVar1 = FUN_005711c0(iVar2,0);
-
-            iVar2 = FUN_005711c0(iVar2,0);
-
-            iVar1 = iVar1 + iVar2;
-
-            if ((_param_4 == -1) || (iVar1 <= _param_4)) {
-
-              _param_4 = iVar1;
-
-            }
-
-            if (iVar1 < 1) break;
-
+  if (modeNot2 != 0) {
+    nSlots = static_cast<int>(ItemDef_CountConfiguredModSlots_Inferred(blob));
+    if (nSlots > 0) {
+      minHave = -1;
+      for (i = 0; i < nSlots; ++i) {
+        slotCbid = *reinterpret_cast<int *>(blob + 0x498 + 4 * i);
+        if (slotCbid != -1) {
+          secondaryHave = InventoryGrid_CountItemsByCbid(cargo, slotCbid, 0);
+          secondaryHave += InventoryGrid_CountItemsByCbid(locker, slotCbid, 0);
+          if (minHave == -1 || secondaryHave <= minHave) {
+            minHave = secondaryHave;
           }
-
-          _param_5 = _param_5 + 1;
-
-          param_2 = param_2 + 1;
-
-          iVar2 = FUN_00599dd0();
-
-        } while (param_2 < iVar2);
-
-        if (0 < _param_4) {
-
-          *param_3 = *param_3 + _param_4;
-
+          if (secondaryHave < 1) {
+            break;
+          }
         }
-
       }
-
+      if (minHave > 0) {
+        *param_3 += minHave;
+      }
     }
-
   }
 
-  return 0 < *param_3;
-
+  return *param_3 > 0;
 }

@@ -1,3 +1,5 @@
+﻿// RETIRED 2026-08-05 MEGA-131: superseded by StdTree_FreeSubtree_Isnil1d_DestroyTreeVal10_Inferred.cpp
+// Do not port from this scaffold.
 // =============================================================================
 // Named_CalleeOf_Named_gfxUIWindow_00440c90
 // -----------------------------------------------------------------------------
@@ -15,8 +17,8 @@
 
 // READABILITY (auto CF):
 //  - Body size: ~10 non-empty decompiler lines.
-//  - Control keywords: return×2, if×1.
-//  - Notable callees: FUN_00440c90×2, FUN_00442730.
+//  - Control keywords: returnÃ—2, ifÃ—1.
+//  - Notable callees: FUN_00440c90Ã—2, FUN_00442730.
 //  - Return sites: 2.
 
 /*

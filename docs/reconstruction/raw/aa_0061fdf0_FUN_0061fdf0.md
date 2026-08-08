@@ -1,4 +1,4 @@
-# Raw capture: FUN_0061fdf0
+﻿# Raw capture: FUN_0061fdf0
 
 | Field | Value |
 |---|---|
@@ -160,3 +160,66 @@ LAB_0062016b:
   return;
 }
 ```
+
+
+---
+
+
+## 2026-08-04 WQ9R-B re-verify (append-only)
+
+| Field | Value |
+|---|---|
+| Agent | WQ9R-B OWN-ONLY |
+| Tools | decompile_function, read_memory, get_function_by_address, get_function_xrefs, get_function_callees |
+| Disallowed | disassemble_bytes; Launcher; parent ledgers |
+
+### Live decompile (2026-08-04)
+
+Matches 2026-07-23 raw control flow: parent pulse FUN_0061b6f0 -> resolve target FUN_00578270 -> gates -> RNG 75% -> Creature/Physics RTTI -> Skill_GatherTargetsInArea mode **1** / filterA **-1** -> spawn FUN_0061f940 children -> enqueue/start.
+
+### Body
+
+| Field | Value |
+|---|---|
+| Range | 0x0061fdf0 - 0x00620186 |
+| Prologue | push ebp; mov ebp,esp; and esp,0xFFFFFFF0; push -1; push SEH |
+| Epilogue | ret 4 (C2 04 00 @ end) confirmed read_memory @ 0x00620170 |
+
+### RTTI / vtbl (read_memory)
+
+| Item | Address / value |
+|---|---|
+| Class vtbl | PTR_FUN_009d14bc (set in ctor FUN_0061f940) |
+| COL @ vtbl-4 | 0x00aae0b8 |
+| Type descriptor | 0x00af2b08 -> .?AVCVOGHBSkill_Virus@@ |
+| vtbl[+0x0c] | 0x0061fdf0 = this unit |
+| Base TryFire slot | vtbl[+0x08] = 0x005082c0 CVOGHBBase_TryFire (calls OnHeartBeat at +0x0c) |
+
+### Gather call seal (bytes + residual a_0058d330)
+
+At call site 0x0061ff9d:
+
+| Formal | Value |
+|---|---|
+| gatherMode (param_8) | **1** (ally / non-hostile) |
+| filterA (param_9) | **0xFFFFFFFF** |
+| maxTargets (param_7) | *(char*)(this+0x102); if 0 then **4** |
+| radius | this[0x17] if non-zero else DAT_00a0f524 = **50.0f** (0x42480000) |
+| origin | world position via Object_GetWorldPositionPtr / FUN_00404c90 |
+
+### RNG gate
+
+(u16_from_table % 100) > 0x19 -> continue only if **> 25** (~75% fire path).
+
+### Null TFID sentinel
+
+DAT_009e2df0: FF FF FF FF FF FF FF FF 00 00 00 00 00 00 00 00 (read_memory).
+
+### Xrefs
+
+DATA only @ 0x009d14c8 (vtbl slot) -- virtual OnHeartBeat, no direct CALL sites.
+
+### Name
+
+**CVOGHBSkill_Virus_OnHeartBeat** -- RTTI class Confirmed; slot role High (OnHeartBeat via TryFire vtbl+0x0c).
+

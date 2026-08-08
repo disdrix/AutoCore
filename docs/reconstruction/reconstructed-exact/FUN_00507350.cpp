@@ -1,78 +1,62 @@
 // =============================================================================
-// FUN_00507350
+// FUN_00507350  (scaffold twin of VOGPhysics_QueryObject_Dtor_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00507350
 // Address:   0x00507350  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    interaction-activation
+// Generated: 2026-08-05 R13-028 dual seal
+// Exactness: Behavior-preserving rewrite. Prefer named clean source.
+// Bit-for-bit vs retail EXE: DEFERRED.
+// Runtime Confirmed: OPEN.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00507350 @ 0x00507350
-// Stable ID: aa_00507350
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~21 non-empty decompiler lines.
-//  - Control keywords: if×3, return×1.
-//  - Notable callees: FUN_00507350, FUN_005ffdb0.
-//  - Return sites: 1.
+extern uint32_t PTR_FUN_009cd99c;
+extern uint32_t PTR_FUN_009d81e8;
+extern uint32_t PTR_LAB_009cc290;
+extern uint32_t *DAT_00b05060;
+void __thiscall FUN_005ffdb0(uint32_t *self, int set_bit);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __fastcall FUN_00507350(uint32_t /* width from decompiler */ *param_1)
-
-
-
+// Canonical: VOGPhysics_QueryObject_Dtor_Inferred
+void __thiscall FUN_00507350(uint32_t *param_1 /* ECX */)
 {
+  uint32_t *puVar1 = reinterpret_cast<uint32_t *>(
+      static_cast<uintptr_t>(param_1[3]));
 
-  uint32_t /* width from decompiler */ *puVar1;
+  *param_1 = reinterpret_cast<uint32_t>(
+      reinterpret_cast<uintptr_t>(&PTR_FUN_009cd99c));
 
-  
-
-  puVar1 = (uint32_t /* width from decompiler */ *)param_1[3];
-
-  *param_1 = &PTR_FUN_009cd99c;
-
-  if ((puVar1 != (uint32_t /* width from decompiler */ *)0x0) &&
-
-     (*(short *)((int)puVar1 + 6) = *(short *)((int)puVar1 + 6) + -1,
-
-     *(short *)((int)puVar1 + 6) == 0)) {
-
-    (**(code **)*puVar1)(1);
-
+  if (puVar1 != nullptr) {
+    int16_t *rc = reinterpret_cast<int16_t *>(
+        reinterpret_cast<uint8_t *>(puVar1) + 6);
+    *rc = static_cast<int16_t>(*rc - 1);
+    if (*rc == 0) {
+      auto **vtbl = reinterpret_cast<void ***>(puVar1);
+      auto fn = reinterpret_cast<void(__stdcall *)(int)>(**vtbl);
+      fn(1);
+    }
   }
 
-  if (-1 < (int)param_1[0xe]) {
-
-    (**(code **)(*DAT_00b05060 + 0x14))(param_1[0xc],param_1[0xe] * 8,0x12);
-
+  if (static_cast<int32_t>(param_1[0xe]) >= 0) {
+    uint32_t nbytes =
+        (param_1[0xe] & 0x7FFFFFFFu) * 8u;
+    auto **alloc_vtbl = reinterpret_cast<void ***>(*DAT_00b05060);
+    auto free_fn = reinterpret_cast<void(__stdcall *)(uint32_t, uint32_t, int)>(
+        alloc_vtbl[0x14 / 4]);
+    free_fn(param_1[0xc], nbytes, 0x12);
   }
 
-  *param_1 = &PTR_FUN_009d81e8;
+  *param_1 = reinterpret_cast<uint32_t>(
+      reinterpret_cast<uintptr_t>(&PTR_FUN_009d81e8));
 
-  if ((short)*(ushort *)(param_1 + 1) < 0) {
-
-    *(ushort *)(param_1 + 1) = *(ushort *)(param_1 + 1) & 0x7fff;
-
-    FUN_005ffdb0(0);
-
+  uint16_t flags = *reinterpret_cast<uint16_t *>(param_1 + 1);
+  if (static_cast<int16_t>(flags) < 0) {
+    flags = static_cast<uint16_t>(flags & 0x7FFFu);
+    *reinterpret_cast<uint16_t *>(param_1 + 1) = flags;
+    FUN_005ffdb0(param_1, 0);
   }
 
-  *param_1 = &PTR_LAB_009cc290;
-
-  return;
-
+  *param_1 = reinterpret_cast<uint32_t>(
+      reinterpret_cast<uintptr_t>(&PTR_LAB_009cc290));
 }

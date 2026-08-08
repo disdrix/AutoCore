@@ -1,51 +1,19 @@
 // =============================================================================
-// FUN_00489892
+// FUN_00489892  (scaffold twin → operator_new)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00489892
 // Address:   0x00489892  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    inventory-transfer (parent dual context); unit = CRT IAT thunk
+// Generated: 2026-08-05 R10-002 (canonical clean: operator_new.cpp)
+// Exactness: Behavior-preserving model of 6-byte IAT trampoline.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00489892 @ 0x00489892
-// Stable ID: aa_00489892
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// Canonical name: operator_new
+// See: docs/reconstruction/reconstructed-exact/operator_new.cpp
 
-// READABILITY (auto CF):
-//  - Body size: ~8 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Return sites: 1.
+extern void * (__cdecl *PTR_operator_new_009c6664)(unsigned int size_bytes);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void * __cdecl operator_new(uint param_1)
-
-
-
+void * __cdecl FUN_00489892(unsigned int size_bytes)
 {
-
-  void *pvVar1;
-
-  
-
-                    /* WARNING: Could not recover jumptable at 0x00489892. Too many branches */
-
-                    /* WARNING: Treating indirect jump as call */
-
-  pvVar1 = operator_new(param_1);
-
-  return pvVar1;
-
+  return PTR_operator_new_009c6664(size_bytes);
 }

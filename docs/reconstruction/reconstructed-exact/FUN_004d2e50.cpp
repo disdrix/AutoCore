@@ -1,386 +1,216 @@
-// =============================================================================
-// FUN_004d2e50
+﻿// =============================================================================
+// FUN_004d2e50 (Ghidra symbol twin)
+// Canonical named: CVOGObject_EvalChildActiveCompleteMissionInteract_Inferred
 // -----------------------------------------------------------------------------
 // Stable ID: aa_004d2e50
-// Address:   0x004d2e50  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Address:   0x004d2e50 - 0x004d319e  (autoassault.exe, image base 0x400000)
+// Size:      847 bytes (0x34F)
+// System:    interaction-activation / missions interact glue
+// Generated: 2026-08-05 MEGA-068 OWN dual (from live Ghidra re-verify)
 // Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Bit-for-bit vs retail EXE: DEFERRED. Runtime Confirmed: OPEN (no Launcher).
+//
+// ABI (sealed by disassemble_function + read_memory + parent call sites):
+//   __stdcall, two stack args, RET 8 (C2 08 00) at three exits.
+//   Parent CVOGObject_EvalInteractStateFromChildren loads ECX before CALL;
+//   this body does not use ECX as this.
+//
+// Returns (AL):
+//   0 - no matching interact state
+//   3 - completed-mission residual flag after child mission-id walk
+//   6 - offerable/active interact (mission[+0x169] == 0)
+//   7 - offerable/active interact (mission[+0x169] != 0)
+//
+// Ghidra: FUN_004d2e50
+// Retires: Named_VOG_DEBUG_STOP_004d2e50 / Mission_VOG_DEBUG_STOP_004d2e50
+//          (VOG_DEBUG_STOP is hash-lock diagnostic only)
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_004d2e50 @ 0x004d2e50
-// Stable ID: aa_004d2e50
-// Embedded strings (evidence for future rename):
-//   - "HashError:TraversalLock, already locked for traversal"
-//   - "VOG_DEBUG_STOP"
-//   - "HashError:TraverseToNext, not locked for traversal"
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// External callees (names as dualed / Ghidra)
+// void*  FUN_0053fff0();  // Mission_EnsureRegionMissions host @ DAT_00b041fc
+// bool   CVOGCharacter_HasCompletedMission(void* character, unsigned missionId);
+// int    CVOGCharacter_CheckMissionRequirements(void* missionDef, void* character);
+// void   FUN_00547920(int);
+// void   FUN_00402c40(void* hash);  // TraversalLock set +0x1d
+// void   FUN_007a4480(int, const char*);
 
-// READABILITY (auto CF):
-//  - Body size: ~173 non-empty decompiler lines.
-//  - Control keywords: if×27, goto×9, while×6, do×4, return×4, for×3.
-//  - Notable callees: FUN_007a4480×6, FUN_0053fff0×5, CVOGCharacter_CheckMissionRequirements×3, CVOGCharacter_HasCompletedMission, FUN_00402c40, FUN_004d2e50, FUN_00547920.
-//  - Strings: "HashError:TraversalLock, already locked for traversal"; "VOG_DEBUG_STOP"; "HashError:TraverseToNext, not locked for traversal".
-//  - Return sites: 4.
-
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-char FUN_004d2e50(int param_1,int *param_2)
-
-
-
+char FUN_004d2e50(
+    int child_reaction,
+    int *character)
 {
+  unsigned mission_id;
+  unsigned *filter_end;
+  bool completed_flag;
+  bool has_completed;
+  int *host_ptr;
+  unsigned *active_mission;
+  void *completed_mission;
+  int node;
+  unsigned *filter_it;
+  unsigned idx;
+  int walk_count;
+  int walk_node;
+  /* decompiler residual on CheckMissionRequirements third arg â€” asm is thiscall + 1 stack */
 
-  uint uVar1;
+  completed_flag = false;
 
-  uint *puVar2;
-
-  bool bVar3;
-
-  bool bVar4;
-
-  int *piVar5;
-
-  uint *this;
-
-  void *this_00;
-
-  int iVar6;
-
-  uint *puVar7;
-
-  uint uVar8;
-
-  int iVar9;
-
-  int iVar10;
-
-  int *unaff_EDI;
-
-  
-
-  bVar4 = false;
-
-  if ((*(int *)(param_1 + 0x244) != 0) &&
-
-     (*(int *)(param_1 + 0x248) - *(int *)(param_1 + 0x244) >> 2 != 0)) {
-
-    uVar8 = 0;
-
-    while ((iVar6 = *(int *)(param_1 + 0x244), iVar6 != 0 &&
-
-           (uVar8 < (uint)(*(int *)(param_1 + 0x248) - iVar6 >> 2)))) {
-
-      iVar10 = uVar8 * 4;
-
-      uVar1 = *(uint *)(iVar6 + iVar10);
-
-      piVar5 = (int *)FUN_0053fff0();
-
-      iVar6 = *piVar5;
-
-      if (iVar6 == 0) {
-
-        this = (uint *)0x0;
-
-LAB_004d2f13:
-
-        bVar3 = CVOGCharacter_HasCompletedMission
-
-                          (param_2,*(uint *)(*(int *)(param_1 + 0x244) + iVar10));
-
-        if (!bVar3) goto LAB_004d2f98;
-
-        uVar1 = *(uint *)(*(int *)(param_1 + 0x244) + iVar10);
-
-        iVar6 = *(int *)(*(int *)(*(int *)(param_2[0x14e] + 0x10) +
-
-                                 (*(uint *)(param_2[0x14e] + 8) & uVar1) * 4) + 4);
-
-        if (iVar6 == 0) {
-
-LAB_004d2f6a:
-
-          this_00 = (void *)0x0;
-
-        }
-
-        else {
-
+  /* ---- Path A: child mission-id vector [+0x244, +0x248) ---- */
+  if ((*(int *)(child_reaction + 0x244) != 0) &&
+      (*(int *)(child_reaction + 0x248) - *(int *)(child_reaction + 0x244) >> 2 != 0)) {
+    idx = 0;
+    while ((node = *(int *)(child_reaction + 0x244), node != 0 &&
+           (idx < (unsigned)(*(int *)(child_reaction + 0x248) - node >> 2)))) {
+      int id_off = idx * 4;
+      mission_id = *(unsigned *)(node + id_off);
+      host_ptr = (int *)FUN_0053fff0();
+      node = *host_ptr;
+      if (node == 0) {
+        active_mission = (unsigned *)0x0;
+LAB_active_or_completed:
+        has_completed = CVOGCharacter_HasCompletedMission(
+            character, *(unsigned *)(*(int *)(child_reaction + 0x244) + id_off));
+        if (!has_completed) goto LAB_try_active_req;
+        mission_id = *(unsigned *)(*(int *)(child_reaction + 0x244) + id_off);
+        /* character completed-mission hash @ +0x538 */
+        node = *(int *)(*(int *)(*(int *)(character[0x14e] + 0x10) +
+                                (*(unsigned *)(character[0x14e] + 8) & mission_id) * 4) + 4);
+        if (node == 0) {
+LAB_completed_null:
+          completed_mission = (void *)0x0;
+        } else {
           do {
-
-            if (uVar1 == *(uint *)(iVar6 + 0x10)) {
-
-              if (iVar6 == 0) goto LAB_004d2f6a;
-
-              this_00 = *(void **)(iVar6 + 8);
-
-              goto LAB_004d2f71;
-
+            if (mission_id == *(unsigned *)(node + 0x10)) {
+              if (node == 0) goto LAB_completed_null;
+              completed_mission = *(void **)(node + 8);
+              goto LAB_completed_found;
             }
-
-            iVar6 = *(int *)(iVar6 + 0xc);
-
-          } while (iVar6 != 0);
-
-          this_00 = (void *)0x0;
-
+            node = *(int *)(node + 0xc);
+          } while (node != 0);
+          completed_mission = (void *)0x0;
         }
-
-LAB_004d2f71:
-
-        if ((*(short *)((int)this_00 + 0xac) == 0) ||
-
-           (iVar6 = CVOGCharacter_CheckMissionRequirements(this_00,param_2,unaff_EDI), iVar6 != 0))
-
-        goto LAB_004d2fac;
-
-        bVar4 = true;
-
-        uVar8 = uVar8 + 1;
-
-      }
-
-      else {
-
-        iVar6 = *(int *)(*(int *)(*(int *)(iVar6 + 0x10) + (*(uint *)(iVar6 + 8) & uVar1) * 4) + 4);
-
-        if (iVar6 == 0) {
-
-LAB_004d2ef8:
-
-          this = (uint *)0x0;
-
-        }
-
-        else {
-
+LAB_completed_found:
+        if ((*(short *)((int)completed_mission + 0xac) == 0) ||
+            (node = CVOGCharacter_CheckMissionRequirements(completed_mission, character),
+             node != 0))
+          goto LAB_next_id;
+        completed_flag = true;
+        idx = idx + 1;
+      } else {
+        /* hash lookup mission_id in region host */
+        node = *(int *)(*(int *)(*(int *)(node + 0x10) + (*(unsigned *)(node + 8) & mission_id) * 4) + 4);
+        if (node == 0) {
+LAB_active_null:
+          active_mission = (unsigned *)0x0;
+        } else {
           do {
-
-            if (uVar1 == *(uint *)(iVar6 + 0x10)) {
-
-              if (iVar6 == 0) goto LAB_004d2ef8;
-
-              this = *(uint **)(iVar6 + 8);
-
-              goto LAB_004d2eff;
-
+            if (mission_id == *(unsigned *)(node + 0x10)) {
+              if (node == 0) goto LAB_active_null;
+              active_mission = *(unsigned **)(node + 8);
+              goto LAB_active_found;
             }
-
-            iVar6 = *(int *)(iVar6 + 0xc);
-
-          } while (iVar6 != 0);
-
-          this = (uint *)0x0;
-
+            node = *(int *)(node + 0xc);
+          } while (node != 0);
+          active_mission = (unsigned *)0x0;
         }
-
-LAB_004d2eff:
-
-        if ((this == (uint *)0x0) || ((short)this[0x2b] != -1)) goto LAB_004d2f13;
-
-LAB_004d2f98:
-
-        if ((this != (uint *)0x0) &&
-
-           (iVar6 = CVOGCharacter_CheckMissionRequirements(this,param_2,unaff_EDI), iVar6 == 0))
-
-        goto LAB_004d3158;
-
-LAB_004d2fac:
-
-        uVar8 = uVar8 + 1;
-
+LAB_active_found:
+        /* short[+0xac] == -1 â†’ treat as active-tracked mission */
+        if ((active_mission == (unsigned *)0x0) || ((short)active_mission[0x2b] != -1))
+          goto LAB_active_or_completed;
+LAB_try_active_req:
+        if ((active_mission != (unsigned *)0x0) &&
+            (node = CVOGCharacter_CheckMissionRequirements(active_mission, character),
+             node == 0))
+          goto LAB_return_6_7;
+LAB_next_id:
+        idx = idx + 1;
       }
-
     }
-
-LAB_004d3188:
-
-    if (!bVar4) {
-
+LAB_return_flag:
+    if (!completed_flag) {
       return '\0';
-
     }
-
     return '\x03';
-
   }
 
-  if ((*(int *)(param_1 + 0x234) != 0) &&
-
-     (*(int *)(param_1 + 0x238) - *(int *)(param_1 + 0x234) >> 2 != 0)) {
-
-    iVar6 = param_2[0x150];
-
-    iVar9 = 0;
-
-    iVar10 = 0;
-
-    if (*(char *)(iVar6 + 0x1d) != '\0') {
-
-      FUN_007a4480(0,"HashError:TraversalLock, already locked for traversal");
-
-      FUN_007a4480(0,"VOG_DEBUG_STOP");
-
+  /* ---- Path B: child byte-filter vector [+0x234, +0x238) ---- */
+  if ((*(int *)(child_reaction + 0x234) != 0) &&
+      (*(int *)(child_reaction + 0x238) - *(int *)(child_reaction + 0x234) >> 2 != 0)) {
+    node = character[0x150]; /* hash @ character+0x540 */
+    walk_count = 0;
+    walk_node = 0;
+    if (*(char *)(node + 0x1d) != '\0') {
+      FUN_007a4480(0, "HashError:TraversalLock, already locked for traversal");
+      FUN_007a4480(0, "VOG_DEBUG_STOP");
     }
-
-    *(uint8_t *)(iVar6 + 0x1d) = 1;
-
+    *(unsigned char *)(node + 0x1d) = 1;
     do {
-
-      iVar6 = param_2[0x150];
-
-      if (*(char *)(iVar6 + 0x1d) == '\0') {
-
-        FUN_007a4480(0,"HashError:TraverseToNext, not locked for traversal");
-
-        FUN_007a4480(0,"VOG_DEBUG_STOP");
-
+      node = character[0x150];
+      if (*(char *)(node + 0x1d) == '\0') {
+        FUN_007a4480(0, "HashError:TraverseToNext, not locked for traversal");
+        FUN_007a4480(0, "VOG_DEBUG_STOP");
       }
-
-      if (iVar10 == 0) {
-
-        iVar10 = *(int *)(iVar6 + 0x14);
-
+      if (walk_node == 0) {
+        walk_node = *(int *)(node + 0x14);
+      } else {
+        walk_node = *(int *)(walk_node + 0x14);
       }
-
-      else {
-
-        iVar10 = *(int *)(iVar10 + 0x14);
-
+      if (walk_node == 0) {
+        node = 0;
+      } else {
+        node = *(int *)(walk_node + 8);
       }
-
-      if (iVar10 == 0) {
-
-        iVar6 = 0;
-
-      }
-
-      else {
-
-        iVar6 = *(int *)(iVar10 + 8);
-
-      }
-
-      if (iVar6 == 0) {
-
-        *(uint8_t *)(param_2[0x150] + 0x1d) = 0;
-
-        iVar6 = 0;
-
+      if (node == 0) {
+        *(unsigned char *)(character[0x150] + 0x1d) = 0;
+        node = 0;
         FUN_0053fff0();
-
         FUN_00402c40();
-
-        while( true ) {
-
-          piVar5 = (int *)FUN_0053fff0();
-
-          iVar10 = *piVar5;
-
-          if (*(char *)(iVar10 + 0x1d) == '\0') {
-
-            FUN_007a4480(0,"HashError:TraverseToNext, not locked for traversal");
-
-            FUN_007a4480(0,"VOG_DEBUG_STOP");
-
+        while (1) {
+          host_ptr = (int *)FUN_0053fff0();
+          walk_node = *host_ptr;
+          if (*(char *)(walk_node + 0x1d) == '\0') {
+            FUN_007a4480(0, "HashError:TraverseToNext, not locked for traversal");
+            FUN_007a4480(0, "VOG_DEBUG_STOP");
           }
-
-          if (iVar6 == 0) {
-
-            iVar6 = *(int *)(iVar10 + 0x14);
-
+          if (node == 0) {
+            node = *(int *)(walk_node + 0x14);
+          } else {
+            node = *(int *)(node + 0x14);
           }
-
-          else {
-
-            iVar6 = *(int *)(iVar6 + 0x14);
-
+          if (node == 0) {
+            active_mission = (unsigned *)0x0;
+          } else {
+            active_mission = *(unsigned **)(node + 8);
           }
-
-          if (iVar6 == 0) {
-
-            this = (uint *)0x0;
-
-          }
-
-          else {
-
-            this = *(uint **)(iVar6 + 8);
-
-          }
-
-          if (this == (uint *)0x0) break;
-
-          puVar2 = *(uint **)(param_1 + 0x238);
-
-          puVar7 = *(uint **)(param_1 + 0x234);
-
-          if (puVar7 != puVar2) {
-
+          if (active_mission == (unsigned *)0x0) break;
+          filter_end = *(unsigned **)(child_reaction + 0x238);
+          filter_it = *(unsigned **)(child_reaction + 0x234);
+          if (filter_it != filter_end) {
             do {
-
-              if (*puVar7 == (uint)*(byte *)((int)this + 0x86)) break;
-
-              puVar7 = puVar7 + 1;
-
-            } while (puVar7 != puVar2);
-
-            if ((puVar7 != puVar2) &&
-
-               (iVar10 = CVOGCharacter_CheckMissionRequirements(this,param_2,unaff_EDI), iVar10 == 0
-
-               )) {
-
-              bVar4 = CVOGCharacter_HasCompletedMission(param_2,*this);
-
-              if (!bVar4) {
-
-                piVar5 = (int *)FUN_0053fff0();
-
-                *(uint8_t *)(*piVar5 + 0x1d) = 0;
-
-LAB_004d3158:
-
+              if (*filter_it == (unsigned)*(unsigned char *)((int)active_mission + 0x86)) break;
+              filter_it = filter_it + 1;
+            } while (filter_it != filter_end);
+            if ((filter_it != filter_end) &&
+                (walk_node = CVOGCharacter_CheckMissionRequirements(active_mission, character),
+                 walk_node == 0)) {
+              completed_flag = CVOGCharacter_HasCompletedMission(character, *active_mission);
+              if (!completed_flag) {
+                host_ptr = (int *)FUN_0053fff0();
+                *(unsigned char *)(*host_ptr + 0x1d) = 0;
+LAB_return_6_7:
                 FUN_00547920(0);
-
-                return (*(char *)((int)this + 0x169) != '\0') + '\x06';
-
+                return (*(char *)((int)active_mission + 0x169) != '\0') + '\x06';
               }
-
-              bVar4 = true;
-
+              completed_flag = true;
             }
-
           }
-
         }
-
-        piVar5 = (int *)FUN_0053fff0();
-
-        *(uint8_t *)(*piVar5 + 0x1d) = 0;
-
-        goto LAB_004d3188;
-
+        host_ptr = (int *)FUN_0053fff0();
+        *(unsigned char *)(*host_ptr + 0x1d) = 0;
+        goto LAB_return_flag;
       }
-
-    } while ((*(short *)(iVar6 + 0xac) == 0) || (iVar9 = iVar9 + 1, iVar9 < 8));
-
-    *(uint8_t *)(param_2[0x150] + 0x1d) = 0;
-
+    } while ((*(short *)(node + 0xac) == 0) || (walk_count = walk_count + 1, walk_count < 8));
+    *(unsigned char *)(character[0x150] + 0x1d) = 0;
   }
-
   return '\0';
-
 }
+

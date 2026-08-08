@@ -1,88 +1,43 @@
 // =============================================================================
-// FUN_0041c140
+// FUN_0041c140  (scaffold twin — prefer StdVector_CopyCtor_Elem0x18_Inferred.cpp)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0041c140
-// Address:   0x0041c140  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x0041c140–0x0041c1c9 inclusive (138 B / 0x8A)
+// System:    skills-abilities (partition)
+// Generated: 2026-08-05 R13-022 OWN dual — keeps Ghidra symbol as twin
+// Canonical: StdVector_CopyCtor_Elem0x18_Inferred
+// Exactness: Behavior-preserving; not modernization. Bit-for-bit: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0041c140 @ 0x0041c140
-// Stable ID: aa_0041c140
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~26 non-empty decompiler lines.
-//  - Control keywords: if×2, return×1.
-//  - Notable callees: FUN_0041c140, FUN_0041c250, FUN_00422580.
-//  - Return sites: 1.
+// See StdVector_CopyCtor_Elem0x18_Inferred.cpp for named plate + layout notes.
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+extern "C" char __thiscall FUN_0041c250(void* self, unsigned n);
+extern "C" void* FUN_00422580(void* first, void* last, void* dest, void* a, void* b);
 
-int __thiscall FUN_0041c140(int param_1,int param_2)
-
-
-
+extern "C" void* __thiscall FUN_0041c140(void* dest /*ECX*/, const void* src /*stack*/)
 {
+  int count = 0;
+  void* src_begin = *reinterpret_cast<void* const*>(
+      reinterpret_cast<const char*>(src) + 4);
+  void* src_end = *reinterpret_cast<void* const*>(
+      reinterpret_cast<const char*>(src) + 8);
 
-  char cVar1;
-
-  int iVar2;
-
-  uint32_t /* width from decompiler */ uVar3;
-
-  void *local_10;
-
-  uint8_t *puStack_c;
-
-  uint32_t /* width from decompiler */ local_8;
-
-  
-
-  local_8 = 0xffffffff;
-
-  puStack_c = &LAB_009bce90;
-
-  local_10 = ExceptionList;
-
-  iVar2 = 0;
-
-  if (*(int *)(param_2 + 4) != 0) {
-
-    iVar2 = (*(int *)(param_2 + 8) - *(int *)(param_2 + 4)) / 0x18;
-
+  if (src_begin != nullptr) {
+    count = static_cast<int>(
+        (static_cast<const char*>(src_end) - static_cast<const char*>(src_begin)) /
+        0x18);
   }
 
-  ExceptionList = &local_10;
-
-  cVar1 = FUN_0041c250(iVar2);
-
-  if (cVar1 != '\0') {
-
-    local_8 = 0;
-
-    uVar3 = FUN_00422580(*(uint32_t /* width from decompiler */ *)(param_2 + 4),*(uint32_t /* width from decompiler */ *)(param_2 + 8),
-
-                         *(uint32_t /* width from decompiler */ *)(param_1 + 4),param_1,param_2);
-
-    *(uint32_t /* width from decompiler */ *)(param_1 + 8) = uVar3;
-
+  char ok = FUN_0041c250(dest, static_cast<unsigned>(count));
+  if (ok != 0) {
+    void* dest_begin = *reinterpret_cast<void**>(
+        reinterpret_cast<char*>(dest) + 4);
+    void* new_end = FUN_00422580(src_begin, src_end, dest_begin,
+                                 const_cast<void*>(dest),
+                                 const_cast<void*>(src));
+    *reinterpret_cast<void**>(reinterpret_cast<char*>(dest) + 8) = new_end;
   }
-
-  ExceptionList = local_10;
-
-  return param_1;
-
+  return dest;
 }

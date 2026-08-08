@@ -171,3 +171,59 @@ LAB_005ae902:
   operator_delete(param_3);
 }
 ```
+
+
+---
+
+## R12-035 re-verify (2026-08-05 OWN-ONLY dual)
+
+**Tools:** Ghidra `decompile_function` + `analyze_function_complete` + `get_function_callers` / `get_function_xrefs` + `read_memory` + `get_assembly_context`. **No** `disassemble_bytes`. No Launcher.
+
+### Live decompile
+
+Live `decompile_function` @ `0x005ae6d0` **=** raw CF above (throw / unlink / rebalance / `operator_delete`). Decompiler marks epilogue + two-child splice blocks as unreachable / false noreturn — **bytes seal the missing tail**.
+
+### Body / ABI (`read_memory`)
+
+| Item | Evidence |
+|---|---|
+| Entry | SEH `64 A1 … 6A FF 68 A2 65 9A 00` (`LAB_009a65a2`); `MOV EBP,ECX` thiscall |
+| isnil test | `80 78 21 00` @ entry (`cmp byte [node+0x21], 0`) |
+| Throw string | `0x00a152f0` = `"invalid map/set<T> iterator"` |
+| ThrowInfo | `DAT_00acc34c` |
+| Color | `+0x20` (`param_3[8]` / `[n+0x20]`) |
+| isnil | `+0x21` |
+| Epilogue | `operator_delete` ? `test size; jbe; add eax,-1; size--` ? `*outIt = succ` ? `add esp,0x54; ret 8` |
+| RET | `C2 08 00` @ `0x005ae983` |
+| Inclusive end | `0x005ae985`; exclusive `0x005ae986`; `CC` pad to `0x005ae98f`; next `FUN_005ae990` @ `0x005ae990` |
+| Body size | **694 B** / `0x2B6` (`0x005ae6d0`–`0x005ae986` exclusive) |
+
+Epilogue tail hex (from `0x005ae94d`):
+
+```
+8b44241050e8cbaeedff8b450883c40485c05f5e5b760683c0ff8945088b4c24608b44245c89088b4c244c5d64890d0000000083c454c20800
+```
+
+### Callers / xrefs
+
+| Kind | Value |
+|---|---|
+| Callers | `FUN_005af2e0` only |
+| Xrefs | 1 UNCONDITIONAL_CALL @ `0x005af37f` |
+| Call site | `MOV ECX,EDI` then `CALL 0x005ae6d0` (thiscall ECX=map sealed) |
+
+### Callees
+
+| Addr / name | Role |
+|---|---|
+| `FUN_004e12c0` | in-order successor / iterator++ (isnil@+0x21) |
+| `FUN_004cb2c0` | leftmost / min (isnil@+0x21) |
+| `FUN_00421a60` | rightmost / max (isnil@+0x21) |
+| `FUN_0050e9f0` | Lrotate isnil21 (R10-030 dualed) |
+| `FUN_005a27f0` | Rrotate isnil21 (R11-007 dualed; parent dual) |
+| `basic_string` / `exception` / `_CxxThrowException` | nil-iterator throw plate |
+| `operator_delete` | free erased node |
+
+### Inferred name
+
+`StdTree_EraseAndRebalance_Isnil21_Inferred` — MSVC `_Tree` single-node erase + RB rebalance for **isnil@+0x21 / color@+0x20 / node 0x28 / Val16** family (peer buynode `00408990`, insert `00407200`, rotates `0050e9f0`/`005a27f0`).

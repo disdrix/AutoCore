@@ -1,24 +1,22 @@
 // =============================================================================
-// FUN_00847240
+// FUN_00847240  (clean twin — decompiler surface)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00847240
 // Address:   0x00847240  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Body:      0x00847240–0x008479f0 (1968 / 0x7B0)
+// System:    inventory-transfer / client item tooltip UI
+// Canonical: UI_ItemTooltip_AppendTypeMetaLines_Inferred
+// Named:     reconstructed-exact/UI_ItemTooltip_AppendTypeMetaLines_Inferred.cpp
+// Retired:   Mission_Mission_Object_00847240 (string-weak)
+// Seal:      R11-029 2026-08-05 dual A/B accept-with-gaps
 // Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Bit-for-bit vs retail EXE: DEFERRED (stage seal only; terminal false).
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00847240 @ 0x00847240
-// Stable ID: aa_00847240
-// Embedded strings (evidence for future rename):
-//   - "Mission Object"
-//   - "UNKNOWN ITEM TYPE"
-//   - "Junk"
-//   - "Subtype"
-//   - "%s - %s %i"
-//   - "Item"
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// PURPOSE: Item tooltip type-class + rarity + bind/trade/charges + patentee +
+//   RE/memorize restriction line builder. EDI = UI text host (caller-live).
+// ABI: cdecl (Item*, char showMeta); caller ADD ESP,8; ret C3; returns line delta.
+// Callers: FUN_00843a60 @ 00843dc1; UI_ItemDetailPanel_Refresh_Inferred @ 0084be00.
 
 // READABILITY (auto CF):
 //  - Body size: ~275 non-empty decompiler lines.

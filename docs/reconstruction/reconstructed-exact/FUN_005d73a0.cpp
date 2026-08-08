@@ -1,54 +1,38 @@
 // =============================================================================
-// FUN_005d73a0
+// FUN_005d73a0  (twin of CVOGHBAIDriver_AxisPark_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_005d73a0
-// Address:   0x005d73a0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x005d73a0–0x005d73e7 inclusive (72 B / 0x48)
+// Module:    autoassault.exe (image base 0x400000)
+// System:    input-drive-control / HB AI driver
+// Agent:     MEGA-015 OWN-ONLY dual 2026-08-05
+// Canonical: CVOGHBAIDriver_AxisPark_Inferred
+// Exactness: Behavior-preserving rewrite of decompiler + assembly control flow.
+// Terminal:  false (no runtime Confirmed / no Launcher).
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_005d73a0 @ 0x005d73a0
-// Stable ID: aa_005d73a0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// Twin keeps Ghidra symbol as entry alias; body matches named clean.
 
-// READABILITY (auto CF):
-//  - Body size: ~10 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: CVOGHBAIFollowVehicle_FireWeapons, FUN_005cc560, FUN_005d73a0, VehicleEntity_PushDriveAxesToController, VehicleEntity_SetHandbrake, VehicleEntity_SetLongitudinalInput, VehicleEntity_SetSteerInput.
-//  - Return sites: 1.
+void __thiscall VehicleEntity_SetSteerInput(void *vehicle, int steer_or_float_bits);
+void __thiscall VehicleEntity_SetLongitudinalInput(void *vehicle, int long_or_float_bits);
+void __thiscall VehicleEntity_SetHandbrake(void *vehicle, unsigned char handbrake);
+void __thiscall CVOGHBAIFollowVehicle_FireWeapons(void *self, int may_fire, int unused);
+void __thiscall VehicleEntity_PushDriveAxesToController(void *vehicle);
+void __fastcall FUN_005cc560(void *self);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void FUN_005d73a0(void)
-
-
-
+void __thiscall FUN_005d73a0(void *self /* ECX */)
 {
+  void *vehicle;
 
-  VehicleEntity_SetSteerInput(0);
+  vehicle = *(void **)((char *)self + 0xbc);
 
-  VehicleEntity_SetLongitudinalInput(0);
+  VehicleEntity_SetSteerInput(vehicle, 0);
+  VehicleEntity_SetLongitudinalInput(vehicle, 0);
+  VehicleEntity_SetHandbrake(vehicle, 1);
 
-  VehicleEntity_SetHandbrake(1);
+  CVOGHBAIFollowVehicle_FireWeapons(self, /*mayFire*/ 0, /*unused*/ 0);
 
-  CVOGHBAIFollowVehicle_FireWeapons(0,0);
+  VehicleEntity_PushDriveAxesToController(vehicle);
 
-  VehicleEntity_PushDriveAxesToController();
-
-  FUN_005cc560();
-
-  return;
-
+  FUN_005cc560(self);
 }

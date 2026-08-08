@@ -1,132 +1,32 @@
-// =============================================================================
-// FUN_00405bd0
+﻿// =============================================================================
+// FUN_00405bd0  (scaffold twin → StdMap_InsertOrFind_PairKey_Isnil29_EbxMap_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00405bd0
 // Address:   0x00405bd0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Body:      0x00405bd0–0x00405c7e inclusive (175 B / 0xAF)
+// System:    MSVC std::map insert-or-find (isnil@+0x29, pair key)
+// Generated: 2026-08-05 WQ9K-D dual seal
+// Exactness: Behavior-preserving; meaningful names. Not modernization.
+// Terminal:  false
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00405bd0 @ 0x00405bd0
-// Stable ID: aa_00405bd0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~48 non-empty decompiler lines.
-//  - Control keywords: if×5, return×2, do×1, while×1, goto×1.
-//  - Notable callees: FUN_00405bd0, FUN_004069f0, FUN_00409820.
-//  - Return sites: 2.
+// See StdMap_InsertOrFind_PairKey_Isnil29_EbxMap_Inferred.cpp for full plate.
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+struct MapShell_Isnil29_Pair;
+struct InsertPair_Isnil29;
+struct Val_PairKey_Isnil29;
 
-void FUN_00405bd0(void)
+extern "C" InsertPair_Isnil29* StdMap_InsertOrFind_PairKey_Isnil29_EbxMap_Inferred(
+    MapShell_Isnil29_Pair* map /*EBX*/,
+    InsertPair_Isnil29* out /*ESI*/,
+    const Val_PairKey_Isnil29* value /*EAX*/);
 
-
-
+extern "C" InsertPair_Isnil29* FUN_00405bd0(
+    MapShell_Isnil29_Pair* map /*EBX*/,
+    InsertPair_Isnil29* out /*ESI*/,
+    const Val_PairKey_Isnil29* value /*EAX*/)
 {
-
-  bool bVar1;
-
-  uint *in_EAX;
-
-  uint32_t /* width from decompiler */ *puVar2;
-
-  int unaff_EBX;
-
-  uint32_t /* width from decompiler */ *unaff_ESI;
-
-  uint32_t /* width from decompiler */ local_8;
-
-  uint32_t /* width from decompiler */ *local_4;
-
-  
-
-  local_4 = *(uint32_t /* width from decompiler */ **)(unaff_EBX + 4);
-
-  bVar1 = true;
-
-  local_8 = 1;
-
-  if (*(char *)((int)local_4[1] + 0x29) == '\0') {
-
-    puVar2 = (uint32_t /* width from decompiler */ *)local_4[1];
-
-    do {
-
-      local_4 = puVar2;
-
-      if (((int)local_4[5] < (int)in_EAX[1]) ||
-
-         (((int)local_4[5] <= (int)in_EAX[1] && ((uint)local_4[4] <= *in_EAX)))) {
-
-        puVar2 = (uint32_t /* width from decompiler */ *)local_4[2];
-
-        bVar1 = false;
-
-        local_8 = 0;
-
-      }
-
-      else {
-
-        puVar2 = (uint32_t /* width from decompiler */ *)*local_4;
-
-        bVar1 = true;
-
-        local_8 = 1;
-
-      }
-
-    } while (*(char *)((int)puVar2 + 0x29) == '\0');
-
-  }
-
-  if (bVar1) {
-
-    if (local_4 == (uint32_t /* width from decompiler */ *)**(int **)(unaff_EBX + 4)) {
-
-      local_8 = 1;
-
-      goto LAB_00405c53;
-
-    }
-
-    FUN_00409820();
-
-  }
-
-  if (((int)in_EAX[1] < (int)local_4[5]) ||
-
-     (((int)in_EAX[1] <= (int)local_4[5] && (*in_EAX <= (uint)local_4[4])))) {
-
-    *unaff_ESI = local_4;
-
-    *(uint8_t *)(unaff_ESI + 1) = 0;
-
-    return;
-
-  }
-
-LAB_00405c53:
-
-  puVar2 = (uint32_t /* width from decompiler */ *)FUN_004069f0(&local_4,local_8,in_EAX);
-
-  *unaff_ESI = *puVar2;
-
-  *(uint8_t *)(unaff_ESI + 1) = 1;
-
-  return;
-
+  return StdMap_InsertOrFind_PairKey_Isnil29_EbxMap_Inferred(map, out, value);
 }

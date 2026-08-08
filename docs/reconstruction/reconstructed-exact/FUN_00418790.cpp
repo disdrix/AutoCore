@@ -1,84 +1,33 @@
 // =============================================================================
-// FUN_00418790
+// FUN_00418790 — alias twin of StdList_Incsize_00418790
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00418790
-// Address:   0x00418790  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Address:   0x00418790–0x004187fe  (autoassault.exe, image base 0x400000)
+// Canonical: StdList_Incsize_00418790
+// System:    shared MSVC std::list
+// Generated: 2026-07-23 scaffold; **sealed 2026-08-05** R10-024 dual A/B
 // Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Bit-for-bit vs retail EXE: DEFERRED
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00418790 @ 0x00418790
-// Stable ID: aa_00418790
-// Embedded strings (evidence for future rename):
-//   - "list<T> too long"
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// See StdList_Incsize_00418790.cpp for full plate + dual notes.
+// This file preserves the Ghidra machine name as a thin alias.
 
-// READABILITY (auto CF):
-//  - Body size: ~23 non-empty decompiler lines.
-//  - Control keywords: return×2, if×1.
-//  - Notable callees: FUN_00401a40, FUN_00418790, _CxxThrowException.
-//  - Strings: "list<T> too long".
-//  - Return sites: 2.
+#include <cstdint>
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+struct StdListHeader {
+  void *_Myhead_or_pad;
+  void *_Myhead;
+  std::uint32_t _Mysize;
+};
 
-void __fastcall FUN_00418790(uint param_1,int param_2)
+extern "C" void __fastcall StdList_Incsize_00418790(
+    std::uint32_t count /*ECX*/,
+    StdListHeader *list /*EDX*/);
 
-
-
+extern "C" void __fastcall FUN_00418790(
+    std::uint32_t count /*ECX*/,
+    StdListHeader *list /*EDX*/)
 {
-
-  basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> local_50 [28];
-
-  uint8_t local_34 [40];
-
-  void *local_c;
-
-  uint8_t *puStack_8;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
-
-  local_4 = 0xffffffff;
-
-  puStack_8 = &LAB_009bc919;
-
-  local_c = ExceptionList;
-
-  if (0x3fffffffU - *(int *)(param_2 + 8) < param_1) {
-
-    ExceptionList = &local_c;
-
-    std::basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>::
-
-    basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>
-
-              (local_50,"list<T> too long");
-
-    local_4 = 0;
-
-    FUN_00401a40(local_50);
-
-                    /* WARNING: Subroutine does not return */
-
-    _CxxThrowException(local_34,(ThrowInfo *)&DAT_00acc388);
-
-  }
-
-  *(uint *)(param_2 + 8) = *(int *)(param_2 + 8) + param_1;
-
-  return;
-
+  StdList_Incsize_00418790(count, list);
 }

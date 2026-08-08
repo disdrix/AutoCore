@@ -1,23 +1,22 @@
 // =============================================================================
-// FUN_008b84a0
+// FUN_008b84a0  (twin of UI_Mail2dPanel_BuildChrome_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_008b84a0
-// Address:   0x008b84a0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Address:   0x008b84a0 – 0x008b8b76  (autoassault.exe, image base 0x400000)
+// Size:      1751 B (0x6D7)
+// System:    inventory-transfer (mail 2d UI chrome builder; client-only)
+// Dual:      R13-013 2026-08-05 — prefer named clean:
+//            reconstructed-exact/UI_Mail2dPanel_BuildChrome_Inferred.cpp
 // Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Bit-for-bit vs retail EXE: DEFERRED. Runtime Confirmed: NOT claimed.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_008b84a0 @ 0x008b84a0
-// Stable ID: aa_008b84a0
-// Embedded strings (evidence for future rename):
-//   - "i_d_mail_2d_tab_receive.xml"
-//   - "i_d_mail_2d_tab_send.xml"
-//   - "i_d_mail_2d_wnd_bg_frame.xml"
-//   - "i_d_mail_2d_wnd_bg_frame_send.xml"
-//   - "i_d_mail_2d_wnd_bg_frame_deposit.xml"
-//   - "i_d_mail_2d_wnd_inv_bg.xml"
+// PURPOSE: Mail 2d panel chrome builder (shared chrome + dual tabs + mode branch).
+// Canonical name: UI_Mail2dPanel_BuildChrome_Inferred
+// Rejected scaffold alias: UI_mail_bg_frame_deposit (send-arm plate only).
+// Embedded strings (evidence):
+//   - "i_d_mail_2d_tab_receive.xml" / "i_d_mail_2d_tab_send.xml"
+//   - "i_d_mail_2d_wnd_bg_frame.xml" / send / deposit / inv_bg / credits / edits
 // Readability: control flow preserved from Ghidra decompile; types tentative.
 
 // READABILITY (auto CF):

@@ -1,94 +1,61 @@
 // =============================================================================
-// FUN_005130e0
+// FUN_005130e0  (twin of Object_IsWorldPickupType_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_005130e0
 // Address:   0x005130e0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// System:    skills-abilities / client-interact / object-type filter
+// Generated: 2026-08-04 WQ9R-C dual seal
 // Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Bit-for-bit vs retail EXE: DEFERRED.
+// Named plate: reconstructed-exact/Object_IsWorldPickupType_Inferred.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_005130e0 @ 0x005130e0
-// Stable ID: aa_005130e0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~29 non-empty decompiler lines.
-//  - Control keywords: return×4, if×2, switch×1.
-//  - Notable callees: FUN_005130e0, __RTDynamicCast.
-//  - Return sites: 4.
+extern "C" int __cdecl __RTDynamicCast(void *obj, int vfDelta, void *srcType,
+                                       void *targetType, int isReference);
+extern "C" void CVOGClonedObjectBase_RTTI_Type_Descriptor;
+extern "C" void CVOGVehicle_RTTI_Type_Descriptor;
 
 /*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
+ * Soft type / world-pickup eligibility (see named clean for full plate).
+ * thiscall; RET 4; AL bool.
+ * requireLoose: when non-zero, require this+0xac == 0.
  */
 
-byte __thiscall FUN_005130e0(int param_1,char param_2)
-
-
-
+extern "C" uint8_t __thiscall FUN_005130e0(int this_obj, char requireLoose)
 {
+  int vehicle;
 
-  int iVar1;
-
-  
-
-  if ((param_2 == '\0') || (*(int *)(param_1 + 0xac) == 0)) {
-
-    switch(*(uint32_t /* width from decompiler */ *)(*(int *)(param_1 + 0xa8) + 0x38)) {
-
+  if ((requireLoose == 0) || (*(int *)(this_obj + 0xac) == 0)) {
+    switch (*(uint32_t *)(*(int *)(this_obj + 0xa8) + 0x38)) {
     case 1:
-
-      return *(byte *)(*(int *)(*(int *)(param_1 + 0xa8) + 0x3c) + 0x3f2) >> 7;
-
+      return (uint8_t)(*(uint8_t *)(*(int *)(*(int *)(this_obj + 0xa8) + 0x3c) +
+                                    0x3f2) >>
+                       7);
     case 4:
-
     case 6:
-
     case 8:
-
     case 10:
-
     case 0xc:
-
     case 0x10:
-
     case 0x1a:
-
     case 0x1c:
-
     case 0x32:
-
     case 0x34:
-
     case 0x42:
-
       return 1;
-
     case 0xe:
-
-      iVar1 = __RTDynamicCast(param_1,0,&CVOGClonedObjectBase::RTTI_Type_Descriptor,
-
-                              &CVOGVehicle::RTTI_Type_Descriptor,0);
-
-      if ((iVar1 != 0) && (*(char *)(iVar1 + 0x2ac) != '\0')) {
-
+      vehicle = __RTDynamicCast(
+          (void *)this_obj, 0, &CVOGClonedObjectBase_RTTI_Type_Descriptor,
+          &CVOGVehicle_RTTI_Type_Descriptor, 0);
+      if ((vehicle != 0) && (*(char *)(vehicle + 0x2ac) != 0)) {
         return 1;
-
       }
-
+      break;
+    default:
+      break;
     }
-
   }
-
   return 0;
-
 }

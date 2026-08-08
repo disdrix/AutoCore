@@ -1,56 +1,23 @@
 // =============================================================================
-// FUN_004cba60
-// -----------------------------------------------------------------------------
-// Stable ID: aa_004cba60
-// Address:   0x004cba60  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// FUN_004cba60  (clean twin — Ghidra symbol)
+// Named: SkillCNDHash_DestroyBucketTable_Inferred
+// Stable ID: aa_004cba60 | VA 0x004cba60–0x004cba93 | WQ9E-A 2026-08-04
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_004cba60 @ 0x004cba60
-// Stable ID: aa_004cba60
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
+#include <cstdlib>
 
-// READABILITY (auto CF):
-//  - Body size: ~11 non-empty decompiler lines.
-//  - Control keywords: if×1, return×1.
-//  - Notable callees: FUN_004cb680, FUN_004cba60, free.
-//  - Return sites: 1.
+extern void FUN_004cb680(void);
+extern void operator delete[](void *p);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __fastcall FUN_004cba60(int param_1)
-
-
-
+void __thiscall FUN_004cba60(int param_1)
 {
-
-  *(uint32_t /* width from decompiler */ *)(param_1 + 0xc) = 0;
-
+  *reinterpret_cast<uint32_t *>(param_1 + 0x0c) = 0;
   FUN_004cb680();
-
-  if (*(uint32_t /* width from decompiler */ **)(param_1 + 0x10) != (uint32_t /* width from decompiler */ *)0x0) {
-
-    free((void *)**(uint32_t /* width from decompiler */ **)(param_1 + 0x10));
-
-    operator_delete__(*(void **)(param_1 + 0x10));
-
-    *(uint32_t /* width from decompiler */ *)(param_1 + 0x10) = 0;
-
+  void **table = *reinterpret_cast<void ***>(param_1 + 0x10);
+  if (table != nullptr) {
+    std::free(*table);
+    operator delete[](table);
+    *reinterpret_cast<uint32_t *>(param_1 + 0x10) = 0;
   }
-
-  return;
-
 }

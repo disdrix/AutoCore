@@ -1,63 +1,74 @@
-# Annotated low-level: FUN_004cb4f0
+# Annotated low-level: StdTree_Predecessor_Isnil29_Inferred (FUN_004cb4f0)
 
 | Field | Value |
 |---|---|
 | Stable ID | `aa_004cb4f0` |
 | VA | `0x004cb4f0` |
-| System | unknown |
-| Date | 2026-07-23 |
+| System | std red-black tree / map iterator (isnil @ +0x29) |
+| Date | 2026-08-04 (WQ9G-B dual seal) |
+| Ghidra | `FUN_004cb4f0` |
+| Named | `StdTree_Predecessor_Isnil29_Inferred` |
 
 ## Machine-level notes
 
-- Source: raw capture for `aa_004cb4f0`.
-- Prefer assembly when decompiler conflicts.
-- Recover types for still-generic parameters via callers/xrefs.
-- Map DAT_* globals and FUN_* callees in follow-up waves.
+- **Role:** MSVC-style `_Tree::_Dec` / unchecked iterator **predecessor** for the **isnil@+0x29** node family (same header as dualed `StdTree_InsertAndRebalance_Isnil29` / insert-or-find / insert-hint).
+- **ABI:** **ECX = Node****; bare **`C3`**; mutates `*it` only. Leaf (no callees).
+- **Layout:** left@+0, parent@+4, right@+8, isnil@**+0x29**. Color/value payload not touched.
+- **Not** successor (`FUN_004cb270`), insert, or rebalance.
+- Scaffold `Named_CalleeOf_…_VOGClient_004cb4f0` is a generic callee-of alias — **reject** as product English.
 
-## Pseudocode (annotated copy of raw)
+## Control flow (three arms)
+
+1. `cur = *it`. If `cur->isnil`: `*it = cur->right` (header/end path) and return.
+2. Else if `cur->left` not isnil: set `*it` to **rightmost** of left subtree (walk right while right not isnil).
+3. Else climb parents while `cur == parent->left`; if final parent not isnil, `*it = parent`.
+
+## Pseudocode (annotated)
 
 ```c
-void __fastcall FUN_004cb4f0(int *param_1)
-
-{
-  char cVar1;
-  int iVar2;
-  int iVar3;
-  int *piVar4;
-  
-  piVar4 = (int *)*param_1;
-  if (*(char *)((int)piVar4 + 0x29) != '\0') {
-    *param_1 = piVar4[2];
-    return;
-  }
-  iVar2 = *piVar4;
-  if (*(char *)(iVar2 + 0x29) == '\0') {
-    cVar1 = *(char *)(*(int *)(iVar2 + 8) + 0x29);
-    iVar3 = *(int *)(iVar2 + 8);
-    while (cVar1 == '\0') {
-      cVar1 = *(char *)(*(int *)(iVar3 + 8) + 0x29);
-      iVar2 = iVar3;
-      iVar3 = *(int *)(iVar3 + 8);
-    }
-    *param_1 = iVar2;
-    return;
-  }
-  piVar4 = (int *)piVar4[1];
-  if (*(char *)((int)piVar4 + 0x29) == '\0') {
-    do {
-      if (*param_1 != *piVar4) break;
-      *param_1 = (int)piVar4;
-      piVar4 = (int *)piVar4[1];
-    } while (*(char *)((int)piVar4 + 0x29) == '\0');
-    if (*(char *)((int)piVar4 + 0x29) == '\0') {
-      *param_1 = (int)piVar4;
-    }
-  }
-  return;
+// ECX = Node**; bare RET; isnil @ +0x29
+void __fastcall StdTree_Predecessor_Isnil29_Inferred(Node** it /*ECX*/)
+{
+  Node* cur = *it;
+  if (cur->isnil != 0) {
+    *it = cur->right;
+    return;
+  }
+  Node* left = cur->left;
+  if (left->isnil == 0) {
+    Node* p = left;
+    while (p->right->isnil == 0) {
+      p = p->right;
+    }
+    *it = p;
+    return;
+  }
+  Node* parent = cur->parent;
+  if (parent->isnil == 0) {
+    do {
+      if (*it != parent->left) break;
+      *it = parent;
+      parent = parent->parent;
+    } while (parent->isnil == 0);
+    if (parent->isnil == 0) {
+      *it = parent;
+    }
+  }
 }
 ```
 
-## Open questions
+## Callers (static)
 
-- Confirm calling convention and full signature against callers.
-- Recover meaningful types for still-generic parameters.
+| Caller | Role |
+|---|---|
+| `FUN_004cbe20` `StdMap_InsertOrFind_IntKey_Isnil29_Inferred` | insert-or-find goLeft predecessor |
+| `FUN_004cbee0` `StdMap_InsertOrFind_PairKey_Isnil29_Inferred` | same |
+| `FUN_004cc220` `StdTree_InsertHint_Isnil29_Inferred` | prev-neighbor for hint |
+| `FUN_00406040` | insert-or-find peer (isnil@+0x21 family uses this pred? — residual) |
+| `FUN_005a3b00` | insert-or-find peer |
+
+## Open / residual
+
+- Product / MSVC demangle English.
+- Whether every caller shares identical value_type (isnil29 family vs mixed).
+- Runtime / bit-exact / differential.

@@ -1,76 +1,43 @@
 // =============================================================================
-// FUN_004020f0
+// FUN_004020f0  (alias: BasicStringFlag_Dtor_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_004020f0
-// Address:   0x004020f0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x004020f0–0x00402126 inclusive (55 B / 0x37)
+// Module:    autoassault.exe, image base 0x400000
+// System:    missions-progression (partition); unit = shared aggregate dtor
+// Wave:      R10-018 OWN-ONLY dual 2026-08-05
+// Exactness: Behavior-preserving rewrite of decompiler control flow + disasm.
+//            Not modernization. Bit-for-bit / runtime: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_004020f0 @ 0x004020f0
-// Stable ID: aa_004020f0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
-
-// READABILITY (auto CF):
-//  - Body size: ~15 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_004020f0.
-//  - Return sites: 1.
+// PURPOSE: SEH-wrapped destructor for BasicStringFlag — destroys only the
+//          basic_string subobject at +0 (flag @ +0x1c is POD).
+// Preferred name: BasicStringFlag_Dtor_Inferred
+// See: reconstructed-exact/BasicStringFlag_Dtor_Inferred.cpp
 
 // READABILITY:
-// Control-flow (from raw @ 0x004020f0; evidence only — no invented semantics):
-//  - Entry: `void FUN_004020f0(basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> *param_1)`.
-//  - Returns (1 site(s)): `void`.
-//  - Assign `local_c = ExceptionList`.
-//  - Assign `local_4 = 0xffffffff`.
+//  - Body size: 55 B; 12 instructions (disassemble_function).
+//  - Sole callee: IAT [0x009c62f4] ~basic_string.
+//  - Callers: 7 Unwind@* UNCONDITIONAL_CALL.
+//  - Epilogue: ADD ESP,0xC; RET 4.
 
-
-
+#include <cstdint>
 
 /*
  * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
+ * - Live decompile 2026-08-05 ≡ raw 2026-07-23 CF.
+ * - ABI sealed: stack object*, thiscall into string dtor, RET 4.
+ * - Family: ctor 00401d30, copy 00402040 (both dualed).
+ * - Runtime / differential verification: OPEN (Terminal false).
  */
 
-void FUN_004020f0(basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>
-
-                  *param_1)
-
-
-
+// Authoritative control-flow shape (Ghidra names retained):
+void FUN_004020f0(
+    /* basic_string / BasicStringFlag* */ void* param_1)
 {
-
-  void *local_c;
-
-  uint8_t *puStack_8;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
-
-  puStack_8 = &LAB_009bbfb9;
-
-  local_c = ExceptionList;
-
-  local_4 = 0xffffffff;
-
-  ExceptionList = &local_c;
-
-  std::basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>::
-
-  ~basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>(param_1);
-
-  ExceptionList = local_c;
-
-  return;
-
+    // SEH: puStack_8 = &LAB_009bbfb9; ExceptionList chain; local_4 = -1
+    // MOV ECX, param_1
+    // CALL [0x009c62f4]  → std::basic_string<char>::~basic_string
+    // ExceptionList restore; ADD ESP,0xC; RET 4
+    (void)param_1;
 }

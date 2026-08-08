@@ -1,88 +1,37 @@
 // =============================================================================
-// FUN_004063a0
+// FUN_004063a0 — clean twin of CNDHash_Ctor_00a2c2b0
 // -----------------------------------------------------------------------------
 // Stable ID: aa_004063a0
-// Address:   0x004063a0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x004063a0–0x0040641c  (125 B)
+// Dual A/B:  2026-08-04 WQ9H-D
+// Prefer named source: CNDHash_Ctor_00a2c2b0.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_004063a0 @ 0x004063a0
-// Stable ID: aa_004063a0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~26 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_004063a0, FUN_00406f20.
-//  - Return sites: 1.
+extern void *PTR_FUN_00a2c2b0;
+extern void CNDHash_AllocBucketTable_00a2c2e4(/* ESI */ void *hash);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-uint32_t /* width from decompiler */ * __thiscall FUN_004063a0(byte param_1,uint32_t /* width from decompiler */ *param_2)
-
-
-
+// ABI: CL=log2; stack self; ret 4; EAX=self (not standard thiscall)
+void *FUN_004063a0(std::uint8_t log2 /*CL*/, void *self /*stack*/)
 {
+  auto *p = reinterpret_cast<std::uint32_t *>(self);
 
-  void *local_c;
+  p[0] = reinterpret_cast<std::uint32_t>(&PTR_FUN_00a2c2b0);
+  p[2] = 1u << (log2 & 0x1f);
+  p[1] = 0;
+  p[3] = 0;
+  p[4] = 0;
+  p[5] = 0;
+  p[6] = 0;
+  *reinterpret_cast<std::uint8_t *>(p + 7) = log2;
+  *reinterpret_cast<std::uint8_t *>(reinterpret_cast<char *>(self) + 0x1d) = 0;
+  p[8] = 0;
+  // +0x24 not written
+  p[10] = 0;
+  p[11] = 0;
+  p[12] = 0;
 
-  uint8_t *puStack_8;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
-
-  puStack_8 = &LAB_009bdae2;
-
-  local_c = ExceptionList;
-
-  ExceptionList = &local_c;
-
-  *param_2 = &PTR_FUN_00a2c2b0;
-
-  param_2[2] = 1 << (param_1 & 0x1f);
-
-  param_2[1] = 0;
-
-  param_2[3] = 0;
-
-  param_2[4] = 0;
-
-  param_2[5] = 0;
-
-  param_2[6] = 0;
-
-  *(byte *)(param_2 + 7) = param_1;
-
-  *(uint8_t *)((int)param_2 + 0x1d) = 0;
-
-  param_2[8] = 0;
-
-  param_2[10] = 0;
-
-  param_2[0xb] = 0;
-
-  param_2[0xc] = 0;
-
-  local_4 = 2;
-
-  FUN_00406f20();
-
-  ExceptionList = local_c;
-
-  return param_2;
-
+  CNDHash_AllocBucketTable_00a2c2e4(self);
+  return self;
 }

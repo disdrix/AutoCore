@@ -1,90 +1,14 @@
 // =============================================================================
-// Named_CalleeOf_Named_CalleeOf_Skill_You_do_not_possess_the_Tink_005206d0
+// RETIRED SCAFFOLD — do not use
 // -----------------------------------------------------------------------------
 // Stable ID: aa_005206d0
-// Callee of Named_CalleeOf_Skill_You_do_not_possess_the_Tinkering_skill_to
-// Address:   0x005206d0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x005206d0
+// Retired:   2026-08-05 R12-019 OWN dual
+// Reason:    Named_CalleeOf tinkering-string plate is wrong domain. Body is a
+//            pure Reverse Engineer cost→level ceil helper (no strings; sole
+//            caller is Character_ComputeReverseEngineerRequiredLevel_Inferred).
+// Canonical: ReverseEngineer_CeilCostToLevelByTier_Inferred
+// Twin:      FUN_005206d0.cpp
 // =============================================================================
 
-// PURPOSE (auto): Called from Named_CalleeOf_Skill_You_do_not_possess_the_Tinkering_skill_to: skill/cast helper with no high-value strings in clean/raw. Role inferred from parent name only; refine when decompile strings or xrefs improve.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
-
-// READABILITY (auto CF):
-//  - Body size: ~25 non-empty decompiler lines.
-//  - Control keywords: return×6, switch×1.
-//  - Notable callees: ROUND×5, ceil×5, FUN_005206d0.
-//  - Return sites: 6.
-
-/*
- * Behavioral notes:
- * Callee of Named_CalleeOf_Skill_You_do_not_possess_the_Tinkering_skill_to
- * Xref/callee-driven rename (parent seed scan)
- *
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-/* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
-
-
-
-int Named_CalleeOf_Named_CalleeOf_Skill_You_do_not_possess_the_Tink_005206d0(uint32_t /* width from decompiler */ param_1,int param_2)
-
-
-
-{
-
-  double dVar1;
-
-  
-
-  switch(param_1) {
-
-  case 0:
-
-  case 1:
-
-    dVar1 = ceil((double)((float)param_2 * _DAT_009cdff4));
-
-    return (int)ROUND(dVar1);
-
-  case 2:
-
-    dVar1 = ceil((double)((float)param_2 * _DAT_009cefcc));
-
-    return (int)ROUND(dVar1);
-
-  case 3:
-
-    dVar1 = ceil((double)((float)param_2 * _DAT_009cefc8));
-
-    return (int)ROUND(dVar1);
-
-  case 4:
-
-    dVar1 = ceil((double)((float)param_2 * _DAT_00aaa7c4));
-
-    return (int)ROUND(dVar1);
-
-  case 5:
-
-    dVar1 = ceil((double)((float)param_2 * _DAT_009cefc4));
-
-    return (int)ROUND(dVar1);
-
-  default:
-
-    return 0;
-
-  }
-
-}
+#error "Retired scaffold Named_CalleeOf_*_005206d0 — use ReverseEngineer_CeilCostToLevelByTier_Inferred"

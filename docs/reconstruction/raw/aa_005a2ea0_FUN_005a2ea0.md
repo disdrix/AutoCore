@@ -171,3 +171,87 @@ LAB_005a30d2:
   operator_delete(param_3);
 }
 ```
+
+---
+
+## R12-030 re-verify (2026-08-05) — OWN-ONLY dual
+
+**Tools:** Ghidra `decompile_function` + `analyze_function_complete` + `get_function_callers` / `get_function_xrefs` / `get_function_callees` + `disassemble_function` + `get_assembly_context` + `read_memory`. **No** `disassemble_bytes`. No Launcher.
+
+### Live ≡ raw CF
+
+Live decompile 2026-08-05 matches raw 2026-07-23 for throw / successor prep / splice / RB. Decompiler still marks `operator_delete` as noreturn and omits size-- / `*outIt` / `ret 8` — **bytes seal** those.
+
+### Body / ABI (bytes)
+
+| Item | Value |
+|---|---|
+| Entry | `0x005a2ea0` |
+| Inclusive end | `0x005a3155` (`C2 08 00`) |
+| Exclusive end / pad | `0x005a3156` (`CC`…) |
+| Size | **694 B** / `0x2B6` |
+| ABI | `__thiscall` ECX=map; stack `outIt**`, `node*`; **`ret 8`** |
+| this | `MOV EBP, ECX` @ `005a2ec1` |
+| isnil test | `CMP byte ptr [EAX+0x21], 0` (`80 78 21 00`) |
+| String | `"invalid map/set<T> iterator"` @ `0x00a152f0` |
+| ThrowInfo | `DAT_00acc34c` |
+| SEH | `LAB_009a6342` |
+| Ghidra listed body | `005a2ea0`–`005a3126` (truncated by false noreturn on delete) |
+
+**Entry hex (80 B):**
+```
+64a1000000006aff6842639a00508b4424146489250000000083ec4880782100558be9745968f052a1008d4c240cff15f8629c008d4c2424c744245400000000ff1560669c008d442408508d4c2434c6
+```
+
+**Epilogue hex (`005a311d`–`ret 8`):**
+```
+8b44241050e8fb66eeff8b450883c40485c05f5e5b760683c0ff8945088b4c24608b44245c89088b4c244c5d64890d0000000083c454c20800
+```
+
+Decoded epilogue:
+1. `PUSH [ESP+0x10]` / `CALL operator_delete` (`0x00489822`) — free erased node
+2. `MOV EAX, [EBP+8]` — map size
+3. `ADD ESP,4` / `TEST EAX,EAX` / `POP EDI,ESI,EBX`
+4. `JBE skip` / `ADD EAX,-1` / `MOV [EBP+8],EAX` — **size--** if size>0
+5. `MOV ECX,[ESP+0x60]` / `MOV EAX,[ESP+0x5c]` / `MOV [EAX],ECX` — **`*outIt = successor`**
+6. SEH teardown / `ADD ESP,0x54` / **`RET 8`**
+
+### Callers / xrefs (2 UNCONDITIONAL_CALL)
+
+| Site | Enclosing | Context |
+|---|---|---|
+| `005a38ff` | `FUN_005a3860` | EraseRange shell: `PUSH node` / `LEA outIt` / `MOV ECX,EDI` / `CALL`; parent `RET 0xC` |
+| `005a052b` | orphan body (Ghidra no function; ~`005a04d0`–`005a053d`, DATA xref `009d7f0c`) | `PUSH` / `LEA` / `MOV ECX,EDI` / `CALL`; parent `RET 4` |
+
+### Callees
+
+| VA | Role |
+|---|---|
+| `FUN_004e12c0` | isnil21 successor / iterator++ (`__fastcall` ECX=`Node**`) |
+| `FUN_004cb2c0` | min / leftmost isnil21 |
+| `FUN_00421a60` | max / rightmost isnil21 |
+| `FUN_0050e9f0` | Lrotate isnil21 (dualed) |
+| `FUN_005a27f0` | Rrotate isnil21 (parent dual R11-007) |
+| `operator_delete` | free node only (no value dtor in this body) |
+| STL throw | `basic_string` / `exception` / `_CxxThrowException` |
+
+### Layout (sealed)
+
+| Off | Field |
+|---|---|
+| map+4 | head* |
+| map+8 | size (uint32) |
+| node+0 | left* |
+| node+4 | parent* |
+| node+8 | right* |
+| node+0x20 | color (0 red / 1 black); also `param_3[8]` as dword color lane |
+| node+0x21 | isnil |
+| node size | **0x28** (Val16 family) |
+
+### Clone family (do not merge VAs)
+
+Same CF class as dualed `00405650` (660 B), `004e3e70` (694 B isomorphic reloc clone), residual peers `0059d300` / `005a3500` / … — shared rotates `0050e9f0`/`005a27f0`.
+
+### Inferred name
+
+`StdTree_EraseAndRebalance_Isnil21_Inferred` — product demangle open → `_Inferred`. Not Runtime Confirmed.

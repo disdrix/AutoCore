@@ -1,166 +1,114 @@
 // =============================================================================
-// FUN_00938670
+// FUN_00938670  (machine twin of Client_Interact_OpenCVOGStore_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00938670
 // Address:   0x00938670  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    interaction-activation
+// Generated: 2026-08-05 MEGA-027 — keep Ghidra symbol twin in sync with named clean
+// Exactness: Behavior-preserving rewrite of decompiler control flow + ABI seal.
+// Canonical: Client_Interact_OpenCVOGStore_Inferred.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00938670 @ 0x00938670
-// Stable ID: aa_00938670
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// PURPOSE: See Client_Interact_OpenCVOGStore_Inferred.cpp
+// ABI: ESI=client live-in; stack TFID 4×u32; RET 0x10; body 0x16D bytes.
 
-// READABILITY (auto CF):
-//  - Body size: ~65 non-empty decompiler lines.
-//  - Control keywords: if×8, return×4, goto×1.
-//  - Notable callees: FUN_007fef20, FUN_00938670, Object_ResolveFromTFID, VehicleEntity_SetFlag_109, VehicleEntity_SetHandbrake, VehicleEntity_SetLongitudinalInput, __RTDynamicCast.
-//  - Return sites: 4.
+#include <cstdint>
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+struct TypeDescriptor;
 
-void FUN_00938670(uint param_1,uint param_2,uint param_3,uint param_4)
+extern "C" {
+void __thiscall VehicleEntity_SetFlag_109(void* entity, uint8_t value);
+void __thiscall VehicleEntity_SetHandbrake(void* entity, int value);
+void __thiscall VehicleEntity_SetLongitudinalInput(void* entity, int value);
+void* Object_ResolveFromTFID(void* objMgr, uint32_t* tfid);
+void* __cdecl __RTDynamicCast(void* obj, uint32_t vfDelta,
+    TypeDescriptor* src, TypeDescriptor* dst, uint32_t isRef);
+void __thiscall FUN_007fef20(void* client, int dialogIndex, int openFlag, int extra);
+}
 
+extern TypeDescriptor CVOGClonedObjectBase_RTTI; // 0x00af8e10
+extern TypeDescriptor CVOGStore_RTTI;            // 0x00afe0c8
 
-
+// Retail calling convention: ESI this + stdcall 0x10. Port as explicit client*.
+void FUN_00938670(void* client /*ESI*/,
+    uint32_t param_1, uint32_t param_2, uint32_t param_3, uint32_t param_4)
 {
+    char cVar1;
+    void* pvVar2;
+    int iVar3;
+    uint32_t* puVar4;
+    uint32_t uVar5;
+    uint32_t auStack_18[6];
 
-  char cVar1;
-
-  void *pvVar2;
-
-  int iVar3;
-
-  uint *puVar4;
-
-  int unaff_ESI;
-
-  uint32_t /* width from decompiler */ uVar5;
-
-  TypeDescriptor *pTVar6;
-
-  TypeDescriptor *pTVar7;
-
-  uint32_t /* width from decompiler */ uVar8;
-
-  uint32_t /* width from decompiler */ auStack_18 [2];
-
-  uint uStack_10;
-
-  uint uStack_c;
-
-  uint uStack_8;
-
-  uint uStack_4;
-
-  
-
-  if (*(int *)(*(int *)(unaff_ESI + 0xe98) + 0x250) != 0) {
-
-    VehicleEntity_SetFlag_109(1);
-
-    VehicleEntity_SetHandbrake(1);
-
-    VehicleEntity_SetLongitudinalInput(0);
-
-  }
-
-  uVar8 = 0;
-
-  pTVar7 = &CVOGStore::RTTI_Type_Descriptor;
-
-  pTVar6 = &CVOGClonedObjectBase::RTTI_Type_Descriptor;
-
-  uVar5 = 0;
-
-  pvVar2 = Object_ResolveFromTFID((TFID_16 *)&param_1);
-
-  iVar3 = __RTDynamicCast(pvVar2,uVar5,pTVar6,pTVar7,uVar8);
-
-  if (iVar3 == 0) {
-
-    return;
-
-  }
-
-  if (*(char *)(iVar3 + 0x4e5) == '\0') {
-
-    cVar1 = (**(code **)(**(int **)(unaff_ESI + 0x105c) + 0x3d8))();
-
-    if ((cVar1 != '\0') && (*(int *)(*(int *)(unaff_ESI + 0x105c) + 0x588) == iVar3)) {
-
-      return;
-
+    if (*reinterpret_cast<int*>(
+            *reinterpret_cast<int*>(reinterpret_cast<uint8_t*>(client) + 0xe98) + 0x250) != 0) {
+        void* entity = *reinterpret_cast<void**>(
+            *reinterpret_cast<uint8_t**>(reinterpret_cast<uint8_t*>(client) + 0xe98) + 0x250);
+        VehicleEntity_SetFlag_109(entity, 1);
+        VehicleEntity_SetHandbrake(entity, 1);
+        VehicleEntity_SetLongitudinalInput(entity, 0);
     }
 
-    if (*(char *)(iVar3 + 0x4e5) == '\0') goto LAB_00938742;
+    void* world = *reinterpret_cast<void**>(reinterpret_cast<uint8_t*>(client) + 0xe04);
+    void* objMgr = *reinterpret_cast<void**>(reinterpret_cast<uint8_t*>(world) + 0xe4e8);
+    uint32_t tfid[4] = { param_1, param_2, param_3, param_4 };
+    pvVar2 = Object_ResolveFromTFID(objMgr, tfid);
+    iVar3 = reinterpret_cast<int>(__RTDynamicCast(pvVar2, 0,
+        &CVOGClonedObjectBase_RTTI, &CVOGStore_RTTI, 0));
+    if (iVar3 == 0) {
+        return;
+    }
 
-  }
+    if (*reinterpret_cast<char*>(iVar3 + 0x4e5) == '\0') {
+        void* host = *reinterpret_cast<void**>(reinterpret_cast<uint8_t*>(client) + 0x105c);
+        auto** vtbl = *reinterpret_cast<void***>(host);
+        using Fn = char(__thiscall*)(void*);
+        cVar1 = reinterpret_cast<Fn>(vtbl[0x3d8 / 4])(host);
+        if ((cVar1 != '\0') &&
+            (*reinterpret_cast<int*>(reinterpret_cast<uint8_t*>(host) + 0x588) == iVar3)) {
+            return;
+        }
+        if (*reinterpret_cast<char*>(iVar3 + 0x4e5) == '\0') {
+            goto LAB_00938742;
+        }
+    }
 
-  cVar1 = (**(code **)(**(int **)(unaff_ESI + 0x1060) + 0x3d8))();
-
-  if ((cVar1 != '\0') && (*(int *)(*(int *)(unaff_ESI + 0x1060) + 0x5a0) == iVar3)) {
-
-    return;
-
-  }
+    {
+        void* host = *reinterpret_cast<void**>(reinterpret_cast<uint8_t*>(client) + 0x1060);
+        auto** vtbl = *reinterpret_cast<void***>(host);
+        using Fn = char(__thiscall*)(void*);
+        cVar1 = reinterpret_cast<Fn>(vtbl[0x3d8 / 4])(host);
+        if ((cVar1 != '\0') &&
+            (*reinterpret_cast<int*>(reinterpret_cast<uint8_t*>(host) + 0x5a0) == iVar3)) {
+            return;
+        }
+    }
 
 LAB_00938742:
+    auStack_18[0] = 0x2024;
+    auStack_18[2] = param_1;
+    auStack_18[3] = param_2;
+    auStack_18[4] = param_3;
+    auStack_18[5] = param_4;
+    if (*reinterpret_cast<int*>(reinterpret_cast<uint8_t*>(client) + 0xc78) != 0) {
+        void* comm = *reinterpret_cast<void**>(reinterpret_cast<uint8_t*>(client) + 0xc78);
+        auto** vtbl = *reinterpret_cast<void***>(comm);
+        using SendFn = void(__thiscall*)(void*, int, void*, int, int);
+        reinterpret_cast<SendFn>(vtbl[0x18 / 4])(comm, -1, auStack_18, 0x18, 0);
+    }
 
-  auStack_18[0] = 0x2024;
-
-  uStack_10 = param_1;
-
-  uStack_c = param_2;
-
-  uStack_8 = param_3;
-
-  uStack_4 = param_4;
-
-  if (*(int *)(unaff_ESI + 0xc78) != 0) {
-
-    (**(code **)(**(int **)(unaff_ESI + 0xc78) + 0x18))(0xffffffff,auStack_18,0x18,0);
-
-  }
-
-  if (*(char *)(iVar3 + 0x4e5) == '\0') {
-
-    puVar4 = (uint *)(*(int *)(unaff_ESI + 0x105c) + 0x528);
-
-    uVar5 = 0xb;
-
-  }
-
-  else {
-
-    puVar4 = (uint *)(*(int *)(unaff_ESI + 0x1060) + 0x548);
-
-    uVar5 = 0xc;
-
-  }
-
-  *puVar4 = param_1;
-
-  puVar4[1] = param_2;
-
-  puVar4[2] = param_3;
-
-  puVar4[3] = param_4;
-
-  FUN_007fef20(uVar5,1,0);
-
-  return;
-
+    if (*reinterpret_cast<char*>(iVar3 + 0x4e5) == '\0') {
+        puVar4 = reinterpret_cast<uint32_t*>(
+            *reinterpret_cast<int*>(reinterpret_cast<uint8_t*>(client) + 0x105c) + 0x528);
+        uVar5 = 0xb;
+    } else {
+        puVar4 = reinterpret_cast<uint32_t*>(
+            *reinterpret_cast<int*>(reinterpret_cast<uint8_t*>(client) + 0x1060) + 0x548);
+        uVar5 = 0xc;
+    }
+    puVar4[0] = param_1;
+    puVar4[1] = param_2;
+    puVar4[2] = param_3;
+    puVar4[3] = param_4;
+    FUN_007fef20(client, static_cast<int>(uVar5), 1, 0);
 }

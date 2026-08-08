@@ -1,88 +1,34 @@
 // =============================================================================
-// FUN_005a4870
+// FUN_005a4870 — scaffold twin of StdTree_Buynode_Isnil21_Node0x24_Inferred
 // -----------------------------------------------------------------------------
 // Stable ID: aa_005a4870
-// Address:   0x005a4870  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x005a4870–0x005a48f5 inclusive (134 B / 0x86)
+// System:    MSVC std::_Tree node buy — isnil@+0x21 / node 0x24
+// Generated: 2026-08-05 R13-008 dual seal (scaffold 2026-07-23)
+// Exactness: Behavior-preserving rewrite of decompiler CF + sealed bytes.
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
+//
+// Canonical named plate:
+//   docs/reconstruction/reconstructed-exact/StdTree_Buynode_Isnil21_Node0x24_Inferred.cpp
+// Dual: reviews/A|B_aa_005a4870_StdTree_Buynode_Isnil21_Node0x24_Inferred.md
 
-// PURPOSE (auto): Scaffold unit for FUN_005a4870 @ 0x005a4870
-// Stable ID: aa_005a4870
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~26 non-empty decompiler lines.
-//  - Control keywords: if×1, return×1.
-//  - Notable callees: FUN_005a42d0, FUN_005a4870.
-//  - Return sites: 1.
+// Forward to named reconstruction (same ABI / body).
+extern "C" void* __stdcall StdTree_Buynode_Isnil21_Node0x24_Inferred(
+    void* left,
+    void* parent,
+    void* right,
+    const void* value,
+    std::uint8_t color);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-uint32_t /* width from decompiler */ *
-
-FUN_005a4870(uint32_t /* width from decompiler */ param_1,uint32_t /* width from decompiler */ param_2,uint32_t /* width from decompiler */ param_3,uint32_t /* width from decompiler */ *param_4,
-
-            uint8_t param_5)
-
-
-
+extern "C" void* __stdcall FUN_005a4870(
+    void* left,
+    void* parent,
+    void* right,
+    const void* value,
+    std::uint8_t color)
 {
-
-  uint32_t /* width from decompiler */ *puVar1;
-
-  void *local_10;
-
-  uint8_t *puStack_c;
-
-  uint32_t /* width from decompiler */ local_8;
-
-  
-
-  local_8 = 0xffffffff;
-
-  puStack_c = &LAB_009a6321;
-
-  local_10 = ExceptionList;
-
-  ExceptionList = &local_10;
-
-  puVar1 = operator_new(0x24);
-
-  local_8 = 1;
-
-  if (puVar1 != (uint32_t /* width from decompiler */ *)0x0) {
-
-    *puVar1 = param_1;
-
-    puVar1[1] = param_2;
-
-    puVar1[2] = param_3;
-
-    puVar1[3] = *param_4;
-
-    FUN_005a42d0(param_4 + 1);
-
-    *(uint8_t *)(puVar1 + 8) = param_5;
-
-    *(uint8_t *)((int)puVar1 + 0x21) = 0;
-
-  }
-
-  ExceptionList = local_10;
-
-  return puVar1;
-
+  return StdTree_Buynode_Isnil21_Node0x24_Inferred(left, parent, right, value, color);
 }

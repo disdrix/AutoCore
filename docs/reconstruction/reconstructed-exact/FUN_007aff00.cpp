@@ -1,70 +1,30 @@
 // =============================================================================
-// FUN_007aff00
+// FUN_007aff00  (twin of CNDUIWindow_ReleaseTextLayoutAndNested_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_007aff00
 // Address:   0x007aff00  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Body:      0x007aff00–0x007aff51 inclusive (82 B / 0x52)
+// Wave:      WQ9L-G OWN-ONLY dual 2026-08-05
+// Canonical: CNDUIWindow_ReleaseTextLayoutAndNested_Inferred
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_007aff00 @ 0x007aff00
-// Stable ID: aa_007aff00
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~17 non-empty decompiler lines.
-//  - Control keywords: if×2, return×2.
-//  - Notable callees: FUN_00424060, FUN_00797d70, FUN_007aff00.
-//  - Return sites: 2.
+extern "C" void __stdcall UiTextLayout_CompleteDtor_Inferred(void* layout);
+extern "C" void __cdecl operator_delete(void* p);
+extern "C" void __fastcall FUN_00424060(void* nested);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __fastcall FUN_007aff00(int param_1)
-
-
-
+extern "C" void __fastcall FUN_007aff00(uint8_t* self /*ECX*/)
 {
-
-  void *pvVar1;
-
-  
-
-  if (*(int *)(param_1 + 0x20c) != 0) {
-
-    pvVar1 = *(void **)(param_1 + 0x28c);
-
-    if (pvVar1 != (void *)0x0) {
-
-      FUN_00797d70(pvVar1);
-
-                    /* WARNING: Subroutine does not return */
-
-      operator_delete(pvVar1);
-
+  if (*reinterpret_cast<int32_t*>(self + 0x20C) != 0) {
+    void* layout = *reinterpret_cast<void**>(self + 0x28C);
+    if (layout != nullptr) {
+      UiTextLayout_CompleteDtor_Inferred(layout);
+      operator_delete(layout);
     }
-
-    *(uint32_t /* width from decompiler */ *)(param_1 + 0x28c) = 0;
-
+    *reinterpret_cast<void**>(self + 0x28C) = nullptr;
   }
-
-  FUN_00424060();
-
-  *(uint32_t /* width from decompiler */ *)(param_1 + 0x128) = 0;
-
-  *(uint32_t /* width from decompiler */ *)(param_1 + 300) = 0;
-
-  return;
-
+  FUN_00424060(self + 0x1E8);
+  *reinterpret_cast<uint32_t*>(self + 0x128) = 0;
+  *reinterpret_cast<uint32_t*>(self + 0x12C) = 0;
 }

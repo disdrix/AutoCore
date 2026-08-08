@@ -1,92 +1,48 @@
 // =============================================================================
-// FUN_004192f0
+// FUN_004192f0  →  StdTree_Rrotate_Isnil29_Inferred
 // -----------------------------------------------------------------------------
 // Stable ID: aa_004192f0
 // Address:   0x004192f0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    MSVC std::_Tree right-rotate (isnil@+0x29)
+// Generated: 2026-08-04 WQ9D-D dual (supersedes 2026-07-23 scaffold)
+// Exactness: Behavior-preserving rewrite of decompiler control flow.
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
+// Prefer named clean: StdTree_Rrotate_Isnil29_Inferred.cpp
 
-// PURPOSE (auto): Scaffold unit for FUN_004192f0 @ 0x004192f0
-// Stable ID: aa_004192f0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~28 non-empty decompiler lines.
-//  - Control keywords: if×3, return×3.
-//  - Notable callees: FUN_004192f0.
-//  - Return sites: 3.
+// Node: left@0 parent@4 right@8 isnil@+0x29
+// Tree: this+4 header; root = *(header+4)
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __thiscall FUN_004192f0(int param_1,int *param_2)
-
-
-
+// __thiscall: ECX = tree*, stack = node* x; void; RET 4
+void __thiscall StdTree_Rrotate_Isnil29_Inferred(std::int32_t tree, std::int32_t* x)
 {
-
-  int iVar1;
-
-  int *piVar2;
-
-  
-
-  iVar1 = *param_2;
-
-  *param_2 = *(int *)(iVar1 + 8);
-
-  if (*(char *)(*(int *)(iVar1 + 8) + 0x29) == '\0') {
-
-    *(int **)(*(int *)(iVar1 + 8) + 4) = param_2;
-
+  std::int32_t y = *x;
+  *x = *reinterpret_cast<std::int32_t*>(y + 8);
+  if (*reinterpret_cast<char*>(*reinterpret_cast<std::int32_t*>(y + 8) + 0x29) == '\0') {
+    *reinterpret_cast<std::int32_t**>(*reinterpret_cast<std::int32_t*>(y + 8) + 4) = x;
   }
-
-  *(int *)(iVar1 + 4) = param_2[1];
-
-  if (param_2 == *(int **)(*(int *)(param_1 + 4) + 4)) {
-
-    *(int *)(*(int *)(param_1 + 4) + 4) = iVar1;
-
-    *(int **)(iVar1 + 8) = param_2;
-
-    param_2[1] = iVar1;
-
+  *reinterpret_cast<std::int32_t*>(y + 4) = x[1];
+  if (x == *reinterpret_cast<std::int32_t**>(*reinterpret_cast<std::int32_t*>(tree + 4) + 4)) {
+    *reinterpret_cast<std::int32_t*>(*reinterpret_cast<std::int32_t*>(tree + 4) + 4) = y;
+    *reinterpret_cast<std::int32_t**>(y + 8) = x;
+    x[1] = y;
     return;
-
   }
-
-  piVar2 = (int *)param_2[1];
-
-  if (param_2 == (int *)piVar2[2]) {
-
-    piVar2[2] = iVar1;
-
-    *(int **)(iVar1 + 8) = param_2;
-
-    param_2[1] = iVar1;
-
+  std::int32_t* parent = reinterpret_cast<std::int32_t*>(x[1]);
+  if (x == reinterpret_cast<std::int32_t*>(parent[2])) {
+    parent[2] = y;
+    *reinterpret_cast<std::int32_t**>(y + 8) = x;
+    x[1] = y;
     return;
-
   }
+  *parent = y;
+  *reinterpret_cast<std::int32_t**>(y + 8) = x;
+  x[1] = y;
+}
 
-  *piVar2 = iVar1;
-
-  *(int **)(iVar1 + 8) = param_2;
-
-  param_2[1] = iVar1;
-
-  return;
-
+void __thiscall FUN_004192f0(std::int32_t param_1, std::int32_t* param_2)
+{
+  StdTree_Rrotate_Isnil29_Inferred(param_1, param_2);
 }

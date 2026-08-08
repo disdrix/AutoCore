@@ -1,43 +1,38 @@
 // =============================================================================
-// FUN_0086b9b0
+// FUN_0086b9b0  /  UI_ArenaTournamentSchedule_CreateChildWidgets_Inferred
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0086b9b0
 // Address:   0x0086b9b0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    inventory-transfer (UI arena tournament-schedule chrome builder)
+// Dual:      R13-009 2026-08-05 — accept-with-gaps
+// Exactness: Scaffold twin. Prefer named clean:
+//   reconstructed-exact/UI_ArenaTournamentSchedule_CreateChildWidgets_Inferred.cpp
+// Canonical: UI_ArenaTournamentSchedule_CreateChildWidgets_Inferred (_Inferred)
+// Supersedes plate alias: UI_arena_tournament_schedule_mini_label
+// ABI: __thiscall ECX=host*; plain RET; body 0x0086b9b0-0x0086cc81 (0x12D2)
+// Bit-for-bit vs retail EXE: DEFERRED (no Launcher / Runtime Confirmed).
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0086b9b0 @ 0x0086b9b0
-// Stable ID: aa_0086b9b0
-// Embedded strings (evidence for future rename):
-//   - "i_d_arena/i_d_arena_tournament_schedule_tab_advanced.xml"
-//   - "i_d_arena/i_d_arena_tournament_schedule_btn_close.xml"
-//   - "i_d_arena/i_d_arena_tournament_schedule_mini_wnd_bg_texture.xml"
-//   - "i_d_arena/i_d_arena_tournament_schedule_mini_wnd_label_status.xml"
-//   - "i_d_arena/i_d_arena_tournament_schedule_mini_btn_cancel.xml"
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// PURPOSE: Virtual create-child-widgets for Arena Tournament Schedule dialog.
+// Embedded plate family: i_d_arena/i_d_arena_tournament_schedule_*.xml
+// Dualed helpers: FUN_00822cb0 (tab select), FUN_00756c90 (move-to-front).
+// See annotated + named clean for sealed slot/tab tables.
 
-// READABILITY (auto CF):
+// READABILITY (auto CF retained below from 2026-07-23 scaffold):
 //  - Body size: ~576 non-empty decompiler lines.
-//  - Control keywords: if×50, return×1.
-//  - Notable callees: FUN_007b5dd0×33, FUN_0079c860×7, FUN_00822cb0×3, FUN_008230b0×3, FUN_00756c90×2, FUN_0078b6e0×2, FUN_0078f890, FUN_00792600.
-//  - Strings: "i_d_arena/i_d_arena_tournament_schedule_tab_advanced.xml"; "i_d_arena/i_d_arena_tournament_schedule_btn_close.xml"; "i_d_arena/i_d_arena_tournament_schedule_mini_btn_cancel.xml".
-//  - Return sites: 1.
+//  - Notable callees: FUN_007b5dd0×many, FUN_0079c860, FUN_00822cb0×3,
+//    FUN_008230b0×3, FUN_00756c90×2, FUN_0078b6e0×2, FUN_0078f890, FUN_00792600.
+//  - Return sites: 1 (plain RET after SEH restore).
 
 /*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
+ * Behavioral notes (R13-009):
+ * - __thiscall ECX = host; virtual via DATA 0x00a5ed20 (vtbl +0x43C).
+ * - Not inventory wire; not mini-label-only.
+ * - Runtime / differential verification: OPEN.
  */
 
-void __fastcall FUN_0086b9b0(int *param_1)
+
+void /*__thiscall ECX*/ FUN_0086b9b0(int *param_1)
 
 
 

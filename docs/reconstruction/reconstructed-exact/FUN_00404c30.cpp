@@ -1,50 +1,23 @@
 // =============================================================================
-// FUN_00404c30
+// FUN_00404c30  (machine twin of Object_Store16At90_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00404c30
 // Address:   0x00404c30  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    skills-abilities (partition); generic object field store
+// Dual:      2026-08-05 R10-022 OWN-ONLY
+// Exactness: Behavior-preserving rewrite of decompiler control flow.
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00404c30 @ 0x00404c30
-// Stable ID: aa_00404c30
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~8 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_00404c30.
-//  - Return sites: 1.
-
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __thiscall FUN_00404c30(int param_1,uint32_t /* width from decompiler */ *param_2)
-
-
-
+// Prefer Object_Store16At90_Inferred.cpp for the named clean unit.
+void __thiscall FUN_00404c30(void *thisObj, const std::uint32_t *src16)
 {
-
-  *(uint32_t /* width from decompiler */ *)(param_1 + 0x90) = *param_2;
-
-  *(uint32_t /* width from decompiler */ *)(param_1 + 0x94) = param_2[1];
-
-  *(uint32_t /* width from decompiler */ *)(param_1 + 0x98) = param_2[2];
-
-  *(uint32_t /* width from decompiler */ *)(param_1 + 0x9c) = param_2[3];
-
-  return;
-
+  auto *dst = reinterpret_cast<std::uint32_t *>(
+      reinterpret_cast<char *>(thisObj) + 0x90);
+  dst[0] = src16[0];
+  dst[1] = src16[1];
+  dst[2] = src16[2];
+  dst[3] = src16[3];
 }

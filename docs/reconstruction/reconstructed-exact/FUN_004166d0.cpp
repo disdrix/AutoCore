@@ -1,52 +1,29 @@
 // =============================================================================
-// FUN_004166d0
+// FUN_004166d0 — twin / Ghidra alias of CVOGMenu_ScalarDeletingDtor
 // -----------------------------------------------------------------------------
 // Stable ID: aa_004166d0
-// Address:   0x004166d0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x004166d0–0x004166ed inclusive (30 B / 0x1E)
+//            autoassault.exe, image base 0x400000
+// Wave:      MEGA-138 OWN-ONLY dual 2026-08-05
+// Canonical: CVOGMenu_ScalarDeletingDtor (see named plate)
+// Exactness: Behavior-preserving rewrite of decompiler CF + full-body bytes.
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_004166d0 @ 0x004166d0
-// Stable ID: aa_004166d0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~9 non-empty decompiler lines.
-//  - Control keywords: return×2, if×1.
-//  - Notable callees: FUN_004166d0, FUN_0082d540.
-//  - Return sites: 2.
+extern "C" void __fastcall FUN_0082d540(void* self); // CVOGMenu_CompleteDtor
+extern "C" void __cdecl operator_delete(void* p);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void * __thiscall FUN_004166d0(void *param_1,byte param_2)
-
-
-
+// ECX = this; stack flags; RET 4; returns this*.
+// MSVC scalar-deleting destructor (vtbl[0] of PTR_FUN_00a72f6c / CVOGMenu).
+extern "C" void* __thiscall FUN_004166d0(void* self, uint8_t flags)
 {
+  FUN_0082d540(self);
 
-  FUN_0082d540();
-
-  if ((param_2 & 1) != 0) {
-
-                    /* WARNING: Subroutine does not return */
-
-    operator_delete(param_1);
-
+  if ((flags & 1u) != 0u) {
+    operator_delete(self);
   }
 
-  return param_1;
-
+  return self;
 }

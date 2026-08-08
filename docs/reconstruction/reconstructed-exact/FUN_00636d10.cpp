@@ -1,52 +1,33 @@
 // =============================================================================
-// FUN_00636d10
+// FUN_00636d10  — twin of CVOGHBMoveVehicle_ScalarDeletingDtor
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00636d10
-// Address:   0x00636d10  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00636d10–0x00636d2d inclusive (30 B / 0x1E)
+//            autoassault.exe, image base 0x400000
+// System:    input-drive-control
+// Generated: 2026-07-23 scaffold; R11-024 dual refresh 2026-08-05
+// Exactness: Behavior-preserving rewrite of decompiler + machine CF.
+// Bit-for-bit vs retail EXE: DEFERRED.
+// Dual A/B: accept (R11-024) — see CVOGHBMoveVehicle_ScalarDeletingDtor.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00636d10 @ 0x00636d10
-// Stable ID: aa_00636d10
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~9 non-empty decompiler lines.
-//  - Control keywords: return×2, if×1.
-//  - Notable callees: FUN_00636b90, FUN_00636d10.
-//  - Return sites: 2.
+extern "C" void __fastcall FUN_00636b90(void *self);
+extern "C" void __cdecl operator_delete(void *p);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+// Canonical: CVOGHBMoveVehicle_ScalarDeletingDtor
+// MSVC scalar-deleting dtor — vtbl[0] of PTR_FUN_009e3b70.
+// thiscall ECX=this; stack flags; RET 4; EAX=this.
+// Complete body FUN_00636b90; free if (flags & 1).
 
-void * __thiscall FUN_00636d10(void *param_1,byte param_2)
-
-
-
+extern "C" void *__thiscall FUN_00636d10(void *param_1 /* ECX */, uint8_t param_2)
 {
+  FUN_00636b90(param_1);
 
-  FUN_00636b90();
-
-  if ((param_2 & 1) != 0) {
-
-                    /* WARNING: Subroutine does not return */
-
+  if ((param_2 & 1u) != 0u) {
     operator_delete(param_1);
-
   }
 
   return param_1;
-
 }

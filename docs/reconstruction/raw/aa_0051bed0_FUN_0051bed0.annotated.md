@@ -1,35 +1,57 @@
-# Annotated low-level: FUN_0051bed0
+# Annotated low-level: Map_FreeSubtree_Isnil15_B (FUN_0051bed0)
 
 | Field | Value |
 |---|---|
 | Stable ID | `aa_0051bed0` |
-| VA | `0x0051bed0` |
-| System | unknown |
-| Date | 2026-07-23 |
+| VA | `0x0051bed0`–`0x0051bf05` exclusive (**53 B**) |
+| Canonical | `Map_FreeSubtree_Isnil15_B` |
+| System | STL / map-set (WQ-009 skill residual; Map_EraseRange_Isnil15_B free helper) |
+| Date | 2026-08-04 WQ9G-D OWN dual |
 
 ## Machine-level notes
 
-- Source: raw capture for `aa_0051bed0`.
-- Prefer assembly when decompiler conflicts.
-- Recover types for still-generic parameters via callers/xrefs.
-- Map DAT_* globals and FUN_* callees in follow-up waves.
+- Source: raw capture + live re-verify for `aa_0051bed0`.
+- **Bytes authority:** decompiler omits left-child walk; reconstruct from `read_memory`.
+- isnil@**+0x15**; left@**+0**; right@**+8**.
+- ABI: stack node*; **ret 4**; ECX preserved/threaded unused (`mov ebx,ecx`).
+- Sole external caller: dualed `Map_EraseRange_Isnil15_B` full-clear path (`head->parent` = root).
+- Twin CF (different VA): dualed `Map_FreeSubtree_Isnil15` @ `0x0051be50` (caller `Map_EraseRange_Isnil15`).
 
-## Pseudocode (annotated copy of raw)
+## Pseudocode (byte-corrected)
 
 ```c
-void FUN_0051bed0(void *param_1)
-
-{
-  if (*(char *)((int)param_1 + 0x15) == '\0') {
-    FUN_0051bed0(*(undefined4 *)((int)param_1 + 8));
-                    /* WARNING: Subroutine does not return */
-    operator_delete(param_1);
-  }
-  return;
+// Ghidra plate (misleading left-walk omission):
+//   if (!isnil) { free(right); operator_delete(self); }
+
+// Byte-correct MSVC free-subtree (isnil@+0x15):
+void Map_FreeSubtree_Isnil15_B(void *node)
+{
+  if (*(char *)((int)node + 0x15) != 0)
+    return;
+
+  for (;;) {
+    Map_FreeSubtree_Isnil15_B(*(void **)((char *)node + 8)); // right
+    {
+      void *left = *(void **)node;                   // left @ +0
+      operator_delete(node);
+      node = left;
+    }
+    if (*(char *)((int)node + 0x15) != 0)
+      break;
+  }
 }
 ```
 
+## Call graph
+
+| Direction | Target | Notes |
+|---|---|---|
+| Caller | `Map_EraseRange_Isnil15_B` `0x0051d940` | full clear only @ `0x0051d95c` |
+| Caller | self | right-child recurse @ `0x0051bee7` |
+| Callee | `operator_delete` | after left snapshot |
+
 ## Open questions
 
-- Confirm calling convention and full signature against callers.
-- Recover meaningful types for still-generic parameters.
+- Exact map instantiation / value dtor (delete-only; no inlined value dtor observed).
+- Why separate clone vs dualed `Map_FreeSubtree_Isnil15` (`0x0051be50`) — compilation unit / map type.
+- Runtime / bit-exact open.

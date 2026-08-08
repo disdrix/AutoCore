@@ -1,84 +1,17 @@
 // =============================================================================
-// FUN_00416830
-// -----------------------------------------------------------------------------
-// Stable ID: aa_00416830
-// Address:   0x00416830  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// FUN_00416830 — twin of Class_00a733ec_Factory_WithFreeCallback_Inferred
+// Stable ID: aa_00416830  VA: 0x00416830  WQ9K-H 2026-08-05
+// Prefer the named clean source for port notes.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00416830 @ 0x00416830
-// Stable ID: aa_00416830
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// See: Class_00a733ec_Factory_WithFreeCallback_Inferred.cpp
 
-// READABILITY (auto CF):
-//  - Body size: ~24 non-empty decompiler lines.
-//  - Control keywords: if×1, return×1.
-//  - Notable callees: FUN_00416830.
-//  - Return sites: 1.
+struct Class_00a733ec;
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+extern "C" Class_00a733ec *Class_00a733ec_Factory_WithFreeCallback_Inferred(
+    void *context);
 
-uint32_t /* width from decompiler */ * FUN_00416830(uint32_t /* width from decompiler */ param_1)
-
-
-
+extern "C" Class_00a733ec *FUN_00416830(void *context)
 {
-
-  uint32_t /* width from decompiler */ *puVar1;
-
-  void *local_c;
-
-  uint8_t *puStack_8;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
-
-  local_4 = 0xffffffff;
-
-  puStack_8 = &LAB_009ab4eb;
-
-  local_c = ExceptionList;
-
-  ExceptionList = &local_c;
-
-  puVar1 = operator_new(0x14);
-
-  if (puVar1 == (uint32_t /* width from decompiler */ *)0x0) {
-
-    puVar1 = (uint32_t /* width from decompiler */ *)0x0;
-
-  }
-
-  else {
-
-    *puVar1 = &PTR_FUN_00a733ec;
-
-    puVar1[1] = param_1;
-
-    puVar1[3] = 0;
-
-    puVar1[2] = 0;
-
-    puVar1[4] = &LAB_00573240;
-
-  }
-
-  ExceptionList = local_c;
-
-  return puVar1;
-
+  return Class_00a733ec_Factory_WithFreeCallback_Inferred(context);
 }

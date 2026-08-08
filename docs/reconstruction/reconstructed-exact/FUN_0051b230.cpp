@@ -1,62 +1,46 @@
-// =============================================================================
-// FUN_0051b230
+﻿// =============================================================================
+// FUN_0051b230  (clean twin of Object_CreateFromEmbeddedCbid_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0051b230
-// Address:   0x0051b230  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x0051b230–0x0051b298 exclusive
+// Dual:      2026-08-04 WQ9R-H — see Object_CreateFromEmbeddedCbid_Inferred.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0051b230 @ 0x0051b230
-// Stable ID: aa_0051b230
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~13 non-empty decompiler lines.
-//  - Control keywords: if×1, return×1.
-//  - Notable callees: CVOGReaction_GiveItemByCbid, FUN_00516720, FUN_0051b230.
-//  - Return sites: 1.
+using VInit = int(__thiscall *)(void *self, int cbid, void *host, int one);
+using VArg  = void(__thiscall *)(void *self, std::uint32_t arg);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+extern "C" void *CVOGReaction_GiveItemByCbid(int cbid, int trailing_zero);
+extern "C" void __thiscall FUN_00516720(void *obj, char *name_or_null);
 
-int * __fastcall FUN_0051b230(int param_1)
-
-
-
+extern "C" void *__thiscall FUN_0051b230(void *self)
 {
+  void *desc = *reinterpret_cast<void **>(reinterpret_cast<std::uint8_t *>(self) + 0xA8);
+  int cbid = *reinterpret_cast<int *>(reinterpret_cast<std::uint8_t *>(desc) + 0x34);
 
-  int *piVar1;
-
-  
-
-  piVar1 = (int *)CVOGReaction_GiveItemByCbid(*(int *)(*(int *)(param_1 + 0xa8) + 0x34));
-
-  if (piVar1 != (int *)0x0) {
-
-    (**(code **)(*piVar1 + 8))
-
-              (*(uint32_t /* width from decompiler */ *)(*(int *)(param_1 + 0xa8) + 0x34),*(uint32_t /* width from decompiler */ *)(param_1 + 0xa4),1);
-
-    (**(code **)(*piVar1 + 0xb8))(*(uint32_t /* width from decompiler */ *)(param_1 + 0xb8));
-
-    FUN_00516720(*(uint32_t /* width from decompiler */ *)(param_1 + 0x158));
-
-    piVar1[0x31] = *(int *)(param_1 + 0xc4);
-
+  void *obj = CVOGReaction_GiveItemByCbid(cbid, 0);
+  if (obj == nullptr) {
+    return nullptr;
   }
 
-  return piVar1;
+  auto *vtbl = *reinterpret_cast<std::uint8_t **>(obj);
 
+  auto init = *reinterpret_cast<VInit *>(vtbl + 8);
+  void *host = *reinterpret_cast<void **>(reinterpret_cast<std::uint8_t *>(self) + 0xA4);
+  init(obj, cbid, host, 1);
+
+  auto set_b8 = *reinterpret_cast<VArg *>(vtbl + 0xB8);
+  std::uint32_t arg_b8 =
+      *reinterpret_cast<std::uint32_t *>(reinterpret_cast<std::uint8_t *>(self) + 0xB8);
+  set_b8(obj, arg_b8);
+
+  char *name =
+      *reinterpret_cast<char **>(reinterpret_cast<std::uint8_t *>(self) + 0x158);
+  FUN_00516720(obj, name);
+
+  *reinterpret_cast<std::uint32_t *>(reinterpret_cast<std::uint8_t *>(obj) + 0xC4) =
+      *reinterpret_cast<std::uint32_t *>(reinterpret_cast<std::uint8_t *>(self) + 0xC4);
+
+  return obj;
 }

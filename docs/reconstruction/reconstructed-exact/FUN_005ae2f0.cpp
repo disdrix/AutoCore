@@ -1,278 +1,37 @@
 // =============================================================================
-// FUN_005ae2f0
+// FUN_005ae2f0  (scaffold twin of StdTree_InsertAndRebalance_Val20_Isnil21_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_005ae2f0
-// Address:   0x005ae2f0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x005ae2f0–0x005ae4da inclusive (491 B / 0x1EB)
+// System:    skills-abilities / STL map-set helpers
+// Dual A/B:  2026-08-05 R12-034 OWN-ONLY
+// Prefer:    StdTree_InsertAndRebalance_Val20_Isnil21_Inferred.cpp
+// Exactness: Behavior-preserving rewrite of decompiler control flow.
+// Bit-for-bit / runtime / diff: OPEN
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_005ae2f0 @ 0x005ae2f0
-// Stable ID: aa_005ae2f0
-// Embedded strings (evidence for future rename):
-//   - "map/set<T> too long"
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// PURPOSE: Always-insert + RB rebalance for Val20 / isnil@+0x21 (node 0x24).
+// Embedded strings: "map/set<T> too long"
+// Callees: FUN_005ae1c0, FUN_0050e9f0, FUN_005a27f0×2, _CxxThrowException
+// Caller:  FUN_005aec50 only
+// ABI:     __thiscall; RET 0x10; size gate 0xCCCCCCB
 
-// READABILITY (auto CF):
-//  - Body size: ~120 non-empty decompiler lines.
-//  - Control keywords: if×14, return×2, do×1, goto×1, while×1.
-//  - Notable callees: FUN_005a27f0×2, FUN_0050e9f0, FUN_005ae1c0, FUN_005ae2f0, _CxxThrowException, exception::exception.
-//  - Strings: "map/set<T> too long".
-//  - Return sites: 2.
+#include <cstdint>
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+// Forward to named clean implementation.
+extern "C" void __thiscall StdTree_InsertAndRebalance_Val20_Isnil21_Inferred(
+    void* map,
+    void** out,
+    char addLeft,
+    void* where,
+    const void* value);
 
-void __thiscall
-
-FUN_005ae2f0(int param_1,uint32_t /* width from decompiler */ *param_2,char param_3,uint32_t /* width from decompiler */ *param_4,uint32_t /* width from decompiler */ param_5)
-
-
-
+extern "C" void __thiscall FUN_005ae2f0(
+    void* map,
+    void** out,
+    char addLeft,
+    void* where,
+    const void* value)
 {
-
-  char cVar1;
-
-  int *piVar2;
-
-  int iVar3;
-
-  int *piVar4;
-
-  int *piVar5;
-
-  int *piVar6;
-
-  int *piVar7;
-
-  basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> local_50 [28];
-
-  undefined **local_34 [3];
-
-  basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> local_28 [28];
-
-  void *local_c;
-
-  uint8_t *puStack_8;
-
-  int local_4;
-
-  
-
-  local_4 = 0xffffffff;
-
-  puStack_8 = &LAB_009a65a2;
-
-  local_c = ExceptionList;
-
-  if (0xcccccca < *(uint *)(param_1 + 8)) {
-
-    ExceptionList = &local_c;
-
-    std::basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>::
-
-    basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>
-
-              (local_50,"map/set<T> too long");
-
-    local_4 = 0;
-
-    exception::exception((exception *)local_34);
-
-    local_4._0_1_ = 1;
-
-    local_34[0] = &PTR_FUN_009c7628;
-
-    std::basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>::
-
-    basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>(local_28,local_50);
-
-    local_4 = (uint)local_4._1_3_ << 8;
-
-    local_34[0] = &PTR_FUN_009c7634;
-
-                    /* WARNING: Subroutine does not return */
-
-    _CxxThrowException(local_34,(ThrowInfo *)&DAT_00acc388);
-
-  }
-
-  ExceptionList = &local_c;
-
-  piVar4 = (int *)FUN_005ae1c0(*(uint32_t /* width from decompiler */ *)(param_1 + 4),param_4,*(uint32_t /* width from decompiler */ *)(param_1 + 4),
-
-                               param_5,0);
-
-  *(int *)(param_1 + 8) = *(int *)(param_1 + 8) + 1;
-
-  if (param_4 == *(uint32_t /* width from decompiler */ **)(param_1 + 4)) {
-
-    (*(uint32_t /* width from decompiler */ **)(param_1 + 4))[1] = piVar4;
-
-    **(uint32_t /* width from decompiler */ **)(param_1 + 4) = piVar4;
-
-    *(int **)(*(int *)(param_1 + 4) + 8) = piVar4;
-
-  }
-
-  else if (param_3 == '\0') {
-
-    param_4[2] = piVar4;
-
-    if (param_4 == *(uint32_t /* width from decompiler */ **)(*(int *)(param_1 + 4) + 8)) {
-
-      *(int **)(*(int *)(param_1 + 4) + 8) = piVar4;
-
-    }
-
-  }
-
-  else {
-
-    *param_4 = piVar4;
-
-    if (param_4 == (uint32_t /* width from decompiler */ *)**(int **)(param_1 + 4)) {
-
-      **(int **)(param_1 + 4) = (int)piVar4;
-
-    }
-
-  }
-
-  cVar1 = *(char *)(piVar4[1] + 0x20);
-
-  piVar7 = piVar4;
-
-  do {
-
-    if (cVar1 != '\0') {
-
-      *(uint8_t *)(*(int *)(*(int *)(param_1 + 4) + 4) + 0x20) = 1;
-
-      *param_2 = piVar4;
-
-      ExceptionList = local_c;
-
-      return;
-
-    }
-
-    piVar5 = piVar7 + 1;
-
-    piVar2 = (int *)*piVar5;
-
-    piVar6 = *(int **)piVar2[1];
-
-    if (piVar2 == piVar6) {
-
-      piVar6 = (int *)((uint32_t /* width from decompiler */ *)piVar2[1])[2];
-
-      if ((char)piVar6[8] == '\0') {
-
-LAB_005ae3f6:
-
-        *(uint8_t *)(*piVar5 + 0x20) = 1;
-
-        *(uint8_t *)(piVar6 + 8) = 1;
-
-        *(uint8_t *)(*(int *)(*piVar5 + 4) + 0x20) = 0;
-
-        piVar7 = *(int **)(*piVar5 + 4);
-
-      }
-
-      else {
-
-        if (piVar7 == (int *)piVar2[2]) {
-
-          FUN_0050e9f0(piVar2);
-
-          piVar7 = piVar2;
-
-        }
-
-        *(uint8_t *)(piVar7[1] + 0x20) = 1;
-
-        *(uint8_t *)(*(int *)(piVar7[1] + 4) + 0x20) = 0;
-
-        FUN_005a27f0(*(uint32_t /* width from decompiler */ *)(piVar7[1] + 4));
-
-      }
-
-    }
-
-    else {
-
-      if ((char)piVar6[8] == '\0') goto LAB_005ae3f6;
-
-      if (piVar7 == (int *)*piVar2) {
-
-        FUN_005a27f0(piVar2);
-
-        piVar7 = piVar2;
-
-      }
-
-      *(uint8_t *)(piVar7[1] + 0x20) = 1;
-
-      *(uint8_t *)(*(int *)(piVar7[1] + 4) + 0x20) = 0;
-
-      iVar3 = *(int *)(piVar7[1] + 4);
-
-      piVar2 = *(int **)(iVar3 + 8);
-
-      *(int *)(iVar3 + 8) = *piVar2;
-
-      if (*(char *)(*piVar2 + 0x21) == '\0') {
-
-        *(int *)(*piVar2 + 4) = iVar3;
-
-      }
-
-      piVar2[1] = *(int *)(iVar3 + 4);
-
-      if (iVar3 == *(int *)(*(int *)(param_1 + 4) + 4)) {
-
-        *(int **)(*(int *)(param_1 + 4) + 4) = piVar2;
-
-      }
-
-      else {
-
-        piVar6 = *(int **)(iVar3 + 4);
-
-        if (iVar3 == *piVar6) {
-
-          *piVar6 = (int)piVar2;
-
-        }
-
-        else {
-
-          piVar6[2] = (int)piVar2;
-
-        }
-
-      }
-
-      *piVar2 = iVar3;
-
-      *(int **)(iVar3 + 4) = piVar2;
-
-    }
-
-    cVar1 = *(char *)(piVar7[1] + 0x20);
-
-  } while( true );
-
+  StdTree_InsertAndRebalance_Val20_Isnil21_Inferred(map, out, addLeft, where, value);
 }

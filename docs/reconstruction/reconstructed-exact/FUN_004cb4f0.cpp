@@ -1,108 +1,20 @@
 // =============================================================================
-// FUN_004cb4f0
+// FUN_004cb4f0  (scaffold twin of StdTree_Predecessor_Isnil29_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_004cb4f0
 // Address:   0x004cb4f0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Body:      0x004cb4f0 – 0x004cb540 exclusive (80 B / 0x50)
+// System:    std red-black tree / map iterator (isnil @ +0x29)
+// Generated: 2026-08-04 WQ9G-B dual seal
+// Exactness: Behavior-preserving; named clean is primary.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_004cb4f0 @ 0x004cb4f0
-// Stable ID: aa_004cb4f0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~36 non-empty decompiler lines.
-//  - Control keywords: if×5, return×3, while×2, do×1.
-//  - Notable callees: FUN_004cb4f0.
-//  - Return sites: 3.
+// Prefer: StdTree_Predecessor_Isnil29_Inferred.cpp
+extern "C" void __fastcall StdTree_Predecessor_Isnil29_Inferred(void** it /*ECX*/);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __fastcall FUN_004cb4f0(int *param_1)
-
-
-
+extern "C" void __fastcall FUN_004cb4f0(void** param_1 /*ECX*/)
 {
-
-  char cVar1;
-
-  int iVar2;
-
-  int iVar3;
-
-  int *piVar4;
-
-  
-
-  piVar4 = (int *)*param_1;
-
-  if (*(char *)((int)piVar4 + 0x29) != '\0') {
-
-    *param_1 = piVar4[2];
-
-    return;
-
-  }
-
-  iVar2 = *piVar4;
-
-  if (*(char *)(iVar2 + 0x29) == '\0') {
-
-    cVar1 = *(char *)(*(int *)(iVar2 + 8) + 0x29);
-
-    iVar3 = *(int *)(iVar2 + 8);
-
-    while (cVar1 == '\0') {
-
-      cVar1 = *(char *)(*(int *)(iVar3 + 8) + 0x29);
-
-      iVar2 = iVar3;
-
-      iVar3 = *(int *)(iVar3 + 8);
-
-    }
-
-    *param_1 = iVar2;
-
-    return;
-
-  }
-
-  piVar4 = (int *)piVar4[1];
-
-  if (*(char *)((int)piVar4 + 0x29) == '\0') {
-
-    do {
-
-      if (*param_1 != *piVar4) break;
-
-      *param_1 = (int)piVar4;
-
-      piVar4 = (int *)piVar4[1];
-
-    } while (*(char *)((int)piVar4 + 0x29) == '\0');
-
-    if (*(char *)((int)piVar4 + 0x29) == '\0') {
-
-      *param_1 = (int)piVar4;
-
-    }
-
-  }
-
-  return;
-
+    StdTree_Predecessor_Isnil29_Inferred(param_1);
 }

@@ -1,65 +1,32 @@
 // =============================================================================
-// FUN_004cbdc0
+// FUN_004cbdc0  (clean twin → SkillCNDHash_Recreate_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_004cbdc0
-// Address:   0x004cbdc0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x004cbdc0–0x004cbe14  (autoassault.exe @ 0x400000; 85 B)
+// System:    skills-abilities
+// Dual A/B:  2026-08-04 WQ9D-A
+// Named clean: SkillCNDHash_Recreate_Inferred.cpp
+// Exactness: Behavior-preserving Ghidra-symbol twin of named clean.
+// Bit-for-bit / runtime / diff: OPEN
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_004cbdc0 @ 0x004cbdc0
-// Stable ID: aa_004cbdc0
-// Embedded strings (evidence for future rename):
-//   - "HashError:Recreate, already locked for traversal"
-//   - "VOG_DEBUG_STOP"
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~14 non-empty decompiler lines.
-//  - Control keywords: if×1, for×1, return×1.
-//  - Notable callees: FUN_007a4480×2, FUN_004cb410, FUN_004cba60, FUN_004cbdc0.
-//  - Strings: "HashError:Recreate, already locked for traversal"; "VOG_DEBUG_STOP".
-//  - Return sites: 1.
+extern void FUN_004cba60(void);
+extern void FUN_004cb410(void);
+extern void FUN_007a4480(int level, const char *msg);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __thiscall FUN_004cbdc0(int param_1,byte param_2)
-
-
-
+void __thiscall FUN_004cbdc0(int param_1, uint8_t param_2)
 {
-
-  if (*(char *)(param_1 + 0x1d) != '\0') {
-
-    FUN_007a4480(0,"HashError:Recreate, already locked for traversal");
-
-    FUN_007a4480(0,"VOG_DEBUG_STOP");
-
+  if (*reinterpret_cast<char *>(param_1 + 0x1d) != '\0') {
+    FUN_007a4480(0, "HashError:Recreate, already locked for traversal");
+    FUN_007a4480(0, "VOG_DEBUG_STOP");
   }
-
   FUN_004cba60();
-
-  *(byte *)(param_1 + 0x1c) = param_2;
-
-  *(uint32_t /* width from decompiler */ *)(param_1 + 0x18) = 0;
-
-  *(int *)(param_1 + 8) = 1 << (param_2 & 0x1f);
-
-  *(uint32_t /* width from decompiler */ *)(param_1 + 0x14) = 0;
-
+  *reinterpret_cast<uint8_t *>(param_1 + 0x1c) = param_2;
+  *reinterpret_cast<uint32_t *>(param_1 + 0x18) = 0;
+  *reinterpret_cast<int *>(param_1 + 8) = 1 << (param_2 & 0x1f);
+  *reinterpret_cast<uint32_t *>(param_1 + 0x14) = 0;
   FUN_004cb410();
-
   return;
-
 }

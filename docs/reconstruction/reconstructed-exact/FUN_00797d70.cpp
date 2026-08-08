@@ -1,94 +1,14 @@
 // =============================================================================
-// FUN_00797d70
-// -----------------------------------------------------------------------------
-// Stable ID: aa_00797d70
-// Address:   0x00797d70  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// FUN_00797d70 — Ghidra twin of UiTextLayout_CompleteDtor_Inferred (aa_00797d70)
+// Wave: WQ9L-F OWN-ONLY dual 2026-08-05
+// Canonical: reconstructed-exact/UiTextLayout_CompleteDtor_Inferred.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00797d70 @ 0x00797d70
-// Stable ID: aa_00797d70
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~29 non-empty decompiler lines.
-//  - Control keywords: return×2, if×1.
-//  - Notable callees: FUN_004271c0, FUN_00797530, FUN_00797d70.
-//  - Return sites: 2.
+extern "C" void __stdcall UiTextLayout_CompleteDtor_Inferred(uint8_t* obj);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void FUN_00797d70(int param_1)
-
-
-
+extern "C" void __stdcall FUN_00797d70(uint8_t* obj)
 {
-
-  void *local_c;
-
-  uint8_t *puStack_8;
-
-  uint local_4;
-
-  
-
-  puStack_8 = &LAB_009add5a;
-
-  local_c = ExceptionList;
-
-  local_4 = 2;
-
-  ExceptionList = &local_c;
-
-  *(float *)(param_1 + 0xa4) = *(float *)(param_1 + 0xa4) + *(float *)(param_1 + 0xa8);
-
-  *(uint32_t /* width from decompiler */ *)(param_1 + 0xa8) = 0;
-
-  FUN_00797530(1);
-
-  if (*(void **)(param_1 + 0x94) != (void *)0x0) {
-
-                    /* WARNING: Subroutine does not return */
-
-    operator_delete(*(void **)(param_1 + 0x94));
-
-  }
-
-  *(uint32_t /* width from decompiler */ *)(param_1 + 0x94) = 0;
-
-  *(uint32_t /* width from decompiler */ *)(param_1 + 0x98) = 0;
-
-  *(uint32_t /* width from decompiler */ *)(param_1 + 0x9c) = 0;
-
-  local_4 = local_4 & 0xffffff00;
-
-  FUN_004271c0();
-
-  local_4 = 0xffffffff;
-
-  std::basic_string<wchar_t,struct_std::char_traits<wchar_t>,class_std::allocator<wchar_t>_>::
-
-  ~basic_string<wchar_t,struct_std::char_traits<wchar_t>,class_std::allocator<wchar_t>_>
-
-            ((basic_string<wchar_t,struct_std::char_traits<wchar_t>,class_std::allocator<wchar_t>_>
-
-              *)(param_1 + 0xc));
-
-  ExceptionList = local_c;
-
-  return;
-
+  UiTextLayout_CompleteDtor_Inferred(obj);
 }

@@ -1,77 +1,41 @@
-// =============================================================================
-// FUN_00409a30
-// -----------------------------------------------------------------------------
-// Stable ID: aa_00409a30
-// Address:   0x00409a30  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+﻿// =============================================================================
+// FUN_00409a30 — scaffold twin of GfxParam_LookupAndWrite_Inferred
+// See: GfxParam_LookupAndWrite_Inferred.cpp (authoritative named clean)
+// Dual: WQ9J-J 2026-08-05
+//
+// Image ABI: EAX=host, EDX=name, stack=data*, RET 4.
+// Below mirrors decompiler CF with host threaded as explicit first arg for readability.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00409a30 @ 0x00409a30
-// Stable ID: aa_00409a30
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~16 non-empty decompiler lines.
-//  - Control keywords: if×1, return×1.
-//  - Notable callees: FUN_00409a30.
-//  - Return sites: 1.
-
-// READABILITY:
-// Control-flow (from raw @ 0x00409a30; evidence only — no invented semantics):
-//  - Entry: `void __fastcall FUN_00409a30(undefined4 param_1,undefined4 param_2,undefined4 param_3)`.
-//  - Branches: if (*(*(in_EAX + 4) + 0xc) == 0).
-//  - Returns (1 site(s)): `void`.
-
-
-
-
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __fastcall FUN_00409a30(uint32_t /* width from decompiler */ param_1,uint32_t /* width from decompiler */ param_2,uint32_t /* width from decompiler */ param_3)
-
-
-
+// Readable stand-in: host is EAX on the real image entry.
+void GfxParam_LookupAndWrite_Body(void *host,
+                                  const char *name,
+                                  void *data)
 {
-
-  int *piVar1;
-
-  int in_EAX;
-
-  uint32_t /* width from decompiler */ uVar2;
-
-  
-
-  if (*(int *)(*(int *)(in_EAX + 4) + 0xc) == 0) {
-
-    uVar2 = 0;
-
+  void *mid = *reinterpret_cast<void **>(reinterpret_cast<char *>(host) + 4);
+  void **service = *reinterpret_cast<void ***>(reinterpret_cast<char *>(mid) + 0xc);
+  std::uint32_t handle = 0;
+  if (service != nullptr) {
+    void **vtbl = *service;
+    using LookupFn = std::uint32_t(__stdcall *)(void *, int, const char *);
+    handle = reinterpret_cast<LookupFn>(vtbl[0x24 / 4])(service, 0, name);
   }
+  mid = *reinterpret_cast<void **>(reinterpret_cast<char *>(host) + 4);
+  service = *reinterpret_cast<void ***>(reinterpret_cast<char *>(mid) + 0xc);
+  void **vtbl2 = *service;
+  using WriteFn = void(__stdcall *)(void *, std::uint32_t, void *, std::uint32_t);
+  reinterpret_cast<WriteFn>(vtbl2[0x50 / 4])(service, handle, data, 0xFFFFFFFFu);
+}
 
-  else {
-
-    piVar1 = *(int **)(*(int *)(in_EAX + 4) + 0xc);
-
-    uVar2 = (**(code **)(*piVar1 + 0x24))(piVar1,0,param_2);
-
-  }
-
-  piVar1 = *(int **)(*(int *)(in_EAX + 4) + 0xc);
-
-  (**(code **)(*piVar1 + 0x50))(piVar1,uVar2,param_3,0xffffffff);
-
-  return;
-
+// Ghidra symbol surface — param_2=EDX name, param_3=stack data; host arrives in EAX.
+extern "C" void __fastcall FUN_00409a30(std::uint32_t /*param_1 unused*/,
+                                        std::uint32_t param_2,
+                                        std::uint32_t param_3)
+{
+  // Cannot recover EAX host in portable C from this signature alone.
+  // Callers: MOV EAX,[DAT_00d1f05c]; MOV EDX,name; PUSH data; CALL FUN_00409a30.
+  (void)param_2;
+  (void)param_3;
 }

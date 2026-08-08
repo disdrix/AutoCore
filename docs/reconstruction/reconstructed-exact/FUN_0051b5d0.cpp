@@ -1,58 +1,34 @@
 // =============================================================================
-// FUN_0051b5d0
+// FUN_0051b5d0  (scaffold alias → StdTree_Min_Isnil29)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0051b5d0
 // Address:   0x0051b5d0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Body:      0x0051b5d0 – 0x0051b5ea inclusive (27 B)
+// System:    MSVC std::_Tree min / leftmost (isnil @ +0x29)
+// Generated: 2026-08-04 WQ9D-B dual seal (supersedes 2026-07-23 scaffold paste)
+// Exactness: Behavior-preserving; prefer named clean StdTree_Min_Isnil29.cpp
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0051b5d0 @ 0x0051b5d0
-// Stable ID: aa_0051b5d0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// See: docs/reconstruction/reconstructed-exact/StdTree_Min_Isnil29.cpp
 
-// READABILITY (auto CF):
-//  - Body size: ~11 non-empty decompiler lines.
-//  - Control keywords: while×1, return×1.
-//  - Notable callees: FUN_0051b5d0.
-//  - Return sites: 1.
+#include <cstdint>
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void FUN_0051b5d0(int *param_1)
-
-
-
+// Ghidra decompile showed void + walk-into-nil; bytes return EAX = leftmost.
+extern "C" int *FUN_0051b5d0(int *param_1)
 {
-
   char cVar1;
+  int *left;
 
-  
-
-  param_1 = (int *)*param_1;
-
-  cVar1 = *(char *)((int)param_1 + 0x29);
-
-  while (cVar1 == '\0') {
-
-    param_1 = (int *)*param_1;
-
-    cVar1 = *(char *)((int)param_1 + 0x29);
-
+  left = (int *)*param_1;
+  cVar1 = *(char *)((int)left + 0x29);
+  if (cVar1 != '\0') {
+    return param_1;
   }
-
-  return;
-
+  do {
+    param_1 = left;
+    left = (int *)*param_1;
+    cVar1 = *(char *)((int)left + 0x29);
+  } while (cVar1 == '\0');
+  return param_1;
 }

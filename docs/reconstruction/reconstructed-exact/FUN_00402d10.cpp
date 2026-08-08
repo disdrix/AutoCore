@@ -1,58 +1,38 @@
 // =============================================================================
-// FUN_00402d10
+// FUN_00402d10  (scaffold twin of StdList_PushBack_Dword_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00402d10
-// Address:   0x00402d10  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Address:   0x00402d10–0x00402d41  (autoassault.exe, image base 0x400000)
+// System:    shared MSVC std::list helper
+// Generated: 2026-07-23 scaffold; sealed twin 2026-08-05 MEGA-126
 // Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Prefer:    StdList_PushBack_Dword_Inferred.cpp
+// Dual:      accept-with-gaps (A+B 2026-08-05)
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00402d10 @ 0x00402d10
-// Stable ID: aa_00402d10
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~11 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_00402d10, FUN_00404840, FUN_00418700.
-//  - Return sites: 1.
+extern "C" void* __stdcall FUN_00418700(void* next, void* prev, const std::uint32_t* pValue);
+extern "C" void __thiscall FUN_00404840(void* list, std::uint32_t count);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+// READABILITY (sealed CF):
+//  - Body size: 50 B (0x00402d10–0x00402d41); RET 4
+//  - Control keywords: return×1
+//  - Callees: FUN_00418700 (BuyNode 0xC), FUN_00404840 (_Incsize)
+//  - Role: std::list push_back of dword payload via pValue*
 
-void __thiscall FUN_00402d10(int param_1,uint32_t /* width from decompiler */ param_2)
-
-
-
+void __thiscall FUN_00402d10(int param_1 /*list ECX*/, std::uint32_t param_2 /*pValue* stack*/)
 {
-
   int iVar1;
-
   int iVar2;
 
-  
-
-  iVar1 = *(int *)(param_1 + 4);
-
-  iVar2 = FUN_00418700(iVar1,*(uint32_t /* width from decompiler */ *)(iVar1 + 4),param_2);
-
-  FUN_00404840(1);
-
-  *(int *)(iVar1 + 4) = iVar2;
-
-  **(int **)(iVar2 + 4) = iVar2;
-
+  iVar1 = *(int*)(param_1 + 4);
+  iVar2 = (int)(std::uintptr_t)FUN_00418700(
+      reinterpret_cast<void*>(static_cast<std::uintptr_t>(iVar1)),
+      *reinterpret_cast<void**>(static_cast<std::uintptr_t>(iVar1) + 4),
+      reinterpret_cast<const std::uint32_t*>(static_cast<std::uintptr_t>(param_2)));
+  FUN_00404840(reinterpret_cast<void*>(static_cast<std::uintptr_t>(param_1)), 1);
+  *(int*)(iVar1 + 4) = iVar2;
+  **(int**)(iVar2 + 4) = iVar2;
   return;
-
 }

@@ -1,74 +1,39 @@
 // =============================================================================
-// FUN_005eb040
+// FUN_005eb040  (twin of PodCopyBlock_0x40_Thiscall_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_005eb040
 // Address:   0x005eb040  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Range:     0x005eb040–0x005eb0a6 inclusive (103 B / 0x67); pad CC after
+// System:    interaction-activation
+// Generated: 2026-08-05 R12-036 dual seal (from live Ghidra re-verify)
+// Exactness: Behavior-preserving rewrite of decompiler/assembly control flow.
+// Bit-for-bit vs retail EXE: DEFERRED.
+// Runtime Confirmed: OPEN (no Launcher this wave).
+// Preferred name: PodCopyBlock_0x40_Thiscall_Inferred
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_005eb040 @ 0x005eb040
-// Stable ID: aa_005eb040
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~20 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_005eb040.
-//  - Return sites: 1.
-
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __thiscall FUN_005eb040(uint32_t /* width from decompiler */ *param_1,uint32_t /* width from decompiler */ *param_2)
-
-
-
+// Leaf thiscall POD copy: 16 dwords / 0x40 bytes.
+// ECX = dest, stack = src, RET 4, EAX = dest.
+uint32_t * __thiscall FUN_005eb040(uint32_t *dest /* ECX */,
+                                   const uint32_t *src /* stack */)
 {
-
-  *param_1 = *param_2;
-
-  param_1[1] = param_2[1];
-
-  param_1[2] = param_2[2];
-
-  param_1[3] = param_2[3];
-
-  param_1[4] = param_2[4];
-
-  param_1[5] = param_2[5];
-
-  param_1[6] = param_2[6];
-
-  param_1[7] = param_2[7];
-
-  param_1[8] = param_2[8];
-
-  param_1[9] = param_2[9];
-
-  param_1[10] = param_2[10];
-
-  param_1[0xb] = param_2[0xb];
-
-  param_1[0xc] = param_2[0xc];
-
-  param_1[0xd] = param_2[0xd];
-
-  param_1[0xe] = param_2[0xe];
-
-  param_1[0xf] = param_2[0xf];
-
-  return;
-
+  dest[0]  = src[0];
+  dest[1]  = src[1];
+  dest[2]  = src[2];
+  dest[3]  = src[3];
+  dest[4]  = src[4];
+  dest[5]  = src[5];
+  dest[6]  = src[6];
+  dest[7]  = src[7];
+  dest[8]  = src[8];
+  dest[9]  = src[9];
+  dest[10] = src[10];
+  dest[11] = src[11];
+  dest[12] = src[12];
+  dest[13] = src[13];
+  dest[14] = src[14];
+  dest[15] = src[15];
+  return dest;
 }

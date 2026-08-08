@@ -1,52 +1,43 @@
 // =============================================================================
-// FUN_005738d0
+// FUN_005738d0  (scaffold twin)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_005738d0
 // Address:   0x005738d0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    inventory-transfer
+// Generated: 2026-07-23 scaffold; refined R11-004 2026-08-05
+// Exactness: Behavior-preserving rewrite. Prefer named clean:
+//   StdTree_Tidy_FreeHead_Bare_Val12_InventoryGrid_Inferred.cpp
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_005738d0 @ 0x005738d0
-// Stable ID: aa_005738d0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~8 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_00573700, FUN_005738d0.
-//  - Return sites: 1.
+struct StdTreeNode_Val12;
+struct StdTreeShell_Val12 {
+  void* unused0;
+  StdTreeNode_Val12* head;
+  std::uint32_t size;
+};
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+extern "C" void __thiscall StdTree_EraseRange_Val12_InventoryGrid_Inferred(
+    StdTreeShell_Val12* map,
+    StdTreeNode_Val12** outIt,
+    StdTreeNode_Val12* first,
+    StdTreeNode_Val12* last);
+extern "C" void __cdecl operator_delete(void* p);
 
-void __fastcall FUN_005738d0(int param_1)
-
-
-
+// Retail: FUN_005738d0 — bare Val12 tidy free-head (InventoryGrid erase leaf).
+// Decompiler false-noreturn after operator_delete; bytes null head+size then RET.
+extern "C" void __fastcall FUN_005738d0(StdTreeShell_Val12* map /*ECX*/)
 {
-
-  int local_4;
-
-  
-
-  local_4 = param_1;
-
-  FUN_00573700(&local_4,**(uint32_t /* width from decompiler */ **)(param_1 + 4),*(uint32_t /* width from decompiler */ **)(param_1 + 4));
-
-                    /* WARNING: Subroutine does not return */
-
-  operator_delete(*(void **)(param_1 + 4));
-
+  void* out;
+  StdTreeNode_Val12* head = map->head;
+  StdTree_EraseRange_Val12_InventoryGrid_Inferred(
+      map,
+      reinterpret_cast<StdTreeNode_Val12**>(&out),
+      head->left,
+      head);
+  operator_delete(head);
+  map->head = nullptr;
+  map->size = 0;
 }

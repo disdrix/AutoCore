@@ -1,88 +1,36 @@
 // =============================================================================
-// FUN_0051dd60
+// FUN_0051dd60  (clean twin → SkillCNDHash_Ctor_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0051dd60
-// Address:   0x0051dd60  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x0051dd60–0x0051ddd2  (autoassault.exe @ 0x400000; 115 B)
+// System:    skills-abilities
+// Dual A/B:  2026-08-04 WQ9D-A
+// Named clean: SkillCNDHash_Ctor_Inferred.cpp
+// Exactness: Behavior-preserving Ghidra-symbol twin of named clean.
+// Bit-for-bit / runtime / diff: OPEN
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0051dd60 @ 0x0051dd60
-// Stable ID: aa_0051dd60
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~26 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_004cb410, FUN_0051dd60.
-//  - Return sites: 1.
+extern void FUN_004cb410(void);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-uint32_t /* width from decompiler */ * __thiscall FUN_0051dd60(uint32_t /* width from decompiler */ *param_1,byte param_2)
-
-
-
+uint32_t *__thiscall FUN_0051dd60(uint32_t *param_1, uint8_t param_2)
 {
-
-  void *local_c;
-
-  uint8_t *puStack_8;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
-
-  puStack_8 = &LAB_009a371b;
-
-  local_c = ExceptionList;
-
-  ExceptionList = &local_c;
-
-  *param_1 = &PTR_FUN_009ce1b8;
-
+  // SEH LAB_009a371b omitted in twin CF
+  *param_1 = 0x009ce1b8u; // PTR_FUN_009ce1b8
   param_1[1] = 0;
-
   param_1[3] = 0;
-
-  param_1[2] = 1 << (param_2 & 0x1f);
-
+  param_1[2] = 1u << (param_2 & 0x1f);
   param_1[4] = 0;
-
   param_1[5] = 0;
-
   param_1[6] = 0;
-
-  *(byte *)(param_1 + 7) = param_2;
-
-  *(uint8_t *)((int)param_1 + 0x1d) = 0;
-
+  *reinterpret_cast<uint8_t *>(param_1 + 7) = param_2;
+  *reinterpret_cast<uint8_t *>(reinterpret_cast<char *>(param_1) + 0x1d) = 0;
   param_1[8] = 0;
-
+  // +0x24 not written
   param_1[10] = 0;
-
-  param_1[0xb] = 0;
-
-  param_1[0xc] = 0;
-
-  local_4 = 0;
-
+  param_1[11] = 0;
+  param_1[12] = 0;
   FUN_004cb410();
-
-  ExceptionList = local_c;
-
   return param_1;
-
 }

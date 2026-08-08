@@ -1,50 +1,16 @@
 // =============================================================================
-// FUN_00416590
+// FUN_00416590  (scaffold twin of PtrVecShell0x14_DefaultCtor_ZeroSkip4_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00416590
-// Address:   0x00416590  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00416590 – 0x004165CF exclusive (63 B / 0x3F)
+// Wave:      WQ9I-J 2026-08-05 (replaces 2026-07-23 blank scaffold)
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00416590 @ 0x00416590
-// Stable ID: aa_00416590
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~8 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_00416590.
-//  - Return sites: 1.
+extern "C" void __thiscall PtrVecShell0x14_DefaultCtor_ZeroSkip4_Inferred(uint32_t* self);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __fastcall FUN_00416590(uint32_t /* width from decompiler */ *param_1)
-
-
-
+extern "C" void __thiscall FUN_00416590(uint32_t* self)
 {
-
-  *param_1 = 0;
-
-  param_1[2] = 0;
-
-  param_1[3] = 0;
-
-  param_1[4] = 0;
-
-  return;
-
+  PtrVecShell0x14_DefaultCtor_ZeroSkip4_Inferred(self);
 }

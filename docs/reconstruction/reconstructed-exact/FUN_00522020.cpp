@@ -1,68 +1,32 @@
-// =============================================================================
-// FUN_00522020
+﻿// =============================================================================
+// FUN_00522020  (machine twin of Character_SelectInventoryGridByMode_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00522020
 // Address:   0x00522020  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    inventory-transfer
+// Generated: 2026-08-05 MEGA-045 dual seal
+// Exactness: Behavior-preserving rewrite of decompiler control flow.
+// Bit-for-bit vs retail EXE: DEFERRED
+// Canonical named: Character_SelectInventoryGridByMode_Inferred
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00522020 @ 0x00522020
-// Stable ID: aa_00522020
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~17 non-empty decompiler lines.
-//  - Control keywords: if×4, return×4.
-//  - Notable callees: FUN_00522020.
-//  - Return sites: 4.
-
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-uint32_t /* width from decompiler */ __thiscall FUN_00522020(int param_1,int param_2)
-
-
-
+// __thiscall: ECX = this (Character*); stack mode; RET 4; EAX = InventoryGrid* or 0
+uint32_t __thiscall FUN_00522020(int param_1 /* Character* this */, int param_2 /* mode */)
 {
-
   if (param_2 == 1) {
-
-    if (*(int *)(param_1 + 0x250) != 0) {
-
-      return *(uint32_t /* width from decompiler */ *)(*(int *)(param_1 + 0x250) + 0x2b0);
-
+    if (*reinterpret_cast<int*>(param_1 + 0x250) != 0) {
+      return *reinterpret_cast<uint32_t*>(
+          *reinterpret_cast<int*>(param_1 + 0x250) + 0x2B0);
     }
-
-  }
-
-  else {
-
+  } else {
     if (param_2 == 3) {
-
-      return *(uint32_t /* width from decompiler */ *)(param_1 + 0xcbc);
-
+      return *reinterpret_cast<uint32_t*>(param_1 + 0xCBC);
     }
-
     if (param_2 == 5) {
-
-      return *(uint32_t /* width from decompiler */ *)(param_1 + 0xce0);
-
+      return *reinterpret_cast<uint32_t*>(param_1 + 0xCE0);
     }
-
   }
-
   return 0;
-
 }

@@ -1,54 +1,14 @@
 // =============================================================================
-// Named_CalleeOf_Named_CalleeOf_CVOGSpawnPoint_CreateCreature_005eb790
+// RETIRED SCAFFOLD — do not use as identity
 // -----------------------------------------------------------------------------
 // Stable ID: aa_005eb790
-// Callee of Named_CalleeOf_CVOGSpawnPoint_CreateCreature (+1 other named callers)
-// Address:   0x005eb790  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x005eb790
+// Retired:   2026-08-05 R12-037 dual seal
+// Reason:    Spawn-point chain name is wrong. Body is a pure physics query-collect
+//            derived ctor (base FUN_005eb210 + vtbl 009dce20 + collect triad +0xC0).
+//            No spawn/creature strings or CreateCreature control flow in this VA.
+// Canonical: VOGPhysics_QueryCollect_Ctor_Inferred
+// Twin:      VOGPhysics_QueryCollect_Ctor_Inferred.cpp / FUN_005eb790.cpp
 // =============================================================================
 
-// PURPOSE (auto): Called from Named_CalleeOf_CVOGSpawnPoint_CreateCreature: spawn/transfer helper with no high-value strings in clean/raw. Role inferred from parent name only; refine when decompile strings or xrefs improve. Named_CalleeOf_CVOGSpawnPoint_CreateCreature (+1 other named callers).
-// Readability: control flow preserved from Ghidra decompile; types tentative.
-
-// READABILITY (auto CF):
-//  - Body size: ~9 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_005eb210, FUN_005eb790.
-//  - Return sites: 1.
-
-/*
- * Behavioral notes:
- * Callee of Named_CalleeOf_CVOGSpawnPoint_CreateCreature (+1 other named callers)
- * Xref/callee-driven rename (parent seed scan)
- *
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-uint32_t /* width from decompiler */ * __thiscall Named_CalleeOf_Named_CalleeOf_CVOGSpawnPoint_CreateCreature_005eb790(uint32_t /* width from decompiler */ *param_1,uint32_t /* width from decompiler */ param_2)
-
-
-
-{
-
-  FUN_005eb210(param_2);
-
-  *param_1 = &PTR_FUN_009dce20;
-
-  param_1[0x30] = 0;
-
-  param_1[0x31] = 0;
-
-  param_1[0x32] = 0x80000000;
-
-  return param_1;
-
-}
+// See: docs/reconstruction/reconstructed-exact/VOGPhysics_QueryCollect_Ctor_Inferred.cpp

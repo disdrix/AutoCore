@@ -1,147 +1,72 @@
-# Annotated low-level: FUN_004cbb60
+# Annotated low-level: FUN_004cbb60 → StdTree_InsertAndRebalance_Isnil29_Inferred
 
 | Field | Value |
 |---|---|
 | Stable ID | `aa_004cbb60` |
 | VA | `0x004cbb60` |
-| System | unknown |
-| Date | 2026-07-23 |
+| Canonical name | `StdTree_InsertAndRebalance_Isnil29_Inferred` |
+| System | MSVC `std::_Tree` always-insert + RB rebalance (isnil@+0x29) |
+| Date | 2026-08-04 (WQ9E-E); scaffold 2026-07-23 |
+| Tools | decompile + read_memory + analyze_function_complete + xrefs (**no** disassemble_bytes) |
+
+---
 
 ## Machine-level notes
 
-- Source: raw capture for `aa_004cbb60`.
-- Prefer assembly when decompiler conflicts.
-- Recover types for still-generic parameters via callers/xrefs.
-- Map DAT_* globals and FUN_* callees in follow-up waves.
+- **Body:** `0x004cbb60`–`0x004cbd4b` exclusive (**491 B**); **RET 0x10**.
+- **ABI:** `__thiscall` ECX=map; stack `Node** outIt`, `char addLeft`, `Node* where`, `Val24* value`.
+- **Max size:** `size > 0xAAAAAA8` → `"map/set<T> too long"` / `DAT_00acc388`.
+- **Buynode:** `FUN_005a2de0` — `operator_new(0x30)`; left/parent/right; **6 dwords** value @ +0x10; color@+0x28; isnil=0 @+0x29.
+- **Link:** empty tree sets root=leftmost=rightmost; else left (`addLeft!=0`) or right (`addLeft==0`) of `where`; update extremities.
+- **RB:** while parent red — uncle recolor or rotate; one grand Lrotate path **inlined** (isnil tests @+0x29); calls `FUN_004192a0` / `FUN_004192f0` for the other rotates.
+- **Exit:** root color black; `*outIt = newNode`.
+- **Reject:** aggro/GetTargetFromAggro scaffold chain as product role — shared container helper.
 
-## Pseudocode (annotated copy of raw)
+---
 
-```c
-void __thiscall
-FUN_004cbb60(int param_1,undefined4 *param_2,char param_3,undefined4 *param_4,undefined4 param_5)
-
-{
-  char cVar1;
-  int *piVar2;
-  int iVar3;
-  int *piVar4;
-  int *piVar5;
-  int *piVar6;
-  int *piVar7;
-  basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> local_50 [28];
-  undefined **local_34 [3];
-  basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> local_28 [28];
-  void *local_c;
-  undefined1 *puStack_8;
-  int local_4;
-  
-  local_4 = 0xffffffff;
-  puStack_8 = &LAB_009a1e42;
-  local_c = ExceptionList;
-  if (0xaaaaaa8 < *(uint *)(param_1 + 8)) {
-    ExceptionList = &local_c;
-    std::basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>::
-    basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>
-              (local_50,"map/set<T> too long");
-    local_4 = 0;
-    exception::exception((exception *)local_34);
-    local_4._0_1_ = 1;
-    local_34[0] = &PTR_FUN_009c7628;
-    std::basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>::
-    basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>(local_28,local_50);
-    local_4 = (uint)local_4._1_3_ << 8;
-    local_34[0] = &PTR_FUN_009c7634;
-                    /* WARNING: Subroutine does not return */
-    _CxxThrowException(local_34,(ThrowInfo *)&DAT_00acc388);
-  }
-  ExceptionList = &local_c;
-  piVar4 = (int *)FUN_005a2de0(*(undefined4 *)(param_1 + 4),param_4,*(undefined4 *)(param_1 + 4),
-                               param_5,0);
-  *(int *)(param_1 + 8) = *(int *)(param_1 + 8) + 1;
-  if (param_4 == *(undefined4 **)(param_1 + 4)) {
-    (*(undefined4 **)(param_1 + 4))[1] = piVar4;
-    **(undefined4 **)(param_1 + 4) = piVar4;
-    *(int **)(*(int *)(param_1 + 4) + 8) = piVar4;
-  }
-  else if (param_3 == '\0') {
-    param_4[2] = piVar4;
-    if (param_4 == *(undefined4 **)(*(int *)(param_1 + 4) + 8)) {
-      *(int **)(*(int *)(param_1 + 4) + 8) = piVar4;
-    }
-  }
-  else {
-    *param_4 = piVar4;
-    if (param_4 == (undefined4 *)**(int **)(param_1 + 4)) {
-      **(int **)(param_1 + 4) = (int)piVar4;
-    }
-  }
-  cVar1 = *(char *)(piVar4[1] + 0x28);
-  piVar7 = piVar4;
-  do {
-    if (cVar1 != '\0') {
-      *(undefined1 *)(*(int *)(*(int *)(param_1 + 4) + 4) + 0x28) = 1;
-      *param_2 = piVar4;
-      ExceptionList = local_c;
-      return;
-    }
-    piVar5 = piVar7 + 1;
-    piVar2 = (int *)*piVar5;
-    piVar6 = *(int **)piVar2[1];
-    if (piVar2 == piVar6) {
-      piVar6 = (int *)((undefined4 *)piVar2[1])[2];
-      if ((char)piVar6[10] == '\0') {
-LAB_004cbc66:
-        *(undefined1 *)(*piVar5 + 0x28) = 1;
-        *(undefined1 *)(piVar6 + 10) = 1;
-        *(undefined1 *)(*(int *)(*piVar5 + 4) + 0x28) = 0;
-        piVar7 = *(int **)(*piVar5 + 4);
-      }
-      else {
-        if (piVar7 == (int *)piVar2[2]) {
-          FUN_004192a0(piVar2);
-          piVar7 = piVar2;
-        }
-        *(undefined1 *)(piVar7[1] + 0x28) = 1;
-        *(undefined1 *)(*(int *)(piVar7[1] + 4) + 0x28) = 0;
-        FUN_004192f0(*(undefined4 *)(piVar7[1] + 4));
-      }
-    }
-    else {
-      if ((char)piVar6[10] == '\0') goto LAB_004cbc66;
-      if (piVar7 == (int *)*piVar2) {
-        FUN_004192f0(piVar2);
-        piVar7 = piVar2;
-      }
-      *(undefined1 *)(piVar7[1] + 0x28) = 1;
-      *(undefined1 *)(*(int *)(piVar7[1] + 4) + 0x28) = 0;
-      iVar3 = *(int *)(piVar7[1] + 4);
-      piVar2 = *(int **)(iVar3 + 8);
-      *(int *)(iVar3 + 8) = *piVar2;
-      if (*(char *)(*piVar2 + 0x29) == '\0') {
-        *(int *)(*piVar2 + 4) = iVar3;
-      }
-      piVar2[1] = *(int *)(iVar3 + 4);
-      if (iVar3 == *(int *)(*(int *)(param_1 + 4) + 4)) {
-        *(int **)(*(int *)(param_1 + 4) + 4) = piVar2;
-      }
-      else {
-        piVar6 = *(int **)(iVar3 + 4);
-        if (iVar3 == *piVar6) {
-          *piVar6 = (int)piVar2;
-        }
-        else {
-          piVar6[2] = (int)piVar2;
-        }
-      }
-      *piVar2 = iVar3;
-      *(int **)(iVar3 + 4) = piVar2;
-    }
-    cVar1 = *(char *)(piVar7[1] + 0x28);
-  } while( true );
+## Control flow (annotated)
+
+```
+if (map->size > 0xAAAAAA8) throw "map/set<T> too long";
+n = FUN_005a2de0(head, where, head, value, color=0);  // red leaf
+map->size++;
+if (where == head) {
+  head->parent = head->left = head->right = n;         // empty
+} else if (addLeft == 0) {
+  where->right = n; if (where == head->right) head->right = n;
+} else {
+  where->left = n;  if (where == head->left)  head->left  = n;
 }
+x = n;
+loop:
+  if (x->parent->color != red) { head->parent->color = black; *outIt = n; return; }
+  // parent red: uncle cases (left-parent / right-parent symmetric)
+  // recolor-uncle climb OR rotate zig-zag then recolor+rotate
+  // one Lrotate-about-grand is inlined with isnil@+0x29 child reparent
 ```
 
-## Open questions
+---
 
-- Confirm calling convention and full signature against callers.
-- Recover meaningful types for still-generic parameters.
+## Callers / callees
+
+| Role | Symbol |
+|---|---|
+| Callers | `FUN_004cbe20` (2), `FUN_004cbee0` (2), `FUN_004cc220` (7) — 11 sites |
+| Buynode | `FUN_005a2de0` (`operator_new(0x30)`) |
+| L / R rotate | `FUN_004192a0`, `FUN_004192f0` |
+
+---
+
+## Peer do-not-merge
+
+| Peer | VA | Diff |
+|---|---|---|
+| `StdTree_InsertAndRebalance_Val12` | `0x005ae4e0` | isnil@+0x19; max `0x15555553`; Val12 buynode |
+| Erase twin | `0x004cb740` | same isnil29 family, erase path |
+
+---
+
+## Pseudocode source
+
+Authoritative raw body: `docs/reconstruction/raw/aa_004cbb60_FUN_004cbb60.md`  
+Clean: `docs/reconstruction/reconstructed-exact/StdTree_InsertAndRebalance_Isnil29_Inferred.cpp`

@@ -1,64 +1,41 @@
 // =============================================================================
-// FUN_00401bc0
+// FUN_00401bc0  — Ghidra twin of Std_OutOfRange_CtorFromString
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00401bc0
 // Address:   0x00401bc0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    MSVC STL / std::out_of_range
+// Generated: 2026-08-05 WQ9L-B dual seal (supersedes 2026-07-23 scaffold)
+// Exactness: Behavior-preserving rewrite of decompiler control flow.
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00401bc0 @ 0x00401bc0
-// Stable ID: aa_00401bc0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// Named reconstruction: Std_OutOfRange_CtorFromString.cpp
+// Purpose: std::out_of_range ctor from string; SEH + logic_error base + vtbl 009c7640.
 
-// READABILITY (auto CF):
-//  - Body size: ~14 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_00401aa0, FUN_00401bc0.
-//  - Return sites: 1.
+#include <cstdint>
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+extern "C" void *ExceptionList;
+extern "C" void FUN_00401aa0(/* const std::string* */ std::uint32_t msg);
+extern "C" void *PTR_FUN_009c7640;
+extern "C" void LAB_009bc828;
 
-uint32_t /* width from decompiler */ * __thiscall FUN_00401bc0(uint32_t /* width from decompiler */ *param_1,uint32_t /* width from decompiler */ param_2)
-
-
-
+// __thiscall; RET 4; returns this
+extern "C" std::uint32_t *__thiscall FUN_00401bc0(
+    std::uint32_t *param_1,
+    std::uint32_t param_2)
 {
-
   void *local_c;
-
-  uint8_t *puStack_8;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
+  std::uint8_t *puStack_8;
+  std::uint32_t local_4;
 
   local_4 = 0xffffffff;
-
-  puStack_8 = &LAB_009bc828;
-
+  puStack_8 = reinterpret_cast<std::uint8_t *>(&LAB_009bc828);
   local_c = ExceptionList;
-
   ExceptionList = &local_c;
 
   FUN_00401aa0(param_2);
-
-  *param_1 = &PTR_FUN_009c7640;
+  *param_1 = reinterpret_cast<std::uint32_t>(&PTR_FUN_009c7640);
 
   ExceptionList = local_c;
-
   return param_1;
-
 }

@@ -1,13 +1,12 @@
 // =============================================================================
+// RETIRED SCAFFOLD — do not use as canonical clean
 // Named_CalleeOf_Client_NotifyActiveMissionChanged_00402b30
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00402b30
-// Callee of Client_NotifyActiveMissionChanged
+// SUPERSEDED BY: StdMap_InsertOrFind_UintKey_Isnil31_EaxEbx_Inferred.cpp
+//                (MEGA-040 dual 2026-08-05 — xref-seed product name rejected)
 // Address:   0x00402b30  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Kept for history only; prefer named clean + FUN_00402b30.cpp twin.
 // =============================================================================
 
 // PURPOSE (auto): Called from Client_NotifyActiveMissionChanged: mission/objective helper with no high-value strings in clean/raw. Role inferred from parent name only; refine when decompile strings or xrefs improve.

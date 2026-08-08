@@ -1,52 +1,28 @@
-// =============================================================================
-// FUN_00578de0
+﻿// =============================================================================
+// FUN_00578de0  (scaffold alias → CVOGHBSkillBase_ScalarDeletingDtor)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00578de0
-// Address:   0x00578de0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Address:   0x00578de0–0x00578dfe exclusive  (autoassault.exe, image base 0x400000)
+// System:    skills-abilities
+// Generated: 2026-07-23 scaffold; refined 2026-08-05 R11-006 dual seal
 // Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
 // Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Preferred name: CVOGHBSkillBase_ScalarDeletingDtor
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00578de0 @ 0x00578de0
-// Stable ID: aa_00578de0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~9 non-empty decompiler lines.
-//  - Control keywords: return×2, if×1.
-//  - Notable callees: FUN_00578a60, FUN_00578de0.
-//  - Return sites: 2.
+extern "C" void __fastcall FUN_00578a60(void *thisHb /* ECX */);
+extern "C" void __cdecl operator_delete(void *p);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void * __thiscall FUN_00578de0(void *param_1,byte param_2)
-
-
-
+// Scaffold symbol kept for path stability. Prefer CVOGHBSkillBase_ScalarDeletingDtor.
+void *__thiscall FUN_00578de0(void *param_1 /* ECX */, uint8_t param_2 /* flags */)
 {
+    FUN_00578a60(param_1);
 
-  FUN_00578a60();
+    if ((param_2 & 1u) != 0) {
+        operator_delete(param_1);
+    }
 
-  if ((param_2 & 1) != 0) {
-
-                    /* WARNING: Subroutine does not return */
-
-    operator_delete(param_1);
-
-  }
-
-  return param_1;
-
+    return param_1;
 }

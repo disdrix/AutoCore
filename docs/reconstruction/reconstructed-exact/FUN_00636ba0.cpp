@@ -1,50 +1,29 @@
 // =============================================================================
-// FUN_00636ba0
+// FUN_00636ba0  — scaffold twin of CVOGHBMoveVehicle_OnEnd
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00636ba0
 // Address:   0x00636ba0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Preferred: reconstructed-exact/CVOGHBMoveVehicle_OnEnd.cpp
+// System:    input-drive-control / heartbeat OnEnd
+// Updated:   2026-08-05 MEGA-017 (retire pure scaffold semantics)
+// Exactness: Ghidra name retained for FUN_* twin path; CF matches named clean.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00636ba0 @ 0x00636ba0
-// Stable ID: aa_00636ba0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// See CVOGHBMoveVehicle_OnEnd.cpp for full plate, RTTI, vtbl, and port notes.
 
-// READABILITY (auto CF):
-//  - Body size: ~8 non-empty decompiler lines.
-//  - Control keywords: if×1, return×1.
-//  - Notable callees: FUN_00636ba0, VehicleEntity_PushDriveAxesToController, VehicleEntity_SetSteerInput.
-//  - Return sites: 1.
-
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __fastcall FUN_00636ba0(int param_1)
-
-
-
+void __thiscall FUN_00636ba0(int param_1)
 {
+  int entity;
 
-  if (*(int *)(param_1 + 0x24) != 0) {
-
-    VehicleEntity_SetSteerInput(0);
-
-    VehicleEntity_PushDriveAxesToController();
-
+  entity = *(int *)(param_1 + 0x24);
+  if (entity != 0) {
+    // VehicleEntity_SetSteerInput(entity, 0) — thiscall; stack float 0
+    // VehicleEntity_PushDriveAxesToController(entity) — thiscall/fastcall ECX
+    extern void __thiscall VehicleEntity_SetSteerInput(int, float);
+    extern void __fastcall VehicleEntity_PushDriveAxesToController(int);
+    VehicleEntity_SetSteerInput(entity, 0.0f);
+    VehicleEntity_PushDriveAxesToController(entity);
   }
-
+  // machine: JMP 0x005081e0 (empty RET) — decompiler shows bare return
   return;
-
 }

@@ -1,64 +1,34 @@
 // =============================================================================
-// FUN_005204f0
+// FUN_005204f0  (clean twin → Character_SumCommodityTierMaxCapacities_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_005204f0
 // Address:   0x005204f0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    inventory-transfer
+// Generated: 2026-08-05 R13-033 dual seal
+// Exactness: Behavior-preserving rewrite of decompiler control flow.
+// Bit-for-bit vs retail EXE: DEFERRED
 // =============================================================================
+//
+// Named clean twin: Character_SumCommodityTierMaxCapacities_Inferred.cpp
+// This file keeps the Ghidra symbol as the primary identifier for twin lookup.
 
-// PURPOSE (auto): Scaffold unit for FUN_005204f0 @ 0x005204f0
-// Stable ID: aa_005204f0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~14 non-empty decompiler lines.
-//  - Control keywords: do×1, while×1, return×1.
-//  - Notable callees: FUN_00520340, FUN_005204f0.
-//  - Return sites: 1.
+struct Character;
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+int __thiscall FUN_00520340(Character* self, uint32_t tier);
 
-int FUN_005204f0(void)
-
-
-
+// Ghidra: FUN_005204f0
+// Decompiler surface omits this; bytes: MOV EBX,ECX / MOV ECX,EBX around CALL.
+int __thiscall FUN_005204f0(Character* self)
 {
-
-  int iVar1;
-
-  int iVar2;
-
-  int iVar3;
-
-  
-
-  iVar3 = 0;
-
-  iVar2 = 0;
+  int sum = 0;
+  int tier = 0;
 
   do {
+    sum += FUN_00520340(self, static_cast<uint32_t>(tier));
+    tier = tier + 1;
+  } while (tier < 6);
 
-    iVar1 = FUN_00520340(iVar2);
-
-    iVar2 = iVar2 + 1;
-
-    iVar3 = iVar3 + iVar1;
-
-  } while (iVar2 < 6);
-
-  return iVar3;
-
+  return sum;
 }

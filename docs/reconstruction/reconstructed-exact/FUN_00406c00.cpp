@@ -1,52 +1,22 @@
-// =============================================================================
-// FUN_00406c00
+﻿// =============================================================================
+// FUN_00406c00  (scaffold twin of StdTree_FreeSubtree_Isnil29_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00406c00
 // Address:   0x00406c00  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Wave:      WQ9G-G 2026-08-04 — points at named clean
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00406c00 @ 0x00406c00
-// Stable ID: aa_00406c00
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~9 non-empty decompiler lines.
-//  - Control keywords: return×2, if×1.
-//  - Notable callees: FUN_00406c00×2.
-//  - Return sites: 2.
+// See StdTree_FreeSubtree_Isnil29_Inferred.cpp for sealed body (bytes authority).
+// Decompiler false-noreturn / missing left-walk must not be ported.
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+struct Node_Isnil29;
 
-void FUN_00406c00(void *param_1)
+extern "C" void __fastcall StdTree_FreeSubtree_Isnil29_Inferred(
+    void* tree_base, Node_Isnil29* node);
 
-
-
+extern "C" void __fastcall FUN_00406c00(void* tree_base, Node_Isnil29* node)
 {
-
-  if (*(char *)((int)param_1 + 0x29) == '\0') {
-
-    FUN_00406c00(*(uint32_t /* width from decompiler */ *)((int)param_1 + 8));
-
-                    /* WARNING: Subroutine does not return */
-
-    operator_delete(param_1);
-
-  }
-
-  return;
-
+  StdTree_FreeSubtree_Isnil29_Inferred(tree_base, node);
 }

@@ -1,76 +1,53 @@
 // =============================================================================
-// FUN_00401fe0
+// FUN_00401fe0  (Ghidra alias of StdTree_NodeCtor_StringByte_Isnil2D_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00401fe0
-// Address:   0x00401fe0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00401fe0–0x0040203a exclusive (90 B / 0x5A)
+// System:    MSVC std::_Tree node construct — string+byte, isnil@+0x2d
+// Generated: 2026-08-05 R10-004 dual seal (scaffold 2026-07-23)
+// Exactness: Behavior-preserving rewrite. Bit-for-bit / runtime: DEFERRED.
 // =============================================================================
+// Prefer named unit: StdTree_NodeCtor_StringByte_Isnil2D_Inferred.cpp
 
-// PURPOSE (auto): Scaffold unit for FUN_00401fe0 @ 0x00401fe0
-// Stable ID: aa_00401fe0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~20 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_00401fe0, FUN_00402040.
-//  - Return sites: 1.
+struct BasicString_0x1c {
+  std::uint8_t raw[0x1C];
+};
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+struct StringByteVal {
+  BasicString_0x1c str;
+  std::uint8_t mapped_byte;
+  std::uint8_t pad_to_color[3];
+};
 
-uint32_t /* width from decompiler */ * __fastcall
+struct NodeIsnil2D_StringByte {
+  NodeIsnil2D_StringByte* left;
+  NodeIsnil2D_StringByte* parent;
+  NodeIsnil2D_StringByte* right;
+  StringByteVal value;
+  std::uint8_t color;
+  std::uint8_t isnil;
+};
 
-FUN_00401fe0(uint32_t /* width from decompiler */ param_1,uint32_t /* width from decompiler */ param_2,uint32_t /* width from decompiler */ *param_3,uint32_t /* width from decompiler */ param_4,
+extern "C" StringByteVal* BasicStringFlag_CopyCtor_EdiSrc_Inferred(StringByteVal* dest);
 
-            uint8_t param_5)
-
-
-
+// Hybrid: ECX=parent, EDX=right, EDI=value*, stack node/left/color, RET 0xC
+extern "C" NodeIsnil2D_StringByte* FUN_00401fe0(
+    NodeIsnil2D_StringByte* node,
+    NodeIsnil2D_StringByte* parent,
+    NodeIsnil2D_StringByte* right,
+    NodeIsnil2D_StringByte* left,
+    const StringByteVal* value,
+    std::uint8_t color)
 {
-
-  void *local_c;
-
-  uint8_t *puStack_8;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
-
-  local_4 = 0xffffffff;
-
-  puStack_8 = &LAB_009bc7ed;
-
-  local_c = ExceptionList;
-
-  ExceptionList = &local_c;
-
-  *param_3 = param_4;
-
-  param_3[1] = param_1;
-
-  param_3[2] = param_2;
-
-  FUN_00402040(param_3 + 3);
-
-  *(uint8_t *)(param_3 + 0xb) = param_5;
-
-  *(uint8_t *)((int)param_3 + 0x2d) = 0;
-
-  ExceptionList = local_c;
-
-  return param_3;
-
+  // SEH LAB_009bc7ed omitted.
+  node->left = left;
+  node->parent = parent;
+  node->right = right;
+  (void)value;  // retail source is EDI into BasicStringFlag_CopyCtor_EdiSrc_Inferred
+  BasicStringFlag_CopyCtor_EdiSrc_Inferred(&node->value);
+  node->color = color;
+  node->isnil = 0;
+  return node;
 }

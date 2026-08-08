@@ -1,68 +1,53 @@
 // =============================================================================
-// FUN_00578a60
+// FUN_00578a60  (scaffold twin — prefer CVOGHBSkillBase_dtor.cpp)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00578a60
-// Address:   0x00578a60  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00578a60–0x00578ab2 inclusive  (autoassault.exe, image base 0x400000)
+// Body:      83 bytes / 0x53
+// System:    skills-abilities
+// Named:     CVOGHBSkillBase_dtor
+// Generated: 2026-07-23 scaffold; R12-026 2026-08-05 assembly-corrected twin
+// Exactness: Behavior-preserving rewrite of assembly CF. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED (Terminal false).
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00578a60 @ 0x00578a60
-// Stable ID: aa_00578a60
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// PURPOSE: Complete destructor body for CVOGHBSkillBase (non-scalar).
+// See CVOGHBSkillBase_dtor.cpp for named plate and dual seal notes.
 
-// READABILITY (auto CF):
-//  - Body size: ~17 non-empty decompiler lines.
-//  - Control keywords: if×2, return×2.
-//  - Notable callees: FUN_00508390, FUN_00578a60.
-//  - Return sites: 2.
+#include <cstdint>
+
+extern "C" void *PTR_FUN_009d3fdc[];
+extern "C" void __fastcall FUN_00508390(void *thisHb /* ECX */);
+extern "C" void __cdecl operator_delete(void *p);
+extern "C" void __cdecl operator_delete[](void *p);
 
 /*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
+ * Behavioral notes (R12-026):
+ * - Scaffold raw decompile used dword indices (0x1a8 = +0x6a0, 0x1ac = +0x6b0).
+ * - Decompiler: false noreturn on operator_delete; CALL+return for base (machine JMP).
+ * - ABI: thiscall ECX; no free of this object.
  */
 
-void __fastcall FUN_00578a60(uint32_t /* width from decompiler */ *param_1)
-
-
-
+void __fastcall FUN_00578a60(void *param_1 /* ECX */)
 {
+    auto *base = reinterpret_cast<std::uint8_t *>(param_1);
+    void *pArr = *reinterpret_cast<void **>(base + 0x6a0);
+    void *pBuf;
 
-  *param_1 = &PTR_FUN_009d3fdc;
+    *reinterpret_cast<void **>(param_1) = PTR_FUN_009d3fdc;
 
-  if ((void *)param_1[0x1a8] != (void *)0x0) {
+    if (pArr != nullptr) {
+        operator_delete[](pArr);
+    }
+    *reinterpret_cast<void **>(base + 0x6a0) = nullptr;
 
-    operator_delete__((void *)param_1[0x1a8]);
+    pBuf = *reinterpret_cast<void **>(base + 0x6b0);
+    if (pBuf != nullptr) {
+        operator_delete(pBuf);
+    }
+    *reinterpret_cast<void **>(base + 0x6b0) = nullptr;
+    *reinterpret_cast<void **>(base + 0x6b4) = nullptr;
+    *reinterpret_cast<void **>(base + 0x6b8) = nullptr;
 
-  }
-
-  param_1[0x1a8] = 0;
-
-  if ((void *)param_1[0x1ac] != (void *)0x0) {
-
-                    /* WARNING: Subroutine does not return */
-
-    operator_delete((void *)param_1[0x1ac]);
-
-  }
-
-  param_1[0x1ac] = 0;
-
-  param_1[0x1ad] = 0;
-
-  param_1[0x1ae] = 0;
-
-  FUN_00508390();
-
-  return;
-
+    FUN_00508390(param_1); // tail JMP on machine
 }

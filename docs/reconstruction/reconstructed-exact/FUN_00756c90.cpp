@@ -1,80 +1,53 @@
 // =============================================================================
-// FUN_00756c90
+// FUN_00756c90  (scaffold synonym)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00756c90
 // Address:   0x00756c90  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    inventory-transfer (UI tab/group chrome helper)
+// Generated: 2026-07-23 scaffold; refined R12-003 2026-08-05 dual seal
+// Canonical: UI_Widget_MoveToFrontInParentGroup_Inferred
+// Exactness: Behavior-preserving rewrite of decompiler + disasm CF.
+// Bit-for-bit vs retail EXE: DEFERRED.
+// Dual reviews:
+//   reviews/A_aa_00756c90_UI_Widget_MoveToFrontInParentGroup_Inferred.md
+//   reviews/B_aa_00756c90_UI_Widget_MoveToFrontInParentGroup_Inferred.md
+// Named clean: reconstructed-exact/UI_Widget_MoveToFrontInParentGroup_Inferred.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00756c90 @ 0x00756c90
-// Stable ID: aa_00756c90
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
+#include <cstring>
 
-// READABILITY (auto CF):
-//  - Body size: ~22 non-empty decompiler lines.
-//  - Control keywords: if×3, return×2, for×1.
-//  - Notable callees: FUN_00456960, FUN_00756c90, memmove.
-//  - Return sites: 2.
+extern "C" void FUN_00456960(std::uint32_t count_ecx, void* vec_edx, void* insert_pos_stack);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-uint32_t /* width from decompiler */ FUN_00756c90(void)
-
-
-
+// Retail ABI: widget in EDI; no stack args; EAX return; RET.
+// Clean form takes widget* for readability — callers must place EDI.
+extern "C" std::uint32_t FUN_00756c90(void* widget /*EDI*/)
 {
-
-  int iVar1;
-
-  int *_Dst;
-
-  int unaff_EDI;
-
-  
-
-  iVar1 = *(int *)(unaff_EDI + 0x88);
-
-  if (iVar1 == 0) {
-
-    return 0xffffffff;
-
-  }
-
-  if ((*(int *)(iVar1 + 0x94) == 0) || (*(int *)(iVar1 + 0x98) - *(int *)(iVar1 + 0x94) >> 2 != 1))
-
-  {
-
-    for (_Dst = *(int **)(iVar1 + 0x94); _Dst != *(int **)(iVar1 + 0x98); _Dst = _Dst + 1) {
-
-      if (*_Dst == unaff_EDI) {
-
-        memmove(_Dst,_Dst + 1,(*(int *)(iVar1 + 0x98) - (int)(_Dst + 1) >> 2) * 4);
-
-        *(int *)(iVar1 + 0x98) = *(int *)(iVar1 + 0x98) + -4;
-
-        break;
-
-      }
-
+    auto* w = reinterpret_cast<std::uint8_t*>(widget);
+    auto* group = *reinterpret_cast<std::uint8_t**>(w + 0x88);
+    if (group == nullptr) {
+        return 0xFFFFFFFFu;
     }
 
-    FUN_00456960(*(uint32_t /* width from decompiler */ *)(*(int *)(unaff_EDI + 0x88) + 0x94));
+    auto** begin = *reinterpret_cast<void***>(group + 0x94);
+    auto** end   = *reinterpret_cast<void***>(group + 0x98);
 
-  }
+    if (begin != nullptr && (end - begin) == 1) {
+        return 0;
+    }
 
-  return 0;
+    for (auto** p = begin; p != end; ++p) {
+        if (*p == widget) {
+            std::memmove(p, p + 1,
+                         static_cast<std::size_t>(
+                             reinterpret_cast<char*>(end) - reinterpret_cast<char*>(p + 1)));
+            *reinterpret_cast<void***>(group + 0x98) =
+                *reinterpret_cast<void***>(group + 0x98) - 1;
+            break;
+        }
+    }
 
+    begin = *reinterpret_cast<void***>(group + 0x94);
+    FUN_00456960(1u, group + 0x90, begin);
+    return 0;
 }

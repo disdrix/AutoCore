@@ -1,43 +1,51 @@
-# Function record: FUN_0051bbc0
+﻿# Function record: FUN_0051bbc0
 
 | Field | Value |
 |---|---|
 | **Stable ID** | `aa_0051bbc0` |
-| **Canonical name** | `FUN_0051bbc0` |
-| **Address** | `0x0051bbc0` |
+| **Canonical name** | `Map_FreeSubtree_Isnil29` |
+| **Ghidra name** | `FUN_0051bbc0` |
+| **Address** | `0x0051bbc0`–`0x0051bbf4` (**53 B** / `0x35`) |
 | **Module** | `autoassault.exe` (image base `0x400000`) |
-| **System** | unknown |
-| **Completion status** | **Partial scaffold** — raw/annotated/clean present; refine + dual review for important units |
-| **Bit-for-bit / runtime / diff** | Open (deferred / not run) |
+| **System** | `skills-abilities` (STL map helper residual) |
+| **Completion status** | **partial** — dual A/B **accept-with-gaps** (WQ9E-H 2026-08-04) |
+| **Bit-for-bit / runtime / diff** | Open |
 
 ## Alias
 
-Human name: `Named_CalleeOf_Named_CalleeOf_CVOGHBAIBase_GetTargetFromAggro_0051bbc0` (callee of `Named_CalleeOf_CVOGHBAIBase_GetTargetFromAggro`)
+- Canonical: `Map_FreeSubtree_Isnil29`
+- Reject scaffold: `Named_CalleeOf_Named_CalleeOf_CVOGHBAIBase_GetTargetFromAggro_0051bbc0`
 
 ## Purpose
 
-Reconstructed from Ghidra decompile. See clean source and annotated notes for body.
+Map free-subtree (isnil@+0x29). Bytes seal left-walk omitted by decompiler. See named record.
 
-## Signature (decompiler-derived)
+## Signature (sealed)
 
 ```c
-void FUN_0051bbc0(void *param_1)
+void __fastcall FUN_0051bbc0(void *tree_base, void *node);
+// RET 4
 ```
 
 ## Artifacts
 
 - Raw: `docs/reconstruction/raw/aa_0051bbc0_FUN_0051bbc0.md`
 - Annotated: `docs/reconstruction/raw/aa_0051bbc0_FUN_0051bbc0.annotated.md`
-- Clean: `docs/reconstruction/reconstructed-exact/FUN_0051bbc0.cpp`
+- Clean: `docs/reconstruction/reconstructed-exact/Map_FreeSubtree_Isnil29.cpp`
+- Clean twin: `docs/reconstruction/reconstructed-exact/FUN_0051bbc0.cpp`
+- Named record: `docs/reconstruction/functions/aa_0051bbc0_Map_FreeSubtree_Isnil29.md`
+- Dual A/B: `reviews/A_aa_0051bbc0_Map_FreeSubtree_Isnil29.md`, `reviews/B_aa_0051bbc0_Map_FreeSubtree_Isnil29.md`
 
 ## Callers / callees
 
-(Populate from Ghidra xrefs in follow-up.)
+- Callers: `Map_EraseRange` (`FUN_0051c7c0`), self
+- Callees: self, `operator_delete`
 
 ## Confidence
 
 | Claim | Level |
 |---|---|
-| Control flow from decompiler | High |
-| Parameter semantic names | Probable / Tentative until caller pass |
-| Types | Tentative |
+| Free-subtree CF (bytes) | High |
+| ABI ECX + RET 4 | High |
+| isnil@+0x29 | High |
+| Product map type English | Open |

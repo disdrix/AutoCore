@@ -1,80 +1,53 @@
-// =============================================================================
+﻿// =============================================================================
 // FUN_00548990
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00548990
 // Address:   0x00548990  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// System:    skills-abilities
+// Generated: 2026-07-23 scaffold; refined 2026-08-05 R12-022 dual seal
 // Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
 // Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Canonical named twin: CVOGHBSkill_XP_CreateDefaultInstance_Inferred.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00548990 @ 0x00548990
-// Stable ID: aa_00548990
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// PURPOSE:
+//   CVOGHBSkill_XP default-instance factory:
+//   operator_new(0x6c0) + CVOGHBSkillBase_DefaultCtor + vtbl PTR_FUN_009d119c.
+//   DATA-only inbound at vtbl+0x48 (0x009d11e4). Class RTTI Confirmed.
 
-// READABILITY (auto CF):
-//  - Body size: ~22 non-empty decompiler lines.
+// READABILITY:
+//  - Body size: ~22 non-empty decompiler lines / 83 image bytes.
 //  - Control keywords: if×1, return×1.
-//  - Notable callees: FUN_00548990, FUN_00578830.
-//  - Return sites: 1.
+//  - Callees: operator_new, FUN_00578830 (CVOGHBSkillBase_DefaultCtor).
+//  - Return sites: 1 (object* or null).
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+extern "C" void *operator_new(unsigned int size);
+extern "C" void *FUN_00578830(void);
+extern "C" void *ExceptionList;
+extern "C" unsigned char LAB_009a43fb;
+extern "C" void *PTR_FUN_009d119c;
 
-uint32_t /* width from decompiler */ * FUN_00548990(void)
-
-
-
+uint32_t *FUN_00548990(void)
 {
-
-  uint32_t /* width from decompiler */ *puVar1;
-
-  uint32_t /* width from decompiler */ *puVar2;
-
+  uint32_t *puVar1;
+  uint32_t *puVar2;
   void *local_c;
-
   uint8_t *puStack_8;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
+  uint32_t local_4;
 
   local_4 = 0xffffffff;
-
   puStack_8 = &LAB_009a43fb;
-
   local_c = ExceptionList;
-
   ExceptionList = &local_c;
-
-  puVar1 = operator_new(0x6c0);
-
+  puVar1 = (uint32_t *)operator_new(0x6c0);
   local_4 = 0;
-
-  puVar2 = (uint32_t /* width from decompiler */ *)0x0;
-
-  if (puVar1 != (uint32_t /* width from decompiler */ *)0x0) {
-
+  puVar2 = (uint32_t *)0x0;
+  if (puVar1 != (uint32_t *)0x0) {
+    // thiscall: ECX = puVar1 (bytes MOV ECX,ESI)
     FUN_00578830();
-
-    *puVar1 = &PTR_FUN_009d119c;
-
+    *puVar1 = (uint32_t)&PTR_FUN_009d119c;
     puVar2 = puVar1;
-
   }
-
   ExceptionList = local_c;
-
   return puVar2;
-
 }

@@ -1,62 +1,37 @@
 // =============================================================================
-// FUN_0051f910
+// FUN_0051f910  (Ghidra twin of LookupRaceShortCode_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0051f910
 // Address:   0x0051f910  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Body:      0x0051f910 – 0x0051f93b exclusive (43 B / 0x2B); pad CC
+// System:    skills-abilities
+// Generated: 2026-08-05 R13-032 dual seal
 // Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Bit-for-bit vs retail EXE: DEFERRED (no runtime Confirmed).
+// Named clean: LookupRaceShortCode_Inferred.cpp
+// Rejected:  Named_CalleeOf_Named_CalleeOf_Named_CalleeOf_Named_VOGClient_0051f910
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0051f910 @ 0x0051f910
-// Stable ID: aa_0051f910
-// Embedded strings (evidence for future rename):
-//   - "Unknown"
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// PURPOSE:
+//   Pure leaf race id → 3-letter short code: HUM / MUT / BIO / Unknown.
+//   cdecl; plain RET; static rodata return.
+//
+// RACE SHORT MAP:
+//   0 → "HUM" @ 0x009cef04
+//   1 → "MUT" @ 0x009cef08
+//   2 → "BIO" @ 0x009cef0c
+//   * → "Unknown" @ 0x00a37c4c
 
-// READABILITY (auto CF):
-//  - Body size: ~13 non-empty decompiler lines.
-//  - Control keywords: return×4, if×3.
-//  - Notable callees: FUN_0051f910.
-//  - Strings: "HUM"; "Unknown"; "BIO"; "MUT".
-//  - Return sites: 4.
-
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-char * FUN_0051f910(int param_1)
-
-
-
+const char * FUN_0051f910(int raceId)
 {
-
-  if (param_1 == 0) {
-
+  if (raceId == 0) {
     return "HUM";
-
   }
-
-  if (param_1 != 1) {
-
-    if (param_1 != 2) {
-
+  if (raceId != 1) {
+    if (raceId != 2) {
       return "Unknown";
-
     }
-
     return "BIO";
-
   }
-
   return "MUT";
-
 }

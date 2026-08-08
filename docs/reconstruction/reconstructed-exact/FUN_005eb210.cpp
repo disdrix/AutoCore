@@ -1,96 +1,69 @@
-// =============================================================================
-// FUN_005eb210
+﻿// =============================================================================
+// FUN_005eb210  (twin of VOGPhysics_QueryObject_BaseCtor_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_005eb210
 // Address:   0x005eb210  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Range:     0x005eb210–0x005eb2ac inclusive (157 B / 0x9D); pad CC after
+// System:    interaction-activation
+// Generated: 2026-08-05 R11-008 dual seal
+// Exactness: Behavior-preserving rewrite of decompiler/assembly control flow.
+// Bit-for-bit vs retail EXE: DEFERRED.
+// Runtime Confirmed: OPEN (no Launcher this wave).
+// Canonical named twin: VOGPhysics_QueryObject_BaseCtor_Inferred.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_005eb210 @ 0x005eb210
-// Stable ID: aa_005eb210
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~30 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_00581190, FUN_005eb040, FUN_005eb210.
-//  - Return sites: 1.
+extern void __thiscall FUN_00581190(uint32_t *self /* ECX */,
+                                    uint32_t obj_from_params1,
+                                    uint32_t mode);
+extern void __thiscall FUN_005eb040(uint32_t *dest /* ECX */,
+                                    const uint32_t *src /* stack */);
+extern uint32_t PTR_FUN_009dcde0;
+extern float DAT_009dcddc;
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-uint32_t /* width from decompiler */ * __thiscall FUN_005eb210(uint32_t /* width from decompiler */ *param_1,uint32_t /* width from decompiler */ *param_2)
-
-
-
+uint32_t * __thiscall FUN_005eb210(uint32_t *self /* ECX */,
+                                   uint32_t *params /* stack */)
 {
+  uint32_t uVar1;
+  float *float_block;
 
-  uint32_t /* width from decompiler */ uVar1;
+  FUN_00581190(self, params[1], 2);
 
-  
+  self[0x0F] = 0;
+  self[0x10] = 0;
+  self[0x11] = 0x80000000u;
+  self[0x12] = 0;
+  self[0x13] = 0;
+  self[0x14] = 0x80000000u;
 
-  FUN_00581190(param_2[1],2);
+  self[0x0B] = (uint32_t)(uintptr_t)self;
+  *self = (uint32_t)(uintptr_t)&PTR_FUN_009dcde0;
 
-  param_1[0xf] = 0;
+  float_block = reinterpret_cast<float *>(self + 0x18);
+  float_block[0] = 0.0f;
+  float_block[1] = 0.0f;
+  float_block[2] = 0.0f;
+  float_block[3] = 0.0f;
+  float_block[4] = 0.0f;
+  float_block[5] = 0.0f;
+  float_block[6] = 0.0f;
+  float_block[7] = 0.0f;
+  float_block[3] = DAT_009dcddc;
+  float_block[7] = DAT_009dcddc;
 
-  param_1[0x10] = 0;
+  self[0x0A] = params[0];
+  self[0x05] = (uint32_t)(uintptr_t)(self + 0x18);
 
-  param_1[0x11] = 0x80000000;
+  {
+    uint32_t *obj = reinterpret_cast<uint32_t *>(self[3]);
+    uint32_t *vtbl = reinterpret_cast<uint32_t *>(obj[0]);
+    using vfn_t = uint32_t(__thiscall *)(uint32_t *);
+    uVar1 = reinterpret_cast<vfn_t>(vtbl[5])(obj);
+  }
+  self[0x15] = uVar1;
 
-  param_1[0x12] = 0;
+  FUN_005eb040(self + 0x20, params + 8);
 
-  param_1[0x13] = 0;
-
-  param_1[0x14] = 0x80000000;
-
-  param_1[0xb] = param_1;
-
-  *param_1 = &PTR_FUN_009dcde0;
-
-  param_1[0x1b] = 0;
-
-  param_1[0x1a] = 0;
-
-  param_1[0x19] = 0;
-
-  param_1[0x18] = 0;
-
-  param_1[0x1f] = 0;
-
-  param_1[0x1e] = 0;
-
-  param_1[0x1d] = 0;
-
-  param_1[0x1c] = 0;
-
-  uVar1 = DAT_009dcddc;
-
-  param_1[0x1b] = DAT_009dcddc;
-
-  param_1[0x1f] = uVar1;
-
-  param_1[10] = *param_2;
-
-  param_1[5] = param_1 + 0x18;
-
-  uVar1 = (**(code **)(*(int *)param_1[3] + 0x14))();
-
-  param_1[0x15] = uVar1;
-
-  FUN_005eb040(param_2 + 8);
-
-  return param_1;
-
+  return self;
 }

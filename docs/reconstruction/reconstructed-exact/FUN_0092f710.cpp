@@ -1,186 +1,110 @@
 // =============================================================================
-// FUN_0092f710
+// FUN_0092f710  (machine twin of Client_LoadKeymapIni)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0092f710
 // Address:   0x0092f710  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    input-drive-control
+// Generated: 2026-07-23 scaffold; MEGA-022 dual seal 2026-08-05
+// Exactness: Behavior-preserving rewrite of decompiler control flow.
+//            Prefer Client_LoadKeymapIni.cpp for named plate + ABI notes.
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0092f710 @ 0x0092f710
+// PURPOSE: keymap.ini loader — see Client_LoadKeymapIni.cpp
 // Stable ID: aa_0092f710
-// Embedded strings (evidence for future rename):
+// Embedded strings:
 //   - "keymap.ini"
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// Delimiters: DAT_00a152dc="//", DAT_00a152e0="=;"
+// ABI: stack client*; RET 4; ActionMap at client+0x116c
+// Caller: Client_InitInstance (FUN_0094a6a0) @ 0x0094a83b
 
-// READABILITY (auto CF):
-//  - Body size: ~74 non-empty decompiler lines.
-//  - Control keywords: if×8, do×3, while×3, return×2.
-//  - Notable callees: strtok×3, FUN_007f72e0×2, FUN_0092db30×2, fgets×2, strncpy×2, FUN_007f9230, FUN_007f9480, FUN_0092f710.
-//  - Strings: "keymap.ini".
-//  - Return sites: 2.
+#include <cstdint>
+#include <cstdio>
+#include <cstring>
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+extern "C" {
+  unsigned FUN_007f9230(const char* desc);
+  unsigned FUN_007f9480(void* actionMap);
+  void FUN_0092db30(uint32_t* key_out);
+  uint8_t FUN_007f72e0(/* register-mediated ActionMap_TrySetSlotBind */);
+}
 
 void FUN_0092f710(int param_1)
-
-
-
 {
-
   char cVar1;
-
-  FILE *_File;
-
-  char *pcVar2;
-
-  char *pcVar3;
-
+  FILE* _File;
+  char* pcVar2;
+  char* pcVar3;
   int iVar4;
+  uint16_t local_c18; // "=;" lo
+  uint8_t  local_c16; // "=;" hi/null
+  uint32_t local_c14;
+  uint16_t local_c10; // "//" lo
+  uint8_t  local_c0e; // "//" hi/null
+  uint     local_c08;
+  FILE*    local_c04;
+  char     local_c00[512];
+  char     local_a00[512];
+  char     local_800[2048];
 
-  uint16_t local_c18;
-
-  uint8_t local_c16;
-
-  uint32_t /* width from decompiler */ local_c14;
-
-  uint16_t local_c10;
-
-  uint8_t local_c0e;
-
-  uint local_c08;
-
-  FILE *local_c04;
-
-  char local_c00 [512];
-
-  char local_a00 [512];
-
-  char local_800 [2048];
-
-  
-
-  _File = fopen("keymap.ini","r");
-
+  _File = fopen("keymap.ini", "r");
   local_c04 = _File;
-
-  if (_File == (FILE *)0x0) {
-
-    FUN_007f9480(param_1 + 0x116c);
-
+  if (_File == (FILE*)0x0) {
+    // Asm: EAX = "keymap.ini"; PUSH param_1+0x116c
+    FUN_007f9480((void*)(param_1 + 0x116c));
     return;
-
   }
-
-  local_c16 = DAT_00a152e2;
-
-  local_c18 = DAT_00a152e0;
-
-  local_c10 = DAT_00a152dc;
-
-  local_c0e = DAT_00a152de;
-
-  pcVar2 = fgets(local_800,0x800,_File);
-
+  local_c16 = /* DAT_00a152e2 */ 0;
+  local_c18 = /* DAT_00a152e0 */ 0x3b3d; // "=;"
+  local_c10 = /* DAT_00a152dc */ 0x2f2f; // "//"
+  local_c0e = /* DAT_00a152de */ 0;
+  pcVar2 = fgets(local_800, 0x800, _File);
   do {
-
-    if (pcVar2 == (char *)0x0) {
-
+    if (pcVar2 == (char*)0x0) {
       fclose(_File);
-
       return;
-
     }
-
-    pcVar2 = strstr(local_800,(char *)&local_c10);
-
-    if (pcVar2 != (char *)0x0) {
-
+    pcVar2 = strstr(local_800, (char*)&local_c10);
+    if (pcVar2 != (char*)0x0) {
       *pcVar2 = '\0';
-
     }
-
     local_c14 = 0;
-
-    pcVar2 = strtok(local_800,(char *)&local_c18);
-
-    if (pcVar2 != (char *)0x0) {
-
+    pcVar2 = strtok(local_800, (char*)&local_c18);
+    if (pcVar2 != (char*)0x0) {
       pcVar3 = pcVar2;
-
       do {
-
         cVar1 = *pcVar3;
-
         pcVar3 = pcVar3 + 1;
-
       } while (cVar1 != '\0');
-
-      if (1 < (uint)((int)pcVar3 - (int)(pcVar2 + 1))) {
-
+      // strlen >= 2
+      if (1 < (unsigned)((int)pcVar3 - (int)(pcVar2 + 1))) {
         iVar4 = 0;
-
         do {
-
+          // EAX=iVar4 mode; ECX=param_1+0x116c
           local_c08 = FUN_007f9230(pcVar2);
-
           local_c08 = local_c08 & 0xff;
-
           if (local_c08 != 0) break;
-
           iVar4 = iVar4 + 1;
-
         } while (iVar4 < 4);
-
         _File = local_c04;
-
         if (((iVar4 != 4) && (local_c08 != 0)) &&
-
-           (pcVar2 = strtok((char *)0x0,(char *)&local_c18), _File = local_c04,
-
-           pcVar2 != (char *)0x0)) {
-
-          strncpy(local_a00,pcVar2,0x1ff);
-
+            (pcVar2 = strtok((char*)0x0, (char*)&local_c18), _File = local_c04,
+             pcVar2 != (char*)0x0)) {
+          strncpy(local_a00, pcVar2, 0x1ff);
           local_c00[0] = '\0';
-
-          pcVar2 = strtok((char *)0x0,(char *)&local_c18);
-
-          if (pcVar2 != (char *)0x0) {
-
-            strncpy(local_c00,pcVar2,0x1ff);
-
+          pcVar2 = strtok((char*)0x0, (char*)&local_c18);
+          if (pcVar2 != (char*)0x0) {
+            strncpy(local_c00, pcVar2, 0x1ff);
           }
-
+          // Primary BL=0 then alt BL=1 (asm-sealed; decomp lost BL)
           FUN_0092db30(&local_c14);
-
-          FUN_007f72e0(param_1 + 0x116c,iVar4);
-
+          FUN_007f72e0(); // ActionMap_TrySetSlotBind primary
           FUN_0092db30(&local_c14);
-
-          FUN_007f72e0(param_1 + 0x116c,iVar4);
-
+          FUN_007f72e0(); // ActionMap_TrySetSlotBind alt
           _File = local_c04;
-
         }
-
       }
-
     }
-
-    pcVar2 = fgets(local_800,0x800,_File);
-
-  } while( true );
-
+    pcVar2 = fgets(local_800, 0x800, _File);
+  } while (true);
 }

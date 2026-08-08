@@ -1,16 +1,16 @@
 // =============================================================================
-// Named_CalleeOf_Client_Input_PollBoundActions_00889fb0
+// Named_CalleeOf_Client_Input_PollBoundActions_00889fb0  [RETIRED AS PRODUCT]
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00889fb0
-// Callee of Client_Input_PollBoundActions
+// RETIRED:   Prefer UI_CarTabs_ApplyPanelMode_Inferred.cpp (R11-033 dual 2026-08-05)
 // Address:   0x00889fb0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// System:    inventory-transfer
+// Scaffold only — parent-seed name from PollBoundActions xref; not product English.
 // Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
 // Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
 // =============================================================================
 
-// PURPOSE (auto): Called from Client_Input_PollBoundActions: input/binding helper with no high-value strings in clean/raw. Role inferred from parent name only; refine when decompile strings or xrefs improve.
+// PURPOSE: Scaffold alias only. Canonical = UI_CarTabs_ApplyPanelMode_Inferred.
 // Readability: control flow preserved from Ghidra decompile; types tentative.
 
 // READABILITY (auto CF):

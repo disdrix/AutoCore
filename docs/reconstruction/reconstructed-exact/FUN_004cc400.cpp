@@ -1,90 +1,31 @@
-// =============================================================================
-// FUN_004cc400
-// -----------------------------------------------------------------------------
-// Stable ID: aa_004cc400
-// Address:   0x004cc400  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
-// =============================================================================
+// Scaffold twin — prefer StdMap_OperatorIndex_Tfid_Isnil29_Inferred.cpp
+// aa_004cc400 / 0x004cc400 / FUN_004cc400
+// WQ9G-C 2026-08-04
 
-// PURPOSE (auto): Scaffold unit for FUN_004cc400 @ 0x004cc400
-// Stable ID: aa_004cc400
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~27 non-empty decompiler lines.
-//  - Control keywords: if×2, goto×1, return×1.
-//  - Notable callees: FUN_004cb4b0, FUN_004cc220, FUN_004cc400.
-//  - Return sites: 1.
+extern "C" int __thiscall FUN_004cb4b0(void *map, const uint32_t *key);
+extern "C" int *__thiscall FUN_004cc220(void *map, int **outIt, int *hint, void *value);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-int __thiscall FUN_004cc400(int param_1,uint *param_2)
-
-
-
+int *__thiscall FUN_004cc400(void *map /*ECX*/, const uint32_t *key /*stack*/)
+// RET 4
 {
-
-  uint *puVar1;
-
-  int iVar2;
-
-  int *piVar3;
-
-  uint local_18;
-
-  uint local_14;
-
-  uint local_10;
-
-  uint local_c;
-
-  uint32_t /* width from decompiler */ local_8;
-
-  
-
-  puVar1 = param_2;
-
-  iVar2 = FUN_004cb4b0(param_2);
-
-  if (iVar2 != *(int *)(param_1 + 4)) {
-
-    if ((*(int *)(iVar2 + 0x14) < (int)puVar1[1]) ||
-
-       ((*(int *)(iVar2 + 0x14) <= (int)puVar1[1] && (*(uint *)(iVar2 + 0x10) <= *puVar1))))
-
-    goto LAB_004cc45e;
-
+  const uint32_t *k = key;
+  int it = FUN_004cb4b0(map, key);
+  if (it != *(int *)((char *)map + 4)) {
+    if ((*(int *)(it + 0x14) < (int)k[1]) ||
+        ((*(int *)(it + 0x14) <= (int)k[1] && (*(uint32_t *)(it + 0x10) <= k[0])))) {
+      return (int *)(it + 0x20);
+    }
   }
-
-  local_18 = *puVar1;
-
-  local_14 = puVar1[1];
-
-  local_10 = puVar1[2];
-
-  local_c = puVar1[3];
-
-  local_8 = 0;
-
-  piVar3 = (int *)FUN_004cc220(&param_2,iVar2,&local_18);
-
-  iVar2 = *piVar3;
-
-LAB_004cc45e:
-
-  return iVar2 + 0x20;
-
+  uint32_t staged[5];
+  staged[0] = k[0];
+  staged[1] = k[1];
+  staged[2] = k[2];
+  staged[3] = k[3];
+  staged[4] = 0;
+  int *out = nullptr;
+  int *pair = FUN_004cc220(map, &out, (int *)it, staged);
+  it = *pair;
+  return (int *)(it + 0x20);
 }

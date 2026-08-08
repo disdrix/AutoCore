@@ -1,86 +1,46 @@
 // =============================================================================
-// FUN_00402410
+// FUN_00402410  (Ghidra symbol twin of StdList_CopyCtor_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00402410
 // Address:   0x00402410  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Body:      0x00402410–0x00402495 inclusive (134 B / 0x86)
+// System:    shared MSVC std::list (partition seed: missions-progression)
+// Generated: 2026-08-05 R10-019 dual re-verify (replaces 2026-07-23 scaffold)
+// Exactness: Behavior-preserving rewrite of decompiler + sealed bytes. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED.
+// Canonical named unit: StdList_CopyCtor_Inferred.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00402410 @ 0x00402410
-// Stable ID: aa_00402410
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~19 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_00402410, FUN_00404490, FUN_0040fb90.
-//  - Return sites: 1.
+extern "C" void* __cdecl StdList_AllocEmptySentinel_Inferred(void);
+extern "C" void __cdecl FUN_00404490(void* list, void* where, void* first, void* last);
+extern "C" void* __stdcall StdList_CopyCtor_Inferred(void* dest, void* src);
 
-// READABILITY:
-// Control-flow (from raw @ 0x00402410; evidence only — no invented semantics):
-//  - Entry: `int FUN_00402410(int param_1,int param_2)`.
-//  - Calls: FUN_0040fb90(); FUN_00404490(param_1,**(param_1 + 4),**(param_2 + ...).
-//  - Returns (1 site(s)): `param_1`.
-//  - Assign `local_8 = 0xffffffff`.
-//  - Assign `local_10 = ExceptionList`.
-//  - Assign `local_8 = 0`.
+// Ghidra inventory name — thin alias to named reconstruction
+extern "C" void* __stdcall FUN_00402410(void* dest, void* src)
+{
+    return StdList_CopyCtor_Inferred(dest, src);
+}
 
-
-
+// Named implementation (kept in twin for single-TU readability; primary body in
+// StdList_CopyCtor_Inferred.cpp — this file documents the FUN_* inventory path).
 
 /*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ * Sealed CF (matches raw + live decompile + disassemble_function):
  *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
+ *   SEH setup (LAB_009bd220)
+ *   ESI = dest = [EBP+8]
+ *   head = FUN_0040fb90()                    // StdList_AllocEmptySentinel_Inferred
+ *   [ESI+4] = head                           // _Myhead
+ *   [ESI+8] = 0                              // _Mysize
+ *   SEH state = 0
+ *   src_head  = [[EBP+0xC]+4]
+ *   src_begin = [src_head]
+ *   where     = [[ESI+4]]                    // dest head->_Next
+ *   FUN_00404490(dest, where, src_begin, src_head)
+ *   EAX = ESI
+ *   RET 8
+ *
+ * Not domain logic. Sibling empty default: StdList_DefaultCtor_Inferred @ 0x004023f0.
  */
-
-int FUN_00402410(int param_1,int param_2)
-
-
-
-{
-
-  uint32_t /* width from decompiler */ uVar1;
-
-  void *local_10;
-
-  uint8_t *puStack_c;
-
-  uint32_t /* width from decompiler */ local_8;
-
-  
-
-  local_8 = 0xffffffff;
-
-  puStack_c = &LAB_009bd220;
-
-  local_10 = ExceptionList;
-
-  ExceptionList = &local_10;
-
-  uVar1 = FUN_0040fb90();
-
-  *(uint32_t /* width from decompiler */ *)(param_1 + 4) = uVar1;
-
-  *(uint32_t /* width from decompiler */ *)(param_1 + 8) = 0;
-
-  local_8 = 0;
-
-  FUN_00404490(param_1,**(uint32_t /* width from decompiler */ **)(param_1 + 4),**(uint32_t /* width from decompiler */ **)(param_2 + 4),
-
-               *(uint32_t /* width from decompiler */ **)(param_2 + 4));
-
-  ExceptionList = local_10;
-
-  return param_1;
-
-}

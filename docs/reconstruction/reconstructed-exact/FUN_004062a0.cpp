@@ -1,82 +1,46 @@
 // =============================================================================
-// FUN_004062a0
+// FUN_004062a0 — scaffold twin of StdVector_PushBack_Elem12_EaxVec_EcxVal_Inferred
 // -----------------------------------------------------------------------------
 // Stable ID: aa_004062a0
 // Address:   0x004062a0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    util / container (elem 0xC)
+// Generated: 2026-08-04 WQ9H-C (refined from 2026-07-23 scaffold)
+// Prefer named clean: StdVector_PushBack_Elem12_EaxVec_EcxVal_Inferred.cpp
+// Exactness: Behavior-preserving rewrite of decompiler control flow.
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_004062a0 @ 0x004062a0
-// Stable ID: aa_004062a0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~18 non-empty decompiler lines.
-//  - Control keywords: return×2, if×1.
-//  - Notable callees: FUN_004062a0, FUN_00406e70, FUN_00409db0.
-//  - Return sites: 2.
+extern "C" void FUN_00409db0(void* dest, int count);
+extern "C" void** FUN_00406e70(void* vec, void** outIt, void* where, const void* value);
 
-// READABILITY:
-// Control-flow (from raw @ 0x004062a0; evidence only — no invented semantics):
-//  - Entry: `void __fastcall FUN_004062a0(undefined4 param_1)`.
-//  - Branches: if ((iVar1 != 0) && (((*(in_EAX + 8) - iVar1) / 0xc) < ((*(in_EAX + 0xc) ...).
-//  - Calls: FUN_00409db0(iVar1,1); FUN_00406e70(&local_4,*(in_EAX + 8),param_1).
-//  - Returns (2 site(s)): `void`.
+// Ghidra surface: void __fastcall FUN_004062a0(undefined4 param_1) + in_EAX host.
+// Recovered: EAX=vec*, ECX=value*, ret 0.
 
-
-
-
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __fastcall FUN_004062a0(uint32_t /* width from decompiler */ param_1)
-
-
-
+extern "C" void FUN_004062a0(
+    /*EAX*/ void* vec,
+    /*ECX*/ const void* value)
 {
+  int begin = *reinterpret_cast<int*>(reinterpret_cast<char*>(vec) + 4);
 
-  int iVar1;
-
-  int in_EAX;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
-
-  iVar1 = *(int *)(in_EAX + 4);
-
-  local_4 = param_1;
-
-  if ((iVar1 != 0) &&
-
-     ((uint)((*(int *)(in_EAX + 8) - iVar1) / 0xc) < (uint)((*(int *)(in_EAX + 0xc) - iVar1) / 0xc))
-
-     ) {
-
-    iVar1 = *(int *)(in_EAX + 8);
-
-    FUN_00409db0(iVar1,1);
-
-    *(int *)(in_EAX + 8) = iVar1 + 0xc;
-
+  if (begin != 0 &&
+      static_cast<unsigned>(
+          (*reinterpret_cast<int*>(reinterpret_cast<char*>(vec) + 8) - begin) /
+          0xc) <
+          static_cast<unsigned>(
+              (*reinterpret_cast<int*>(reinterpret_cast<char*>(vec) + 0xc) - begin) /
+              0xc)) {
+    int end = *reinterpret_cast<int*>(reinterpret_cast<char*>(vec) + 8);
+    FUN_00409db0(reinterpret_cast<void*>(end), 1);
+    *reinterpret_cast<int*>(reinterpret_cast<char*>(vec) + 8) = end + 0xc;
     return;
-
   }
 
-  FUN_00406e70(&local_4,*(uint32_t /* width from decompiler */ *)(in_EAX + 8),param_1);
-
-  return;
-
+  void* outScratch = const_cast<void*>(value);
+  FUN_00406e70(
+      vec,
+      &outScratch,
+      *reinterpret_cast<void**>(reinterpret_cast<char*>(vec) + 8),
+      value);
 }

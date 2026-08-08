@@ -1,90 +1,70 @@
 // =============================================================================
-// FUN_0092a590
+// FUN_0092a590  (Ghidra twin of Tracker_SetActiveMissionObjective_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0092a590
-// Address:   0x0092a590  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x0092a590 – 0x0092a5fe  (111 B / 0x6F)
+// Canonical: Tracker_SetActiveMissionObjective_Inferred
+// System:    missions-progression
+// Sealed:    2026-08-05 dual MEGA-010
+// Exactness: Behavior-preserving rewrite of image control flow. Not modernization.
+// Bit-for-bit / runtime / diff: DEFERRED. Terminal: false.
+// =============================================================================
+//
+// Prefer the named clean source:
+//   docs/reconstruction/reconstructed-exact/Tracker_SetActiveMissionObjective_Inferred.cpp
+//
+// ABI: ECX = MissionTracker*; EAX = missionId; AL = bool; bare RET.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0092a590 @ 0x0092a590
-// Stable ID: aa_0092a590
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~27 non-empty decompiler lines.
-//  - Control keywords: if×3, return×3.
-//  - Notable callees: FUN_00929c00×2, FUN_0092a3d0×2, CNDHash_LookupByKey, FUN_0092a590.
-//  - Return sites: 3.
+using u32 = std::uint32_t;
+using u8  = std::uint8_t;
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+struct Client;
+struct Character;
+struct ObjectiveNode;
+struct MissionTracker;
 
-uint32_t /* width from decompiler */ __fastcall FUN_0092a590(int *param_1)
+void* __thiscall CNDHash_LookupByKey(void* hash, u32 key);
+u32 FUN_0092a3d0(void); // EDI = tracker
+u32 FUN_00929c00(void); // EAX = tracker
 
-
-
+char __fastcall FUN_0092a590(MissionTracker* tracker /*ECX*/, u32 missionId /*EAX*/)
 {
+    auto* base = reinterpret_cast<u8*>(tracker);
 
-  uint in_EAX;
+    *reinterpret_cast<u32*>(base + 0x10) = missionId;
+    *(base + 0x6) = 1;
 
-  void *pvVar1;
-
-  
-
-  param_1[4] = in_EAX;
-
-  *(uint8_t *)((int)param_1 + 6) = 1;
-
-  if (in_EAX == 0) {
-
-    FUN_0092a3d0();
-
-    FUN_00929c00();
-
-    param_1[4] = 0;
-
-    param_1[3] = 0;
-
-    return 1;
-
-  }
-
-  if (*(int *)(*param_1 + 0xe98) != 0) {
-
-    pvVar1 = CNDHash_LookupByKey(*(void **)(*(int *)(*param_1 + 0xe98) + 0x548),in_EAX);
-
-    if (pvVar1 != (void *)0x0) {
-
-      param_1[3] = **(int **)((int)pvVar1 + 0x14c);
-
-      *(uint8_t *)(param_1 + 1) = 1;
-
-      return 1;
-
+    if (missionId == 0) {
+        FUN_0092a3d0();
+        FUN_00929c00();
+        *reinterpret_cast<u32*>(base + 0x10) = 0;
+        *reinterpret_cast<u32*>(base + 0x0c) = 0;
+        return 1;
     }
 
-  }
+    auto* host = *reinterpret_cast<Client**>(base + 0x00);
+    auto* character =
+        *reinterpret_cast<Character**>(reinterpret_cast<u8*>(host) + 0xe98);
+    if (character != nullptr) {
+        void* hash =
+            *reinterpret_cast<void**>(reinterpret_cast<u8*>(character) + 0x548);
+        auto* node =
+            reinterpret_cast<ObjectiveNode*>(CNDHash_LookupByKey(hash, missionId));
+        if (node != nullptr) {
+            auto* headPtr =
+                *reinterpret_cast<u32**>(reinterpret_cast<u8*>(node) + 0x14c);
+            *reinterpret_cast<u32*>(base + 0x0c) = *headPtr;
+            *(base + 0x4) = 1;
+            return 1;
+        }
+    }
 
-  FUN_0092a3d0();
-
-  FUN_00929c00();
-
-  param_1[4] = 0;
-
-  param_1[3] = 0;
-
-  return 0;
-
+    FUN_0092a3d0();
+    FUN_00929c00();
+    *reinterpret_cast<u32*>(base + 0x10) = 0;
+    *reinterpret_cast<u32*>(base + 0x0c) = 0;
+    return 0;
 }

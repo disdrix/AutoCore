@@ -3,41 +3,48 @@
 | Field | Value |
 |---|---|
 | **Stable ID** | `aa_004cb2c0` |
-| **Canonical name** | `FUN_004cb2c0` |
+| **Canonical name** | `FUN_004cb2c0` (scaffold); dual-named **`StdTree_Min_Isnil21_Inferred`** |
 | **Address** | `0x004cb2c0` |
+| **Body** | `0x004cb2c0`–`0x004cb2da` inclusive (**27 B** / `0x1b`) |
 | **Module** | `autoassault.exe` (image base `0x400000`) |
-| **System** | unknown |
-| **Completion status** | **Partial scaffold** — raw/annotated/clean present; refine + dual review for important units |
+| **System** | MSVC `std::_Tree` min / leftmost (isnil @ +0x21) |
+| **Completion status** | **Dual-reviewed** R13-002 — **accept** |
 | **Bit-for-bit / runtime / diff** | Open (deferred / not run) |
-
-## Alias
-
-Human name: `Named_CalleeOf_Named_CalleeOf_Named_CalleeOf_Named_CalleeOf_Nam_004cb2c0` (callee of `Named_CalleeOf_Named_CalleeOf_Named_CalleeOf_Named_VOG_DEBUG_ST`)
+| **Partition** | `WAVE_2026-08-05_r13_residual_partition_map.md` → **R13-002** |
 
 ## Purpose
 
-Reconstructed from Ghidra decompile. See clean source and annotated notes for body.
+Return leftmost non-nil node in subtree (MSVC `_Tree_min`). isnil flag at `+0x21`. Stack-arg ABI (`[esp+4]`); EAX return. Callers: seven isnil21 map erase plates recomputing head leftmost (including parent `FUN_00405650`).
 
-## Signature (decompiler-derived)
+## Signature (sealed)
 
 ```c
-void FUN_004cb2c0(int *param_1)
+// stack arg node*; returns node* in EAX; bare RET
+void *FUN_004cb2c0(void *node /*[esp+4]*/);
 ```
 
 ## Artifacts
 
 - Raw: `docs/reconstruction/raw/aa_004cb2c0_FUN_004cb2c0.md`
 - Annotated: `docs/reconstruction/raw/aa_004cb2c0_FUN_004cb2c0.annotated.md`
-- Clean: `docs/reconstruction/reconstructed-exact/FUN_004cb2c0.cpp`
+- Clean: `docs/reconstruction/reconstructed-exact/StdTree_Min_Isnil21_Inferred.cpp`
+- Twin: `docs/reconstruction/reconstructed-exact/FUN_004cb2c0.cpp`
+- Named record: `docs/reconstruction/functions/aa_004cb2c0_StdTree_Min_Isnil21_Inferred.md`
+- Review A/B: `docs/reconstruction/reviews/A_aa_004cb2c0_StdTree_Min_Isnil21_Inferred.md`, `B_aa_004cb2c0_StdTree_Min_Isnil21_Inferred.md`
 
 ## Callers / callees
 
-(Populate from Ghidra xrefs in follow-up.)
+| Direction | Targets |
+|---|---|
+| Callers | `FUN_00405650` @ `0x0040571a`; `FUN_004e3e70` @ `0x004e3f5f`; `FUN_00511c00` @ `0x00511cec`; `FUN_0059d300` @ `0x0059d3ec`; `FUN_005a2ea0` @ `0x005a2f8f`; `FUN_005a4590` @ `0x005a467c`; `FUN_005ae6d0` @ `0x005ae7bf` (7 UNCONDITIONAL_CALL) |
+| Callees | none (leaf) |
 
 ## Confidence
 
 | Claim | Level |
 |---|---|
-| Control flow from decompiler | High |
-| Parameter semantic names | Probable / Tentative until caller pass |
-| Types | Tentative |
+| Control flow from bytes | **High** |
+| Stack-arg / EAX-out ABI | **High** |
+| isnil +0x21 | **High** |
+| Product map English | **Open** (role sealed) |
+| Runtime | **Open** |

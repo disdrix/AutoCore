@@ -1,9 +1,10 @@
-// =============================================================================
+﻿// =============================================================================
 // FUN_00888b00
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00888b00
 // Address:   0x00888b00  (autoassault.exe, image base 0x400000)
-// System:    unknown
+// System:    inventory-transfer (UI Cs2d tabs)
+// R11-031: dual sealed as UI_Cs2dTabs_SelectTab_Inferred — see named clean twin.
 // Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
 // Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
 // Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
@@ -16,8 +17,8 @@
 
 // READABILITY (auto CF):
 //  - Body size: ~43 non-empty decompiler lines.
-//  - Control keywords: if×7, return×2.
-//  - Notable callees: FUN_00822cb0×4, FUN_00756c90×2, FUN_00888b00.
+//  - Control keywords: ifÃ—7, returnÃ—2.
+//  - Notable callees: FUN_00822cb0Ã—4, FUN_00756c90Ã—2, FUN_00888b00.
 //  - Return sites: 2.
 
 /*
@@ -120,3 +121,4 @@ void FUN_00888b00(int *param_1,uint32_t /* width from decompiler */ param_2)
   return;
 
 }
+

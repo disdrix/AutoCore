@@ -1,50 +1,33 @@
 // =============================================================================
-// FUN_006202f0
+// FUN_006202f0  — scaffold twin of CVOGHBSkill_SummonSnoop_Ctor
 // -----------------------------------------------------------------------------
 // Stable ID: aa_006202f0
-// Address:   0x006202f0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x006202f0–0x00620323  (autoassault.exe, image base 0x400000)
+// System:    skills-abilities
+// Generated: 2026-07-23 scaffold; refined 2026-08-05 R11-016 dual
+// Exactness: Behavior-preserving. Prefer named unit:
+//            reconstructed-exact/CVOGHBSkill_SummonSnoop_Ctor.cpp
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_006202f0 @ 0x006202f0
-// Stable ID: aa_006202f0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~8 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_005788d0, FUN_006202f0.
-//  - Return sites: 1.
+extern "C" void *__thiscall CVOGHBSkillBase_ctor(
+    void *self, void *p2, void *p3, std::uint32_t p4, void *p5, void *p6,
+    std::uint32_t p7);
+extern "C" void *PTR_FUN_009d156c;
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-uint32_t /* width from decompiler */ * __thiscall
-
-FUN_006202f0(uint32_t /* width from decompiler */ *param_1,uint32_t /* width from decompiler */ param_2,uint32_t /* width from decompiler */ param_3,uint32_t /* width from decompiler */ param_4,
-
-            uint32_t /* width from decompiler */ param_5,uint32_t /* width from decompiler */ param_6,uint32_t /* width from decompiler */ param_7)
-
-
-
+extern "C" void *__thiscall FUN_006202f0(
+    void *param_1 /*this ECX*/,
+    void *param_2,
+    void *param_3,
+    std::uint32_t param_4,
+    void *param_5,
+    void *param_6,
+    std::uint32_t param_7)
 {
-
-  FUN_005788d0(param_2,param_3,param_4,param_5,param_6,param_7);
-
-  *param_1 = &PTR_FUN_009d156c;
-
+  CVOGHBSkillBase_ctor(param_1, param_2, param_3, param_4, param_5, param_6,
+                       param_7);
+  *reinterpret_cast<void **>(param_1) = &PTR_FUN_009d156c;
   return param_1;
-
 }

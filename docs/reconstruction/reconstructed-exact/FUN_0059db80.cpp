@@ -1,136 +1,74 @@
 // =============================================================================
-// FUN_0059db80
+// FUN_0059db80  — twin of CVOGObjective_ProbeEligibilityCode_Inferred
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0059db80
 // Address:   0x0059db80  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    missions-progression
+// Generated: 2026-08-05 MEGA-091 dual seal
+// Exactness: Behavior-preserving rewrite of decompiler control flow.
+// Named clean: CVOGObjective_ProbeEligibilityCode_Inferred.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0059db80 @ 0x0059db80
-// Stable ID: aa_0059db80
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~50 non-empty decompiler lines.
-//  - Control keywords: if×8, return×4, goto×2, while×2, do×1.
-//  - Notable callees: FUN_0059db80.
-//  - Return sites: 4.
-
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-int __thiscall FUN_0059db80(int param_1,int param_2)
-
-
-
+int __thiscall FUN_0059db80(int param_1, int param_2)
 {
+    int *piVar1;
+    char cVar2;
+    int iVar3;
+    int iVar4;
+    int iVar5;
+    std::uint32_t *puVar6;
 
-  int *piVar1;
-
-  char cVar2;
-
-  int iVar3;
-
-  int iVar4;
-
-  int iVar5;
-
-  uint32_t /* width from decompiler */ *puVar6;
-
-  
-
-  iVar4 = *(int *)(param_1 + 0x120);
-
-  if (iVar4 == -1) {
-
-    iVar4 = *(int *)(*(int *)(param_1 + 0x14c) + 0xfc);
-
-  }
-
-  iVar5 = *(int *)(*(int *)(*(int *)(*(int *)(param_2 + 0x55c) + 0x10) +
-
-                           (*(uint *)(*(int *)(param_2 + 0x55c) + 8) & *(uint *)(param_1 + 0x10)) *
-
-                           4) + 4);
-
-  if (iVar5 == 0) {
-
-LAB_0059dbda:
-
-    iVar5 = 0;
-
-  }
-
-  else {
-
-    do {
-
-      if (*(uint *)(param_1 + 0x10) == *(uint *)(iVar5 + 0x10)) {
-
-        if (iVar5 == 0) goto LAB_0059dbda;
-
-        iVar5 = *(int *)(iVar5 + 8);
-
-        goto LAB_0059dbe1;
-
-      }
-
-      iVar5 = *(int *)(iVar5 + 0xc);
-
-    } while (iVar5 != 0);
-
-    iVar5 = 0;
-
-  }
-
-LAB_0059dbe1:
-
-  if (iVar5 == 0) {
-
-    return iVar4;
-
-  }
-
-  puVar6 = *(uint32_t /* width from decompiler */ **)(param_1 + 0x158);
-
-  if (puVar6 != *(uint32_t /* width from decompiler */ **)(param_1 + 0x15c)) {
-
-    while( true ) {
-
-      piVar1 = (int *)*puVar6;
-
-      cVar2 = (**(code **)(*piVar1 + 8))(param_2,iVar5);
-
-      if (((cVar2 == '\0') && (iVar3 = (**(code **)(*piVar1 + 0x58))(), iVar3 != -1)) &&
-
-         (iVar3 != 0)) break;
-
-      puVar6 = puVar6 + 1;
-
-      if (puVar6 == *(uint32_t /* width from decompiler */ **)(param_1 + 0x15c)) {
-
-        return iVar4;
-
-      }
-
+    iVar4 = *reinterpret_cast<int *>(param_1 + 0x120);
+    if (iVar4 == -1) {
+        iVar4 = *reinterpret_cast<int *>(
+            *reinterpret_cast<int *>(param_1 + 0x14c) + 0xfc);
     }
-
-    return iVar3;
-
-  }
-
-  return iVar4;
-
+    iVar5 = *reinterpret_cast<int *>(
+        *reinterpret_cast<int *>(
+            *reinterpret_cast<int *>(
+                *reinterpret_cast<int *>(param_2 + 0x55c) + 0x10) +
+            ((*reinterpret_cast<std::uint32_t *>(
+                  *reinterpret_cast<int *>(param_2 + 0x55c) + 8) &
+              *reinterpret_cast<std::uint32_t *>(param_1 + 0x10)) *
+             4) +
+        4);
+    if (iVar5 == 0) {
+LAB_0059dbda:
+        iVar5 = 0;
+    } else {
+        do {
+            if (*reinterpret_cast<std::uint32_t *>(param_1 + 0x10) ==
+                *reinterpret_cast<std::uint32_t *>(iVar5 + 0x10)) {
+                if (iVar5 == 0) goto LAB_0059dbda;
+                iVar5 = *reinterpret_cast<int *>(iVar5 + 8);
+                goto LAB_0059dbe1;
+            }
+            iVar5 = *reinterpret_cast<int *>(iVar5 + 0xc);
+        } while (iVar5 != 0);
+        iVar5 = 0;
+    }
+LAB_0059dbe1:
+    if (iVar5 == 0) {
+        return iVar4;
+    }
+    puVar6 = *reinterpret_cast<std::uint32_t **>(param_1 + 0x158);
+    if (puVar6 != *reinterpret_cast<std::uint32_t **>(param_1 + 0x15c)) {
+        while (true) {
+            piVar1 = reinterpret_cast<int *>(*puVar6);
+            cVar2 = (**(char (**)(int, int))(*piVar1 + 8))(param_2, iVar5);
+            if (((cVar2 == '\0') &&
+                 (iVar3 = (**(int (**)())(*piVar1 + 0x58))(), iVar3 != -1)) &&
+                (iVar3 != 0)) {
+                break;
+            }
+            puVar6 = puVar6 + 1;
+            if (puVar6 == *reinterpret_cast<std::uint32_t **>(param_1 + 0x15c)) {
+                return iVar4;
+            }
+        }
+        return iVar3;
+    }
+    return iVar4;
 }

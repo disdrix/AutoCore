@@ -1,74 +1,58 @@
 // =============================================================================
-// FUN_00401f40
+// FUN_00401f40  — scaffold twin of StdTree_Buynode_StringByte_Isnil2D_Inferred
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00401f40
-// Address:   0x00401f40  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00401f40–0x00401fbf exclusive (127 B / 0x7F)
+// System:    MSVC std::_Tree node buy — string+byte value, isnil@+0x2d, size 0x30
+// Generated: 2026-08-05 MEGA-079 dual seal (scaffold 2026-07-23 refreshed)
+// Exactness: Behavior-preserving rewrite of decompiler CF + sealed bytes.
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
+//
+// Canonical clean: StdTree_Buynode_StringByte_Isnil2D_Inferred.cpp
+// Dual: reviews/A|B_aa_00401f40_StdTree_Buynode_StringByte_Isnil2D_Inferred.md
+// Retired: Named_CalleeOf_*Mis_00401f40 chain plate.
 
-// PURPOSE (auto): Scaffold unit for FUN_00401f40 @ 0x00401f40
-// Stable ID: aa_00401f40
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~19 non-empty decompiler lines.
-//  - Control keywords: if×1, return×1.
-//  - Notable callees: FUN_00401f40, FUN_00401fe0.
-//  - Return sites: 1.
+struct StringByteVal {
+  std::uint8_t str_storage[0x1c];
+  std::uint8_t mapped_byte;
+};
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+struct NodeIsnil2D_StringByte {
+  NodeIsnil2D_StringByte* left;
+  NodeIsnil2D_StringByte* parent;
+  NodeIsnil2D_StringByte* right;
+  StringByteVal value;
+  std::uint8_t color;
+  std::uint8_t isnil;
+};
 
-void * FUN_00401f40(uint32_t /* width from decompiler */ param_1)
+extern "C" NodeIsnil2D_StringByte* FUN_00401fe0(
+    NodeIsnil2D_StringByte* self,
+    NodeIsnil2D_StringByte* parent,
+    NodeIsnil2D_StringByte* right,
+    NodeIsnil2D_StringByte* left,
+    std::uint8_t color);
 
+extern "C" void* operator_new(std::size_t size);
 
+extern "C" NodeIsnil2D_StringByte* __stdcall StdTree_Buynode_StringByte_Isnil2D_Inferred(
+    NodeIsnil2D_StringByte* left,
+    NodeIsnil2D_StringByte* parent,
+    NodeIsnil2D_StringByte* right,
+    const StringByteVal* value,
+    std::uint8_t color);
 
+// Ghidra symbol alias
+extern "C" NodeIsnil2D_StringByte* __stdcall FUN_00401f40(
+    NodeIsnil2D_StringByte* left,
+    NodeIsnil2D_StringByte* parent,
+    NodeIsnil2D_StringByte* right,
+    const StringByteVal* value,
+    std::uint8_t color)
 {
-
-  void *pvVar1;
-
-  uint32_t /* width from decompiler */ in_stack_00000014;
-
-  void *local_10;
-
-  uint8_t *puStack_c;
-
-  uint32_t /* width from decompiler */ local_8;
-
-  
-
-  local_8 = 0xffffffff;
-
-  puStack_c = &LAB_009bc811;
-
-  local_10 = ExceptionList;
-
-  ExceptionList = &local_10;
-
-  pvVar1 = operator_new(0x30);
-
-  local_8 = 1;
-
-  if (pvVar1 != (void *)0x0) {
-
-    FUN_00401fe0(pvVar1,param_1,in_stack_00000014);
-
-  }
-
-  ExceptionList = local_10;
-
-  return pvVar1;
-
+  // SEH omitted (LAB_009bc811). operator_new(0x30); null-safe FUN_00401fe0; RET 0x14.
+  return StdTree_Buynode_StringByte_Isnil2D_Inferred(left, parent, right, value, color);
 }

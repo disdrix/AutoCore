@@ -3,41 +3,44 @@
 | Field | Value |
 |---|---|
 | **Stable ID** | `aa_004cbb60` |
-| **Canonical name** | `FUN_004cbb60` |
+| **Canonical name** | `FUN_004cbb60` (Ghidra); dual-named **`StdTree_InsertAndRebalance_Isnil29_Inferred`** |
 | **Address** | `0x004cbb60` |
 | **Module** | `autoassault.exe` (image base `0x400000`) |
-| **System** | unknown |
-| **Completion status** | **Partial scaffold** — raw/annotated/clean present; refine + dual review for important units |
-| **Bit-for-bit / runtime / diff** | Open (deferred / not run) |
-
-## Alias
-
-Human name: `Named_CalleeOf_Named_CalleeOf_Named_CalleeOf_CVOGHBAIBase_GetTa_004cbb60` (callee of `Named_CalleeOf_Named_CalleeOf_CVOGHBAIBase_GetTargetFromAggro`)
+| **System** | MSVC std map/set tree insert (isnil@+0x29) |
+| **Completion status** | **Dual sealed** WQ9E-E 2026-08-04 — raw re-verify + A/B + named clean |
+| **Bit-for-bit / runtime / diff** | Open (Terminal **false**) |
 
 ## Purpose
 
-Reconstructed from Ghidra decompile. See clean source and annotated notes for body.
+Always-insert + red-black rebalance for isnil@+0x29 trees. See named plate.
 
-## Signature (decompiler-derived)
+## Signature
 
 ```c
-void __thiscall
+void __thiscall FUN_004cbb60(MapShell *map /*ECX*/, Node **outIt,
+                             char addLeft, Node *where, Val24 *value);
+// RET 0x10
 ```
 
 ## Artifacts
 
 - Raw: `docs/reconstruction/raw/aa_004cbb60_FUN_004cbb60.md`
 - Annotated: `docs/reconstruction/raw/aa_004cbb60_FUN_004cbb60.annotated.md`
-- Clean: `docs/reconstruction/reconstructed-exact/FUN_004cbb60.cpp`
+- Clean named: `docs/reconstruction/reconstructed-exact/StdTree_InsertAndRebalance_Isnil29_Inferred.cpp`
+- Clean twin: `docs/reconstruction/reconstructed-exact/FUN_004cbb60.cpp`
+- Named record: `docs/reconstruction/functions/aa_004cbb60_StdTree_InsertAndRebalance_Isnil29_Inferred.md`
+- Review A/B: `docs/reconstruction/reviews/A_aa_004cbb60_StdTree_InsertAndRebalance_Isnil29_Inferred.md` / `B_…`
 
 ## Callers / callees
 
-(Populate from Ghidra xrefs in follow-up.)
+| Callers | `FUN_004cbe20`, `FUN_004cbee0`, `FUN_004cc220` (11 UNCONDITIONAL_CALL) |
+| Callees | `FUN_005a2de0`, `FUN_004192a0`, `FUN_004192f0`, throw path |
 
 ## Confidence
 
 | Claim | Level |
 |---|---|
-| Control flow from decompiler | High |
-| Parameter semantic names | Probable / Tentative until caller pass |
-| Types | Tentative |
+| Control flow from decompiler | **High** |
+| ABI RET 0x10 / thiscall | **High** |
+| Buynode 0x30 / isnil@+0x29 | **High** |
+| Product demangle | Tentative (`_Inferred`) |

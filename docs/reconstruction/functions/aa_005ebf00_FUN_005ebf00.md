@@ -4,20 +4,23 @@
 |---|---|
 | **Stable ID** | `aa_005ebf00` |
 | **Canonical name** | `FUN_005ebf00` |
-| **Address** | `0x005ebf00` |
+| **Inferred name** | `VOGPhysics_SphereQueryCollect_Dtor_Inferred` |
+| **Address** | `0x005ebf00`–`0x005ebf67` (104 B / `0x68`) |
 | **Module** | `autoassault.exe` (image base `0x400000`) |
-| **System** | unknown |
-| **Completion status** | **Partial scaffold** — raw/annotated/clean present; refine + dual review for important units |
-| **Bit-for-bit / runtime / diff** | Open (deferred / not run) |
+| **System** | interaction-activation |
+| **Partition parent** | `0x005eb210` `VOGPhysics_QueryObject_BaseCtor_Inferred` |
+| **Completion status** | **Dual sealed (R12-038)** — **accept-with-gaps** |
+| **Bit-for-bit / runtime / diff** | Open |
 
 ## Purpose
 
-Reconstructed from Ghidra decompile. See clean source and annotated notes for body.
+Complete-object destructor for the dualed **sphere query collect** type: releases the `+0xC0` collect triad, then tail-jumps base dtor `FUN_006343d0`.
 
-## Signature (decompiler-derived)
+## Signature
 
 ```c
-void __fastcall FUN_005ebf00(uint32_t /* width from decompiler */ *param_1)
+void __thiscall FUN_005ebf00(uint32_t *self /* ECX */);
+// no stack args; ends in JMP FUN_006343d0
 ```
 
 ## Artifacts
@@ -25,15 +28,22 @@ void __fastcall FUN_005ebf00(uint32_t /* width from decompiler */ *param_1)
 - Raw: `docs/reconstruction/raw/aa_005ebf00_FUN_005ebf00.md`
 - Annotated: `docs/reconstruction/raw/aa_005ebf00_FUN_005ebf00.annotated.md`
 - Clean: `docs/reconstruction/reconstructed-exact/FUN_005ebf00.cpp`
+- Named clean: `docs/reconstruction/reconstructed-exact/VOGPhysics_SphereQueryCollect_Dtor_Inferred.cpp`
+- Named record: `docs/reconstruction/functions/aa_005ebf00_VOGPhysics_SphereQueryCollect_Dtor_Inferred.md`
+- Dual A/B: `reviews/A|B_aa_005ebf00_VOGPhysics_SphereQueryCollect_Dtor_Inferred.md`
+- Report: `docs/agents/task-dual-ab-005ebf00-r12-report.md`
 
 ## Callers / callees
 
-(Populate from Ghidra xrefs in follow-up.)
+| Direction | Target |
+|---|---|
+| Caller | `FUN_005ebf70` @ `0x005ebf73` (scalar-deleting dtor) |
+| Callee | per-element vcall `+0x14`; allocator free tag `0x12`; tail `FUN_006343d0` |
 
 ## Confidence
 
 | Claim | Level |
 |---|---|
-| Control flow from decompiler | High |
-| Parameter semantic names | Probable / Tentative until caller pass |
-| Types | Tentative |
+| CF / thiscall / triad offsets / tail JMP | **High** |
+| Sphere-collect dtor identity (vtbl `009dce90`) | **High** |
+| Product English / element type / runtime | **Open** |

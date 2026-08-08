@@ -1,100 +1,39 @@
-// =============================================================================
-// FUN_00416e80
+﻿// =============================================================================
+// FUN_00416e80  (scaffold twin of FreelistSlabVector_Teardown_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00416e80
 // Address:   0x00416e80  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Body:      0x00416e80–0x00416ef6 (119 B / 0x77); stdcall ret 4
+// System:    container / CNDHash freelist slab pointer vector
+// Generated: 2026-08-05 WQ9I-A — points at named clean
+// Exactness: Behavior-preserving. Not modernization. Bit-for-bit DEFERRED.
+// Dual A/B: accept-with-gaps (2026-08-05).
+// Canonical clean: FreelistSlabVector_Teardown_Inferred.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00416e80 @ 0x00416e80
-// Stable ID: aa_00416e80
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~32 non-empty decompiler lines.
-//  - Control keywords: if×2, return×2, do×1, while×1.
-//  - Notable callees: FUN_00416e80, _aligned_free.
-//  - Return sites: 2.
+extern "C" void _aligned_free(void* p);
+extern "C" void operator_delete(void* p);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void FUN_00416e80(int param_1)
-
-
-
+// stdcall ret 4 — stack freelist subobject*
+extern "C" void FUN_00416e80(void* freelistSubobject)
 {
+  unsigned char* base = static_cast<unsigned char*>(freelistSubobject);
+  void** it = *reinterpret_cast<void***>(base + 0x08);
+  void** end = *reinterpret_cast<void***>(base + 0x0c);
 
-  void **ppvVar1;
-
-  uint32_t /* width from decompiler */ *puVar2;
-
-  void *local_c;
-
-  uint8_t *puStack_8;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
-
-  puStack_8 = &LAB_009bc71b;
-
-  local_c = ExceptionList;
-
-  local_4 = 0;
-
-  puVar2 = *(uint32_t /* width from decompiler */ **)(param_1 + 8);
-
-  ExceptionList = &local_c;
-
-  ppvVar1 = &local_c;
-
-  if (puVar2 != *(uint32_t /* width from decompiler */ **)(param_1 + 0xc)) {
-
-    do {
-
-      ExceptionList = ppvVar1;
-
-      _aligned_free((void *)*puVar2);
-
-      puVar2 = puVar2 + 1;
-
-      ppvVar1 = ExceptionList;
-
-    } while (puVar2 != *(uint32_t /* width from decompiler */ **)(param_1 + 0xc));
-
+  while (it != end) {
+    _aligned_free(*it);
+    ++it;
   }
 
-  local_4 = 0xffffffff;
-
-  if (*(void **)(param_1 + 8) == (void *)0x0) {
-
-    *(uint32_t /* width from decompiler */ *)(param_1 + 8) = 0;
-
-    *(uint32_t /* width from decompiler */ *)(param_1 + 0xc) = 0;
-
-    *(uint32_t /* width from decompiler */ *)(param_1 + 0x10) = 0;
-
-    ExceptionList = local_c;
-
-    return;
-
+  void* begin = *reinterpret_cast<void**>(base + 0x08);
+  if (begin != nullptr) {
+    operator_delete(begin); // RETURNS
   }
 
-                    /* WARNING: Subroutine does not return */
-
-  operator_delete(*(void **)(param_1 + 8));
-
+  *reinterpret_cast<void**>(base + 0x08) = nullptr;
+  *reinterpret_cast<void**>(base + 0x0c) = nullptr;
+  *reinterpret_cast<void**>(base + 0x10) = nullptr;
 }

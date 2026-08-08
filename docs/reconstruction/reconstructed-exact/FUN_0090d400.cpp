@@ -1,80 +1,54 @@
 // =============================================================================
-// FUN_0090d400
+// FUN_0090d400 — twin of UI_CloseRelatedChrome_Inferred
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0090d400
-// Address:   0x0090d400  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x0090d400 – 0x0090d465 inclusive (102 B / 0x66)
+// See:       reconstructed-exact/UI_CloseRelatedChrome_Inferred.cpp
+// Name:      INFERRED 2026-08-05 MEGA-086
+// Ghidra:    FUN_0090d400 (keep for xref continuity)
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0090d400 @ 0x0090d400
-// Stable ID: aa_0090d400
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~22 non-empty decompiler lines.
-//  - Control keywords: if×4, return×1.
-//  - Notable callees: FUN_0090d400.
-//  - Return sites: 1.
+struct UiObject {
+  void** vtbl;
+};
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+extern UiObject* DAT_00d1b978;
 
-void FUN_0090d400(void)
+using FnVisible = char(__thiscall*)(UiObject*);
+using FnSetState = void(__thiscall*)(UiObject*, int);
+using FnClose = void(__thiscall*)(UiObject*);
+using FnNotify = void(__thiscall*)(UiObject*, UiObject*);
+using FnBind = void(__thiscall*)(UiObject*, UiObject*);
+using FnReset = void(__thiscall*)(UiObject*, int);
 
+// Retail: ESI = primary (closed), EDI = secondary (notified); bare RET (C3).
+// Decompiler: void FUN_0090d400(void) with unaff_ESI / unaff_EDI.
 
-
+extern "C" void FUN_0090d400(UiObject* primary /*ESI*/,
+                             UiObject* secondary /*EDI*/)
 {
-
-  char cVar1;
-
-  int *unaff_ESI;
-
-  int *unaff_EDI;
-
-  
-
-  if (unaff_ESI != (int *)0x0) {
-
-    cVar1 = (**(code **)(*unaff_ESI + 0x3d8))();
-
-    if (cVar1 != '\0') {
-
-      (**(code **)(*unaff_ESI + 0xcc))(0);
-
-      (**(code **)(*unaff_ESI + 0x440))();
-
-      (**(code **)(*unaff_EDI + 0xb0))();
-
-      if (DAT_00d1b978 != (int *)0x0) {
-
-        cVar1 = (**(code **)(*DAT_00d1b978 + 0x3d8))();
-
-        if (cVar1 != '\0') {
-
-          (**(code **)(*unaff_EDI + 0x3bc))(DAT_00d1b978);
-
-        }
-
-      }
-
-      (**(code **)(*unaff_EDI + 0x3f4))(0xffffffff);
-
-    }
-
+  if (primary == nullptr) {
+    return;
   }
 
-  return;
+  if (reinterpret_cast<FnVisible>(primary->vtbl[0x3d8 / 4])(primary) == 0) {
+    return;
+  }
 
+  reinterpret_cast<FnSetState>(primary->vtbl[0xcc / 4])(primary, 0);
+  reinterpret_cast<FnClose>(primary->vtbl[0x440 / 4])(primary);
+
+  reinterpret_cast<FnNotify>(secondary->vtbl[0xb0 / 4])(secondary, primary);
+
+  if (DAT_00d1b978 != nullptr) {
+    if (reinterpret_cast<FnVisible>(DAT_00d1b978->vtbl[0x3d8 / 4])(DAT_00d1b978) !=
+        0) {
+      reinterpret_cast<FnBind>(secondary->vtbl[0x3bc / 4])(secondary,
+                                                           DAT_00d1b978);
+    }
+  }
+
+  reinterpret_cast<FnReset>(secondary->vtbl[0x3f4 / 4])(secondary, -1);
 }

@@ -1,10 +1,10 @@
-// =============================================================================
+﻿// =============================================================================
 // FUN_005194f0
 // -----------------------------------------------------------------------------
 // Stable ID: aa_005194f0
 // Address:   0x005194f0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// System:    graphics / material FX (see Gfx_BindMatDiffuseAmbientEmissive_Inferred.cpp)
+// Generated: 2026-07-23 scaffold; refined 2026-08-04 WQ9R-F → Gfx_BindMatDiffuseAmbientEmissive_Inferred
 // Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
 // Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
 // =============================================================================
@@ -20,8 +20,8 @@
 
 // READABILITY (auto CF):
 //  - Body size: ~54 non-empty decompiler lines.
-//  - Control keywords: if×7, while×1, return×1.
-//  - Notable callees: FUN_009700f0×3, FUN_005194f0, FUN_0051def0, FUN_007a4480.
+//  - Control keywords: ifÃ—7, whileÃ—1, returnÃ—1.
+//  - Notable callees: FUN_009700f0Ã—3, FUN_005194f0, FUN_0051def0, FUN_007a4480.
 //  - Strings: "VOG_DEBUG_STOP"; "MatDiffuse"; "MatAmbient"; "MatEmissive".
 //  - Return sites: 1.
 
@@ -147,3 +147,4 @@ void FUN_005194f0(int param_1,int param_2)
   return;
 
 }
+

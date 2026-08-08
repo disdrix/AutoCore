@@ -1,13 +1,10 @@
 // =============================================================================
-// Named_CalleeOf_CVOGReaction_Dispatch_007a4170
+// Named_CalleeOf_CVOGReaction_Dispatch_007a4170  [SUPERSEDED 2026-08-04 WQ9D-F]
 // -----------------------------------------------------------------------------
+// Prefer: Rng_SampleUnitFloat_Inferred.cpp  (dual A/B sealed)
 // Stable ID: aa_007a4170
-// Callee of CVOGReaction_Dispatch
 // Address:   0x007a4170  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Legacy scaffold retained for path stability only.
 // =============================================================================
 
 // PURPOSE (auto): Called from CVOGReaction_Dispatch: packet/network helper with no high-value strings in clean/raw. Role inferred from parent name only; refine when decompile strings or xrefs improve.

@@ -1,92 +1,54 @@
-// =============================================================================
-// FUN_00626240
+﻿// =============================================================================
+// FUN_00626240  (alias of CVOGHBSkill_PossessCreature_ctor)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00626240
-// Address:   0x00626240  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Address:   0x00626240–0x006262e4  (autoassault.exe, image base 0x400000)
+// System:    skills-abilities
+// Generated: 2026-08-05 R11-021 dual seal
 // Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Bit-for-bit vs retail EXE: DEFERRED.
+// Named twin: CVOGHBSkill_PossessCreature_ctor.cpp
+// RTTI:      .?AVCVOGHBSkill_PossessCreature@@  (Confirmed)
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00626240 @ 0x00626240
-// Stable ID: aa_00626240
-// Embedded strings (evidence for future rename):
-//   - "VOG_DEBUG_STOP"
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <stdint.h>
 
-// READABILITY (auto CF):
-//  - Body size: ~27 non-empty decompiler lines.
-//  - Control keywords: if×1, return×1.
-//  - Notable callees: FUN_005788d0, FUN_00626240, FUN_007a4480, __RTDynamicCast.
-//  - Strings: "VOG_DEBUG_STOP".
-//  - Return sites: 1.
+extern void *__thiscall CVOGHBSkillBase_ctor(
+    void *self, void *pSource, void *pSkillBlob, uint32_t arg4,
+    void *pTarget, void *pTfid, uint32_t arg7);
+extern void *__cdecl __RTDynamicCast(
+    void *obj, long vfDelta, void *srcTD, void *targetTD, int isRef);
+extern void __cdecl FUN_007a4480(int flag, const char *msg);
+extern void *PTR_FUN_009d1ba4;
+extern void *CVOGClonedObjectBase_RTTI_Type_Descriptor;
+extern void *CVOGCreature_RTTI_Type_Descriptor;
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-uint32_t /* width from decompiler */ * __thiscall
-
-FUN_00626240(uint32_t /* width from decompiler */ *param_1,uint32_t /* width from decompiler */ param_2,uint32_t /* width from decompiler */ param_3,uint32_t /* width from decompiler */ param_4,
-
-            uint32_t /* width from decompiler */ param_5,uint32_t /* width from decompiler */ param_6,uint32_t /* width from decompiler */ param_7)
-
-
-
+void *__thiscall FUN_00626240(
+    void *self,
+    void *param_2,
+    void *param_3,
+    uint32_t param_4,
+    void *param_5,
+    void *param_6,
+    uint32_t param_7)
 {
+  void *creature;
 
-  int iVar1;
+  CVOGHBSkillBase_ctor(self, param_2, param_3, param_4, param_5, param_6, param_7);
 
-  void *local_c;
+  *(uint32_t *)self = (uint32_t)(uintptr_t)&PTR_FUN_009d1ba4;
+  *((uint8_t *)self + 0x6c8) = 0;
+  *(uint32_t *)((char *)self + 0x6c4) = 0;
+  *((uint8_t *)self + 0x6c9) = 0;
 
-  uint8_t *puStack_8;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
-
-  local_4 = 0xffffffff;
-
-  puStack_8 = &LAB_009a8ae8;
-
-  local_c = ExceptionList;
-
-  ExceptionList = &local_c;
-
-  FUN_005788d0(param_2,param_3,param_4,param_5,param_6,param_7);
-
-  local_4 = 0;
-
-  *param_1 = &PTR_FUN_009d1ba4;
-
-  *(uint8_t *)(param_1 + 0x1b2) = 0;
-
-  param_1[0x1b1] = 0;
-
-  *(uint8_t *)((int)param_1 + 0x6c9) = 0;
-
-  iVar1 = __RTDynamicCast(param_5,0,&CVOGClonedObjectBase::RTTI_Type_Descriptor,
-
-                          &CVOGCreature::RTTI_Type_Descriptor,0);
-
-  param_1[0x1b0] = iVar1;
-
-  if (iVar1 == 0) {
-
-    FUN_007a4480(0,"VOG_DEBUG_STOP");
-
+  creature = __RTDynamicCast(
+      param_5, 0,
+      &CVOGClonedObjectBase_RTTI_Type_Descriptor,
+      &CVOGCreature_RTTI_Type_Descriptor,
+      0);
+  *(void **)((char *)self + 0x6c0) = creature;
+  if (creature == 0) {
+    FUN_007a4480(0, "VOG_DEBUG_STOP");
   }
-
-  ExceptionList = local_c;
-
-  return param_1;
-
+  return self;
 }

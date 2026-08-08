@@ -1,100 +1,72 @@
 // =============================================================================
-// FUN_00570f70
+// FUN_00570f70  (scaffold twin → see named clean)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00570f70
 // Address:   0x00570f70  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Named:     InventoryGrid_ClearItemsAndReEmptyCells_Inferred
+// System:    inventory-transfer
+// Wave:      MEGA-090 (2026-08-05) — supersedes 2026-07-23 scaffold
+// Exactness: Behavior-preserving; prefer named clean for ports.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00570f70 @ 0x00570f70
-// Stable ID: aa_00570f70
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// Canonical implementation lives in:
+//   InventoryGrid_ClearItemsAndReEmptyCells_Inferred.cpp
+//
+// This twin retains the Ghidra symbol for path stability with older indexes.
 
-// READABILITY (auto CF):
-//  - Body size: ~32 non-empty decompiler lines.
-//  - Control keywords: if×3, while×1, return×1.
-//  - Notable callees: FUN_004022a0×2, FUN_004294f0, FUN_004bc580, FUN_004d4790, FUN_00570f70, InventoryGrid_AllocateCellArray_Inferred, LeaveCriticalSection.
-//  - Return sites: 1.
+#include <cstdint>
+#include <windows.h>
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+struct InventoryGrid;
 
-void __fastcall FUN_00570f70(void *param_1)
+void __fastcall List_TraversalLock(void* list);
+unsigned __fastcall LockedList_TryAdvanceIterator_Inferred(
+    void* list, int** cursor, int** outPayload);
+void __fastcall List_RemoveAll(void* list);
+void __fastcall InventoryGrid_AllocateCellArray_Inferred(void* grid);
+void FUN_004d4790(int* item);
 
-
-
+void __fastcall FUN_00570f70(void* param_1)
 {
+    int* piVar1;
+    int iVar2;
+    int* local_8;
+    unsigned local_4;
 
-  int *piVar1;
+    void* list = reinterpret_cast<std::uint8_t*>(param_1) + 0x2c;
 
-  int iVar2;
-
-  int *local_8;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
-
-  local_4 = 0;
-
-  FUN_004294f0();
-
-  iVar2 = FUN_004022a0(&local_4,&local_8);
-
-  piVar1 = local_8;
-
-  while (local_8 = piVar1, iVar2 == 0) {
-
-    if (piVar1 != (int *)0x0) {
-
-      (**(code **)(*piVar1 + 0x158))(0);
-
-      if (piVar1[0x29] == 0) {
-
-        (**(code **)*piVar1)(1);
-
-        local_8 = (int *)0x0;
-
-      }
-
-      else {
-
-        FUN_004d4790(piVar1);
-
-      }
-
-    }
-
-    iVar2 = FUN_004022a0(&local_4,&local_8);
-
+    local_4 = 0;
+    List_TraversalLock(list);
+    iVar2 = static_cast<int>(
+        LockedList_TryAdvanceIterator_Inferred(
+            list,
+            reinterpret_cast<int**>(&local_4),
+            &local_8));
     piVar1 = local_8;
-
-  }
-
-  if (*(char *)((int)param_1 + 0x54) != '\0') {
-
-    *(uint8_t *)((int)param_1 + 0x54) = 0;
-
-    LeaveCriticalSection((LPCRITICAL_SECTION)((int)param_1 + 0x30));
-
-  }
-
-  FUN_004bc580();
-
-  InventoryGrid_AllocateCellArray_Inferred(param_1);
-
-  return;
-
+    while (local_8 = piVar1, iVar2 == 0) {
+        if (piVar1 != nullptr) {
+            (**(void(__thiscall***)(int*, int))(*piVar1 + 0x158))(piVar1, 0);
+            if (piVar1[0x29] == 0) {
+                (**(void(__thiscall***)(int*, int))(*piVar1))(piVar1, 1);
+                local_8 = nullptr;
+            } else {
+                FUN_004d4790(piVar1);
+            }
+        }
+        iVar2 = static_cast<int>(
+            LockedList_TryAdvanceIterator_Inferred(
+                list,
+                reinterpret_cast<int**>(&local_4),
+                &local_8));
+        piVar1 = local_8;
+    }
+    if (*reinterpret_cast<char*>(reinterpret_cast<std::uint8_t*>(param_1) + 0x54) !=
+        '\0') {
+        *reinterpret_cast<std::uint8_t*>(
+            reinterpret_cast<std::uint8_t*>(param_1) + 0x54) = 0;
+        LeaveCriticalSection(reinterpret_cast<LPCRITICAL_SECTION>(
+            reinterpret_cast<std::uint8_t*>(param_1) + 0x30));
+    }
+    List_RemoveAll(list);
+    InventoryGrid_AllocateCellArray_Inferred(param_1);
 }

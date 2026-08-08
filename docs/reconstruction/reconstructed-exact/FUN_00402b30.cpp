@@ -1,120 +1,81 @@
 // =============================================================================
-// FUN_00402b30
+// FUN_00402b30  — twin of StdMap_InsertOrFind_UintKey_Isnil31_EaxEbx_Inferred
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00402b30
 // Address:   0x00402b30  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Body:      0x00402b30 – 0x00402be6 inclusive (183 B / 0xB7)
+// System:    missions-progression host map; unit = MSVC std map insert-or-find
+// Generated: 2026-08-05 MEGA-040 dual seal
+// Exactness: Behavior-preserving rewrite of decompiler CF + byte ABI.
+// Canonical: StdMap_InsertOrFind_UintKey_Isnil31_EaxEbx_Inferred.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00402b30 @ 0x00402b30
-// Stable ID: aa_00402b30
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~42 non-empty decompiler lines.
-//  - Control keywords: if×5, return×3, do×1, while×1.
-//  - Notable callees: FUN_00403250×2, FUN_00402b30, FUN_00404290.
-//  - Return sites: 3.
+// Machine ABI twin — see named clean for layouts and full commentary.
+// EAX=map, EBX=value*, stack out pair*, RET 4.
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+struct Node_00402b30 {
+  Node_00402b30 *left;
+  Node_00402b30 *parent;
+  Node_00402b30 *right;
+  uint32_t _pad0c;
+  uint32_t key;       // +0x10
+  uint8_t color;      // +0x30 (insert callee)
+  uint8_t isnil;      // +0x31
+};
 
-uint32_t /* width from decompiler */ * FUN_00402b30(uint32_t /* width from decompiler */ *param_1)
+struct Map_00402b30 {
+  void *proxy;
+  Node_00402b30 *head;
+  uint32_t size;
+};
 
+struct Pair_00402b30 {
+  Node_00402b30 *it;
+  uint8_t inserted;
+  uint8_t _pad[3];
+};
 
+extern "C" Node_00402b30 *FUN_00403250(Node_00402b30 **hint, char addLeft, const uint32_t *value);
+extern "C" void FUN_00404290();
 
+Pair_00402b30 *FUN_00402b30(Map_00402b30 *map /*EAX*/, Pair_00402b30 *out /*stack*/,
+                            const uint32_t *value /*EBX*/)
 {
+  Node_00402b30 *head = map->head;
+  Node_00402b30 *node = head->parent;
+  bool goLeft = true;
 
-  uint32_t /* width from decompiler */ *puVar1;
-
-  int in_EAX;
-
-  uint32_t /* width from decompiler */ *puVar2;
-
-  uint *unaff_EBX;
-
-  bool bVar3;
-
-  
-
-  puVar1 = param_1;
-
-  param_1 = *(uint32_t /* width from decompiler */ **)(in_EAX + 4);
-
-  bVar3 = true;
-
-  if (*(char *)((int)param_1[1] + 0x31) == '\0') {
-
-    puVar2 = (uint32_t /* width from decompiler */ *)param_1[1];
-
+  if (node->isnil == 0) {
+    Node_00402b30 *cur = node;
     do {
-
-      param_1 = puVar2;
-
-      bVar3 = *unaff_EBX < (uint)param_1[4];
-
-      if (bVar3) {
-
-        puVar2 = (uint32_t /* width from decompiler */ *)*param_1;
-
-      }
-
-      else {
-
-        puVar2 = (uint32_t /* width from decompiler */ *)param_1[2];
-
-      }
-
-    } while (*(char *)((int)puVar2 + 0x31) == '\0');
-
+      node = cur;
+      goLeft = *value < node->key;
+      cur = goLeft ? node->left : node->right;
+    } while (cur->isnil == 0);
   }
 
-  if (bVar3) {
+  Node_00402b30 *hint = node;
 
-    if (param_1 == (uint32_t /* width from decompiler */ *)**(int **)(in_EAX + 4)) {
-
-      puVar2 = (uint32_t /* width from decompiler */ *)FUN_00403250(&param_1,1,unaff_EBX);
-
-      *puVar1 = *puVar2;
-
-      *(uint8_t *)(puVar1 + 1) = 1;
-
-      return puVar1;
-
+  if (goLeft) {
+    if (node == head->left) {
+      Node_00402b30 *r = FUN_00403250(&hint, 1, value);
+      out->it = r;
+      out->inserted = 1;
+      return out;
     }
-
     FUN_00404290();
-
   }
 
-  if ((uint)param_1[4] < *unaff_EBX) {
-
-    puVar2 = (uint32_t /* width from decompiler */ *)FUN_00403250(&param_1,bVar3,unaff_EBX);
-
-    *puVar1 = *puVar2;
-
-    *(uint8_t *)(puVar1 + 1) = 1;
-
-    return puVar1;
-
+  if (hint->key < *value) {
+    Node_00402b30 *r = FUN_00403250(&hint, (char)goLeft, value);
+    out->it = r;
+    out->inserted = 1;
+    return out;
   }
 
-  *puVar1 = param_1;
-
-  *(uint8_t *)(puVar1 + 1) = 0;
-
-  return puVar1;
-
+  out->it = hint;
+  out->inserted = 0;
+  return out;
 }

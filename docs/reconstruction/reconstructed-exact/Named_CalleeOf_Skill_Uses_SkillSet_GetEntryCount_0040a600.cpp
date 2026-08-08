@@ -1,70 +1,17 @@
-// =============================================================================
-// Named_CalleeOf_Skill_Uses_SkillSet_GetEntryCount_0040a600
+﻿// =============================================================================
+// RETIRED NAME SCAFFOLD — do not use as canonical
 // -----------------------------------------------------------------------------
+// Former: Named_CalleeOf_Skill_Uses_SkillSet_GetEntryCount_0040a600
 // Stable ID: aa_0040a600
-// Callee of Skill_Uses_SkillSet_GetEntryCount
-// Address:   0x0040a600  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x0040a600
+// Retired:   2026-08-05 MEGA-055 OWN dual
+// Reason:    Chain-of-caller scaffold; SkillSet_GetEntryCount is a peer of the
+//            real parent (vector insert FUN_00412730), not a direct caller of
+//            this VA. Wrong product implication (skill-uses vs container Ucopy).
+// Canonical: SkillSet_Vector_UninitializedCopy_0x18_Inferred
+//            → reconstructed-exact/SkillSet_Vector_UninitializedCopy_0x18_Inferred.cpp
+//            → functions/aa_0040a600_SkillSet_Vector_UninitializedCopy_0x18_Inferred.md
+// Twin keep: reconstructed-exact/FUN_0040a600.cpp
 // =============================================================================
 
-// PURPOSE (auto): Called from Skill_Uses_SkillSet_GetEntryCount: skill/cast helper with no high-value strings in clean/raw. Role inferred from parent name only; refine when decompile strings or xrefs improve.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
-
-// READABILITY (auto CF):
-//  - Body size: ~16 non-empty decompiler lines.
-//  - Control keywords: for×1, return×1.
-//  - Notable callees: FUN_0040a600, FUN_00412b10.
-//  - Return sites: 1.
-
-/*
- * Behavioral notes:
- * Callee of Skill_Uses_SkillSet_GetEntryCount
- * Xref/callee-driven rename (parent seed scan)
- *
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-int __thiscall Named_CalleeOf_Skill_Uses_SkillSet_GetEntryCount_0040a600(int param_1,int param_2,int param_3)
-
-
-
-{
-
-  void *local_10;
-
-  uint8_t *puStack_c;
-
-  uint32_t /* width from decompiler */ local_8;
-
-  
-
-  puStack_c = &LAB_009bd090;
-
-  local_10 = ExceptionList;
-
-  local_8 = 0;
-
-  ExceptionList = &local_10;
-
-  for (; param_2 != param_1; param_2 = param_2 + 0x18) {
-
-    FUN_00412b10();
-
-    param_3 = param_3 + 0x18;
-
-  }
-
-  ExceptionList = local_10;
-
-  return param_3;
-
-}
+// Body intentionally omitted — see named clean plate for behavior-preserving CF.

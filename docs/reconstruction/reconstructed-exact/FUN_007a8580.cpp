@@ -1,72 +1,41 @@
 // =============================================================================
-// FUN_007a8580
+// FUN_007a8580  (Ghidra twin of CNDUIWindow_ClearOwnedObject_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_007a8580
-// Address:   0x007a8580  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x007a8580–0x007a85df inclusive (96 B / 0x60)
+// Wave:      WQ9L-E OWN-ONLY dual 2026-08-05
+// Named:     CNDUIWindow_ClearOwnedObject_Inferred
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_007a8580 @ 0x007a8580
-// Stable ID: aa_007a8580
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~19 non-empty decompiler lines.
-//  - Control keywords: if×4, return×1.
-//  - Notable callees: FUN_007a8580.
-//  - Return sites: 1.
+extern "C" char DAT_00a1419b;
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __fastcall FUN_007a8580(int *param_1)
-
-
-
+extern "C" void __fastcall FUN_007a8580(uint32_t* self)
 {
-
-  if (param_1[0xa6] != 0) {
-
-    if ((uint32_t /* width from decompiler */ *)param_1[0xad] != (uint32_t /* width from decompiler */ *)0x0) {
-
-      (*(code *)**(uint32_t /* width from decompiler */ **)param_1[0xad])(0);
-
+  if (self[0xA6] != 0) {
+    if (uint32_t* child = reinterpret_cast<uint32_t*>(self[0xAD])) {
+      void** cvtbl = *reinterpret_cast<void***>(child);
+      reinterpret_cast<void(__thiscall*)(void*, int)>(cvtbl[0])(child, 0);
     }
-
-    (**(code **)(*param_1 + 0x4c))();
-
-    (**(code **)(*param_1 + 0x288))(&DAT_00a1419b);
-
-    if ((char)param_1[0x2f] != '\0') {
-
-      if ((uint32_t /* width from decompiler */ *)param_1[0xa6] != (uint32_t /* width from decompiler */ *)0x0) {
-
-        (*(code *)**(uint32_t /* width from decompiler */ **)param_1[0xa6])(1);
-
+    {
+      void** vtbl = *reinterpret_cast<void***>(self);
+      reinterpret_cast<void(__thiscall*)(void*)>(vtbl[0x4C / 4])(self);
+    }
+    {
+      void** vtbl = *reinterpret_cast<void***>(self);
+      reinterpret_cast<void(__thiscall*)(void*, char*)>(vtbl[0x288 / 4])(
+          self, &DAT_00a1419b);
+    }
+    auto* b = reinterpret_cast<uint8_t*>(self);
+    if (b[0xBC] != 0) {
+      if (uint32_t* owned = reinterpret_cast<uint32_t*>(self[0xA6])) {
+        void** ovtbl = *reinterpret_cast<void***>(owned);
+        reinterpret_cast<void(__thiscall*)(void*, int)>(ovtbl[0])(owned, 1);
       }
-
-      param_1[0xa6] = 0;
-
-      *(uint8_t *)(param_1 + 0x2f) = 0;
-
+      self[0xA6] = 0;
+      b[0xBC] = 0;
     }
-
   }
-
-  param_1[0xa6] = 0;
-
-  return;
-
+  self[0xA6] = 0;
 }

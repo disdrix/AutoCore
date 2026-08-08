@@ -1,18 +1,19 @@
-# Function record: FUN_008c4fc0
+# Function record: FUN_008c4fc0 (scaffold synonym)
 
 | Field | Value |
 |---|---|
 | **Stable ID** | `aa_008c4fc0` |
-| **Canonical name** | `FUN_008c4fc0` |
+| **Canonical name** | `Client_CastFirstHardpointSkillFlag200_Inferred` (**INFERRED**) |
+| **Ghidra / scaffold** | `FUN_008c4fc0` |
 | **Address** | `0x008c4fc0` |
 | **Module** | `autoassault.exe` (image base `0x400000`) |
-| **System** | unknown |
-| **Completion status** | **Partial scaffold** — raw/annotated/clean present; refine + dual review for important units |
-| **Bit-for-bit / runtime / diff** | Open (deferred / not run) |
+| **System** | skills-abilities / host hardpoint cast |
+| **Completion status** | **Partial** — dual A/B sealed WQ8R-F 2026-08-04 |
+| **Bit-for-bit / runtime / diff** | Open |
 
 ## Purpose
 
-Reconstructed from Ghidra decompile. See clean source and annotated notes for body.
+See named record: `aa_008c4fc0_Client_CastFirstHardpointSkillFlag200_Inferred.md`.
 
 ## Signature (decompiler-derived)
 
@@ -22,18 +23,16 @@ void FUN_008c4fc0(void)
 
 ## Artifacts
 
+- Named record: `docs/reconstruction/functions/aa_008c4fc0_Client_CastFirstHardpointSkillFlag200_Inferred.md`
 - Raw: `docs/reconstruction/raw/aa_008c4fc0_FUN_008c4fc0.md`
 - Annotated: `docs/reconstruction/raw/aa_008c4fc0_FUN_008c4fc0.annotated.md`
-- Clean: `docs/reconstruction/reconstructed-exact/FUN_008c4fc0.cpp`
-
-## Callers / callees
-
-(Populate from Ghidra xrefs in follow-up.)
+- Clean named: `docs/reconstruction/reconstructed-exact/Client_CastFirstHardpointSkillFlag200_Inferred.cpp`
+- Scaffold clean: `docs/reconstruction/reconstructed-exact/FUN_008c4fc0.cpp`
 
 ## Confidence
 
 | Claim | Level |
 |---|---|
-| Control flow from decompiler | High |
-| Parameter semantic names | Probable / Tentative until caller pass |
-| Types | Tentative |
+| Control flow from decompiler | **High** |
+| Named role | **High** CF / **Inferred** product English |
+| Runtime | **Open** |

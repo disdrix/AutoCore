@@ -1,102 +1,59 @@
 // =============================================================================
-// FUN_0083a880
+// FUN_0083a880  (twin of ShopVehObject_ApplyDefaultOrientQuat_Flag_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0083a880
-// Address:   0x0083a880  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x0083a880 – 0x0083a94d inclusive (206 B / 0xCE)
+// Dual:      WQ9L-J 2026-08-05 — accept-with-gaps
+// Note:      Ghidra-style twin. Product entry is EAX=obj + stack flag + RET 4.
+//            Named clean is authoritative for porting.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0083a880 @ 0x0083a880
-// Stable ID: aa_0083a880
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~33 non-empty decompiler lines.
-//  - Control keywords: if×3, return×2.
-//  - Notable callees: FUN_0076e5e0×2, FUN_0040d1a0, FUN_00833390, FUN_00833490, FUN_0083a880.
-//  - Return sites: 2.
+extern "C" float *FUN_0076e5e0(float *out, float *in); // Math_QuatNormalize
+extern "C" void __thiscall FUN_0040d1a0(void *self, const float *quat4);
+extern "C" void FUN_00833490(void);
+extern "C" void FUN_00833390(void);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+extern "C" uint32_t DAT_00aaa97c;
+extern "C" uint32_t DAT_00aaa980;
+extern "C" uint32_t DAT_00aaa984;
+extern "C" uint32_t DAT_00aaa988;
 
-void FUN_0083a880(char param_1)
-
-
-
+// Modeled with explicit obj; retail: EAX=obj, stack char flag, RET 4.
+extern "C" void FUN_0083a880(void *in_EAX_obj, char param_1)
 {
-
-  uint32_t /* width from decompiler */ *puVar1;
-
-  int in_EAX;
-
-  uint32_t /* width from decompiler */ local_10;
-
-  uint32_t /* width from decompiler */ local_c;
-
-  uint32_t /* width from decompiler */ local_8;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
-
-  if (in_EAX != 0) {
-
-    local_10 = DAT_00aaa988;
-
-    local_c = DAT_00aaa984;
-
-    local_8 = DAT_00aaa980;
-
-    local_4 = DAT_00aaa97c;
-
-    FUN_0076e5e0(&local_10,&local_10);
-
-    if (param_1 != '\0') {
-
-      FUN_0040d1a0(&local_10);
-
-      FUN_00833490();
-
-      if (*(int **)(in_EAX + 0x508) != (int *)0x0) {
-
-        (**(code **)(**(int **)(in_EAX + 0x508) + 0x44))();
-
-      }
-
-      FUN_00833390();
-
-      return;
-
-    }
-
-    puVar1 = (uint32_t /* width from decompiler */ *)(in_EAX + 0x5e0);
-
-    *puVar1 = local_10;
-
-    *(uint32_t /* width from decompiler */ *)(in_EAX + 0x5e4) = local_c;
-
-    *(uint32_t /* width from decompiler */ *)(in_EAX + 0x5e8) = local_8;
-
-    *(uint8_t *)(in_EAX + 0x5dc) = 1;
-
-    *(uint32_t /* width from decompiler */ *)(in_EAX + 0x5ec) = local_4;
-
-    FUN_0076e5e0(puVar1,puVar1);
-
+  if (in_EAX_obj == nullptr) {
+    return;
   }
 
-  return;
+  auto *obj = reinterpret_cast<uint8_t *>(in_EAX_obj);
 
+  uint32_t local_10 = DAT_00aaa988;
+  uint32_t local_c = DAT_00aaa984;
+  uint32_t local_8 = DAT_00aaa980;
+  uint32_t local_4 = DAT_00aaa97c;
+  float *local = reinterpret_cast<float *>(&local_10);
+  FUN_0076e5e0(local, local);
+
+  if (param_1 != '\0') {
+    FUN_0040d1a0(obj + 0x510, local);
+    FUN_00833490();
+    int *nested = *reinterpret_cast<int **>(obj + 0x508);
+    if (nested != nullptr) {
+      auto **vtbl = *reinterpret_cast<void ***>(nested);
+      using VFn = void(__thiscall *)(void *);
+      reinterpret_cast<VFn>(vtbl[0x44 / 4])(nested);
+    }
+    FUN_00833390();
+    return;
+  }
+
+  uint32_t *puVar1 = reinterpret_cast<uint32_t *>(obj + 0x5e0);
+  *puVar1 = local_10;
+  *reinterpret_cast<uint32_t *>(obj + 0x5e4) = local_c;
+  *reinterpret_cast<uint32_t *>(obj + 0x5e8) = local_8;
+  obj[0x5dc] = 1;
+  *reinterpret_cast<uint32_t *>(obj + 0x5ec) = local_4;
+  FUN_0076e5e0(reinterpret_cast<float *>(puVar1), reinterpret_cast<float *>(puVar1));
 }

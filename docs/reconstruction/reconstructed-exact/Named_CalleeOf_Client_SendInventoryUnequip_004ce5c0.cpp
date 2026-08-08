@@ -1,56 +1,20 @@
 // =============================================================================
-// Named_CalleeOf_Client_SendInventoryUnequip_004ce5c0
+// RETIRED scaffold — Named_CalleeOf_Client_SendInventoryUnequip_004ce5c0
 // -----------------------------------------------------------------------------
 // Stable ID: aa_004ce5c0
-// Callee of Client_SendInventoryUnequip
-// Address:   0x004ce5c0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x004ce5c0
+// Retired:   2026-08-05 MEGA-118
+// Reason:    Parent-seed name is incomplete (also called from FUN_008012f0 ×2).
+// Canonical: Character_TownInventoryFallback_Inferred
+//            docs/reconstruction/reconstructed-exact/Character_TownInventoryFallback_Inferred.cpp
 // =============================================================================
 
-// PURPOSE (auto): Called from Client_SendInventoryUnequip: inventory/item helper with no high-value strings in clean/raw. Role inferred from parent name only; refine when decompile strings or xrefs improve.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~10 non-empty decompiler lines.
-//  - Control keywords: return×3, if×2.
-//  - Notable callees: FUN_004ce5c0.
-//  - Return sites: 3.
+// Forward to sealed name (body identical to FUN_004ce5c0).
+bool __thiscall Character_TownInventoryFallback_Inferred(int modeHost, int character);
 
-/*
- * Behavioral notes:
- * Callee of Client_SendInventoryUnequip
- * Xref/callee-driven rename (parent seed scan)
- *
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-bool __thiscall Named_CalleeOf_Client_SendInventoryUnequip_004ce5c0(int param_1,int param_2)
-
-
-
+bool __thiscall Named_CalleeOf_Client_SendInventoryUnequip_004ce5c0(int param_1, int param_2)
 {
-
-  if (param_2 == 0) {
-
-    return false;
-
-  }
-
-  if (*(char *)(param_1 + 0xf5) != '\0') {
-
-    return true;
-
-  }
-
-  return *(char *)(param_1 + 0x7e) != '\0';
-
+  return Character_TownInventoryFallback_Inferred(param_1, param_2);
 }

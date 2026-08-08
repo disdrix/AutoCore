@@ -1,98 +1,48 @@
-// =============================================================================
-// FUN_005190c0
-// -----------------------------------------------------------------------------
-// Stable ID: aa_005190c0
-// Address:   0x005190c0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+﻿// =============================================================================
+// FUN_005190c0  — twin of Object_EnsureIntKeyMapAt0x15c_Inferred
+// Stable ID: aa_005190c0 | VA: 0x005190c0
+// See: Object_EnsureIntKeyMapAt0x15c_Inferred.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_005190c0 @ 0x005190c0
-// Stable ID: aa_005190c0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~31 non-empty decompiler lines.
-//  - Control keywords: if×2, return×1.
-//  - Notable callees: FUN_0040f400, FUN_005190c0.
-//  - Return sites: 1.
+struct TreeNode_Isnil15 {
+  TreeNode_Isnil15 *left;
+  TreeNode_Isnil15 *parent;
+  TreeNode_Isnil15 *right;
+  std::uint8_t is_nil_pad[5];
+  std::uint8_t is_nil; // +0x15
+};
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+struct IntKeyMapHeader_0C {
+  std::uint32_t unused0;
+  TreeNode_Isnil15 *myhead;
+  std::uint32_t size;
+};
 
-uint32_t /* width from decompiler */ __fastcall FUN_005190c0(int param_1)
+extern "C" void *operator_new(std::uint32_t size);
+extern "C" TreeNode_Isnil15 *FUN_0040f400(void);
 
-
-
+extern "C" IntKeyMapHeader_0C *__fastcall FUN_005190c0(void *host /* ECX */)
 {
+  IntKeyMapHeader_0C **slot =
+      reinterpret_cast<IntKeyMapHeader_0C **>(
+          reinterpret_cast<char *>(host) + 0x15c);
 
-  void *pvVar1;
-
-  int iVar2;
-
-  void *local_c;
-
-  uint8_t *puStack_8;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
-
-  local_4 = 0xffffffff;
-
-  puStack_8 = &LAB_009a363c;
-
-  local_c = ExceptionList;
-
-  if (*(int *)(param_1 + 0x15c) == 0) {
-
-    ExceptionList = &local_c;
-
-    pvVar1 = operator_new(0xc);
-
-    local_4 = 0;
-
-    if (pvVar1 == (void *)0x0) {
-
-      pvVar1 = (void *)0x0;
-
+  if (*slot == nullptr) {
+    auto *map = static_cast<IntKeyMapHeader_0C *>(operator_new(0x0C));
+    if (map == nullptr) {
+      *slot = nullptr;
+    } else {
+      TreeNode_Isnil15 *sentinel = FUN_0040f400();
+      map->myhead = sentinel;
+      sentinel->is_nil = 1;
+      sentinel->parent = sentinel;
+      sentinel->left = sentinel;
+      sentinel->right = sentinel;
+      map->size = 0;
+      *slot = map;
     }
-
-    else {
-
-      iVar2 = FUN_0040f400();
-
-      *(int *)((int)pvVar1 + 4) = iVar2;
-
-      *(uint8_t *)(iVar2 + 0x15) = 1;
-
-      *(int *)(*(int *)((int)pvVar1 + 4) + 4) = *(int *)((int)pvVar1 + 4);
-
-      *(uint32_t /* width from decompiler */ *)*(uint32_t /* width from decompiler */ *)((int)pvVar1 + 4) = *(uint32_t /* width from decompiler */ *)((int)pvVar1 + 4);
-
-      *(int *)(*(int *)((int)pvVar1 + 4) + 8) = *(int *)((int)pvVar1 + 4);
-
-      *(uint32_t /* width from decompiler */ *)((int)pvVar1 + 8) = 0;
-
-    }
-
-    *(void **)(param_1 + 0x15c) = pvVar1;
-
   }
-
-  ExceptionList = local_c;
-
-  return *(uint32_t /* width from decompiler */ *)(param_1 + 0x15c);
-
+  return *slot;
 }

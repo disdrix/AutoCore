@@ -1,39 +1,30 @@
-# Function record: operator_delete__
+# Function record: operator_delete__ (alias → operator_delete_array)
 
 | Field | Value |
 |---|---|
 | **Stable ID** | `aa_0048981c` |
-| **Canonical name** | `operator_delete__` |
+| **This name** | `operator_delete__` (Ghidra decomp encoding) |
+| **Canonical** | `operator_delete_array` |
+| **Redirect** | See `aa_0048981c_operator_delete_array.md` |
 | **Address** | `0x0048981c` |
-| **Module** | `autoassault.exe` (image base `0x400000`) |
-| **System** | unknown |
-| **Completion status** | **Partial scaffold** — raw/annotated/clean present; refine + dual review for important units |
-| **Bit-for-bit / runtime / diff** | Open (deferred / not run) |
+| **Wave** | R10-010 OWN-ONLY dual (2026-08-05) |
+| **Verdict** | **accept** |
+| **Completion status** | Dual sealed — use named record |
 
 ## Purpose
 
-Reconstructed from Ghidra decompile. See clean source and annotated notes for body.
+Alias plate for pre-R10 scaffold name `operator_delete__`. Authoritative identity is CRT **`operator delete[]`** / canonical **`operator_delete_array`**.
 
-## Signature (decompiler-derived)
+## Signature
 
 ```c
-void __cdecl operator_delete__(void *param_1)
+void __cdecl operator_delete__(void *param_1);  // alias of operator_delete_array
 ```
 
 ## Artifacts
 
+- Named: `docs/reconstruction/functions/aa_0048981c_operator_delete_array.md`
+- FUN: `docs/reconstruction/functions/aa_0048981c_FUN_0048981c.md`
 - Raw: `docs/reconstruction/raw/aa_0048981c_operator_delete__.md`
-- Annotated: `docs/reconstruction/raw/aa_0048981c_operator_delete__.annotated.md`
-- Clean: `docs/reconstruction/reconstructed-exact/operator_delete__.cpp`
-
-## Callers / callees
-
-(Populate from Ghidra xrefs in follow-up.)
-
-## Confidence
-
-| Claim | Level |
-|---|---|
-| Control flow from decompiler | High |
-| Parameter semantic names | Probable / Tentative until caller pass |
-| Types | Tentative |
+- Clean: `docs/reconstruction/reconstructed-exact/operator_delete_array.cpp`
+- Report: `docs/agents/task-dual-ab-0048981c-r10-report.md`

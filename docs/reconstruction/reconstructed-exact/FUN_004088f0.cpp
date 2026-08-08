@@ -1,86 +1,36 @@
 // =============================================================================
-// FUN_004088f0
+// FUN_004088f0  — scaffold twin of StdTree_BuynodeEmpty_Isnil21_Size0x28_Inferred
 // -----------------------------------------------------------------------------
 // Stable ID: aa_004088f0
 // Address:   0x004088f0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    util / tree empty buynode isnil@+0x21 size 0x28
+// Generated: 2026-08-04 WQ9H-I (updates scaffold 2026-07-23)
+// Exactness: Behavior-preserving; prefer named clean for port.
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
+//
+// NOTE: Decompiler prints void; sealed return is EAX = node*.
 
-// PURPOSE (auto): Scaffold unit for FUN_004088f0 @ 0x004088f0
-// Stable ID: aa_004088f0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
+#include <cstddef>
 
-// READABILITY (auto CF):
-//  - Body size: ~25 non-empty decompiler lines.
-//  - Control keywords: if×3, return×1.
-//  - Notable callees: FUN_004088f0.
-//  - Return sites: 1.
+extern "C" void* operator_new(std::size_t size);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void FUN_004088f0(void)
-
-
-
+// Prefer: StdTree_BuynodeEmpty_Isnil21_Size0x28_Inferred
+extern "C" std::uint32_t* FUN_004088f0(void)
 {
-
-  uint32_t /* width from decompiler */ *puVar1;
-
-  void *local_10;
-
-  uint8_t *puStack_c;
-
-  uint32_t /* width from decompiler */ local_8;
-
-  
-
-  local_8 = 0xffffffff;
-
-  puStack_c = &LAB_009bc6c0;
-
-  local_10 = ExceptionList;
-
-  ExceptionList = &local_10;
-
-  puVar1 = operator_new(0x28);
-
-  if (puVar1 != (uint32_t /* width from decompiler */ *)0x0) {
-
-    *puVar1 = 0;
-
+  // SEH omitted in scaffold plate.
+  std::uint32_t* puVar1 = static_cast<std::uint32_t*>(operator_new(0x28));
+  if (puVar1 != nullptr) {
+    *puVar1 = 0;           // left
   }
-
-  if (puVar1 + 1 != (uint32_t /* width from decompiler */ *)0x0) {
-
-    puVar1[1] = 0;
-
+  if (puVar1 != nullptr) {
+    puVar1[1] = 0;         // parent  (decomp: if puVar1+1)
+    puVar1[2] = 0;         // right   (decomp: if puVar1+2)
   }
-
-  if (puVar1 + 2 != (uint32_t /* width from decompiler */ *)0x0) {
-
-    puVar1[2] = 0;
-
+  if (puVar1 != nullptr) {
+    *reinterpret_cast<std::uint8_t*>(puVar1 + 8) = 1;            // color @ +0x20
+    *reinterpret_cast<std::uint8_t*>(reinterpret_cast<char*>(puVar1) + 0x21) = 0; // isnil
   }
-
-  *(uint8_t *)(puVar1 + 8) = 1;
-
-  *(uint8_t *)((int)puVar1 + 0x21) = 0;
-
-  ExceptionList = local_10;
-
-  return;
-
+  return puVar1; // EAX
 }

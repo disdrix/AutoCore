@@ -1,3 +1,8 @@
+// *** REJECTED ALIAS (R11-028 dual 2026-08-05) ***
+// Do not use as primary name. Combat is one optional "Required Combat" line.
+// Canonical role: UI_AppendCraftRequirements_Inferred (see twin + dual A/B).
+// Keep file only as historical scaffold pointer.
+
 // READABILITY (auto CF):
 //  - Body size: ~350 non-empty decompiler lines.
 //  - Control keywords: if×44, goto×7, do×5, while×5, return×4.
@@ -6,12 +11,13 @@
 //  - Return sites: 4.
 
 // =============================================================================
-// Named_Required_Combat_00846820
+// Named_Required_Combat_00846820  [REJECTED]
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00846820
 // Address:   0x00846820  (autoassault.exe, image base 0x400000)
-// System:    unknown
+// System:    skills-abilities (see dual seal)
 // Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Superseded: UI_AppendCraftRequirements_Inferred.cpp / FUN_00846820.cpp (R11-028)
 // Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
 // Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
 // =============================================================================

@@ -8,8 +8,9 @@
 | **Module** | `autoassault.exe` (image base `0x400000`) |
 | **System** | missions-progression |
 | **Calling convention** | MSVC `__thiscall` |
-| **Completion status** | **Human-refined clean** — CF sealed from raw; runtime/diff open |
+| **Completion status** | **REVERIFY** — dual-hash CF holds; **mode-gate `this` = attach object** (AUDIT F-027); runtime/diff open |
 | **Bit-for-bit / runtime / diff** | Open (deferred / not run) |
+| **Audit** | AUDIT-2026-08-05-01 S-005 / F-027 — ECX for `0x004ce340` is continent attach at `+0xa8`, not character |
 
 ## Purpose
 
@@ -28,7 +29,7 @@ bool __thiscall CVOGCharacter_HasCompletedMission(void* this /*CVOGCharacter*/, 
 3. Else Path B: `mode AND +0x53c hit` → true.
 4. **Critical:** attached + mode + def OK + `+0xfc` match → Path A dead; only Path B can true (538-only is false).
 
-Mode gate body (`aa_004ce340`): `+0x100==0 && +0xac!=2` — not weapon math.
+Mode gate body (`aa_004ce340`): `+0x100==0 && +0xac!=2` on the **attach object** (ECX), not on `CVOGCharacter` — not weapon math. Asm before both mode CALLs: load attach via `+0xa8` chain into ECX.
 
 ## Confidence by dimension
 
@@ -39,9 +40,10 @@ Mode gate body (`aa_004ce340`): `+0x100==0 && +0xac!=2` — not weapon math.
 | Control flow / truth table | High | Raw + 2026-07-29 re-decompile; Path A/B sealed static |
 | Hash offsets `+0x538` / `+0x53c` | High | Body + debug string + GiveMission |
 | Continent match `+0xfc` | Probable | Def vs attach-object field; product name open |
-| Mode gate fields | High body / open writers | `aa_004ce340` dual; producers of `+0x100`/`+0xac` open |
+| Mode gate fields | High body / open writers | Fields on **attach** (`aa_004ce340`); producers of `+0x100`/`+0xac` open |
+| Mode gate `this` | **Confirmed attach** | AUDIT F-027: ECX = continent attach `+0xa8`, not character |
 | `FUN_0053fff0` | Probable | Lazy mission-def holder `+0xf18`; shared with GiveMission |
-| Overall | **High (static)** | Dual A/B tightened 2026-07-29; runtime still open |
+| Overall | **Probable / High CF** | Dual-hash CF High; mode-this fixed in clean 2026-08-05; siblings re-verify; runtime open |
 
 ## Open questions
 

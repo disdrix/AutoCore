@@ -1,16 +1,18 @@
 // =============================================================================
-// Named_CalleeOf_Client_RefreshOpenMissionUiWindows_008e55e0
+// Named_CalleeOf_Client_RefreshOpenMissionUiWindows_008e55e0  **RETIRED SCAFFOLD**
 // -----------------------------------------------------------------------------
 // Stable ID: aa_008e55e0
-// Callee of Client_RefreshOpenMissionUiWindows
-// Address:   0x008e55e0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// RETIRED: 2026-08-05 R13-015 dual seal
+// Canonical: UI_CraftHost_RefreshCraftEnableAndStatus_Inferred
+// Address:   0x008e55e0–0x008e598d (autoassault.exe, image base 0x400000)
+// System:    inventory-transfer
+// See:       reconstructed-exact/UI_CraftHost_RefreshCraftEnableAndStatus_Inferred.cpp
+//            reviews/A|B_aa_008e55e0_UI_CraftHost_RefreshCraftEnableAndStatus_Inferred.md
 // =============================================================================
-
-// PURPOSE (auto): Called from Client_RefreshOpenMissionUiWindows: mission/objective helper. Evidence string: "You must select an item to craft!". Supports parent flow (not a free-standing entry point).
+// This mission-only Named_CalleeOf name is wrong: also called from craft bind
+// (008e5990) and craft tick (008e63e3). Keep file only as rename breadcrumb.
+//
+// PURPOSE (retired auto): Called from Client_RefreshOpenMissionUiWindows — incomplete.
 // Embedded strings (evidence):
 //   - "You must select an item to craft!"
 //   - "You need a broken item to craft!"

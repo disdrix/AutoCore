@@ -1,196 +1,114 @@
 // =============================================================================
-// FUN_00516720
+// FUN_00516720  — twin of Object_SetDisplayName_Inferred
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00516720
-// Address:   0x00516720  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00516720 – 0x00516899 exclusive  (377 B / 0x179)
+// Module:    autoassault.exe  (image base 0x400000)
+// System:    object-identity / display-name
+// Generated: 2026-08-05 R10-031 OWN dual (live Ghidra seal)
+// Canonical: Object_SetDisplayName_Inferred
+// Exactness: Behavior-preserving. Bit-for-bit vs retail EXE: DEFERRED.
+// =============================================================================
+//
+// See Object_SetDisplayName_Inferred.cpp for full plate, ABI, and contract.
+// This twin keeps the Ghidra inventory name as a link target.
+//
+// ABI: __thiscall; ECX=object*; stack char* nameOrNull; RET 4; void.
+// Field: *(this+0x158) owned display-name string.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00516720 @ 0x00516720
-// Stable ID: aa_00516720
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
+#include <cstring>
 
-// READABILITY (auto CF):
-//  - Body size: ~80 non-empty decompiler lines.
-//  - Control keywords: if×7, do×5, while×5, return×3, goto×1.
-//  - Notable callees: FUN_00403450, FUN_004ce940, FUN_004eb240, FUN_005146a0, FUN_00516720, FUN_007a6880, FUN_007a69d0, free.
-//  - Return sites: 3.
+extern "C" void operator_delete[](void *p);
+extern "C" void *operator_new[](unsigned size);
+extern "C" void *FUN_004ce940(void);
+extern "C" void *FUN_007a69d0();
+extern "C" std::uint32_t FUN_007a6880(void *localeObj);
+extern "C" void FUN_005146a0(void *self, char *name, std::uint32_t locale,
+                             int cap, char *outBuf);
+extern "C" void *FUN_004eb240(void *descriptor);
+extern "C" void FUN_00403450(void *mbOut, const wchar_t *wide, unsigned cp);
+extern "C" int strncmp(const char *a, const char *b, size_t n);
+extern "C" void free(void *p);
+extern "C" void * (*PTR_FUN_00af8c9c)(void);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __thiscall FUN_00516720(int *param_1,char *param_2)
-
-
-
+// Ghidra inventory name — same body as Object_SetDisplayName_Inferred.
+void __thiscall FUN_00516720(void *self, char *nameOrNull)
 {
+  auto *obj = reinterpret_cast<std::uint8_t *>(self);
+  auto **vtbl = *reinterpret_cast<void ***>(obj);
+  auto &nameField = *reinterpret_cast<char **>(obj + 0x158);
+  auto *hostAtA4 = *reinterpret_cast<void **>(obj + 0xA4);
+  auto *descAtA8 = *reinterpret_cast<void **>(obj + 0xA8);
 
-  char cVar1;
-
-  bool bVar2;
-
-  char *pcVar3;
-
-  int iVar4;
-
-  uint32_t /* width from decompiler */ uVar5;
-
-  char *pcVar6;
-
-  uint32_t /* width from decompiler */ uVar7;
-
-  uint32_t /* width from decompiler */ *puVar8;
-
-  uint32_t /* width from decompiler */ uStack_84;
-
-  char acStack_80 [128];
-
-  
-
-  if (param_2 == (char *)0x0) {
-
+  if (nameOrNull == nullptr) {
     return;
-
   }
 
-  if ((void *)param_1[0x56] != (void *)0x0) {
-
-    operator_delete__((void *)param_1[0x56]);
-
+  if (nameField != nullptr) {
+    operator_delete[](nameField);
   }
+  nameField = nullptr;
 
-  param_1[0x56] = 0;
-
-  pcVar3 = param_2;
-
-  do {
-
-    cVar1 = *pcVar3;
-
-    pcVar3 = pcVar3 + 1;
-
-  } while (cVar1 != '\0');
-
-  iVar4 = (**(code **)(*param_1 + 0x60))();
-
-  if (((iVar4 != 0) && (param_1[0x29] != 0)) && (iVar4 = FUN_004ce940(), iVar4 != 0)) {
-
-    puVar8 = &uStack_84;
-
-    uVar7 = 0x5a;
-
-    FUN_007a69d0(0x5a,puVar8);
-
-    uVar5 = FUN_007a6880();
-
-    FUN_005146a0(param_2,uVar5,uVar7,puVar8);
-
-    pcVar3 = (char *)&uStack_84;
-
-    do {
-
-      cVar1 = *pcVar3;
-
-      pcVar3 = pcVar3 + 1;
-
-    } while (cVar1 != '\0');
-
-    pcVar6 = operator_new__((uint)(pcVar3 + (1 - ((int)&uStack_84 + 1))));
-
-    param_1[0x56] = (int)pcVar6;
-
-    pcVar3 = (char *)&uStack_84;
-
-    do {
-
-      cVar1 = *pcVar3;
-
-      *pcVar6 = cVar1;
-
-      pcVar3 = pcVar3 + 1;
-
-      pcVar6 = pcVar6 + 1;
-
-    } while (cVar1 != '\0');
-
-    return;
-
+  const char *scan = nameOrNull;
+  while (*scan != '\0') {
+    ++scan;
   }
+  const unsigned nameLen = static_cast<unsigned>(scan - nameOrNull);
 
-  uVar5 = FUN_004eb240();
+  using Vtbl60_t = int(__thiscall *)(void *);
+  const int gateCount = reinterpret_cast<Vtbl60_t>(vtbl[0x60 / 4])(self);
 
-  uStack_84 = acStack_80;
+  if (gateCount != 0 && hostAtA4 != nullptr && FUN_004ce940() != nullptr) {
+    alignas(4) char composeBuf[128 + 4];
+    char *outPtr = composeBuf;
+    std::uint32_t locale = FUN_007a6880(FUN_007a69d0());
+    FUN_005146a0(self, nameOrNull, locale, 0x5A, outPtr);
 
-  uVar7 = (*(code *)PTR_FUN_00af8c9c)();
-
-  FUN_00403450(uVar5,uVar7);
-
-  iVar4 = strncmp(param_2,uStack_84,0x41);
-
-  if (iVar4 != 0) {
-
-    pcVar6 = param_2;
-
-    do {
-
-      cVar1 = *pcVar6;
-
-      pcVar6 = pcVar6 + 1;
-
-    } while (cVar1 != '\0');
-
-    if (1 < (uint)((int)pcVar6 - (int)(param_2 + 1))) {
-
-      bVar2 = true;
-
-      goto LAB_00516846;
-
+    const char *cscan = outPtr;
+    while (*cscan != '\0') {
+      ++cscan;
     }
-
-  }
-
-  bVar2 = false;
-
-LAB_00516846:
-
-  if (uStack_84 != acStack_80) {
-
-    free(uStack_84);
-
-  }
-
-  if (bVar2) {
-
-    pcVar3 = operator_new__((uint)(pcVar3 + (1 - (int)(param_2 + 1))));
-
-    param_1[0x56] = (int)pcVar3;
-
+    const unsigned composedLen = static_cast<unsigned>(cscan - outPtr);
+    char *dst = static_cast<char *>(operator_new[](composedLen + 1));
+    nameField = dst;
+    const char *src = outPtr;
+    char ch;
     do {
-
-      cVar1 = *param_2;
-
-      *pcVar3 = cVar1;
-
-      param_2 = param_2 + 1;
-
-      pcVar3 = pcVar3 + 1;
-
-    } while (cVar1 != '\0');
-
+      ch = *src++;
+      *dst++ = ch;
+    } while (ch != '\0');
+    return;
   }
 
-  return;
+  void *defaultSrc = FUN_004eb240(descAtA8);
+  (void)defaultSrc;
 
+  char stackMb[128];
+  char *mbPtr = stackMb;
+  void *wideOrStr = PTR_FUN_00af8c9c();
+  FUN_00403450(&mbPtr, static_cast<const wchar_t *>(wideOrStr), 0);
+
+  char *defaultMb = mbPtr;
+  int cmp = strncmp(nameOrNull, defaultMb, 0x41);
+  bool storeCustom = false;
+  if (cmp != 0 && nameLen > 1) {
+    storeCustom = true;
+  }
+
+  if (mbPtr != stackMb) {
+    free(mbPtr);
+  }
+
+  if (storeCustom) {
+    char *dst = static_cast<char *>(operator_new[](nameLen + 1));
+    nameField = dst;
+    const char *src = nameOrNull;
+    char ch;
+    do {
+      ch = *src++;
+      *dst++ = ch;
+    } while (ch != '\0');
+  }
 }

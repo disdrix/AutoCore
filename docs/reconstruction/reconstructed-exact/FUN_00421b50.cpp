@@ -1,60 +1,30 @@
-// =============================================================================
-// FUN_00421b50
+﻿// =============================================================================
+// FUN_00421b50 — scaffold twin of StdTree_Max_Isnil29_Inferred
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00421b50
 // Address:   0x00421b50  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    MSVC std::_Tree max / rightmost (isnil@+0x29)
+// Generated: 2026-08-04 WQ9D-G seal (scaffold 2026-07-23)
+// Exactness: Behavior-preserving rewrite from body bytes (read_memory).
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00421b50 @ 0x00421b50
-// Stable ID: aa_00421b50
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// PURPOSE: Rightmost non-nil of subtree (MSVC `_Tree_max`). Prefer named unit
+// StdTree_Max_Isnil29_Inferred.cpp for product documentation.
 
-// READABILITY (auto CF):
-//  - Body size: ~12 non-empty decompiler lines.
-//  - Control keywords: while×1, return×1.
-//  - Notable callees: FUN_00421b50.
-//  - Return sites: 1.
+#include <cstdint>
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void FUN_00421b50(int param_1)
-
-
-
+// __cdecl; node* → node*; RET
+std::int32_t *FUN_00421b50(std::int32_t *node)
 {
+  std::int32_t *right;
 
-  char cVar1;
-
-  int iVar2;
-
-  
-
-  iVar2 = *(int *)(param_1 + 8);
-
-  cVar1 = *(char *)(iVar2 + 0x29);
-
-  while (cVar1 == '\0') {
-
-    iVar2 = *(int *)(iVar2 + 8);
-
-    cVar1 = *(char *)(iVar2 + 0x29);
-
-  }
-
-  return;
-
+  right = (std::int32_t *)node[2];
+  if (*(char *)((std::uintptr_t)right + 0x29) != '\0')
+    return node;
+  do {
+    node = right;
+    right = (std::int32_t *)node[2];
+  } while (*(char *)((std::uintptr_t)right + 0x29) == '\0');
+  return node;
 }

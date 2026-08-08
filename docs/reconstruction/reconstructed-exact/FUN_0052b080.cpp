@@ -1,96 +1,81 @@
 // =============================================================================
-// FUN_0052b080
+// FUN_0052b080  (twin of CVOGCharacter_ComputeObjectDifficultyScore_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0052b080
 // Address:   0x0052b080  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    skills-abilities
+// Dual:      R13-035 OWN-ONLY 2026-08-05 (dual start 2686)
+// Exactness: Behavior-preserving rewrite of decompiler + asm-sealed CF.
+// Bit-for-bit vs retail EXE: DEFERRED.
+// Runtime Confirmed: NOT claimed.
+// =============================================================================
+//
+// Scaffold twin retained for FUN_* path stability. Prefer the named clean:
+//   CVOGCharacter_ComputeObjectDifficultyScore_Inferred.cpp
+//
+// PURPOSE:
+//   Character thiscall difficulty score for a target object from resource-gap
+//   math (base 100, −6 per overlevel, clamp gap 15; 0 if under-level / null /
+//   gap>15). Sole direct caller: UI_FormatObjectDifficultyTier (0x008e4430).
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0052b080 @ 0x0052b080
-// Stable ID: aa_0052b080
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <stdint.h>
 
-// READABILITY (auto CF):
-//  - Body size: ~30 non-empty decompiler lines.
-//  - Control keywords: if×5, return×3, goto×1.
-//  - Notable callees: FUN_00418b80, FUN_0052b080.
-//  - Return sites: 3.
+extern "C" void __thiscall FUN_00418b80(void *mapHeader, void **outNode, int *pKey);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+static float const *const DAT_00aaa7ac = (float const *)0x00aaa7ac; /* 100.0f */
+static float const *const DAT_00aaa8dc = (float const *)0x00aaa8dc; /*   6.0f */
+static float const *const DAT_00aaa7a4 = (float const *)0x00aaa7a4; /*  15.0f */
+static float const *const g_flZero     = (float const *)0x00a0f518; /*   0.0f */
 
-float10 __thiscall FUN_0052b080(int param_1,float param_2)
-
-
-
+// Decompiler shows float stack arg — asm uses it as object*. Keep pointer type.
+extern "C" float __thiscall FUN_0052b080(void *character /*ECX*/, void *targetObject /*stack*/)
 {
+  void *holder;
+  void *clone;
+  int required;
+  int typeId;
+  void *node;
+  int playerVal;
+  float score;
 
-  int iVar1;
-
-  int iVar2;
-
-  int local_4;
-
-  
-
-  if ((param_2 == 0.0) || (*(int *)((int)param_2 + 0xa8) == 0)) {
-
-    return (float10)g_flZero;
-
+  if (targetObject == 0) {
+    return *g_flZero;
+  }
+  holder = *(void **)((char *)targetObject + 0xa8);
+  if (holder == 0) {
+    return *g_flZero;
   }
 
-  iVar2 = *(int *)(*(int *)((int)param_2 + 0xa8) + 0x3c);
+  clone = *(void **)((char *)holder + 0x3c);
+  required = *(int *)((char *)clone + 0x4b0);
+  typeId   = *(int *)((char *)clone + 0x4ac);
 
-  iVar1 = *(int *)(iVar2 + 0x4b0);
-
-  param_2 = *(float *)(iVar2 + 0x4ac);
-
-  local_4 = param_1;
-
-  FUN_00418b80(&local_4,&param_2);
-
-  if (local_4 == *(int *)(param_1 + 0x588)) {
-
-    iVar2 = -1;
-
+  {
+    void *outNode = 0;
+    int key = typeId;
+    FUN_00418b80((char *)character + 0x584, &outNode, &key);
+    node = outNode;
   }
 
-  else {
-
-    iVar2 = *(int *)(local_4 + 0x10);
-
+  if (node == *(void **)((char *)character + 0x588)) {
+    playerVal = -1;
+  } else {
+    playerVal = *(int *)((char *)node + 0x10);
   }
 
-  param_2 = DAT_00aaa7ac;
-
-  if (iVar1 <= iVar2) {
-
-    if ((iVar2 != iVar1) && (iVar1 < iVar2)) {
-
-      if (DAT_00aaa7a4 < (float)(iVar2 - iVar1)) goto LAB_0052b0ed;
-
-      param_2 = DAT_00aaa7ac - (float)(iVar2 - iVar1) * DAT_00aaa8dc;
-
+  score = *DAT_00aaa7ac;
+  if (playerVal < required) {
+    return 0.0f;
+  }
+  if (playerVal == required) {
+    return score;
+  }
+  {
+    int gap = playerVal - required;
+    if ((float)gap > *DAT_00aaa7a4) {
+      return 0.0f;
     }
-
-    return (float10)param_2;
-
+    return score - (float)gap * (*DAT_00aaa8dc);
   }
-
-LAB_0052b0ed:
-
-  return (float10)0.0;
-
 }

@@ -1,10 +1,11 @@
 // =============================================================================
-// UI_int_btn_generic_0082fc40
+// UI_int_btn_generic_0082fc40  — SUPERSEDED scaffold (MEGA-077 2026-08-05)
 // -----------------------------------------------------------------------------
+// Prefer:    UI_InteractionMenu_AddTrade_Inferred.cpp
 // Stable ID: aa_0082fc40
 // Address:   0x0082fc40  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// System:    interaction menu / Trade UI (was: unknown plate scaffold)
+// Generated: 2026-07-23 from raw capture (scaffold; dual sealed MEGA-077)
 // Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
 // Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
 // =============================================================================

@@ -1,132 +1,34 @@
 // =============================================================================
-// FUN_00614c80
-// -----------------------------------------------------------------------------
+// FUN_00614c80  — legacy Ghidra name twin
+// Canonical: CVOGHBSkill_Master_Execute  (see CVOGHBSkill_Master_Execute.cpp)
 // Stable ID: aa_00614c80
-// Address:   0x00614c80  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00614c80–0x00614d87
+// Dual:      R11-011 2026-08-05
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00614c80 @ 0x00614c80
-// Stable ID: aa_00614c80
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~48 non-empty decompiler lines.
-//  - Control keywords: if×4, return×2, do×1, while×1.
-//  - Notable callees: CONCAT31, CVOGHBBase_Start, CVOGHBList_Enqueue, FUN_005788d0, FUN_00614c80.
-//  - Return sites: 2.
+// Full plate lives in CVOGHBSkill_Master_Execute.cpp.
+// This twin preserves the Ghidra symbol for path-stable includes.
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+extern uint32_t __thiscall CVOGHBSkill_Master_Execute(
+    void *self,
+    void *skillOrSource,
+    void *a2,
+    int mapWorld,
+    void *targetTable,
+    void *a5,
+    void *a6);
 
-uint32_t /* width from decompiler */
-
-FUN_00614c80(uint32_t /* width from decompiler */ param_1,uint32_t /* width from decompiler */ param_2,int param_3,int param_4,uint32_t /* width from decompiler */ param_5,
-
-            uint32_t /* width from decompiler */ param_6)
-
-
-
+uint32_t __thiscall FUN_00614c80(
+    void *self,
+    void *param_1,
+    void *param_2,
+    int param_3,
+    void *param_4,
+    void *param_5,
+    void *param_6)
 {
-
-  int *piVar1;
-
-  int iVar2;
-
-  CVOGHBBase *pAction;
-
-  char local_d;
-
-  void *local_c;
-
-  uint8_t *puStack_8;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
-
-  local_4 = 0xffffffff;
-
-  puStack_8 = &LAB_009a862b;
-
-  local_c = ExceptionList;
-
-  local_d = '\0';
-
-  ExceptionList = &local_c;
-
-  do {
-
-    piVar1 = (int *)(local_d * 0x10 + param_4);
-
-    if (((*piVar1 == -1) && (piVar1[1] == -1)) && ((char)piVar1[2] == '\0')) {
-
-      ExceptionList = local_c;
-
-      return 1;
-
-    }
-
-    iVar2 = CVOGReaction_ResolveObjectTarget
-
-                      (CONCAT31((int3)((uint)piVar1 >> 8),(char)piVar1[2]),*piVar1,piVar1[1]);
-
-    if (iVar2 != 0) {
-
-      pAction = operator_new(0x6c0);
-
-      local_4 = 0;
-
-      if (pAction == (CVOGHBBase *)0x0) {
-
-        pAction = (CVOGHBBase *)0x0;
-
-      }
-
-      else {
-
-        FUN_005788d0(param_1,param_2,param_3,iVar2,param_5,param_6);
-
-        pAction->pVTable = &PTR_FUN_009d0e6c;
-
-      }
-
-      local_4 = 0xffffffff;
-
-      if (pAction->pOwnerObject == (void *)0x0) {
-
-        (**(code **)pAction->pVTable)(1);
-
-      }
-
-      else {
-
-        CVOGHBList_Enqueue(*(void **)(param_3 + 0xe4ec),pAction);
-
-        CVOGHBBase_Start(pAction);
-
-      }
-
-    }
-
-    local_d = local_d + '\x01';
-
-  } while (local_d < 'd');
-
-  ExceptionList = local_c;
-
-  return 1;
-
+  return CVOGHBSkill_Master_Execute(
+      self, param_1, param_2, param_3, param_4, param_5, param_6);
 }

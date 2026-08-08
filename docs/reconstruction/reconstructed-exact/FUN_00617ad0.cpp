@@ -1,62 +1,48 @@
 // =============================================================================
-// FUN_00617ad0
+// FUN_00617ad0 — twin of CVOGHBSkill_OnHit_ctor
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00617ad0
 // Address:   0x00617ad0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Body:      0x00617ad0 – 0x00617b33 (100 B / 0x64)
+// System:    skills-abilities
+// Generated: 2026-08-05 R11-012 dual seal
+// Exactness: Behavior-preserving rewrite of decompiler control flow.
+// Canonical clean: CVOGHBSkill_OnHit_ctor.cpp
+// Scaffold Named_CalleeOf_Named_VOG_DEBUG_STOP_00617ad0 retired (RTTI sealed).
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00617ad0 @ 0x00617ad0
-// Stable ID: aa_00617ad0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~14 non-empty decompiler lines.
-//  - Control keywords: return×2, if×1.
-//  - Notable callees: FUN_005788d0, FUN_00617ad0.
-//  - Return sites: 2.
+extern "C" void* __thiscall CVOGHBSkillBase_ctor(
+    void* self, void* pSourceObj, void* pSkillBlob, std::uint32_t arg4,
+    void* pTarget, std::uint32_t* pTfid, std::uint32_t arg7);
+extern "C" void* PTR_FUN_009d0f1c;
+extern "C" float g_flZero;
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-uint32_t /* width from decompiler */ * __thiscall
-
-FUN_00617ad0(uint32_t /* width from decompiler */ *param_1,uint32_t /* width from decompiler */ param_2,int param_3,uint32_t /* width from decompiler */ param_4,
-
-            uint32_t /* width from decompiler */ param_5,uint32_t /* width from decompiler */ param_6,uint32_t /* width from decompiler */ param_7)
-
-
-
+// Prefer CVOGHBSkill_OnHit_ctor for named use.
+extern "C" void* __thiscall FUN_00617ad0(
+    void* thisHb,
+    void* pSourceObj,
+    void* pSkillBlob,
+    std::uint32_t arg4,
+    void* pTarget,
+    std::uint32_t* pTfid,
+    std::uint32_t arg7)
 {
+  auto* self = static_cast<std::uint32_t*>(thisHb);
 
-  FUN_005788d0(param_2,param_3,param_4,param_5,param_6,param_7);
+  CVOGHBSkillBase_ctor(thisHb, pSourceObj, pSkillBlob, arg4, pTarget, pTfid,
+                       arg7);
+  *self = reinterpret_cast<std::uint32_t>(&PTR_FUN_009d0f1c);
 
-  *param_1 = &PTR_FUN_009d0f1c;
-
-  if (*(float *)(param_3 + 0x4c) != g_flZero) {
-
-    *(uint8_t *)(param_1 + 0x1b1) = 1;
-
-    param_1[0x1b0] = (int)*(float *)(param_3 + 0x4c);
-
-    return param_1;
-
+  float f = *reinterpret_cast<float*>(static_cast<char*>(pSkillBlob) + 0x4c);
+  if (f != g_flZero) {
+    *reinterpret_cast<std::uint8_t*>(static_cast<char*>(thisHb) + 0x6c4) = 1;
+    *reinterpret_cast<int*>(static_cast<char*>(thisHb) + 0x6c0) =
+        static_cast<int>(f);
+    return thisHb;
   }
-
-  *(uint8_t *)(param_1 + 0x1b1) = 0;
-
-  return param_1;
-
+  *reinterpret_cast<std::uint8_t*>(static_cast<char*>(thisHb) + 0x6c4) = 0;
+  return thisHb;
 }

@@ -1,87 +1,26 @@
-// =============================================================================
-// FUN_00406190
+﻿// =============================================================================
+// FUN_00406190  (scaffold twin → StdTree_ConstructEmpty_Isnil2D_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00406190
 // Address:   0x00406190  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Body:      0x00406190–0x004061e9 inclusive (90 B / 0x5A)
+// System:    MSVC std::_Tree empty construct (isnil@+0x2d)
+// Generated: 2026-08-05 WQ9K-D dual seal
+// Exactness: Behavior-preserving; meaningful names. Not modernization.
+// Terminal:  false
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00406190 @ 0x00406190
-// Stable ID: aa_00406190
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~20 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_00406190, FUN_00409780.
-//  - Return sites: 1.
+// See StdTree_ConstructEmpty_Isnil2D_Inferred.cpp for full plate + types.
 
-// READABILITY:
-// Control-flow (from raw @ 0x00406190; evidence only — no invented semantics):
-//  - Entry: `int FUN_00406190(int param_1)`.
-//  - Calls: FUN_00409780().
-//  - Returns (1 site(s)): `param_1`.
-//  - Assign `local_4 = 0xffffffff`.
-//  - Assign `local_c = ExceptionList`.
+struct NodeIsnil2D_Size0x30;
+struct TreeShellIsnil2D;
 
+extern "C" TreeShellIsnil2D* __stdcall StdTree_ConstructEmpty_Isnil2D_Inferred(
+    TreeShellIsnil2D* shell);
 
-
-
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-int FUN_00406190(int param_1)
-
-
-
+extern "C" TreeShellIsnil2D* __stdcall FUN_00406190(TreeShellIsnil2D* shell)
 {
-
-  int iVar1;
-
-  void *local_c;
-
-  uint8_t *puStack_8;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
-
-  local_4 = 0xffffffff;
-
-  puStack_8 = &LAB_009bd1a8;
-
-  local_c = ExceptionList;
-
-  ExceptionList = &local_c;
-
-  iVar1 = FUN_00409780();
-
-  *(int *)(param_1 + 4) = iVar1;
-
-  *(uint8_t *)(iVar1 + 0x2d) = 1;
-
-  *(int *)(*(int *)(param_1 + 4) + 4) = *(int *)(param_1 + 4);
-
-  *(uint32_t /* width from decompiler */ *)*(uint32_t /* width from decompiler */ *)(param_1 + 4) = *(uint32_t /* width from decompiler */ *)(param_1 + 4);
-
-  *(int *)(*(int *)(param_1 + 4) + 8) = *(int *)(param_1 + 4);
-
-  *(uint32_t /* width from decompiler */ *)(param_1 + 8) = 0;
-
-  ExceptionList = local_c;
-
-  return param_1;
-
+  return StdTree_ConstructEmpty_Isnil2D_Inferred(shell);
 }

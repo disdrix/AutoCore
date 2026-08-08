@@ -1,316 +1,124 @@
 // =============================================================================
-// FUN_00930360
+// FUN_00930360  (clean twin of Client_SortTargetListByViewAngle_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00930360
-// Address:   0x00930360  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00930360–0x00930691 inclusive (0x332 B)
+// Canonical: Client_SortTargetListByViewAngle_Inferred
+// Generated: 2026-08-05 MEGA-023 (replaces 2026-07-23 scaffold)
+// See:       Client_SortTargetListByViewAngle_Inferred.cpp for full plate.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00930360 @ 0x00930360
-// Stable ID: aa_00930360
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
+#include <cmath>
 
-// READABILITY (auto CF):
-//  - Body size: ~140 non-empty decompiler lines.
-//  - Control keywords: if×7, while×2, return×2, do×1, goto×1.
-//  - Notable callees: FUN_00408640, FUN_00409bd0, FUN_00409e20, FUN_004e8a40, FUN_004e8ad0, FUN_00930360, Object_ResolveFromTFID, SQRT.
-//  - Return sites: 2.
+struct TFID_16 {
+  uint32_t dwCoidLo;
+  uint32_t dwCoidHi;
+  uint8_t bGlobal;
+  uint8_t bPad0, bPad1, bPad2, bPad3, bPad4, bPad5, bPad6;
+};
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+struct TargetScoreElem {
+  void *obj;
+  float score;
+  float dist;
+  float distSq;
+};
 
-void FUN_00930360(int param_1,TFID_16 *param_2,uint *param_3)
+extern float g_flOne;
+extern float g_flZero;
+extern float g_flLevelUpUiBase_Inferred;
+extern float DAT_00aaa668;
 
+extern "C" void FUN_004e8a40(const float *quat, float *outForward);
+extern "C" void FUN_004e8ad0(const float *quat, float *outRight);
+extern "C" void *Object_ResolveFromTFID(TFID_16 *tfid);
+extern "C" void FUN_00408640(uint32_t count, void *vec, void *where, const void *value);
+extern "C" void FUN_00409bd0(void *begin, void *end, int n, void *pred);
+extern "C" void operator_delete(void *p);
+extern "C" bool LAB_0092cdd0(const TargetScoreElem *left, const TargetScoreElem *right);
 
-
+// Ghidra name entry — identical CF to Client_SortTargetListByViewAngle_Inferred.
+extern "C" void FUN_00930360(void *client, TFID_16 *tfidList, unsigned *countInOut)
 {
-
-  int iVar1;
-
-  uint32_t /* width from decompiler */ uVar2;
-
-  float *pfVar3;
-
-  uint32_t /* width from decompiler */ *puVar4;
-
-  int *piVar5;
-
-  uint uVar6;
-
-  int iVar7;
-
-  void *pvVar8;
-
-  float fVar9;
-
-  float fVar10;
-
-  float fVar11;
-
-  float fVar12;
-
-  float fVar13;
-
-  float fVar14;
-
-  uint uStack_8c;
-
-  TFID_16 *pTStack_88;
-
-  uint8_t auStack_80 [4];
-
-  void *pvStack_7c;
-
-  int iStack_78;
-
-  int iStack_74;
-
-  int *piStack_70;
-
-  float fStack_6c;
-
-  float fStack_68;
-
-  uint32_t /* width from decompiler */ uStack_60;
-
-  uint32_t /* width from decompiler */ uStack_5c;
-
-  uint32_t /* width from decompiler */ uStack_58;
-
-  uint32_t /* width from decompiler */ uStack_54;
-
-  float fStack_50;
-
-  float fStack_4c;
-
-  float fStack_48;
-
-  float fStack_40;
-
-  float fStack_3c;
-
-  float fStack_38;
-
-  float fStack_30;
-
-  float fStack_2c;
-
-  float fStack_28;
-
-  void *pvStack_1c;
-
-  uint8_t *puStack_18;
-
-  uint32_t /* width from decompiler */ uStack_14;
-
-  
-
-  uStack_14 = 0xffffffff;
-
-  puStack_18 = &LAB_009ac665;
-
-  pvStack_1c = ExceptionList;
-
-  ExceptionList = &pvStack_1c;
-
-  pfVar3 = (float *)(**(code **)(*(int *)(*(int *)(*(int *)(*(int *)(param_1 + 0xe98) + 4) + 4) + 4
-
-                                         + *(int *)(param_1 + 0xe98)) + 0x1a0))();
-
-  fStack_50 = *pfVar3;
-
-  fStack_4c = pfVar3[1];
-
-  fStack_48 = pfVar3[2];
-
-  puVar4 = (uint32_t /* width from decompiler */ *)
-
-           (**(code **)(*(int *)(*(int *)(*(int *)(*(int *)(param_1 + 0xe98) + 4) + 4) + 4 +
-
-                                *(int *)(param_1 + 0xe98)) + 0x1a4))();
-
-  uStack_60 = *puVar4;
-
-  uStack_5c = puVar4[1];
-
-  uStack_58 = puVar4[2];
-
-  uStack_54 = puVar4[3];
-
-  FUN_004e8a40(&uStack_60,&fStack_40);
-
-  FUN_004e8ad0(&uStack_60,&fStack_30);
-
-  iVar7 = 0;
-
-  pvVar8 = (void *)0x0;
-
-  pvStack_7c = (void *)0x0;
-
-  iStack_78 = 0;
-
-  iStack_74 = 0;
-
-  uStack_14 = 0;
-
-  uStack_8c = 0;
-
-  if (*param_3 != 0) {
-
-    pTStack_88 = param_2;
-
+  int player = *(int *)((char *)client + 0xe98);
+  int *interior =
+      (int *)(*(int *)(*(int *)(player + 4) + 4) + 4 + player);
+  int *vtbl = (int *)*interior;
+
+  float *pfPos = ((float *(*)(void))vtbl[0x1a0 / 4])();
+  float posX = pfPos[0], posY = pfPos[1], posZ = pfPos[2];
+
+  float *pfQuat = ((float *(*)(void))vtbl[0x1a4 / 4])();
+  float quat[4] = {pfQuat[0], pfQuat[1], pfQuat[2], pfQuat[3]};
+  float forward[4], right[4];
+  FUN_004e8a40(quat, forward);
+  FUN_004e8ad0(quat, right);
+
+  TargetScoreElem *begin = nullptr;
+  TargetScoreElem *end = nullptr;
+  TargetScoreElem *capEnd = nullptr;
+
+  unsigned nIn = *countInOut;
+  if (nIn != 0) {
+    TFID_16 *cursor = tfidList;
+    unsigned i = 0;
     do {
+      void *obj = Object_ResolveFromTFID(cursor);
+      if (obj != nullptr) {
+        int *ovtbl = *(int **)obj;
+        ((void (*)(void *))ovtbl[0x144 / 4])(obj);
 
-      piVar5 = Object_ResolveFromTFID(pTStack_88);
+        float dX = *(float *)((char *)obj + 0x80) - posX;
+        float dY = *(float *)((char *)obj + 0x84) - posY;
+        float dZ = *(float *)((char *)obj + 0x88) - posZ;
+        float distSq = dX * dX + dY * dY + dZ * dZ;
+        float dist = sqrtf(distSq);
+        float score = g_flLevelUpUiBase_Inferred;
 
-      piStack_70 = piVar5;
-
-      if (piVar5 != (int *)0x0) {
-
-        (**(code **)(*piVar5 + 0x144))();
-
-        fVar12 = (float)piVar5[0x21] - fStack_4c;
-
-        fVar13 = (float)piVar5[0x22] - fStack_48;
-
-        fVar14 = (float)piVar5[0x20] - fStack_50;
-
-        fVar9 = fVar13 * fVar13 + fVar12 * fVar12 + fVar14 * fVar14;
-
-        fStack_68 = SQRT(fVar9);
-
-        fStack_6c = g_flLevelUpUiBase_Inferred;
-
-        if (g_flZero < fStack_68) {
-
-          fVar10 = g_flOne / fStack_68;
-
-          fVar11 = fStack_38 * fVar13 * fVar10 + fStack_3c * fVar12 * fVar10 +
-
-                   fStack_40 * fVar10 * fVar14;
-
-          if (fStack_28 * fVar13 * fVar10 + fStack_2c * fVar12 * fVar10 +
-
-              fStack_30 * fVar10 * fVar14 <= g_flZero) {
-
-            fStack_6c = fVar11 + g_flOne;
-
-          }
-
-          else {
-
-            fStack_6c = fVar11 * DAT_00aaa668 - g_flOne;
-
-          }
-
+        if (g_flZero < dist) {
+          float inv = g_flOne / dist;
+          float uX = dX * inv, uY = dY * inv, uZ = dZ * inv;
+          float fDot = forward[0] * uX + forward[1] * uY + forward[2] * uZ;
+          float rDot = right[0] * uX + right[1] * uY + right[2] * uZ;
+          if (rDot <= g_flZero)
+            score = fDot + g_flOne;
+          else
+            score = fDot * DAT_00aaa668 - g_flOne;
         }
 
-        if ((pvVar8 == (void *)0x0) ||
-
-           ((uint)(iStack_74 - (int)pvVar8 >> 4) <= (uint)(iVar7 - (int)pvVar8 >> 4))) {
-
-          FUN_00408640(iVar7,&piStack_70);
-
-          iVar7 = iStack_78;
-
-          pvVar8 = pvStack_7c;
-
+        TargetScoreElem value = {obj, score, dist, distSq};
+        uint32_t size = begin ? (uint32_t)(end - begin) : 0;
+        uint32_t cap = begin ? (uint32_t)(capEnd - begin) : 0;
+        if (begin == nullptr || cap <= size) {
+          void *triad[3] = {begin, end, capEnd};
+          FUN_00408640(1, triad, end, &value);
+          begin = (TargetScoreElem *)triad[0];
+          end = (TargetScoreElem *)triad[1];
+          capEnd = (TargetScoreElem *)triad[2];
+        } else {
+          *end = value;
+          end += 1;
         }
-
-        else {
-
-          FUN_00409e20(iVar7,1,auStack_80,fVar9);
-
-          iStack_78 = iVar7 + 0x10;
-
-          iVar7 = iStack_78;
-
-        }
-
       }
-
-      pTStack_88 = pTStack_88 + 1;
-
-      uStack_8c = uStack_8c + 1;
-
-    } while (uStack_8c < *param_3);
-
+      cursor += 1;
+      i += 1;
+    } while (i < nIn);
   }
 
-  uVar6 = iVar7 - (int)pvVar8 >> 4;
+  uint32_t n = begin ? (uint32_t)(end - begin) : 0;
+  FUN_00409bd0(begin, end, (int)n, (void *)&LAB_0092cdd0);
 
-  FUN_00409bd0(pvVar8,iVar7,uVar6,&LAB_0092cdd0);
-
-  iVar7 = (int)pvVar8 - (int)param_2;
-
-  uStack_8c = 0;
-
-  while (pvVar8 != (void *)0x0) {
-
-    if (uVar6 <= uStack_8c) goto LAB_00930652;
-
-    iVar1 = *(int *)(iVar7 + (int)param_2);
-
-    uStack_8c = uStack_8c + 1;
-
-    param_2->dwCoidLo = *(uint *)(iVar1 + 0x160);
-
-    param_2->dwCoidHi = *(uint *)(iVar1 + 0x164);
-
-    uVar2 = *(uint32_t /* width from decompiler */ *)(iVar1 + 0x168);
-
-    param_2->bGlobal = (char)uVar2;
-
-    param_2->bPad0 = (char)((uint)uVar2 >> 8);
-
-    param_2->bPad1 = (char)((uint)uVar2 >> 0x10);
-
-    param_2->bPad2 = (char)((uint)uVar2 >> 0x18);
-
-    uVar2 = *(uint32_t /* width from decompiler */ *)(iVar1 + 0x16c);
-
-    param_2->bPad3 = (char)uVar2;
-
-    param_2->bPad4 = (char)((uint)uVar2 >> 8);
-
-    param_2->bPad5 = (char)((uint)uVar2 >> 0x10);
-
-    param_2->bPad6 = (char)((uint)uVar2 >> 0x18);
-
-    param_2 = param_2 + 1;
-
+  unsigned outCount = 0;
+  if (begin != nullptr) {
+    TFID_16 *out = tfidList;
+    for (unsigned j = 0; j < n; ++j) {
+      *out = *(TFID_16 *)((char *)begin[j].obj + 0x160);
+      out += 1;
+      outCount += 1;
+    }
   }
-
-  uVar6 = 0;
-
-LAB_00930652:
-
-  *param_3 = uVar6;
-
-  uStack_14 = 0xffffffff;
-
-  if (pvVar8 == (void *)0x0) {
-
-    ExceptionList = pvStack_1c;
-
-    return;
-
-  }
-
-                    /* WARNING: Subroutine does not return */
-
-  operator_delete(pvVar8);
-
+  *countInOut = outCount;
+  if (begin != nullptr)
+    operator_delete(begin);
 }

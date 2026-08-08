@@ -1,50 +1,15 @@
 // =============================================================================
-// FUN_0040c700
+// FUN_0040c700  (scaffold twin — prefer List_TraversalUnlock)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0040c700
 // Address:   0x0040c700  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    client::list
+// Generated: 2026-08-04 WQ9D-E (named twin is authoritative clean)
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0040c700 @ 0x0040c700
-// Stable ID: aa_0040c700
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+void __fastcall List_TraversalUnlock(void *list);
 
-// READABILITY (auto CF):
-//  - Body size: ~8 non-empty decompiler lines.
-//  - Control keywords: if×1, return×1.
-//  - Notable callees: FUN_0040c700, LeaveCriticalSection.
-//  - Return sites: 1.
-
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __fastcall FUN_0040c700(int param_1)
-
-
-
+void __fastcall FUN_0040c700(void *param_1)
 {
-
-  if (*(char *)(param_1 + 0x28) != '\0') {
-
-    *(uint8_t *)(param_1 + 0x28) = 0;
-
-    LeaveCriticalSection((LPCRITICAL_SECTION)(param_1 + 4));
-
-  }
-
-  return;
-
+  List_TraversalUnlock(param_1);
 }

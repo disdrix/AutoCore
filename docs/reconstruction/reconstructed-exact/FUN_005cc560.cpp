@@ -1,80 +1,50 @@
 // =============================================================================
-// FUN_005cc560
+// FUN_005cc560  (twin of CVOGHBAI_DecEntityA4SecondaryCounter_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_005cc560
-// Address:   0x005cc560  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x005cc560 – 0x005cc5ad  (autoassault.exe, image base 0x400000)
+// System:    input-drive-control / npc-ai / HBAI entity counters
+// Generated: 2026-08-05 MEGA-093 (supersedes 2026-07-23 scaffold)
+// Exactness: Behavior-preserving rewrite of decompiler + live bytes CF.
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_005cc560 @ 0x005cc560
-// Stable ID: aa_005cc560
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// PURPOSE:
+//   Decrement one secondary counter on entity(+0x18)->block(+0xA4) after
+//   resolving related via entity vtbl+0x214, branched on related+0x250.
+//   Tail target of Driver axis-park FUN_005d73a0; also vtbl method on
+//   CreatureBase / Character / Mine / Bot / WalkingCreatureTurreted.
 
-// READABILITY (auto CF):
-//  - Body size: ~22 non-empty decompiler lines.
-//  - Control keywords: if×3, return×1.
-//  - Notable callees: FUN_005cc560.
-//  - Return sites: 1.
+#include <stdint.h>
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+typedef int *(__thiscall *Entity_Vtbl214_t)(void *entity);
 
-void __fastcall FUN_005cc560(int param_1)
-
-
-
+void __thiscall FUN_005cc560(void *self)
 {
+  int *entity;
+  int *counters;
+  int *related;
+  void **entity_vtbl;
 
-  int *piVar1;
-
-  int iVar2;
-
-  int iVar3;
-
-  
-
-  piVar1 = *(int **)(param_1 + 0x18);
-
-  if ((piVar1 != (int *)0x0) && (piVar1[0x29] != 0)) {
-
-    iVar2 = piVar1[0x29];
-
-    iVar3 = (**(code **)(*piVar1 + 0x214))();
-
-    if (iVar3 != 0) {
-
-      if (*(int *)(iVar3 + 0x250) == 0) {
-
-        piVar1 = (int *)(iVar2 + 0x18);
-
-        *piVar1 = *piVar1 + -1;
-
-      }
-
-      else {
-
-        piVar1 = (int *)(iVar2 + 0x1c);
-
-        *piVar1 = *piVar1 + -1;
-
-      }
-
-    }
-
+  entity = *(int **)((char *)self + 0x18);
+  if (entity == 0) {
+    return;
   }
 
-  return;
+  counters = *(int **)((char *)entity + 0xA4);
+  if (counters == 0) {
+    return;
+  }
 
+  entity_vtbl = *(void ***)entity;
+  related = ((Entity_Vtbl214_t)entity_vtbl[0x214 / 4])(entity);
+  if (related == 0) {
+    return;
+  }
+
+  if (*(int *)((char *)related + 0x250) == 0) {
+    *(int *)((char *)counters + 0x18) -= 1;
+  } else {
+    *(int *)((char *)counters + 0x1c) -= 1;
+  }
 }

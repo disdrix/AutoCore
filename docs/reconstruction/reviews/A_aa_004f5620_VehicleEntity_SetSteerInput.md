@@ -5,12 +5,13 @@
 | **Stable ID** | `aa_004f5620` |
 | **VA** | `0x004f5620` |
 | **Canonical name** | `VehicleEntity_SetSteerInput` |
-| **Review date** | `2026-07-29` (dual residual refresh) |
+| **Review date** | `2026-07-29` (dual residual refresh); re-verify `2026-08-06` |
 | **Reviewer role** | Independent reconstruction review |
 | **Counterpart** | `reviews/B_aa_004f5620_VehicleEntity_SetSteerInput.md` |
 | **Scratch** | `reviews/a_004f5620.md` |
 | **System** | `input-drive-control` |
 | **Verdict** | **accept-with-gaps** |
+| **Complete?** | **No** — dual depth ≠ project verification complete; Runtime Confirmed **false** |
 
 ---
 
@@ -78,6 +79,20 @@ Body is ~`0x2b` bytes (instruction-sealed). Callers supply axis sign/magnitude (
 1. Runtime / CE force of `wobj+0xb4` bits (matrix policy) — not dual residual CF.
 2. Bit-exact image diff beyond this `read_memory` window (optional).
 3. `wobj` type identity and flag producers (**UF open — do not invent**).
+
+---
+
+## 6. Re-verify 2026-08-06 (verification-first; not a completion claim)
+
+Live Ghidra `decompile_function` + `read_memory` @ `0x004f5620` (48 B):
+
+```
+8b4104 8b5004 8b840ab0000000 85c07409 f680b4000000c7 750e
+f30f10442404 f30f118118060000 c20400
+```
+
+Sealed again: gate chain; mask imm **`0xC7`** at `wobj+0xb4`; store **`movss [ecx+0x618]`**; **`ret 4`**.  
+Clean `VehicleEntity_SetSteerInput.cpp` still matches. **Unit remains partial** under project verification requirements (runtime/diff open). Dual/accept-with-gaps does **not** raise completion metrics.
 4. Soft L/R polarity ownership belongs to DriveControlTick plates, not this unit.
 5. Optional exhaustive scan of every direct `+0x618` store beyond sealed bypass table.
 

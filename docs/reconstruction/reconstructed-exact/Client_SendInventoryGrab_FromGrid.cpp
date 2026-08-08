@@ -43,10 +43,11 @@
 // Always returns 1 (including busy-skip — not a "sent OK" code).
 //
 // Control flow summary:
-//   1) Optional UI refresh when selection matches tracked widget (vtbl+0x3ac)
+//   1) Optional UI path: selectionHost GetObject @ vtbl+0x3ac; if match/null,
+//      set DAT_00d1d8f4/f5 and refresh tracked host via DAT_00d1d8dc vtbl+4 (not +0x3ac)
 //   2) FUN_007fbbb0() pre-send hook
 //   3) if DAT_00d1a8f6 == 0:
-//        pack 0x2034 (item TFID from object, type from window, qty arg)
+//        pack 0x2034 (item TFID from object via GetObject +0x3ac, type from window, qty arg)
 //        net send size 0x20; set busy flags DAT_00d1b4b0 / DAT_00d1a8f6
 //   4) return 1
 //

@@ -499,3 +499,41 @@ LAB_008007bf:
   return;
 }
 ```
+
+---
+
+## Live re-verify — WQ9D-I 2026-08-04
+
+| Field | Value |
+|---|---|
+| **Agent** | WQ9D-I OWN-ONLY |
+| **Tools** | atch_decompile, nalyze_function_complete, get_function_by_address, callers/xrefs/callees, ead_memory |
+| **No** | disassemble_bytes |
+
+### Bounds / ABI
+
+- Body: `0x007ffef0`–`0x00800ad1` exclusive (**3041 B** / `0xBE1`).
+- Entry: `mov eax,[esp+4]` then load `[eax+0xF40]`; `sub esp,0x14C`.
+- Epilogue: `C2 08 00` → **`ret 8`** (two stack args).
+- Live decompile **≡** frozen raw CF above.
+
+### Call graph
+
+- Caller: `FUN_0093ffb0` (CALL @ `0x00940e37`).
+- Callees: `Object_ResolveFromTFID`, `TFID_EqualsObjectId`, `TFID_NotEquals`, `FUN_0040aff0`, `FUN_005749d0`, `FUN_007a69d0`, `FUN_007a6de0`, `sprintf`, `FUN_008f8200`.
+
+### Constants (`read_memory`)
+
+| VA | Value |
+|---|---|
+| `DAT_00a1e850` | null TFID `FF..FF FF..FF 00..00 00..00` |
+| `DAT_00a84270` | `"for"` |
+| `DAT_00a84224` | `"Hits"` |
+| `DAT_00a84184` | `"Saps"` |
+| `DAT_00a43258` | `"XP"` |
+| `DAT_00a1419b` | empty C-string (first byte 0) |
+| `DAT_00af921c` | image dword0 `0xFFFFFFFF` (bit filter source) |
+
+### Channel codes to chat log
+
+`0x10` crit, `0x11` damage, `0x12` dodge/miss/resist/deflect, `0x13` repair, `0x14` XP, `0x15` power, `0x16` shielded.

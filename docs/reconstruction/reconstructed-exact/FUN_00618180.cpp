@@ -1,108 +1,60 @@
 // =============================================================================
-// FUN_00618180
+// FUN_00618180  — scaffold twin of CVOGHBSkill_Common_ctor
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00618180
 // Address:   0x00618180  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Body:      0x00618180 – 0x00618265 inclusive (230 B / 0xE6)
+// System:    skills-abilities
+// Generated: 2026-08-05 R11-014 dual seal
+// Exactness: Behavior-preserving rewrite of decompiler CF + machine-corrected
+//            float store at +0x6c4. Prefer CVOGHBSkill_Common_ctor.cpp.
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00618180 @ 0x00618180
-// Stable ID: aa_00618180
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~36 non-empty decompiler lines.
-//  - Control keywords: if×3, return×2.
-//  - Notable callees: CVOGHBBase_GetRemainingSeconds, FUN_005788d0, FUN_00618180.
-//  - Return sites: 2.
+extern "C" void *__thiscall CVOGHBSkillBase_ctor(
+    void *thisHb, void *p2, void *p3, std::uint32_t p4, void *p5, void *p6,
+    std::uint32_t p7);
+extern "C" float __fastcall CVOGHBBase_GetRemainingSeconds(void *thisHb);
+extern "C" void __thiscall CVOGHBBase_SetPeriodAndCounter(void *thisHb, int a,
+                                                          bool b);
+extern "C" void *PTR_FUN_009e1f2c;
+extern "C" float DAT_00a0f694; // 30.0f
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-CVOGHBBase * __thiscall
-
-FUN_00618180(CVOGHBBase *param_1,uint32_t /* width from decompiler */ param_2,uint32_t /* width from decompiler */ param_3,uint32_t /* width from decompiler */ param_4,
-
-            int param_5,uint32_t /* width from decompiler */ param_6,uint32_t /* width from decompiler */ param_7,uint8_t param_8,int param_9)
-
-
-
+extern "C" void *__thiscall FUN_00618180(
+    void *param_1, void *param_2, void *param_3, std::uint32_t param_4,
+    void *param_5, void *param_6, std::uint32_t param_7, std::uint8_t param_8,
+    float param_9 /* decompiler shows int; bytes are movss float */)
 {
+  auto *self = static_cast<std::uint8_t *>(param_1);
+  auto *dw = static_cast<std::uint32_t *>(param_1);
 
-  int iVar1;
+  CVOGHBSkillBase_ctor(param_1, param_2, param_3, param_4, param_5, param_6,
+                       param_7);
 
-  float fVar2;
+  std::uint8_t iVar1 = self[0x44];
+  *dw = reinterpret_cast<std::uint32_t>(&PTR_FUN_009e1f2c);
+  self[0x6c0] = param_8;
+  *reinterpret_cast<float *>(self + 0x6c4) = param_9;
+  dw[0x1b2] = 0; // +0x6c8
 
-  void *local_c;
-
-  uint8_t *puStack_8;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
-
-  local_4 = 0xffffffff;
-
-  puStack_8 = &LAB_009a8708;
-
-  local_c = ExceptionList;
-
-  ExceptionList = &local_c;
-
-  FUN_005788d0(param_2,param_3,param_4,param_5,param_6,param_7);
-
-  iVar1 = param_1[1].nUnusedOrFlags;
-
-  local_4 = 0;
-
-  param_1->pVTable = &PTR_FUN_009e1f2c;
-
-  *(uint8_t *)&param_1[0x2b].nPeriodMs = param_8;
-
-  param_1[0x2b].nPeriodSentinel = param_9;
-
-  param_1[0x2b].nPeriodCounter = 0;
-
-  if (((((char)iVar1 != '\0') && (param_5 != 0)) && (*(int *)(param_5 + 0xa4) != 0)) &&
-
-     (*(char *)(*(int *)(param_5 + 0xa4) + 0xf6) != '\0')) {
-
-    fVar2 = CVOGHBBase_GetRemainingSeconds(param_1);
-
-    if (DAT_00a0f694 < fVar2) {
-
-      if (1 < param_1->nPeriodSentinel) {
-
-        CVOGHBBase_SetPeriodAndCounter
-
-                  (param_1,(int)(30000 / (ulonglong)(uint)param_1->nPeriodMs),true);
-
-        ExceptionList = local_c;
-
-        return param_1;
-
+  if (iVar1 != 0 && param_5 != nullptr) {
+    int *pSub = *reinterpret_cast<int **>(static_cast<std::uint8_t *>(param_5) +
+                                          0xa4);
+    if (pSub != nullptr &&
+        *reinterpret_cast<char *>(reinterpret_cast<std::uint8_t *>(pSub) +
+                                  0xf6) != 0) {
+      float fVar2 = CVOGHBBase_GetRemainingSeconds(param_1);
+      if (DAT_00a0f694 < fVar2) {
+        if (1 < static_cast<int>(dw[3])) { // +0x0C nPeriodSentinel
+          CVOGHBBase_SetPeriodAndCounter(
+              param_1, static_cast<int>(30000u / dw[2]), true); // / +0x08
+          return param_1;
+        }
+        dw[2] = 30000; // +0x08 nPeriodMs
       }
-
-      param_1->nPeriodMs = 30000;
-
     }
-
   }
-
-  ExceptionList = local_c;
-
   return param_1;
-
 }

@@ -3,41 +3,48 @@
 | Field | Value |
 |---|---|
 | **Stable ID** | `aa_007aff00` |
-| **Canonical name** | `FUN_007aff00` |
-| **Address** | `0x007aff00` |
+| **Canonical name** | `CNDUIWindow_ReleaseTextLayoutAndNested_Inferred` |
+| **Ghidra name** | `FUN_007aff00` |
+| **Address** | `0x007aff00`–`0x007aff51` (**82 B** / `0x52`) |
 | **Module** | `autoassault.exe` (image base `0x400000`) |
-| **System** | unknown |
-| **Completion status** | **Partial scaffold** — raw/annotated/clean present; refine + dual review for important units |
+| **System** | CNDUIWindow complete-dtor helper |
+| **Completion status** | **Dual A/B sealed** (WQ9L-G, 2026-08-05) |
 | **Bit-for-bit / runtime / diff** | Open (deferred / not run) |
-
-## Alias
-
-Human name: `Named_CalleeOf_Named_VOG_DEBUG_STOP_007aff00` (callee of `Named_VOG_DEBUG_STOP`)
+| **Rejected alias** | `Named_CalleeOf_Named_VOG_DEBUG_STOP_007aff00` |
 
 ## Purpose
 
-Reconstructed from Ghidra decompile. See clean source and annotated notes for body.
+Partial teardown leaf of `CNDUIWindow_CompleteDtor`: gated free of owned text layout at `+0x28C`, nested CS-list clear at `+0x1E8`, zero `+0x128`/`+0x12C`.
 
-## Signature (decompiler-derived)
+## Signature
 
 ```c
-void __fastcall FUN_007aff00(int param_1)
+// ECX = this; bare RET (C3); void
+void __fastcall FUN_007aff00(void* self);
 ```
 
 ## Artifacts
 
-- Raw: `docs/reconstruction/raw/aa_007aff00_FUN_007aff00.md`
+- Raw (+ re-verify): `docs/reconstruction/raw/aa_007aff00_FUN_007aff00.md`
 - Annotated: `docs/reconstruction/raw/aa_007aff00_FUN_007aff00.annotated.md`
-- Clean: `docs/reconstruction/reconstructed-exact/FUN_007aff00.cpp`
+- Clean: `docs/reconstruction/reconstructed-exact/CNDUIWindow_ReleaseTextLayoutAndNested_Inferred.cpp`
+- Clean twin: `docs/reconstruction/reconstructed-exact/FUN_007aff00.cpp`
+- Named record: `docs/reconstruction/functions/aa_007aff00_CNDUIWindow_ReleaseTextLayoutAndNested_Inferred.md`
+- Review A: `docs/reconstruction/reviews/A_aa_007aff00_CNDUIWindow_ReleaseTextLayoutAndNested_Inferred.md`
+- Review B: `docs/reconstruction/reviews/B_aa_007aff00_CNDUIWindow_ReleaseTextLayoutAndNested_Inferred.md`
 
 ## Callers / callees
 
-(Populate from Ghidra xrefs in follow-up.)
+- **Callers (code):** `CNDUIWindow_CompleteDtor` / `FUN_007b5be0` @ `0x007b5c8a`
+- **DATA xrefs:** many subclass vtbl slots
+- **Callees:** `UiTextLayout_CompleteDtor_Inferred` (`FUN_00797d70`), `operator_delete`, `FUN_00424060`
 
 ## Confidence
 
 | Claim | Level |
 |---|---|
-| Control flow from decompiler | High |
-| Parameter semantic names | Probable / Tentative until caller pass |
-| Types | Tentative |
+| Control flow from decompiler + bytes | High |
+| Nested LEA ECX correction | High |
+| Gated layout free | High |
+| Parameter product English | Tentative (`_Inferred`) |
+| Runtime Confirmed | Open (terminal false) |

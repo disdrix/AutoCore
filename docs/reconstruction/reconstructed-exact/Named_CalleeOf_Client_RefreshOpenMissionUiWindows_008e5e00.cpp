@@ -1,13 +1,16 @@
 // =============================================================================
+// RETIRED SCAFFOLD (R10-015 2026-08-05)
+// Prefer: Client_UI_CraftHost_RefreshMaterialList_Inferred.cpp
 // Named_CalleeOf_Client_RefreshOpenMissionUiWindows_008e5e00
 // -----------------------------------------------------------------------------
 // Stable ID: aa_008e5e00
 // Callee of Client_RefreshOpenMissionUiWindows
 // Address:   0x008e5e00  (autoassault.exe, image base 0x400000)
-// System:    unknown
+// System:    inventory-transfer (was: unknown scaffold)
 // Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
 // Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
 // Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Dual:      R10-015 accept-with-gaps -- do not use this scaffold name.
 // =============================================================================
 
 // PURPOSE (auto): Called from Client_RefreshOpenMissionUiWindows: mission/objective helper with no high-value strings in clean/raw. Role inferred from parent name only; refine when decompile strings or xrefs improve.

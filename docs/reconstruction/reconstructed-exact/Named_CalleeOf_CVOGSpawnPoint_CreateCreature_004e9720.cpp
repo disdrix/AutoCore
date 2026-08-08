@@ -1,3 +1,8 @@
+﻿// =============================================================================
+// RETIRED SCAFFOLD — R13-027 dual 2026-08-05
+// Superseded by: CVOGPhysicsUtils_FindClearSpawnPosition_Inferred.cpp
+// Do not use as authoritative reconstruction.
+// =============================================================================
 // =============================================================================
 // Named_CalleeOf_CVOGSpawnPoint_CreateCreature_004e9720
 // -----------------------------------------------------------------------------
@@ -15,8 +20,8 @@
 
 // READABILITY (auto CF):
 //  - Body size: ~134 non-empty decompiler lines.
-//  - Control keywords: if×7, do×1, while×1, return×1.
-//  - Notable callees: CONCAT31×2, CVOGReaction_RandomUnitScalar×2, FUN_004cd220, FUN_004e9720, FUN_004eacc0, FUN_0055ff20, FUN_00560020, FUN_005eb130.
+//  - Control keywords: ifÃ—7, doÃ—1, whileÃ—1, returnÃ—1.
+//  - Notable callees: CONCAT31Ã—2, CVOGReaction_RandomUnitScalarÃ—2, FUN_004cd220, FUN_004e9720, FUN_004eacc0, FUN_0055ff20, FUN_00560020, FUN_005eb130.
 //  - Return sites: 1.
 
 /*
@@ -306,3 +311,4 @@ bool Named_CalleeOf_CVOGSpawnPoint_CreateCreature_004e9720(uint32_t /* width fro
   return !bVar3;
 
 }
+

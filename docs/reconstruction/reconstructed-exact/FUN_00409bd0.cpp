@@ -1,114 +1,61 @@
 // =============================================================================
-// FUN_00409bd0
+// FUN_00409bd0  — twin of StdSort_RanItStride16_Inferred
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00409bd0
-// Address:   0x00409bd0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00409bd0–0x00409cb9 inclusive (234 B / 0xEA)
+// Canonical: StdSort_RanItStride16_Inferred
+// Agent:     MEGA-043 OWN-ONLY dual 2026-08-05
+// Exactness: Machine-faithful CF from live decompile; ABI sealed.
+// Terminal:  false
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00409bd0 @ 0x00409bd0
-// Stable ID: aa_00409bd0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~39 non-empty decompiler lines.
-//  - Control keywords: if×6, return×2, do×1, goto×1, while×1.
-//  - Notable callees: FUN_00409bd0×3, FUN_00409f90, FUN_0040a380, FUN_0040a410, FUN_0040a820.
-//  - Return sites: 2.
+// Prefer the named clean source for port notes.
+// This twin keeps the Ghidra symbol for inventory lockstep.
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+extern "C" void __cdecl FUN_00409f90(void *out_pair, int first, int last, std::uint32_t pred);
+extern "C" void __cdecl FUN_0040a410(int first, int last, std::uint32_t pred);
+extern "C" void __cdecl FUN_0040a820(int first, int last, std::uint32_t pred);
+extern "C" void __cdecl FUN_0040a380(int first, int last, std::uint32_t pred);
 
-void FUN_00409bd0(int param_1,int param_2,int param_3,uint32_t /* width from decompiler */ param_4)
-
-
-
+// __cdecl; plain RET; stride-16 introsort (MSVC std::_Sort pattern)
+extern "C" void __cdecl FUN_00409bd0(int param_1, int param_2, int param_3, std::uint32_t param_4)
 {
-
-  int iVar1;
-
-  int local_8;
-
-  int local_4;
-
-  
-
-  iVar1 = param_2 - param_1;
-
-  do {
-
-    iVar1 = iVar1 >> 4;
-
-    if (iVar1 < 0x21) {
-
-LAB_00409c67:
-
-      if (1 < iVar1) {
-
-        FUN_0040a410(param_1,param_2,param_4);
-
-      }
-
-      return;
-
-    }
-
-    if (param_3 < 1) {
-
-      if (0x20 < iVar1) {
-
-        if (0x10 < (int)(param_2 - param_1 & 0xfffffff0U)) {
-
-          FUN_0040a820(param_1,param_2,param_4);
-
-        }
-
-        FUN_0040a380(param_1,param_2,param_4);
-
-        return;
-
-      }
-
-      goto LAB_00409c67;
-
-    }
-
-    FUN_00409f90(&local_8,param_1,param_2,param_4);
-
-    iVar1 = local_4;
-
-    param_3 = param_3 / 2 + (param_3 / 2) / 2;
-
-    if ((int)(local_8 - param_1 & 0xfffffff0U) < (int)(param_2 - local_4 & 0xfffffff0U)) {
-
-      FUN_00409bd0(param_1,local_8,param_3,param_4);
-
-      param_1 = iVar1;
-
-    }
-
-    else {
-
-      FUN_00409bd0(local_4,param_2,param_3,param_4);
-
-      param_2 = local_8;
-
-    }
+    int iVar1;
+    int local_8;
+    int local_4;
 
     iVar1 = param_2 - param_1;
-
-  } while( true );
-
+    do {
+        iVar1 = iVar1 >> 4;
+        if (iVar1 < 0x21) {
+LAB_00409c67:
+            if (1 < iVar1) {
+                FUN_0040a410(param_1, param_2, param_4);
+            }
+            return;
+        }
+        if (param_3 < 1) {
+            if (0x20 < iVar1) {
+                if (0x10 < (int)(param_2 - param_1 & 0xfffffff0U)) {
+                    FUN_0040a820(param_1, param_2, param_4);
+                }
+                FUN_0040a380(param_1, param_2, param_4);
+                return;
+            }
+            goto LAB_00409c67;
+        }
+        FUN_00409f90(&local_8, param_1, param_2, param_4);
+        iVar1 = local_4;
+        param_3 = param_3 / 2 + (param_3 / 2) / 2;
+        if ((int)(local_8 - param_1 & 0xfffffff0U) < (int)(param_2 - local_4 & 0xfffffff0U)) {
+            FUN_00409bd0(param_1, local_8, param_3, param_4);
+            param_1 = iVar1;
+        } else {
+            FUN_00409bd0(local_4, param_2, param_3, param_4);
+            param_2 = local_8;
+        }
+        iVar1 = param_2 - param_1;
+    } while (true);
 }

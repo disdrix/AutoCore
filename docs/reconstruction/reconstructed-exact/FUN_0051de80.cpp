@@ -1,77 +1,32 @@
 // =============================================================================
-// FUN_0051de80
+// FUN_0051de80  (scaffold twin of SkillCNDHash_CompleteDtor_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0051de80
-// Address:   0x0051de80  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x0051de80–0x0051deea inclusive (107 B / 0x6B)
+// Wave:      2026-08-04 WQ9G-A OWN dual A/B
+// Named:     reconstructed-exact/SkillCNDHash_CompleteDtor_Inferred.cpp
+// Exactness: Behavior-preserving rewrite; thiscall + soft-lock + teardown order sealed.
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0051de80 @ 0x0051de80
-// Stable ID: aa_0051de80
-// Embedded strings (evidence for future rename):
-//   - "HashError:Destructor, already locked for traversal"
-//   - "VOG_DEBUG_STOP"
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~19 non-empty decompiler lines.
-//  - Control keywords: if×1, for×1, return×1.
-//  - Notable callees: FUN_007a4480×2, FUN_004cba60, FUN_0051de80, FUN_0059c8a0.
-//  - Strings: "HashError:Destructor, already locked for traversal"; "VOG_DEBUG_STOP".
-//  - Return sites: 1.
+extern "C" void __thiscall FUN_004cba60(void *self);
+extern "C" void __fastcall FUN_0059c8a0(void *host);
+extern "C" void FUN_007a4480(int level, const char *msg);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __fastcall FUN_0051de80(uint32_t /* width from decompiler */ *param_1)
-
-
-
+// ECX=this; bare RET; void
+extern "C" void __thiscall FUN_0051de80(void *self)
 {
+  // SEH frame LAB_009a371b omitted
 
-  void *local_c;
+  *reinterpret_cast<void **>(self) = reinterpret_cast<void *>(0x009ce1b8); // PTR_FUN_009ce1b8
 
-  uint8_t *puStack_8;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
-
-  puStack_8 = &LAB_009a371b;
-
-  local_c = ExceptionList;
-
-  ExceptionList = &local_c;
-
-  *param_1 = &PTR_FUN_009ce1b8;
-
-  local_4 = 0;
-
-  if (*(char *)((int)param_1 + 0x1d) != '\0') {
-
-    FUN_007a4480(0,"HashError:Destructor, already locked for traversal");
-
-    FUN_007a4480(0,"VOG_DEBUG_STOP");
-
+  if (*reinterpret_cast<uint8_t *>(reinterpret_cast<char *>(self) + 0x1d) != 0) {
+    FUN_007a4480(0, "HashError:Destructor, already locked for traversal");
+    FUN_007a4480(0, "VOG_DEBUG_STOP");
   }
 
-  FUN_004cba60();
-
-  FUN_0059c8a0();
-
-  ExceptionList = local_c;
-
-  return;
-
+  FUN_004cba60(self);
+  FUN_0059c8a0(reinterpret_cast<char *>(self) + 0x20);
 }

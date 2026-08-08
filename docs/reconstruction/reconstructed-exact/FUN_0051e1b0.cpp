@@ -1,52 +1,40 @@
 // =============================================================================
-// FUN_0051e1b0
+// FUN_0051e1b0  (scaffold alias — see Map_Tidy_FreeHead_Isnil15_B.cpp)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0051e1b0
 // Address:   0x0051e1b0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    STL map tidy free-head (isnil@+0x15_B family)
+// Generated: 2026-08-04 WQ9G-D — scaffold kept as FUN_* twin of named clean
+// Exactness: Behavior-preserving. Prefer Map_Tidy_FreeHead_Isnil15_B.cpp.
+// Dual: reviews/A|B_aa_0051e1b0_Map_Tidy_FreeHead_Isnil15_B.md
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0051e1b0 @ 0x0051e1b0
-// Stable ID: aa_0051e1b0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~8 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_0051d940, FUN_0051e1b0.
-//  - Return sites: 1.
+struct MapNode {
+  MapNode* left;
+  MapNode* parent;
+  MapNode* right;
+};
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+struct MapFacade {
+  void* _unused0;
+  MapNode* head;
+  std::uint32_t size;
+};
 
-void __fastcall FUN_0051e1b0(int param_1)
+extern "C" void __thiscall Map_EraseRange_Isnil15_B(MapFacade* map,
+                                                    void* out_iter,
+                                                    MapNode* first,
+                                                    MapNode* last);
+extern "C" void __cdecl operator_delete(void* p);
 
-
-
+void __fastcall FUN_0051e1b0(MapFacade* map)
 {
-
-  int local_4;
-
-  
-
-  local_4 = param_1;
-
-  FUN_0051d940(&local_4,**(uint32_t /* width from decompiler */ **)(param_1 + 4),*(uint32_t /* width from decompiler */ **)(param_1 + 4));
-
-                    /* WARNING: Subroutine does not return */
-
-  operator_delete(*(void **)(param_1 + 4));
-
+  void* out;
+  MapNode* head = map->head;
+  Map_EraseRange_Isnil15_B(map, &out, head->left, head);
+  operator_delete(head);
+  map->head = nullptr;
+  map->size = 0;
 }

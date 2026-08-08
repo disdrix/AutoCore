@@ -1,54 +1,16 @@
 // =============================================================================
-// FUN_00416370
+// FUN_00416370 — scaffold twin of Mem_ZeroSixDwords_Ecx_Inferred
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00416370
 // Address:   0x00416370  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// See:       Mem_ZeroSixDwords_Ecx_Inferred.cpp (named clean; dual WQ9I-I)
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00416370 @ 0x00416370
-// Stable ID: aa_00416370
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~10 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_00416370.
-//  - Return sites: 1.
+extern "C" uint32_t* Mem_ZeroSixDwords_Ecx_Inferred(uint32_t* dest /*ECX*/);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __fastcall FUN_00416370(uint32_t /* width from decompiler */ *param_1)
-
-
-
+extern "C" uint32_t* FUN_00416370(uint32_t* dest /*ECX*/)
 {
-
-  *param_1 = 0;
-
-  param_1[1] = 0;
-
-  param_1[2] = 0;
-
-  param_1[3] = 0;
-
-  param_1[4] = 0;
-
-  param_1[5] = 0;
-
-  return;
-
+  return Mem_ZeroSixDwords_Ecx_Inferred(dest);
 }

@@ -1,108 +1,48 @@
 // =============================================================================
-// FUN_00424060
+// FUN_00424060  (Ghidra twin of ObjectCsList_DestroyAll_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00424060
-// Address:   0x00424060  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00424060–0x0042415a inclusive (251 B / 0xFB)
+// Wave:      WQ9L-E OWN-ONLY dual 2026-08-05
+// Named:     ObjectCsList_DestroyAll_Inferred
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00424060 @ 0x00424060
-// Stable ID: aa_00424060
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
+#include <windows.h>
 
-// READABILITY (auto CF):
-//  - Body size: ~35 non-empty decompiler lines.
-//  - Control keywords: return×2, if×1, while×1.
-//  - Notable callees: LeaveCriticalSection×2, EnterCriticalSection, FUN_00424060, _CxxThrowException.
-//  - Return sites: 2.
+struct ObjectCsListNode {
+  void** vtbl;
+  uint32_t field04;
+  ObjectCsListNode* next;
+};
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+extern "C" void* __cdecl _CxxThrowException(void* pExceptionObject, void* pThrowInfo);
+extern "C" void* DAT_00acc430;
 
-/* WARNING: Function: __chkstk replaced with injection: alloca_probe */
-
-
-
-void __fastcall FUN_00424060(int param_1)
-
-
-
+extern "C" void __fastcall FUN_00424060(void* list_raw)
 {
+  auto* list = reinterpret_cast<uint8_t*>(list_raw);
 
-  uint32_t /* width from decompiler */ *puVar1;
+  EnterCriticalSection(reinterpret_cast<LPCRITICAL_SECTION>(list + 4));
 
-  uint32_t /* width from decompiler */ local_18;
+  auto* node = *reinterpret_cast<ObjectCsListNode**>(list + 0x1C);
 
-  uint8_t *local_14;
-
-  void *local_10;
-
-  uint8_t *puStack_c;
-
-  uint32_t /* width from decompiler */ local_8;
-
-  
-
-  puStack_c = &LAB_009bd790;
-
-  local_10 = ExceptionList;
-
-  local_18 = 0x424083;
-
-  local_14 = &stack0xffffefdc;
-
-  local_8 = 0;
-
-  ExceptionList = &local_10;
-
-  EnterCriticalSection((LPCRITICAL_SECTION)(param_1 + 4));
-
-  puVar1 = *(uint32_t /* width from decompiler */ **)(param_1 + 0x1c);
-
-  if (*(char *)(param_1 + 0x28) != '\0') {
-
-    LeaveCriticalSection((LPCRITICAL_SECTION)(param_1 + 4));
-
-    local_18 = 0x80070005;
-
-                    /* WARNING: Subroutine does not return */
-
-    _CxxThrowException(&local_18,(ThrowInfo *)&DAT_00acc430);
-
+  if (list[0x28] != 0) {
+    LeaveCriticalSection(reinterpret_cast<LPCRITICAL_SECTION>(list + 4));
+    uint32_t hr = 0x80070005u;
+    _CxxThrowException(&hr, &DAT_00acc430);
   }
 
-  while (puVar1 != (uint32_t /* width from decompiler */ *)0x0) {
-
-    *(uint32_t /* width from decompiler */ *)(param_1 + 0x1c) = puVar1[2];
-
-    (**(code **)*puVar1)(1);
-
-    puVar1 = *(uint32_t /* width from decompiler */ **)(param_1 + 0x1c);
-
+  while (node != nullptr) {
+    *reinterpret_cast<ObjectCsListNode**>(list + 0x1C) = node->next;
+    using ScalarDtor = void(__thiscall*)(ObjectCsListNode*, int);
+    reinterpret_cast<ScalarDtor>(node->vtbl[0])(node, 1);
+    node = *reinterpret_cast<ObjectCsListNode**>(list + 0x1C);
   }
 
-  *(uint32_t /* width from decompiler */ *)(param_1 + 0x24) = 0;
+  *reinterpret_cast<uint32_t*>(list + 0x24) = 0;
+  *reinterpret_cast<uint32_t*>(list + 0x20) = 0;
+  *reinterpret_cast<uint32_t*>(list + 0x1C) = 0;
 
-  *(uint32_t /* width from decompiler */ *)(param_1 + 0x20) = 0;
-
-  *(uint32_t /* width from decompiler */ *)(param_1 + 0x1c) = 0;
-
-  LeaveCriticalSection((LPCRITICAL_SECTION)(param_1 + 4));
-
-  ExceptionList = local_10;
-
-  return;
-
+  LeaveCriticalSection(reinterpret_cast<LPCRITICAL_SECTION>(list + 4));
 }

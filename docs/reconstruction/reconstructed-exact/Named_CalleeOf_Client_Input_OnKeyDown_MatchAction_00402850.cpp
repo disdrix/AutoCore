@@ -1,3 +1,9 @@
+﻿// =============================================================================
+// RETIRED scaffold — MEGA-034 2026-08-05
+// Replaced by: StdTree_EraseAndRebalance_Isnil29_RetC_Inferred.cpp
+// Stable ID: aa_00402850  VA: 0x00402850
+// Reason: Named_CalleeOf_* plate only named a caller; real role is STL tree erase.
+// =============================================================================
 // =============================================================================
 // Named_CalleeOf_Client_Input_OnKeyDown_MatchAction_00402850
 // -----------------------------------------------------------------------------
@@ -15,8 +21,8 @@
 
 // READABILITY (auto CF):
 //  - Body size: ~143 non-empty decompiler lines.
-//  - Control keywords: if×22, return×2, do×1, goto×1, while×1.
-//  - Notable callees: block×11, FUN_00403200×3, FUN_00407a60×3, FUN_00401bc0, FUN_00402850, FUN_004031c0, FUN_004031e0, FUN_004040a0.
+//  - Control keywords: ifÃ—22, returnÃ—2, doÃ—1, gotoÃ—1, whileÃ—1.
+//  - Notable callees: blockÃ—11, FUN_00403200Ã—3, FUN_00407a60Ã—3, FUN_00401bc0, FUN_00402850, FUN_004031c0, FUN_004031e0, FUN_004040a0.
 //  - Strings: "invalid map/set<T> iterator".
 //  - Return sites: 2.
 
@@ -325,3 +331,4 @@ LAB_00402a5e:
   operator_delete(param_3);
 
 }
+

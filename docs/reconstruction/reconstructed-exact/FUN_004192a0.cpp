@@ -1,92 +1,48 @@
 // =============================================================================
-// FUN_004192a0
+// FUN_004192a0  →  StdTree_Lrotate_Isnil29
 // -----------------------------------------------------------------------------
 // Stable ID: aa_004192a0
 // Address:   0x004192a0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    MSVC std::_Tree left-rotate (isnil@+0x29)
+// Generated: 2026-07-23 scaffold; 2026-08-04 WQ9D-C seal
+// Exactness: Behavior-preserving rewrite of decompiler control flow.
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_004192a0 @ 0x004192a0
-// Stable ID: aa_004192a0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// Prefer named clean: StdTree_Lrotate_Isnil29.cpp
 
-// READABILITY (auto CF):
-//  - Body size: ~28 non-empty decompiler lines.
-//  - Control keywords: if×3, return×3.
-//  - Notable callees: FUN_004192a0.
-//  - Return sites: 3.
+#include <cstdint>
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+void __thiscall StdTree_Lrotate_Isnil29(std::int32_t tree, std::int32_t x);
 
-void __thiscall FUN_004192a0(int param_1,int param_2)
-
-
-
+void __thiscall FUN_004192a0(std::int32_t param_1, std::int32_t param_2)
 {
+  std::int32_t *piVar1;
+  std::int32_t *piVar2;
 
-  int *piVar1;
-
-  int *piVar2;
-
-  
-
-  piVar1 = *(int **)(param_2 + 8);
-
-  *(int *)(param_2 + 8) = *piVar1;
-
-  if (*(char *)(*piVar1 + 0x29) == '\0') {
-
-    *(int *)(*piVar1 + 4) = param_2;
-
+  piVar1 = *reinterpret_cast<std::int32_t **>(param_2 + 8);
+  *reinterpret_cast<std::int32_t *>(param_2 + 8) = *piVar1;
+  if (*reinterpret_cast<char *>(*piVar1 + 0x29) == '\0') {
+    *reinterpret_cast<std::int32_t *>(*piVar1 + 4) = param_2;
   }
-
-  piVar1[1] = *(int *)(param_2 + 4);
-
-  if (param_2 == *(int *)(*(int *)(param_1 + 4) + 4)) {
-
-    *(int **)(*(int *)(param_1 + 4) + 4) = piVar1;
-
+  piVar1[1] = *reinterpret_cast<std::int32_t *>(param_2 + 4);
+  if (param_2 == *reinterpret_cast<std::int32_t *>(
+                     *reinterpret_cast<std::int32_t *>(param_1 + 4) + 4)) {
+    *reinterpret_cast<std::int32_t **>(
+        *reinterpret_cast<std::int32_t *>(param_1 + 4) + 4) = piVar1;
     *piVar1 = param_2;
-
-    *(int **)(param_2 + 4) = piVar1;
-
+    *reinterpret_cast<std::int32_t **>(param_2 + 4) = piVar1;
     return;
-
   }
-
-  piVar2 = *(int **)(param_2 + 4);
-
+  piVar2 = *reinterpret_cast<std::int32_t **>(param_2 + 4);
   if (param_2 == *piVar2) {
-
-    *piVar2 = (int)piVar1;
-
+    *piVar2 = reinterpret_cast<std::int32_t>(piVar1);
     *piVar1 = param_2;
-
-    *(int **)(param_2 + 4) = piVar1;
-
+    *reinterpret_cast<std::int32_t **>(param_2 + 4) = piVar1;
     return;
-
   }
-
-  piVar2[2] = (int)piVar1;
-
+  piVar2[2] = reinterpret_cast<std::int32_t>(piVar1);
   *piVar1 = param_2;
-
-  *(int **)(param_2 + 4) = piVar1;
-
+  *reinterpret_cast<std::int32_t **>(param_2 + 4) = piVar1;
   return;
-
 }

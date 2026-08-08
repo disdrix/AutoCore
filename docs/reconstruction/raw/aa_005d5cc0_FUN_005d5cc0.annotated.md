@@ -1,228 +1,158 @@
-# Annotated low-level: FUN_005d5cc0
+# Annotated low-level: FUN_005d5cc0 → CVOGWaypoint_DoFollowObjectShortcutsUpdate
 
 | Field | Value |
 |---|---|
 | Stable ID | `aa_005d5cc0` |
-| VA | `0x005d5cc0` |
-| System | unknown |
-| Date | 2026-07-23 |
+| VA | `0x005d5cc0`–`0x005d62fb` (**1596 B** / `0x63C`) |
+| System | skills-abilities / waypoint path AI (plate: CVOGWaypoint) |
+| Date | 2026-08-05 (MEGA-057 refresh) |
+| Ghidra name | `FUN_005d5cc0` |
+| Canonical name | `CVOGWaypoint_DoFollowObjectShortcutsUpdate` |
+| Evidence | Live decompile + `disassemble_function` + `read_memory` + callers/xrefs |
+
+---
 
 ## Machine-level notes
 
-- Source: raw capture for `aa_005d5cc0`.
-- Prefer assembly when decompiler conflicts.
-- Recover types for still-generic parameters via callers/xrefs.
-- Map DAT_* globals and FUN_* callees in follow-up waves.
+- **ABI:** thiscall; **ECX** = `CVOGWaypoint* this`; no stack args; **void**; **`RET`** (not `RET n`).
+- **SEH:** `LAB_009a7110`; scope enter/leave via `FUN_0076cf00` / `FUN_0076cef0`.
+- **Plate string (product):** `"CVOGWaypoint::DoFollowObjectShortcutsUpdate"` @ `0x009dace4`.
+- **Sole caller:** `CVOGWaypoint_UpdateState` @ `0x005d6300` state case **2** (call site `0x005d6353`).
+- Prefer assembly when decompiler conflicts (surface-distance this-arg; operator_delete return).
 
-## Pseudocode (annotated copy of raw)
+### Constants (`read_memory`)
+
+| Symbol | VA | Value |
+|---|---|---|
+| `g_flOne` | `0x00a0f2a0` | `1.0f` |
+| `DAT_00a0f70c` | `0x00a0f70c` | `0.2f` (direction-dot threshold) |
+| `_DAT_009dace0` | `0x009dace0` | `1e7f` (min-distance init) |
+
+### this offsets
+
+| Off | Role |
+|---|---|
+| `+0x10` | owner entity |
+| `+0x20..+0x2c` | output desired pose (float4) |
+| `+0x30` | follow-object TFID |
+| `+0x40/+0x44` | active shortcut/path COID lo/hi |
+| `+0x48` | secondary path id |
+| `+0x4c` | patrol/follow range float |
+| `+0x52` | follow target resolved+flagged |
+| `+0x53` | within patrol range of follow target |
+
+### Callees (annotated)
+
+| Addr / name | Role here |
+|---|---|
+| `FUN_0076cf00` / `FUN_0076cef0` | scope enter/leave |
+| `Object_ResolveFromTFID` (`0x004bb950`) | resolve follow TFID |
+| `__RTDynamicCast` | object → `CVOGPhysicsBase` |
+| `Object_GetWorldPositionPtr` (`0x00404c90`) | world pos float* |
+| `Object_SurfaceDistance3D_Inferred` (`0x0053e510`) | surface distance owner↔target |
+| `FUN_005d5960` | state-1 peer path update (called when path COID valid) |
+| `FUN_004d5910` | gather shortcut candidates into local vector |
+| `operator_delete` (`0x00489822`) | free candidate vector buffer |
+| vtbl `+0x2c` | write/get pose (float3 out) |
+| vtbl `+0x10` | path/query along direction |
+
+---
+
+## Pseudocode (annotated; CF ≡ raw)
 
 ```c
-/* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
-
-void __fastcall FUN_005d5cc0(int param_1)
-
-{
-  int iVar1;
-  void *pvVar2;
-  int iVar3;
-  float *pfVar4;
-  undefined4 *puVar5;
-  int *piVar6;
-  float10 fVar7;
-  float fVar8;
-  float fVar9;
-  float local_68;
-  float local_60;
-  float local_5c;
-  float local_58;
-  float local_54;
-  float local_50;
-  float local_4c;
-  float local_48;
-  float local_44;
-  undefined1 local_40 [4];
-  undefined4 *local_3c;
-  undefined4 *local_38;
-  undefined4 local_34;
-  float local_30;
-  float fStack_2c;
-  float fStack_28;
-  void *local_1c;
-  undefined1 *puStack_18;
-  undefined4 local_14;
-  
-  local_14 = 0xffffffff;
-  puStack_18 = &LAB_009a7110;
-  local_1c = ExceptionList;
-  ExceptionList = &local_1c;
-  FUN_0076cf00("CVOGWaypoint::DoFollowObjectShortcutsUpdate");
-  local_14 = 0;
-  pvVar2 = Object_ResolveFromTFID((TFID_16 *)(param_1 + 0x30));
-  if ((pvVar2 == (void *)0x0) || ((*(uint *)((int)pvVar2 + 0x17c) >> 5 & 1) == 0)) {
-    *(undefined1 *)(param_1 + 0x52) = 0;
-    goto LAB_005d62e5;
-  }
-  *(undefined1 *)(param_1 + 0x52) = 1;
-  iVar3 = __RTDynamicCast(pvVar2,0,&CVOGClonedObjectBase::RTTI_Type_Descriptor,
-                          &CVOGPhysicsBase::RTTI_Type_Descriptor,0);
-  if (*(int *)(iVar3 + 8) == 0) {
-    pfVar4 = (float *)(*(int *)(*(int *)(iVar3 + 4) + 4) + 0x84 + iVar3);
-  }
-  else {
-    pfVar4 = (float *)(*(int *)(*(int *)(iVar3 + 8) + 0x3c) + 0xb0);
-  }
-  local_50 = *pfVar4;
-  iVar1 = *(int *)(param_1 + 0x10);
-  local_4c = pfVar4[1];
-  local_48 = pfVar4[2];
-  local_44 = pfVar4[3];
-  if (*(int *)(iVar1 + 8) == 0) {
-    pfVar4 = (float *)(*(int *)(*(int *)(iVar1 + 4) + 4) + 0x84 + iVar1);
-  }
-  else {
-    pfVar4 = (float *)(*(int *)(*(int *)(iVar1 + 8) + 0x3c) + 0xb0);
-  }
-  local_60 = *pfVar4;
-  local_5c = pfVar4[1];
-  local_58 = pfVar4[2];
-  local_54 = pfVar4[3];
-  fVar7 = (float10)FUN_0053e510(iVar3);
-  fVar9 = (float)fVar7;
-  if ((float10)*(float *)(param_1 + 0x4c) <= fVar7) {
-    *(undefined1 *)(param_1 + 0x53) = 0;
-  }
-  else {
-    *(undefined1 *)(param_1 + 0x53) = 1;
-  }
-  if (fVar9 < g_flOne) {
-    *(float *)(param_1 + 0x20) = local_50;
-    *(float *)(param_1 + 0x24) = local_4c;
-    *(float *)(param_1 + 0x28) = local_48;
-    *(float *)(param_1 + 0x2c) = local_44;
-    goto LAB_005d62e5;
-  }
-  if ((*(uint *)(param_1 + 0x40) & *(uint *)(param_1 + 0x44)) != 0xffffffff) {
-    FUN_005d5960();
-    pfVar4 = (float *)FUN_00404c90();
-    local_4c = local_4c - pfVar4[1];
-    local_48 = local_48 - pfVar4[2];
-    local_50 = local_50 - *pfVar4;
-    fVar8 = local_48 * local_48 + local_4c * local_4c + local_50 * local_50;
-    fVar9 = 0.0;
-    if (fVar8 != 0.0) {
-      fVar9 = g_flOne / SQRT(fVar8);
-    }
-    local_4c = local_4c * fVar9;
-    local_60 = *(float *)(param_1 + 0x20);
-    local_5c = *(float *)(param_1 + 0x24);
-    local_58 = *(float *)(param_1 + 0x28);
-    local_54 = *(float *)(param_1 + 0x2c);
-    local_50 = fVar9 * local_50;
-    local_48 = local_48 * fVar9;
-    pfVar4 = (float *)FUN_00404c90();
-    local_60 = local_60 - *pfVar4;
-    local_5c = local_5c - pfVar4[1];
-    local_58 = local_58 - pfVar4[2];
-    fVar8 = local_58 * local_58 + local_5c * local_5c + local_60 * local_60;
-    fVar9 = 0.0;
-    if (fVar8 != 0.0) {
-      fVar9 = g_flOne / SQRT(fVar8);
-    }
-    local_58 = local_58 * fVar9;
-    local_5c = local_5c * fVar9;
-    local_60 = fVar9 * local_60;
-    local_54 = (local_54 - pfVar4[3]) * fVar9;
-    if (local_58 * local_48 + local_5c * local_4c + local_60 * local_50 < DAT_00a0f70c) {
-      *(undefined4 *)(param_1 + 0x40) = 0xffffffff;
-      *(undefined4 *)(param_1 + 0x44) = 0xffffffff;
-      *(undefined4 *)(param_1 + 0x48) = 0xffffffff;
-      puVar5 = (undefined4 *)FUN_00404c90();
-      *(undefined4 *)(param_1 + 0x20) = *puVar5;
-      *(undefined4 *)(param_1 + 0x24) = puVar5[1];
-      *(undefined4 *)(param_1 + 0x28) = puVar5[2];
-      *(undefined4 *)(param_1 + 0x2c) = puVar5[3];
-    }
-    goto LAB_005d62e5;
-  }
-  pfVar4 = (float *)FUN_00404c90();
-  local_60 = *pfVar4;
-  local_5c = pfVar4[1];
-  local_58 = pfVar4[2];
-  local_54 = pfVar4[3];
-  local_3c = (undefined4 *)0x0;
-  local_38 = (undefined4 *)0x0;
-  local_34 = 0;
-  local_68 = _DAT_009dace0;
-  local_14 = CONCAT31(local_14._1_3_,1);
-  FUN_004d5910(&local_60,local_40);
-  if (local_3c == local_38) {
-LAB_005d6285:
-    *(float *)(param_1 + 0x20) = local_50;
-    *(float *)(param_1 + 0x24) = local_4c;
-    *(float *)(param_1 + 0x28) = local_48;
-    *(float *)(param_1 + 0x2c) = local_44;
-  }
-  else {
-    piVar6 = (int *)0x0;
-    puVar5 = local_3c;
-    do {
-      (**(code **)(*(int *)*puVar5 + 0x2c))(&local_30);
-      fVar8 = (local_48 - fStack_28) * (local_48 - fStack_28) +
-              (local_4c - fStack_2c) * (local_4c - fStack_2c) +
-              (local_50 - local_30) * (local_50 - local_30);
-      if (((fVar8 <= fVar9 * fVar9) &&
-          ((fStack_28 - local_58) * (fStack_28 - local_58) +
-           (fStack_2c - local_5c) * (fStack_2c - local_5c) +
-           (local_30 - local_60) * (local_30 - local_60) <= fVar9 * fVar9)) && (fVar8 < local_68)) {
-        piVar6 = (int *)*puVar5;
-        local_68 = fVar8;
-      }
-      puVar5 = puVar5 + 1;
-    } while (puVar5 != local_38);
-    if (piVar6 == (int *)0x0) goto LAB_005d6285;
-    local_4c = local_5c - local_4c;
-    local_48 = local_58 - local_48;
-    iVar3 = piVar6[0x4d];
-    local_50 = local_60 - local_50;
-    fVar9 = local_48 * local_48 + local_4c * local_4c + local_50 * local_50;
-    *(int *)(param_1 + 0x40) = iVar3;
-    *(int *)(param_1 + 0x44) = iVar3 >> 0x1f;
-    if (fVar9 == 0.0) {
-      fVar9 = 0.0;
-    }
-    else {
-      fVar9 = g_flOne / SQRT(fVar9);
-    }
-    local_50 = fVar9 * local_50;
-    local_4c = local_4c * fVar9;
-    local_48 = local_48 * fVar9;
-    local_44 = (local_54 - local_44) * fVar9;
-    iVar3 = (**(code **)(*piVar6 + 0x10))(0xffffffff,&local_50);
-    if (iVar3 == 0) {
-      *(undefined4 *)(param_1 + 0x48) = 0xffffffff;
-      (**(code **)(*piVar6 + 0x2c))(param_1 + 0x20);
-    }
-    else {
-      *(undefined4 *)(param_1 + 0x48) = *(undefined4 *)(iVar3 + 0x134);
-      (**(code **)(*piVar6 + 0x2c))(param_1 + 0x20);
-    }
-  }
-  if (local_3c != (undefined4 *)0x0) {
-                    /* WARNING: Subroutine does not return */
-    operator_delete(local_3c);
-  }
-  local_3c = (undefined4 *)0x0;
-  local_38 = (undefined4 *)0x0;
-  local_34 = 0;
-LAB_005d62e5:
-  local_14 = 0xffffffff;
-  FUN_0076cef0();
-  ExceptionList = local_1c;
-  return;
+// thiscall: ECX = CVOGWaypoint* this; void; RET 0
+void __thiscall CVOGWaypoint_DoFollowObjectShortcutsUpdate(CVOGWaypoint *this)
+{
+  // SEH + scope "CVOGWaypoint::DoFollowObjectShortcutsUpdate"
+  void *follow = Object_ResolveFromTFID(/* via owner map */ &this->follow_tfid /* +0x30 */);
+  if (follow == NULL || ((*(uint*)(follow + 0x17c) >> 5) & 1) == 0) {
+    this->flag_follow_valid /* +0x52 */ = 0;
+    goto unscope;
+  }
+  this->flag_follow_valid = 1;
+
+  CVOGPhysicsBase *targetPhys =
+    __RTDynamicCast(follow, 0, &CVOGClonedObjectBase_RTTI, &CVOGPhysicsBase_RTTI, 0);
+
+  // target pose float4 (physics rb+0xb0 or entity +0x84 dual)
+  float tgt[4] = *GetPose4(targetPhys);
+  // owner pose float4 from this->owner (+0x10)
+  float own[4] = *GetPose4(this->owner);
+
+  // bytes: ECX=owner, stack=targetPhys  (decompiler residual: single arg)
+  float dist = (float)Object_SurfaceDistance3D_Inferred(this->owner, targetPhys);
+
+  this->flag_in_patrol /* +0x53 */ = (this->patrol_range /* +0x4c */ > dist) ? 1 : 0;
+
+  if (dist < 1.0f) {
+    // snap desired pose to target
+    CopyPose4(this->pose /* +0x20 */, tgt);
+    goto unscope;
+  }
+
+  // path COID pair valid?
+  if ((this->path_coid_lo /* +0x40 */ & this->path_coid_hi /* +0x44 */) != 0xFFFFFFFF) {
+    FUN_005d5960(this);  // state-1 peer
+    // unit dir: target - owner_world
+    // unit dir: saved_pose - owner_world
+    // if dot < 0.2f: clear path COIDs +0x40/44/48 to -1; snap pose from owner world
+    goto unscope;
+  }
+
+  // no path: gather shortcuts around owner pose
+  float owner_world[4] = *Object_GetWorldPositionPtr(this->owner);
+  vector<void*> candidates; // local_3c/local_38/local_34
+  float best = 1e7f;
+  FUN_004d5910(/*owner map ctx*/, owner_world, &candidates);
+
+  if (candidates empty) {
+    CopyPose4(this->pose, tgt);
+  } else {
+    void *bestObj = NULL;
+    for (each c in candidates) {
+      float p[3]; c->vtbl[+0x2c](&p);
+      // both (tgt-p) and (p-owner_world) within dist²; track min (tgt-p)²
+      if (ok && closer) bestObj = c;
+    }
+    if (!bestObj) {
+      CopyPose4(this->pose, tgt);
+    } else {
+      // store COID from bestObj+0x134 → +0x40/+0x44 (sign extend)
+      // normalize dir owner_world - tgt; vtbl+0x10(-1, dir)
+      // set +0x48 from result+0x134 or -1; vtbl+0x2c → this+0x20
+    }
+  }
+  if (candidates.buf) operator_delete(candidates.buf);
+
+unscope:
+  FUN_0076cef0();
+  return;
 }
 ```
 
-## Open questions
+---
 
-- Confirm calling convention and full signature against callers.
-- Recover meaningful types for still-generic parameters.
+## Control-flow summary
+
+```
+enter scope
+  resolve follow TFID → null/flag? → +0x52=0 → exit
+  +0x52=1; cast physics; load poses
+  surface dist vs +0x4c → +0x53
+  dist < 1 → pose=target → exit
+  path COID valid?
+    yes → FUN_005d5960; dir-dot gate; maybe clear path → exit
+    no  → gather shortcuts → pick nearest → set COIDs/pose
+  free vector
+exit scope
+```
+
+---
+
+## Gaps (annotated)
+
+1. Product English for `FUN_004d5910` (shortcut gather) and `FUN_005d5960` (state-1 peer).
+2. Exact class of candidate objects (vtbl `+0x10` / `+0x2c` / `+0x134` COID).
+3. Bit meaning of object flag `+0x17c` bit 5 beyond "usable follow target".
+4. Runtime / bit-exact / differential — open.

@@ -1,74 +1,32 @@
-// =============================================================================
-// FUN_00404180
+﻿// =============================================================================
+// FUN_00404180  (scaffold twin → StdTree_Buynode_Val24_Isnil29_EaxCtor_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00404180
-// Address:   0x00404180  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00404180–0x00404202 exclusive (130 B / 0x82)
+// System:    MSVC std::_Tree buynode Val24/isnil29 (EAX-ctor path)
+// Generated: 2026-08-04 WQ9K-C dual seal (scaffold 2026-07-23 refined)
+// Exactness: Behavior-preserving; prefer named clean sibling for ports.
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00404180 @ 0x00404180
-// Stable ID: aa_00404180
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~19 non-empty decompiler lines.
-//  - Control keywords: if×1, return×1.
-//  - Notable callees: FUN_00404180, FUN_00409880.
-//  - Return sites: 1.
+struct NodeIsnil29;
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+extern "C" NodeIsnil29* __stdcall StdTree_Buynode_Val24_Isnil29_EaxCtor_Inferred(
+    NodeIsnil29* left,
+    NodeIsnil29* parent,
+    NodeIsnil29* right,
+    const std::uint32_t* value6,
+    std::uint8_t color);
 
-void * FUN_00404180(uint32_t /* width from decompiler */ param_1,uint32_t /* width from decompiler */ param_2,uint32_t /* width from decompiler */ param_3,uint32_t /* width from decompiler */ param_4,
-
-                   uint32_t /* width from decompiler */ param_5)
-
-
-
+extern "C" NodeIsnil29* __stdcall FUN_00404180(
+    NodeIsnil29* left,
+    NodeIsnil29* parent,
+    NodeIsnil29* right,
+    const std::uint32_t* value6,
+    std::uint8_t color)
 {
-
-  void *pvVar1;
-
-  void *local_10;
-
-  uint8_t *puStack_c;
-
-  uint32_t /* width from decompiler */ local_8;
-
-  
-
-  local_8 = 0xffffffff;
-
-  puStack_c = &LAB_009bc701;
-
-  local_10 = ExceptionList;
-
-  ExceptionList = &local_10;
-
-  pvVar1 = operator_new(0x30);
-
-  local_8 = 1;
-
-  if (pvVar1 != (void *)0x0) {
-
-    FUN_00409880(param_2,param_3,param_5);
-
-  }
-
-  ExceptionList = local_10;
-
-  return pvVar1;
-
+  return StdTree_Buynode_Val24_Isnil29_EaxCtor_Inferred(
+      left, parent, right, value6, color);
 }

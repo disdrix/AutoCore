@@ -1,52 +1,49 @@
 // =============================================================================
-// FUN_00650f50
+// FUN_00650f50  — legacy twin of CVOGHBSkill_XPAdder_ctor
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00650f50
-// Address:   0x00650f50  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00650f50 – 0x00650f8e  (autoassault.exe, image base 0x400000)
+// System:    skills-abilities
+// Generated: 2026-07-23 scaffold; R11-025 dual seal 2026-08-05
+// Exactness: Behavior-preserving. Prefer CVOGHBSkill_XPAdder_ctor.cpp as named clean.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00650f50 @ 0x00650f50
-// Stable ID: aa_00650f50
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~9 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_005788d0, FUN_00650f50.
-//  - Return sites: 1.
+extern "C" void* __thiscall CVOGHBSkillBase_ctor(
+    void* self,
+    void* pSourceObj,
+    void* pSkillBlob,
+    uint32_t arg4,
+    void* pTarget,
+    void* pTfid16,
+    uint32_t arg7);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+extern "C" void* PTR_FUN_009e5304[];
 
-uint32_t /* width from decompiler */ * __thiscall
-
-FUN_00650f50(uint32_t /* width from decompiler */ *param_1,uint32_t /* width from decompiler */ param_2,uint32_t /* width from decompiler */ param_3,uint32_t /* width from decompiler */ param_4,
-
-            uint32_t /* width from decompiler */ param_5,uint32_t /* width from decompiler */ param_6,uint32_t /* width from decompiler */ param_7)
-
-
-
+// Ghidra surface name (thiscall ECX=this; ret 0x18)
+uint32_t* __thiscall FUN_00650f50(
+    uint32_t* param_1 /*ECX*/,
+    uint32_t param_2,
+    uint32_t param_3,
+    uint32_t param_4,
+    uint32_t param_5,
+    uint32_t param_6,
+    uint32_t param_7)
 {
+  CVOGHBSkillBase_ctor(
+      param_1,
+      reinterpret_cast<void*>(static_cast<uintptr_t>(param_2)),
+      reinterpret_cast<void*>(static_cast<uintptr_t>(param_3)),
+      param_4,
+      reinterpret_cast<void*>(static_cast<uintptr_t>(param_5)),
+      reinterpret_cast<void*>(static_cast<uintptr_t>(param_6)),
+      param_7);
 
-  FUN_005788d0(param_2,param_3,param_4,param_5,param_6,param_7);
+  *param_1 = reinterpret_cast<uint32_t>(&PTR_FUN_009e5304[0]);
 
-  *param_1 = &PTR_FUN_009e5304;
-
-  param_1[0x1b0] = 0;
+  // dword-index 0x1b0 == byte +0x6c0; retail uses MOVSS float zero
+  *reinterpret_cast<float*>(reinterpret_cast<uint8_t*>(param_1) + 0x6c0) = 0.0f;
 
   return param_1;
-
 }

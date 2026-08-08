@@ -1,58 +1,45 @@
 // =============================================================================
-// FUN_004cb2c0
+// FUN_004cb2c0  — clean twin of StdTree_Min_Isnil21_Inferred
 // -----------------------------------------------------------------------------
 // Stable ID: aa_004cb2c0
 // Address:   0x004cb2c0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Body:      0x004cb2c0 – 0x004cb2da inclusive (27 B / 0x1b)
+// System:    MSVC std::_Tree min / leftmost (isnil @ +0x21)
+// Generated: 2026-08-05 R13-002 dual seal (replaces 2026-07-23 scaffold)
+// Exactness: Behavior-preserving rewrite from body bytes (read_memory).
+//            Ghidra decompile is void — NOT authoritative for return (EAX).
+// Bit-for-bit vs retail EXE: DEFERRED.
+// Runtime Confirmed: NOT claimed.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_004cb2c0 @ 0x004cb2c0
-// Stable ID: aa_004cb2c0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~11 non-empty decompiler lines.
-//  - Control keywords: while×1, return×1.
-//  - Notable callees: FUN_004cb2c0.
-//  - Return sites: 1.
+// See StdTree_Min_Isnil21_Inferred.cpp for full plate + purpose.
+// This twin keeps the Ghidra symbol as the primary export for path matching.
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+struct StdTreeNode_Isnil21_Twin {
+  StdTreeNode_Isnil21_Twin *left;    // +0x00
+  StdTreeNode_Isnil21_Twin *parent;  // +0x04
+  StdTreeNode_Isnil21_Twin *right;   // +0x08
+};
 
-void FUN_004cb2c0(int *param_1)
-
-
-
+// Stack arg; EAX out; bare RET
+extern "C" StdTreeNode_Isnil21_Twin *FUN_004cb2c0(
+    StdTreeNode_Isnil21_Twin *param_1)
 {
+  StdTreeNode_Isnil21_Twin *left =
+      *reinterpret_cast<StdTreeNode_Isnil21_Twin **>(param_1);
 
-  char cVar1;
-
-  
-
-  param_1 = (int *)*param_1;
-
-  cVar1 = *(char *)((int)param_1 + 0x21);
-
-  while (cVar1 == '\0') {
-
-    param_1 = (int *)*param_1;
-
-    cVar1 = *(char *)((int)param_1 + 0x21);
-
+  if (*reinterpret_cast<char *>(reinterpret_cast<std::uintptr_t>(left) + 0x21) !=
+      0) {
+    return param_1;
   }
 
-  return;
+  do {
+    param_1 = left;
+    left = *reinterpret_cast<StdTreeNode_Isnil21_Twin **>(param_1);
+  } while (*reinterpret_cast<char *>(
+               reinterpret_cast<std::uintptr_t>(left) + 0x21) == 0);
 
+  return param_1;
 }

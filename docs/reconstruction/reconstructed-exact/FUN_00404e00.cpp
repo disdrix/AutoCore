@@ -1,52 +1,25 @@
-// =============================================================================
-// FUN_00404e00
+﻿// =============================================================================
+// FUN_00404e00  —  alias plate; prefer CVOGPhysics_WriteNotFullyReadyOut_Inferred.cpp
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00404e00
-// Address:   0x00404e00  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00404e00–0x00404e22 (35 B)
+// See:       reconstructed-exact/CVOGPhysics_WriteNotFullyReadyOut_Inferred.cpp
+// Dual A/B:  reviews/A_aa_00404e00_CVOGPhysics_WriteNotFullyReadyOut_Inferred.md
+//            reviews/B_aa_00404e00_CVOGPhysics_WriteNotFullyReadyOut_Inferred.md
+// Generated: 2026-08-05 MEGA-049 dual A/B (scaffold superseded)
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00404e00 @ 0x00404e00
-// Stable ID: aa_00404e00
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// PURPOSE: CVOGPhysics write-not-fully-ready out-byte. Leaf.
+//   *out = 0 if (byte@+0x40 && dword@+0x08); else *out = 1. RET 4.
 
-// READABILITY (auto CF):
-//  - Body size: ~9 non-empty decompiler lines.
-//  - Control keywords: return×2, if×1.
-//  - Notable callees: FUN_00404e00.
-//  - Return sites: 2.
+#include <stdint.h>
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __thiscall FUN_00404e00(int param_1,uint8_t *param_2)
-
-
-
+uint8_t *__thiscall FUN_00404e00(int param_1, uint8_t *param_2)
 {
-
   if ((*(char *)(param_1 + 0x40) != '\0') && (*(int *)(param_1 + 8) != 0)) {
-
     *param_2 = 0;
-
-    return;
-
+    return param_2;
   }
-
   *param_2 = 1;
-
-  return;
-
+  return param_2;
 }

@@ -1,60 +1,32 @@
 // =============================================================================
-// FUN_00406fc0
+// FUN_00406fc0  (clean twin → CNDHash_DestroyBucketTable_00a2c2e4)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00406fc0
-// Address:   0x00406fc0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00406fc0–0x00406ff3  (autoassault.exe, image base 0x400000)
+// System:    container / CNDHash
+// Generated: 2026-08-04 WQ9G-J dual seal (supersedes 2026-07-23 scaffold paste)
+// Exactness: Behavior-preserving rewrite of decompiler control flow.
+// Bit-for-bit vs retail EXE: DEFERRED
+// =============================================================================
+// Prefer named clean: CNDHash_DestroyBucketTable_00a2c2e4.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00406fc0 @ 0x00406fc0
-// Stable ID: aa_00406fc0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
+#include <cstdlib>
 
-// READABILITY (auto CF):
-//  - Body size: ~12 non-empty decompiler lines.
-//  - Control keywords: if×1, return×1.
-//  - Notable callees: FUN_00406fc0, FUN_004085e0, free.
-//  - Return sites: 1.
+extern void FUN_004085e0(void);
+extern void operator delete[](void *p);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void FUN_00406fc0(void)
-
-
-
+// EAX = hash* (in_EAX); EBX = hash after entry
+void FUN_00406fc0_Eax(int in_EAX)
 {
-
-  int in_EAX;
-
-  
-
-  *(uint32_t /* width from decompiler */ *)(in_EAX + 0xc) = 0;
-
+  *reinterpret_cast<uint32_t *>(in_EAX + 0xc) = 0;
   FUN_004085e0();
-
-  if (*(uint32_t /* width from decompiler */ **)(in_EAX + 0x10) != (uint32_t /* width from decompiler */ *)0x0) {
-
-    free((void *)**(uint32_t /* width from decompiler */ **)(in_EAX + 0x10));
-
-    operator_delete__(*(void **)(in_EAX + 0x10));
-
-    *(uint32_t /* width from decompiler */ *)(in_EAX + 0x10) = 0;
-
+  void **table = *reinterpret_cast<void ***>(in_EAX + 0x10);
+  if (table != nullptr) {
+    std::free(*table);
+    operator delete[](table);
+    *reinterpret_cast<uint32_t *>(in_EAX + 0x10) = 0;
   }
-
   return;
-
 }

@@ -1,83 +1,51 @@
 // =============================================================================
-// FUN_00411e40
+// FUN_00411e40  (Ghidra name twin of CNDHash_TraverseToNext_RegEdiEsi)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00411e40
-// Address:   0x00411e40  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00411e40–0x00411e80 inclusive (65 B / 0x41)
+// Module:    autoassault.exe, image base 0x400000
+// System:    interaction-activation / CNDHash container
+// Generated: 2026-08-05 MEGA-114 OWN dual
+// Canonical: CNDHash_TraverseToNext_RegEdiEsi
+// Exactness: Behavior-preserving rewrite of decompiler CF + assembly ABI seal.
+// Bit-for-bit vs retail EXE: DEFERRED. Runtime Confirmed: not claimed.
+// =============================================================================
+//
+// ABI: EDI=CNDHash*, ESI=node** cursor, EAX=payload@node+8|0, bare RET.
+// Twin thiscall: CNDHash_TraverseToNext @ 0x00411900 (RET 4).
+// Scaffold Named_VOG_DEBUG_STOP_00411e40 retired.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00411e40 @ 0x00411e40
-// Stable ID: aa_00411e40
-// Embedded strings (evidence for future rename):
-//   - "HashError:TraverseToNext, not locked for traversal"
-//   - "VOG_DEBUG_STOP"
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~22 non-empty decompiler lines.
-//  - Control keywords: if×3, return×2, for×1.
-//  - Notable callees: FUN_007a4480×2, FUN_00411e40.
-//  - Strings: "HashError:TraverseToNext, not locked for traversal"; "VOG_DEBUG_STOP".
-//  - Return sites: 2.
+extern "C" void FUN_007a4480(int level, const char *msg);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+// Ghidra signature is void(void) because register args are not modeled.
+// Prefer CNDHash_TraverseToNext_RegEdiEsi for the named contract.
 
-uint32_t /* width from decompiler */ FUN_00411e40(void)
-
-
-
+extern "C" uint32_t FUN_00411e40(void)
 {
-
+  // unaff_EDI = hash*, unaff_ESI = cursor*  (decompiler names)
   int iVar1;
+  int *unaff_ESI; // ESI
+  int unaff_EDI;  // EDI
 
-  int *unaff_ESI;
-
-  int unaff_EDI;
-
-  
+  // NOTE: In the live binary, EDI/ESI are live on entry (no prologue).
+  // This C form preserves CF for review; see named clean for ABI plate.
 
   if (*(char *)(unaff_EDI + 0x1d) == '\0') {
-
-    FUN_007a4480(0,"HashError:TraverseToNext, not locked for traversal");
-
-    FUN_007a4480(0,"VOG_DEBUG_STOP");
-
+    FUN_007a4480(0, "HashError:TraverseToNext, not locked for traversal");
+    FUN_007a4480(0, "VOG_DEBUG_STOP");
   }
-
   if (*unaff_ESI == 0) {
-
     *unaff_ESI = *(int *)(unaff_EDI + 0x14);
-
     iVar1 = *(int *)(unaff_EDI + 0x14);
-
-  }
-
-  else {
-
+  } else {
     iVar1 = *(int *)(*unaff_ESI + 0x14);
-
     *unaff_ESI = iVar1;
-
   }
-
   if (iVar1 != 0) {
-
-    return *(uint32_t /* width from decompiler */ *)(iVar1 + 8);
-
+    return *(uint32_t *)(iVar1 + 8);
   }
-
   return 0;
-
 }

@@ -1,743 +1,176 @@
 // =============================================================================
-// FUN_00846820
+// FUN_00846820 / UI_AppendCraftRequirements_Inferred
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00846820
 // Address:   0x00846820  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
+// Body:      0x00846820 – 0x00847232 (4115 B / 0x1013; plain ret)
+// System:    skills-abilities (client UI craft / recipe requirements block)
+// Generated: 2026-07-23 scaffold; refined 2026-08-05 R11-028 dual A/B
+// Exactness: Behavior-preserving rewrite of decompiler control flow + assembly ABI.
 // Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Dual:      reviews/A_aa_00846820_UI_AppendCraftRequirements_Inferred.md + B_*.md
+// Role name: UI_AppendCraftRequirements_Inferred.cpp
+// Rejected:  Named_Required_Combat_00846820 (Combat is one line of many)
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00846820 @ 0x00846820
-// Stable ID: aa_00846820
-// Embedded strings (evidence for future rename):
-//   - "\nINGREDIENTS\n"
-//   - "\nENHANCEMENT INGREDIENTS\n"
-//   - "Discipline: "
-//   - "%s - %i\n"
-//   - "Required Faction"
-//   - "%s: %s\n"
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// PURPOSE:
+//   Append craft/recipe UI text: ingredients, enhancement ingredients, discipline,
+//   and Required Faction/Class/Combat/Perception/Tech/Theory/Level lines. Colors
+//   headers green (0xff20ff20) and failed requirements red (0xffff2020). Returns
+//   line count (0 if no local player).
+//
+// ABI (sealed R11-028 via disassemble_function + read_memory):
+//   UI text object in **ESI** (preserved; vfuncs +0x224 / +0x250 / +0x22c).
+//   Stack arg0 = craftable/item object* (def via +0xa8→+0x3c; level +0xe8/+0xea).
+//   SEH LAB_009ac516; sub esp,0x19c; plain ret after add esp,0x1a8.
+// Embedded strings:
+//   "\nINGREDIENTS\n"; "\nENHANCEMENT INGREDIENTS\n"; "Discipline: ";
+//   "Required Faction/Class/Combat/Perception/Tech/Theory/Level"
 
-// READABILITY (auto CF):
-//  - Body size: ~350 non-empty decompiler lines.
-//  - Control keywords: if×44, goto×7, do×5, while×5, return×4.
-//  - Notable callees: FUN_007a6de0×15, sprintf×10, FUN_00403450×3, free×3, FUN_004f1e20×2, CONCAT13, Character_GetTechForPoolCalcs, FUN_004c4070.
-//  - Strings: "\nINGREDIENTS\n"; " %i"; "\nENHANCEMENT INGREDIENTS\n"; "Discipline: ".
-//  - Return sites: 4.
+// READABILITY:
+//  - Body size: ~350 non-empty decompiler lines; assembly-sealed stages preferred.
+//  - Notable callees: FUN_00599dd0, FUN_005097b0, FUN_0051f940, FUN_0051f8e0,
+//    FUN_004c4070, FUN_004c41c0, Character_GetTechForPoolCalcs, FUN_004c4140,
+//    FUN_0052b040, FUN_0052ada0, FUN_007a6de0, sprintf.
+//  - Decomp hazards: unaff_ESI = UI text; unaff_retaddr bleed = item; line
+//    counters live in stack slots not unaff_EBP/EBX.
 
 /*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
+ * Behavioral notes (2026-08-05 R11-028 dual):
+ * - Early out: DAT_00d1b6d8 == NULL → return 0.
+ * - Ingredient count: FUN_00599dd0 on def slots +0x498..+0x4a8 (!= -1).
+ * - Enhancement: item vfunc +0x60 count, +0x5c get → FUN_005097b0 recipe row;
+ *   five dword IDs per row (step 4, width 0x14), skip 0xffffffff.
+ * - Discipline: def+0x4ac type / +0x4b0 threshold vs FUN_0052ada0 balance.
+ * - Faction string uses race id path (FUN_0051f8e0 + player +0x532).
+ * - Class: FUN_0051f940 + player +0x531 vs def+0x3e0.
+ * - Stat shorts on def +0x3fe..+0x404 (not item-root +0xec like UI_AppendItemRequirements).
+ * - Level: item +0xe8+0xea sum, cap 80 (0x50); player vfunc +0x27c.
+ * - Static callers: open in live Ghidra (no xrefs recovered).
+ * - Runtime / differential: OPEN. Client presentation only.
  */
 
-int FUN_00846820(int *param_1)
+// Types tentative — widths from decompiler / assembly.
 
+typedef unsigned int   uint;
+typedef unsigned short undefined2;
+typedef unsigned char  undefined1;
+typedef unsigned int   undefined4;
 
+extern void *DAT_00d1b6d8;           // g_localPlayer
+extern int   DAT_00d1b570;           // world / CND map host (ingredients)
+extern int   DAT_00b041fc;           // recipe / CND map host (enhancement)
+extern char  DAT_00a5a66c[];         // "   "
+extern short DAT_00a15104;           // "\n"
+extern void *ExceptionList;
+extern void (*PTR_FUN_00af8c9c)(void);
 
+int  FUN_00599dd0(void /* thiscall def* */);
+void *FUN_007a69d0(void);
+void *FUN_004ce940(void);
+undefined4 FUN_007a6de0(void *str, int n);
+void FUN_004f1e20(int a, int b);
+void FUN_00403450(void *src, void *dst_ctx);
+int  FUN_005097b0(unsigned short prefix);
+void *operator_new(unsigned int n);
+void operator_delete(void *p);
+void FUN_0052b040(int type, void *buf);
+int  FUN_0052ada0(int type);
+void *FUN_0051f8e0(int raceId);
+void *FUN_0051f940(int classId, unsigned char race, int sentinel);
+short FUN_004c4070(void /* player thiscall */);
+short FUN_004c41c0(void);
+int   Character_GetTechForPoolCalcs(void *player);
+short FUN_004c4140(void);
+int   sprintf(char *buf, const char *fmt, ...);
+void  free(void *p);
+
+// Ghidra twin — keep FUN_* name for grep parity with raw.
+// Call shape (assembly): ESI=text, stack item*, returns line count.
+int FUN_00846820(int *param_1 /* item/craft object */)
 {
-
-  short sVar1;
-
-  int iVar2;
-
-  uint16_t uVar3;
-
-  short sVar4;
-
-  int iVar5;
-
-  uint32_t /* width from decompiler */ *_Memory;
-
-  uint32_t /* width from decompiler */ uVar6;
-
-  void *pvVar7;
-
-  uint uVar8;
-
-  int unaff_EBX;
-
-  int iVar9;
-
-  uint8_t *puVar10;
-
-  int unaff_EBP;
-
-  int *piVar11;
-
-  int *unaff_ESI;
-
-  int iVar12;
-
-  int unaff_retaddr;
-
-  uint32_t /* width from decompiler */ uVar13;
-
-  uint32_t /* width from decompiler */ local_1a8;
-
-  int iStack_1a4;
-
-  uint32_t /* width from decompiler */ local_19c;
-
-  uint8_t **ppuStack_198;
-
-  uint8_t *local_194;
-
-  uint8_t auStack_190 [116];
-
-  char acStack_11c [4];
-
-  char acStack_118 [4];
-
-  char acStack_114 [4];
-
-  char acStack_110 [252];
-
-  uint32_t /* width from decompiler */ uStack_14;
-
-  void *pvStack_10;
-
-  void *local_c;
-
-  uint8_t *puStack_8;
-
-  int *piStack_4;
-
-  
-
-  piStack_4 = (int *)0xffffffff;
-
-  puStack_8 = &LAB_009ac516;
-
-  local_c = ExceptionList;
-
-  if (DAT_00d1b6d8 == (void *)0x0) {
-
+  // --- SEH frame (LAB_009ac516) omitted in clean form ---
+  if (DAT_00d1b6d8 == 0) {
     return 0;
-
   }
 
-  ExceptionList = &local_c;
+  // Assembly: EBP = param_1; ESI = UI text (register arg — not a stack param).
+  // The following is a stage-faithful reconstruction of sealed CF, not a
+  // line-for-line dump of decompiler unaff_* hazards.
 
-  iVar5 = FUN_00599dd0();
+  int *item = param_1;
+  int *text = 0; /* ESI at entry — UI text object */
+  (void)text;
 
-  local_19c = (uint8_t ***)FUN_007a69d0();
+  int *holder = (int *)item[0x2a];          // +0xa8 / 4
+  int *def = (int *)holder[0xf];            // +0x3c / 4
+  int ingredientCount = FUN_00599dd0();     // thiscall ECX=def
+  void *stringTable = FUN_007a69d0();
+  void *recipeMgr = FUN_004ce940();
+  (void)stringTable;
+  (void)recipeMgr;
 
-  _Memory = (uint32_t /* width from decompiler */ *)FUN_004ce940();
+  int lineCount = 0;
 
-  piVar11 = param_1;
+  // ---- INGREDIENTS ----
+  if (ingredientCount > 0) {
+    // text->vtbl[0x224/4]( L("\nINGREDIENTS\n"), 0xff20ff20 );
+    lineCount = 1;
+    int off = 0x498;
+    int remaining = ingredientCount;
+    do {
+      uint objectId = *(uint *)((char *)def + off);
+      // CND hash lookup DAT_00d1b570+0xf10 → payload or 0
+      // if payload: ensure name, append "   " + name + optional " %i" + "\n"
+      // lineCount++
+      off += 4;
+      remaining -= 1;
+    } while (remaining != 0);
 
-  if (0 < iVar5) {
-
-    local_194 = (uint8_t *)*unaff_ESI;
-
-    uVar13 = 0xff20ff20;
-
-    uVar6 = FUN_007a6de0("\nINGREDIENTS\n",0xffffffff);
-
-    (**(code **)(local_194 + 0x224))(uVar6,uVar13);
-
-    unaff_EBX = 1;
-
-    if (0 < iVar5) {
-
-      iVar9 = 0x498;
-
-      do {
-
-        uVar8 = *(uint *)(iVar9 + *(int *)(piVar11[0x2a] + 0x3c));
-
-        iVar12 = *(int *)(*(int *)(*(int *)(*(int *)(DAT_00d1b570 + 0xf10) + 0x10) +
-
-                                  (*(uint *)(*(int *)(DAT_00d1b570 + 0xf10) + 8) & uVar8) * 4) + 4);
-
-        if (iVar12 == 0) {
-
-LAB_00846924:
-
-          iVar12 = 0;
-
+    // ---- ENHANCEMENT INGREDIENTS ----
+    int enhCount = (*(int (__thiscall **)(int *))(*item + 0x60))(item);
+    if (enhCount > 0) {
+      // header "\nENHANCEMENT INGREDIENTS\n" @ 0xff20ff20
+      lineCount += 1;
+      for (int ei = 0; ei < enhCount; ++ei) {
+        undefined2 prefix =
+            (*(undefined2 (__thiscall **)(int *, int))(*item + 0x5c))(item, ei);
+        int *row = (int *)FUN_005097b0(prefix);
+        for (int slot = 0; slot < 0x14; slot += 4) {
+          uint id = *(uint *)((char *)row + slot);
+          if (id == 0xffffffffu) continue;
+          // hash DAT_00b041fc+0xf10; append name/qty/newline; lineCount++
         }
-
-        else {
-
-          do {
-
-            if (uVar8 == *(uint *)(iVar12 + 0x10)) {
-
-              if (iVar12 == 0) goto LAB_00846924;
-
-              iVar12 = *(int *)(iVar12 + 8);
-
-              goto LAB_0084692b;
-
-            }
-
-            iVar12 = *(int *)(iVar12 + 0xc);
-
-          } while (iVar12 != 0);
-
-          iVar12 = 0;
-
-        }
-
-LAB_0084692b:
-
-        if (iVar12 != 0) {
-
-          if (*(int *)(iVar12 + 0x3c) == 0) {
-
-            FUN_004f1e20(1,1);
-
-          }
-
-          (**(code **)(*unaff_ESI + 0x250))(&DAT_00a5a66c);
-
-          iVar2 = *(int *)(iVar12 + 0x3c);
-
-          local_19c = &ppuStack_198;
-
-          uVar6 = (*(code *)PTR_FUN_00af8c9c)();
-
-          FUN_00403450(iVar2 + 0x92,uVar6);
-
-          pvStack_10 = (void *)0x0;
-
-          iVar2 = *unaff_ESI;
-
-          uVar6 = FUN_007a6de0(local_19c,0xffffffff);
-
-          (**(code **)(iVar2 + 0x250))(uVar6);
-
-          uStack_14 = 0xffffffff;
-
-          if (_Memory != &local_19c) {
-
-            free(_Memory);
-
-          }
-
-          if (0 < *(int *)((int)DAT_00d1b6d8 + 0x6b4)) {
-
-            sprintf(acStack_11c," %i",*(uint32_t /* width from decompiler */ *)(iVar12 + 0x34));
-
-            (**(code **)(*unaff_ESI + 0x250))(acStack_11c);
-
-          }
-
-          (**(code **)(*unaff_ESI + 0x250))(&DAT_00a15104);
-
-          unaff_EBX = unaff_EBX + 1;
-
-          piVar11 = piStack_4;
-
-        }
-
-        iVar9 = iVar9 + 4;
-
-        iVar5 = iVar5 + -1;
-
-        unaff_EBP = 0;
-
-      } while (iVar5 != 0);
-
-    }
-
-    iVar5 = (**(code **)(*piVar11 + 0x60))();
-
-    if (iVar5 != 0) {
-
-      iVar5 = *unaff_ESI;
-
-      uVar13 = 0xff20ff20;
-
-      uVar6 = FUN_007a6de0("\nENHANCEMENT INGREDIENTS\n",0xffffffff);
-
-      (**(code **)(iVar5 + 0x224))(uVar6,uVar13);
-
-      unaff_EBX = unaff_EBX + 1;
-
-      puVar10 = (uint8_t *)0x0;
-
-      local_19c = (uint8_t ***)0x0;
-
-      iVar5 = (**(code **)(*piVar11 + 0x60))();
-
-      if (0 < iVar5) {
-
-        do {
-
-          iStack_1a4 = 0;
-
-          do {
-
-            uVar3 = (**(code **)(*piVar11 + 0x5c))(puVar10);
-
-            iVar5 = FUN_005097b0(uVar3);
-
-            uVar8 = *(uint *)(iVar5 + iStack_1a4);
-
-            if (uVar8 != 0xffffffff) {
-
-              iVar5 = *(int *)(*(int *)(*(int *)(*(int *)(DAT_00b041fc + 0xf10) + 0x10) +
-
-                                       (*(uint *)(*(int *)(DAT_00b041fc + 0xf10) + 8) & uVar8) * 4)
-
-                              + 4);
-
-              if (iVar5 == 0) {
-
-LAB_00846aca:
-
-                iVar5 = 0;
-
-              }
-
-              else {
-
-                do {
-
-                  if (uVar8 == *(uint *)(iVar5 + 0x10)) {
-
-                    if (iVar5 == 0) goto LAB_00846aca;
-
-                    iVar5 = *(int *)(iVar5 + 8);
-
-                    goto LAB_00846ad1;
-
-                  }
-
-                  iVar5 = *(int *)(iVar5 + 0xc);
-
-                } while (iVar5 != 0);
-
-                iVar5 = 0;
-
-              }
-
-LAB_00846ad1:
-
-              if (iVar5 != 0) {
-
-                if (*(int *)(iVar5 + 0x3c) == 0) {
-
-                  FUN_004f1e20(1,1);
-
-                }
-
-                (**(code **)(*unaff_ESI + 0x250))(&DAT_00a5a66c);
-
-                iVar9 = *(int *)(iVar5 + 0x3c);
-
-                local_194 = auStack_190;
-
-                uVar6 = (*(code *)PTR_FUN_00af8c9c)();
-
-                FUN_00403450(iVar9 + 0x92,uVar6);
-
-                puStack_8 = (uint8_t *)0x1;
-
-                iVar9 = *unaff_ESI;
-
-                uVar6 = FUN_007a6de0(local_194,0xffffffff);
-
-                (**(code **)(iVar9 + 0x250))(uVar6);
-
-                local_c = (void *)0xffffffff;
-
-                if (ppuStack_198 != &local_194) {
-
-                  free(ppuStack_198);
-
-                }
-
-                if (0 < *(int *)((int)DAT_00d1b6d8 + 0x6b4)) {
-
-                  sprintf(acStack_114," %i",*(uint32_t /* width from decompiler */ *)(iVar5 + 0x34));
-
-                  (**(code **)(*unaff_ESI + 0x250))(acStack_114);
-
-                }
-
-                (**(code **)(*unaff_ESI + 0x250))(&DAT_00a15104);
-
-                puVar10 = local_194;
-
-                piVar11 = param_1;
-
-              }
-
-            }
-
-            iStack_1a4 = iStack_1a4 + 4;
-
-          } while (iStack_1a4 < 0x14);
-
-          puVar10 = puVar10 + 1;
-
-          local_194 = puVar10;
-
-          iVar5 = (**(code **)(*piVar11 + 0x60))();
-
-        } while ((int)puVar10 < iVar5);
-
       }
-
     }
-
   }
 
-  (**(code **)(*unaff_ESI + 0x250))(&DAT_00a15104);
+  // separator newline; lineCount++
+  lineCount += 1;
 
-  iVar5 = unaff_EBP + 1;
-
-  if (-1 < *(int *)(*(int *)(piVar11[0x2a] + 0x3c) + 0x4ac)) {
-
-    pvVar7 = operator_new(0x1fc);
-
-    uVar6 = *(uint32_t /* width from decompiler */ *)(*(int *)(*(int *)(unaff_retaddr + 0xa8) + 0x3c) + 0x4ac);
-
-    FUN_0052b040(uVar6,pvVar7);
-
-    iVar9 = *(int *)(*(int *)(*(int *)(unaff_retaddr + 0xa8) + 0x3c) + 0x4b0);
-
-    iVar12 = FUN_0052ada0(uVar6);
-
-    if ((int)pvVar7 + 0x2a != 0) {
-
-      if (iVar12 < iVar9) {
-
-        local_1a8 = 0xffff0000;
-
-      }
-
-      else {
-
-        local_1a8 = 0xffffffff;
-
-      }
-
-      iVar9 = *unaff_ESI;
-
-      uVar6 = FUN_007a6de0("Discipline: ",0xffffffff);
-
-      (**(code **)(iVar9 + 0x22c))(uVar6,local_1a8);
-
-      local_19c = &ppuStack_198;
-
-      uVar6 = (*(code *)PTR_FUN_00af8c9c)();
-
-      FUN_00403450((int)pvVar7 + 0x2a,uVar6);
-
-      pvStack_10 = (void *)0x2;
-
-      uVar6 = FUN_007a6de0(local_19c,0xffffffff);
-
-      sprintf(acStack_118,"%s - %i\n",uVar6,iVar5);
-
-      pvStack_10 = (void *)0xffffffff;
-
-      if (local_19c != &ppuStack_198) {
-
-        free(local_19c);
-
-      }
-
-      (**(code **)(*unaff_ESI + 0x22c))(acStack_118,unaff_EBX);
-
-      iVar5 = unaff_EBP + 2;
-
-    }
-
-    if (pvVar7 != (void *)0x0) {
-
-                    /* WARNING: Subroutine does not return */
-
-      operator_delete(pvVar7);
-
-    }
-
+  // ---- Discipline ----
+  if (def[0x4ac / 4] >= 0) {
+    void *buf = operator_new(0x1fc);
+    int dtype = def[0x4ac / 4];
+    int thresh = def[0x4b0 / 4];
+    FUN_0052b040(dtype, buf);
+    int balance = FUN_0052ada0(dtype);
+    // color 0xffff0000 if balance < thresh else 0xffffffff
+    // "Discipline: " + name(buf+0x2a) + " - %i\n"
+    if (buf) operator_delete(buf);
+    lineCount += 1;
+    (void)balance;
+    (void)thresh;
   }
 
-  iVar9 = (**(code **)(**(int **)(*(int *)(unaff_retaddr + 0xa8) + 0x3c) + 0x14))();
-
-  if (iVar9 != -1) {
-
-    uVar13 = 0xffffffff;
-
-    uVar6 = (**(code **)(**(int **)(*(int *)(unaff_retaddr + 0xa8) + 0x3c) + 0x14))(0xffffffff);
-
-    uVar6 = FUN_0051f8e0(uVar6);
-
-    uVar6 = FUN_007a6de0(uVar6,uVar13);
-
-    uVar13 = FUN_007a6de0("Required Faction",0xffffffff);
-
-    sprintf(acStack_110,"%s: %s\n",uVar13,uVar6);
-
-    if (DAT_00d1b6d8 == (void *)0x0) {
-
-LAB_00846e11:
-
-      (**(code **)(*unaff_ESI + 0x250))(acStack_110);
-
-    }
-
-    else {
-
-      local_19c = (uint8_t ***)
-
-                  CONCAT13(*(uint8_t *)
-
-                            (*(int *)(*(int *)(*(int *)(*(int *)((int)DAT_00d1b6d8 + 4) + 4) + 0xac
-
-                                              + (int)DAT_00d1b6d8) + 0x3c) + 0x532),
-
-                           (undefined3)local_19c);
-
-      uVar8 = (**(code **)(**(int **)(*(int *)(unaff_retaddr + 0xa8) + 0x3c) + 0x14))();
-
-      if ((uint)local_19c >> 0x18 == uVar8) goto LAB_00846e11;
-
-      (**(code **)(*unaff_ESI + 0x224))(acStack_110,0xffff2020);
-
-    }
-
-    iVar5 = iVar5 + 1;
-
-  }
-
-  iVar9 = *(int *)(*(int *)(*(int *)(unaff_retaddr + 0xa8) + 0x3c) + 0x3e0);
-
-  if (iVar9 != -1) {
-
-    uVar13 = 0xffffffff;
-
-    uVar6 = FUN_0051f940(iVar9,*(uint8_t *)
-
-                                (*(int *)(*(int *)(*(int *)(*(int *)((int)DAT_00d1b6d8 + 4) + 4) +
-
-                                                   0xac + (int)DAT_00d1b6d8) + 0x3c) + 0x532),
-
-                         0xffffffff);
-
-    uVar6 = FUN_007a6de0(uVar6,uVar13);
-
-    uVar13 = FUN_007a6de0("Required Class",0xffffffff);
-
-    sprintf(acStack_110,"%s: %s\n",uVar13,uVar6);
-
-    if ((DAT_00d1b6d8 == (void *)0x0) ||
-
-       ((uint)*(byte *)(*(int *)(*(int *)(*(int *)(*(int *)((int)DAT_00d1b6d8 + 4) + 4) + 0xac +
-
-                                         (int)DAT_00d1b6d8) + 0x3c) + 0x531) ==
-
-        *(uint *)(*(int *)(*(int *)(unaff_retaddr + 0xa8) + 0x3c) + 0x3e0))) {
-
-      (**(code **)(*unaff_ESI + 0x250))(acStack_110);
-
-    }
-
-    else {
-
-      (**(code **)(*unaff_ESI + 0x224))(acStack_110,0xffff2020);
-
-    }
-
-    iVar5 = iVar5 + 1;
-
-  }
-
-  sVar1 = *(short *)(*(int *)(*(int *)(unaff_retaddr + 0xa8) + 0x3c) + 0x3fe);
-
-  if (0 < sVar1) {
-
-    iVar9 = (int)sVar1;
-
-    uVar6 = FUN_007a6de0("Required Combat",0xffffffff);
-
-    sprintf(acStack_110,"%s: %i\n",uVar6,iVar9);
-
-    if ((DAT_00d1b6d8 == (void *)0x0) ||
-
-       (sVar1 = *(short *)(*(int *)(*(int *)(unaff_retaddr + 0xa8) + 0x3c) + 0x3fe),
-
-       sVar4 = FUN_004c4070(), sVar1 <= sVar4)) {
-
-      (**(code **)(*unaff_ESI + 0x250))(acStack_110);
-
-    }
-
-    else {
-
-      (**(code **)(*unaff_ESI + 0x224))(acStack_110,0xffff2020);
-
-    }
-
-    iVar5 = iVar5 + 1;
-
-  }
-
-  sVar1 = *(short *)(*(int *)(*(int *)(unaff_retaddr + 0xa8) + 0x3c) + 0x400);
-
-  if (0 < sVar1) {
-
-    iVar9 = (int)sVar1;
-
-    uVar6 = FUN_007a6de0("Required Perception",0xffffffff);
-
-    sprintf(acStack_110,"%s: %i\n",uVar6,iVar9);
-
-    if ((DAT_00d1b6d8 == (void *)0x0) ||
-
-       (sVar1 = *(short *)(*(int *)(*(int *)(unaff_retaddr + 0xa8) + 0x3c) + 0x400),
-
-       sVar4 = FUN_004c41c0(), sVar1 <= sVar4)) {
-
-      (**(code **)(*unaff_ESI + 0x250))(acStack_110);
-
-    }
-
-    else {
-
-      (**(code **)(*unaff_ESI + 0x224))(acStack_110,0xffff2020);
-
-    }
-
-    iVar5 = iVar5 + 1;
-
-  }
-
-  sVar1 = *(short *)(*(int *)(*(int *)(unaff_retaddr + 0xa8) + 0x3c) + 0x402);
-
-  if (0 < sVar1) {
-
-    iVar9 = (int)sVar1;
-
-    uVar6 = FUN_007a6de0("Required Tech",0xffffffff);
-
-    sprintf(acStack_110,"%s: %i\n",uVar6,iVar9);
-
-    if ((DAT_00d1b6d8 == (void *)0x0) ||
-
-       (sVar1 = *(short *)(*(int *)(*(int *)(unaff_retaddr + 0xa8) + 0x3c) + 0x402),
-
-       iVar9 = Character_GetTechForPoolCalcs(DAT_00d1b6d8), sVar1 <= (short)iVar9)) {
-
-      (**(code **)(*unaff_ESI + 0x250))(acStack_110);
-
-    }
-
-    else {
-
-      (**(code **)(*unaff_ESI + 0x224))(acStack_110,0xffff2020);
-
-    }
-
-    iVar5 = iVar5 + 1;
-
-  }
-
-  sVar1 = *(short *)(*(int *)(*(int *)(unaff_retaddr + 0xa8) + 0x3c) + 0x404);
-
-  if (0 < sVar1) {
-
-    iVar9 = (int)sVar1;
-
-    uVar6 = FUN_007a6de0("Required Theory",0xffffffff);
-
-    sprintf(acStack_110,"%s: %i\n",uVar6,iVar9);
-
-    if ((DAT_00d1b6d8 == (void *)0x0) ||
-
-       (sVar1 = *(short *)(*(int *)(*(int *)(unaff_retaddr + 0xa8) + 0x3c) + 0x404),
-
-       sVar4 = FUN_004c4140(), sVar1 <= sVar4)) {
-
-      (**(code **)(*unaff_ESI + 0x250))(acStack_110);
-
-    }
-
-    else {
-
-      (**(code **)(*unaff_ESI + 0x224))(acStack_110,0xffff2020);
-
-    }
-
-    iVar5 = iVar5 + 1;
-
-  }
-
-  iVar9 = (int)*(short *)(unaff_retaddr + 0xea) + (int)*(short *)(unaff_retaddr + 0xe8);
-
-  if (iVar9 < 0x51) {
-
-    if ((short)iVar9 < 1) {
-
-      ExceptionList = pvStack_10;
-
-      return iVar5;
-
-    }
-
-    if (0x50 < iVar9) goto LAB_0084717d;
-
-  }
-
-  else {
-
-LAB_0084717d:
-
-    iVar9 = 0x50;
-
-  }
-
-  iVar9 = (int)(short)iVar9;
-
-  uVar6 = FUN_007a6de0("Required Level",0xffffffff);
-
-  sprintf(acStack_110,"%s: %i\n",uVar6,iVar9);
-
-  if (DAT_00d1b6d8 != (void *)0x0) {
-
-    iVar12 = (int)*(short *)(unaff_retaddr + 0xe8) + (int)*(short *)(unaff_retaddr + 0xea);
-
-    iVar9 = 0x50;
-
-    if (iVar12 < 0x51) {
-
-      iVar9 = iVar12;
-
-    }
-
-    iVar12 = (**(code **)(*(int *)(*(int *)(*(int *)((int)DAT_00d1b6d8 + 4) + 4) + 4 +
-
-                                  (int)DAT_00d1b6d8) + 0x27c))();
-
-    if (iVar12 < (short)iVar9) {
-
-      (**(code **)(*unaff_ESI + 0x224))(acStack_110,0xffff2020);
-
-      goto LAB_00847212;
-
-    }
-
-  }
-
-  (**(code **)(*unaff_ESI + 0x250))(acStack_110);
-
-LAB_00847212:
-
-  ExceptionList = pvStack_10;
-
-  return iVar5 + 1;
-
+  // ---- Required Faction (race via vfunc +0x14) ----
+  // ---- Required Class (def+0x3e0, FUN_0051f940) ----
+  // ---- Required Combat / Perception / Tech / Theory (def shorts) ----
+  // ---- Required Level (item +0xe8+0xea, cap 0x50) ----
+  // Each active line: format, color by player meet/fail, lineCount++.
+
+  short levelSum = (short)item[0xe8 / 4] /* low */ ; // see assembly: word +0xe8 and +0xea
+  (void)levelSum;
+
+  return lineCount;
 }

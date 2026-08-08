@@ -1,3 +1,6 @@
+﻿// RETIRED SCAFFOLD (R11-030 2026-08-05): product name is CVOGDialog_Ctor (RTTI .?AVCVOGDialog@@).
+// See reconstructed-exact/CVOGDialog_Ctor.cpp and functions/aa_0087b890_CVOGDialog_Ctor.md.
+// This file kept for path stability only — do not treat as product symbol.
 // =============================================================================
 // Named_CalleeOf_Mission_i_d_npc_xml_0087b890
 // -----------------------------------------------------------------------------
@@ -15,7 +18,7 @@
 
 // READABILITY (auto CF):
 //  - Body size: ~21 non-empty decompiler lines.
-//  - Control keywords: return×1.
+//  - Control keywords: returnÃ—1.
 //  - Notable callees: FUN_00792d20, FUN_0087b890.
 //  - Return sites: 1.
 
@@ -78,3 +81,4 @@ uint32_t /* width from decompiler */ * Named_CalleeOf_Mission_i_d_npc_xml_0087b8
   return param_1;
 
 }
+

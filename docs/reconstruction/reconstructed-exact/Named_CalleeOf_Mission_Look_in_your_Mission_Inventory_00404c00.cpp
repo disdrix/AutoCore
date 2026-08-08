@@ -1,46 +1,16 @@
 // =============================================================================
-// Named_CalleeOf_Mission_Look_in_your_Mission_Inventory_00404c00
+// RETIRED scaffold — Named_CalleeOf_Mission_Look_in_your_Mission_Inventory_00404c00
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00404c00
-// Callee of Mission_Look_in_your_Mission_Inventory
-// Address:   0x00404c00  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00404c00
+// Status:    RETIRED by MEGA-060 (2026-08-05)
+// Reason:    Parent-driven name only. Body is pure float3 Euclidean length;
+//            not mission-inventory logic. Partition hint pointed at parent plate
+//            Mission_Look_in_your_Mission_Inventory (0x008a8770), a consumer.
+// Replacement:
+//   docs/reconstruction/reconstructed-exact/Math_Vec3_Length_Sqrt_Inferred.cpp
+//   docs/reconstruction/reconstructed-exact/FUN_00404c00.cpp
 // =============================================================================
 
-// PURPOSE (auto): Called from Mission_Look_in_your_Mission_Inventory: mission/objective helper with no high-value strings in clean/raw. Role inferred from parent name only; refine when decompile strings or xrefs improve.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
-
-// READABILITY (auto CF):
-//  - Body size: ~5 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_00404c00, SQRT.
-//  - Return sites: 1.
-
-/*
- * Behavioral notes:
- * Callee of Mission_Look_in_your_Mission_Inventory
- * Xref/callee-driven rename (parent seed scan)
- *
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-float10 __fastcall Named_CalleeOf_Mission_Look_in_your_Mission_Inventory_00404c00(float *param_1)
-
-
-
-{
-
-  return SQRT((float10)param_1[2] * (float10)param_1[2] +
-
-              (float10)param_1[1] * (float10)param_1[1] + (float10)*param_1 * (float10)*param_1);
-
-}
+// Intentionally left as a retirement shim. Do not expand this file.
+// See Math_Vec3_Length_Sqrt_Inferred for the sealed reconstruction.

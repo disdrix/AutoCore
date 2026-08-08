@@ -1,136 +1,71 @@
 // =============================================================================
-// FUN_004e4e10
+// FUN_004e4e10  — Ghidra-name twin of StdTree_EraseRange_Isnil21_Inferred
 // -----------------------------------------------------------------------------
 // Stable ID: aa_004e4e10
-// Address:   0x004e4e10  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x004e4e10 – 0x004e4ec4 exclusive (180 B / 0xB4)
+// System:    skills-abilities / STL map-set (isnil@+0x21)
+// Generated: 2026-08-05 R13-024 dual seal
+// Prefer:    StdTree_EraseRange_Isnil21_Inferred.cpp for named types
+// Exactness: Behavior-preserving rewrite of decompiler control flow + sealed ABI.
+// Bit-for-bit vs retail EXE: DEFERRED
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_004e4e10 @ 0x004e4e10
-// Stable ID: aa_004e4e10
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~50 non-empty decompiler lines.
-//  - Control keywords: if×3, while×3, return×2.
-//  - Notable callees: FUN_004e2e00, FUN_004e3e70, FUN_004e4e10.
-//  - Return sites: 2.
+extern "C" void FUN_004e2e00(void *root);
+extern "C" void __thiscall FUN_004e3e70(void *map, void **outIt, void *node);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __thiscall FUN_004e4e10(int param_1,uint32_t /* width from decompiler */ *param_2,int *param_3,int *param_4)
-
-
-
+void __thiscall FUN_004e4e10(
+    int map,           // ECX — head @ +4, size @ +8
+    uint32_t *outIt,   // stack0
+    int *first,        // stack1
+    int *last)         // stack2
 {
-
   char cVar1;
-
   int *piVar2;
-
   int *piVar3;
-
   int *piVar4;
-
   int *piVar5;
-
   int *piVar6;
 
-  
-
-  piVar4 = param_4;
-
-  piVar6 = *(int **)(param_1 + 4);
-
-  piVar3 = param_3;
-
-  if ((param_3 == (int *)*piVar6) && (param_4 == piVar6)) {
-
-    FUN_004e2e00(piVar6[1]);
-
-    *(int *)(*(int *)(param_1 + 4) + 4) = *(int *)(param_1 + 4);
-
-    *(uint32_t /* width from decompiler */ *)(param_1 + 8) = 0;
-
-    *(uint32_t /* width from decompiler */ *)*(uint32_t /* width from decompiler */ *)(param_1 + 4) = *(uint32_t /* width from decompiler */ *)(param_1 + 4);
-
-    *(int *)(*(int *)(param_1 + 4) + 8) = *(int *)(param_1 + 4);
-
-    *param_2 = **(uint32_t /* width from decompiler */ **)(param_1 + 4);
-
-    return;
-
+  piVar4 = last;
+  piVar6 = *(int **)(map + 4); // head
+  piVar3 = first;
+  if ((first == (int *)*piVar6) && (last == piVar6)) {
+    FUN_004e2e00((void *)piVar6[1]); // free root subtree
+    *(int *)(*(int *)(map + 4) + 4) = *(int *)(map + 4);
+    *(uint32_t *)(map + 8) = 0;
+    **(uint32_t **)(map + 4) = *(uint32_t *)(map + 4);
+    *(int *)(*(int *)(map + 4) + 8) = *(int *)(map + 4);
+    *outIt = **(uint32_t **)(map + 4);
+    return; // ret 0x0c
   }
-
   while (piVar3 != piVar4) {
-
     piVar6 = piVar3;
-
     if (*(char *)((int)piVar3 + 0x21) == '\0') {
-
       piVar6 = (int *)piVar3[2];
-
       if (*(char *)((int)piVar6 + 0x21) == '\0') {
-
         cVar1 = *(char *)(*piVar6 + 0x21);
-
         piVar2 = (int *)*piVar6;
-
         while (cVar1 == '\0') {
-
           cVar1 = *(char *)(*piVar2 + 0x21);
-
           piVar6 = piVar2;
-
           piVar2 = (int *)*piVar2;
-
         }
-
-      }
-
-      else {
-
+      } else {
         cVar1 = *(char *)(piVar3[1] + 0x21);
-
         piVar5 = (int *)piVar3[1];
-
         piVar2 = piVar3;
-
         while ((piVar6 = piVar5, cVar1 == '\0' && (piVar2 == (int *)piVar6[2]))) {
-
           cVar1 = *(char *)(piVar6[1] + 0x21);
-
           piVar5 = (int *)piVar6[1];
-
           piVar2 = piVar6;
-
         }
-
       }
-
     }
-
-    FUN_004e3e70(&param_3,piVar3);
-
+    FUN_004e3e70((void *)map, (void **)&first, piVar3);
     piVar3 = piVar6;
-
   }
-
-  *param_2 = piVar3;
-
-  return;
-
+  *outIt = (uint32_t)piVar3;
+  return; // ret 0x0c
 }

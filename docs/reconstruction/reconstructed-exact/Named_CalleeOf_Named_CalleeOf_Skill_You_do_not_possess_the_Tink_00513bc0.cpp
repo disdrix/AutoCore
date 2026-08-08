@@ -1,3 +1,4 @@
+﻿// RETIRED scaffold (MEGA-104 2026-08-05): prefer Item_TinkerPrerequisiteGate_Inferred.cpp
 // =============================================================================
 // Named_CalleeOf_Named_CalleeOf_Skill_You_do_not_possess_the_Tink_00513bc0
 // -----------------------------------------------------------------------------
@@ -15,7 +16,7 @@
 
 // READABILITY (auto CF):
 //  - Body size: ~26 non-empty decompiler lines.
-//  - Control keywords: if×5, goto×2, return×2.
+//  - Control keywords: ifÃ—5, gotoÃ—2, returnÃ—2.
 //  - Notable callees: CONCAT31, FUN_00513bc0.
 //  - Return sites: 2.
 

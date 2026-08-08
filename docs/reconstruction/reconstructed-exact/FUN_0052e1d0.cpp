@@ -1,520 +1,177 @@
 // =============================================================================
-// FUN_0052e1d0
+// FUN_0052e1d0  (twin of Character_ComputeReverseEngineerRequiredLevel_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0052e1d0
-// Address:   0x0052e1d0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x0052e1d0 – 0x0052e636 (autoassault.exe, image base 0x400000)
+// System:    inventory-transfer
+// Dual:      R11-002 2026-08-05
+// Exactness: Decompiler-faithful control flow; prefer named clean for port notes.
+// Bit-for-bit / runtime / differential: OPEN.
 // =============================================================================
+// Canonical name: Character_ComputeReverseEngineerRequiredLevel_Inferred
+// See: reconstructed-exact/Character_ComputeReverseEngineerRequiredLevel_Inferred.cpp
+// REJECT scaffold Named_CalleeOf_Skill_You_do_not_possess_the_Tinkering_skill_to_0052e1d0
 
-// PURPOSE (auto): Scaffold unit for FUN_0052e1d0 @ 0x0052e1d0
-// Stable ID: aa_0052e1d0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cmath>
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~241 non-empty decompiler lines.
-//  - Control keywords: if×37, do×7, while×7, goto×6, return×3.
-//  - Notable callees: FUN_004f1e20×4, FUN_005206d0×4, FUN_00599dd0×3, ceil×3, ROUND×2, CONCAT22, FUN_00404d70, FUN_004ce940.
-//  - Return sites: 3.
+extern void* DAT_00b041fc;
+extern float _DAT_009cdff4; // 0.2857143f == 1/3.5
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+extern void  FUN_004ce940(void);
+extern int   FUN_00599dd0(void); // ECX = item def
+extern void  FUN_004f1e20(int, int);
+extern int   FUN_00404d70(uint32_t cbid);
+extern int   FUN_005097b0(uint16_t);
+extern int   FUN_005206d0(unsigned tier, int cost);
 
-/* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
-
-
-
-int __thiscall FUN_0052e1d0(int param_1,int *param_2)
-
-
-
-{
-
-  float fVar1;
-
-  uint16_t uVar2;
-
-  int iVar3;
-
-  uint uVar4;
-
-  int iVar5;
-
-  uint uVar6;
-
-  int unaff_EBX;
-
-  int iVar7;
-
-  uint uVar8;
-
-  int *piVar9;
-
-  uint16_t in_FPUControlWord;
-
-  double dVar10;
-
-  int *unaff_retaddr;
-
-  int local_34;
-
-  int local_30;
-
-  int aiStack_18 [6];
-
-  
-
-  iVar7 = 0;
-
-  if (((param_2 == (int *)0x0) || (iVar3 = FUN_00599dd0(), iVar3 < 1)) ||
-
-     (0 < *(int *)(param_1 + 0x6b4))) {
-
-    return 0;
-
+static int* ObjectMapLookupById(uint32_t id) {
+  auto* host = *reinterpret_cast<uint8_t**>(
+      reinterpret_cast<uint8_t*>(DAT_00b041fc) + 0xf10);
+  if (!host) return nullptr;
+  uint32_t mask = *reinterpret_cast<uint32_t*>(host + 8);
+  auto* buckets = *reinterpret_cast<int***>(host + 0x10);
+  int* bucket = reinterpret_cast<int*>(buckets[mask & id]);
+  if (!bucket) return nullptr;
+  int* node = *reinterpret_cast<int**>(reinterpret_cast<uint8_t*>(bucket) + 4);
+  while (node) {
+    if (static_cast<uint32_t>(*(int*)(reinterpret_cast<uint8_t*>(node) + 0x10)) == id) {
+      return *reinterpret_cast<int**>(reinterpret_cast<uint8_t*>(node) + 8);
+    }
+    node = *reinterpret_cast<int**>(reinterpret_cast<uint8_t*>(node) + 0xc);
   }
+  return nullptr;
+}
+
+static uint32_t LiveMaterialRank(uint32_t cbid) {
+  if (cbid == 0xffffffffu) return 0;
+  int* obj = ObjectMapLookupById(cbid);
+  if (!obj) return 0;
+  if (*(int*)(reinterpret_cast<uint8_t*>(obj) + 0x3c) == 0) FUN_004f1e20(1, 1);
+  if (*(int*)(reinterpret_cast<uint8_t*>(obj) + 0x38) != 0x1a) return 0;
+  int clone = *(int*)(reinterpret_cast<uint8_t*>(obj) + 0x3c);
+  if (clone == 0) return 0;
+  return *reinterpret_cast<uint8_t*>(clone + 0x4c8);
+}
+
+static int PrimaryContrib(uint32_t cbid) {
+  uint32_t rank = LiveMaterialRank(cbid);
+  if (rank == 1 || static_cast<int>(rank - 1) < 0) return 0;
+  if (cbid == 0xffffffffu) return -1;
+  int base = FUN_00404d70(cbid);
+  if (base == 0) return -1;
+  if (*(int*)(base + 0x3c) == 0) FUN_004f1e20(1, 1);
+  if (*(int*)(base + 0x38) != 0x1a) return -1;
+  int clone = *(int*)(base + 0x3c);
+  if (clone == 0) return -1;
+  return *reinterpret_cast<uint8_t*>(clone + 0x4c8) - 1;
+}
+
+static int SecondaryContrib(uint32_t cbid) {
+  uint32_t rank = LiveMaterialRank(cbid);
+  if (rank == 1 || static_cast<int>(rank - 1) < 0) return 0;
+  int* obj = ObjectMapLookupById(cbid);
+  if (!obj) return -1;
+  if (*(int*)(reinterpret_cast<uint8_t*>(obj) + 0x3c) == 0) FUN_004f1e20(1, 1);
+  if (*(int*)(reinterpret_cast<uint8_t*>(obj) + 0x38) != 0x1a) return -1;
+  int clone = *(int*)(reinterpret_cast<uint8_t*>(obj) + 0x3c);
+  if (clone == 0) return -1;
+  return *reinterpret_cast<uint8_t*>(clone + 0x4c8) - 1;
+}
+
+// thiscall: ECX=character (param_1), stack item* (param_2), EAX int, RET 4
+int __thiscall FUN_0052e1d0(int param_1, int* param_2) {
+  if (param_2 == nullptr) return 0;
+
+  // item[+0xa8] → +0x3c def; FUN_00599dd0 ECX=def (decompiler elides)
+  int link = param_2[0x2a];
+  if (link == 0) return 0;
+  int def = *reinterpret_cast<int*>(link + 0x3c);
+  if (def == 0) return 0;
+
+  int slots = FUN_00599dd0();
+  if (slots < 1) return 0;
+  if (*reinterpret_cast<int*>(param_1 + 0x6b4) > 0) return 0;
 
   FUN_004ce940();
 
-  local_30 = 0;
+  int local_30 = 0;
+  int aiStack_18[6];
+  aiStack_18[1] = -1;
+  aiStack_18[2] = -1;
+  aiStack_18[3] = -1;
+  aiStack_18[4] = -1;
+  aiStack_18[5] = -1;
 
-  aiStack_18[1] = 0xffffffff;
-
-  aiStack_18[2] = 0xffffffff;
-
-  aiStack_18[3] = 0xffffffff;
-
-  aiStack_18[4] = 0xffffffff;
-
-  aiStack_18[5] = 0xffffffff;
-
-  iVar3 = FUN_00599dd0();
-
-  if (0 < iVar3) {
-
-    iVar3 = 0x498;
-
+  int iVar7 = 0;
+  slots = FUN_00599dd0();
+  if (slots > 0) {
+    int off = 0x498;
     do {
-
-      uVar8 = *(uint *)(*(int *)(param_2[0x2a] + 0x3c) + iVar3);
-
-      if (uVar8 == 0xffffffff) {
-
-        uVar4 = 0;
-
-      }
-
-      else {
-
-        iVar5 = *(int *)(*(int *)(*(int *)(*(int *)(DAT_00b041fc + 0xf10) + 0x10) +
-
-                                 (*(uint *)(*(int *)(DAT_00b041fc + 0xf10) + 8) & uVar8) * 4) + 4);
-
-        if (iVar5 == 0) {
-
-LAB_0052e297:
-
-          iVar5 = 0;
-
-        }
-
-        else {
-
-          do {
-
-            if (uVar8 == *(uint *)(iVar5 + 0x10)) {
-
-              if (iVar5 == 0) goto LAB_0052e297;
-
-              iVar5 = *(int *)(iVar5 + 8);
-
-              goto LAB_0052e29e;
-
-            }
-
-            iVar5 = *(int *)(iVar5 + 0xc);
-
-          } while (iVar5 != 0);
-
-          iVar5 = 0;
-
-        }
-
-LAB_0052e29e:
-
-        if (iVar5 == 0) {
-
-          uVar4 = 0;
-
-        }
-
-        else {
-
-          if (*(int *)(iVar5 + 0x3c) == 0) {
-
-            FUN_004f1e20(1,1);
-
-          }
-
-          if (*(int *)(iVar5 + 0x38) == 0x1a) {
-
-            if (*(int *)(iVar5 + 0x3c) == 0) {
-
-              uVar4 = 0;
-
-            }
-
-            else {
-
-              uVar4 = (uint)*(byte *)(*(int *)(iVar5 + 0x3c) + 0x4c8);
-
-            }
-
-          }
-
-          else {
-
-            uVar4 = 0;
-
-          }
-
-        }
-
-      }
-
-      if (uVar4 == 1 || (int)(uVar4 - 1) < 0) {
-
-        iVar5 = 0;
-
-      }
-
-      else if (uVar8 == 0xffffffff) {
-
-        iVar5 = -1;
-
-      }
-
-      else {
-
-        iVar5 = FUN_00404d70(uVar8);
-
-        if (iVar5 == 0) {
-
-          iVar5 = -1;
-
-        }
-
-        else {
-
-          if (*(int *)(iVar5 + 0x3c) == 0) {
-
-            FUN_004f1e20(1,1);
-
-          }
-
-          if (*(int *)(iVar5 + 0x38) == 0x1a) {
-
-            if (*(int *)(iVar5 + 0x3c) == 0) {
-
-              iVar5 = -1;
-
-            }
-
-            else {
-
-              iVar5 = *(byte *)(*(int *)(iVar5 + 0x3c) + 0x4c8) - 1;
-
-            }
-
-          }
-
-          else {
-
-            iVar5 = -1;
-
-          }
-
-        }
-
-      }
-
-      local_30 = local_30 + iVar5;
-
-      iVar7 = iVar7 + 1;
-
-      iVar3 = iVar3 + 4;
-
-      iVar5 = FUN_00599dd0();
-
-    } while (iVar7 < iVar5);
-
+      uint32_t cbid = *reinterpret_cast<uint32_t*>(def + off);
+      local_30 += PrimaryContrib(cbid);
+      iVar7 += 1;
+      off += 4;
+      slots = FUN_00599dd0();
+    } while (iVar7 < slots);
   }
 
-  iVar7 = local_30;
+  int saved_primary = local_30;
+  int local_34 = static_cast<int>(std::ceil(
+      static_cast<double>(static_cast<float>(local_30) * _DAT_009cdff4)));
 
-  dVar10 = ceil((double)((float)local_30 * _DAT_009cdff4));
-
-  uVar8 = 0;
-
-  local_34 = (int)ROUND(dVar10);
-
-  iVar3 = (**(code **)(*param_2 + 0x60))();
-
-  if (iVar3 != 0) {
-
+  unsigned uVar8 = 0;
+  auto** vtbl = *reinterpret_cast<void***>(param_2);
+  using CountFn = int(__thiscall*)(int*);
+  using GetFn = uint16_t(__thiscall*)(int*, unsigned);
+  int row_count = reinterpret_cast<CountFn>(vtbl[0x60 / 4])(param_2);
+  if (row_count != 0) {
     do {
-
-      iVar3 = 0;
-
-      (**(code **)(*param_2 + 0x5c))(uVar8);
-
+      int iVar3 = 0;
+      reinterpret_cast<GetFn>(vtbl[0x5c / 4])(param_2, uVar8);
+      int row_cost = 0;
       do {
-
-        uVar2 = (**(code **)(*param_2 + 0x5c))(uVar8);
-
-        iVar5 = FUN_005097b0(uVar2);
-
-        if ((iVar5 != 0) && (uVar4 = *(uint *)(iVar5 + iVar3), uVar4 != 0xffffffff)) {
-
-          iVar5 = *(int *)(*(int *)(*(int *)(*(int *)(DAT_00b041fc + 0xf10) + 0x10) +
-
-                                   (*(uint *)(*(int *)(DAT_00b041fc + 0xf10) + 8) & uVar4) * 4) + 4)
-
-          ;
-
-          if (iVar5 == 0) {
-
-LAB_0052e42b:
-
-            iVar5 = 0;
-
+        uint16_t prefix =
+            reinterpret_cast<GetFn>(vtbl[0x5c / 4])(param_2, uVar8);
+        int recipe = FUN_005097b0(prefix);
+        if (recipe != 0) {
+          uint32_t cbid = *reinterpret_cast<uint32_t*>(recipe + iVar3);
+          if (cbid != 0xffffffffu) {
+            row_cost += SecondaryContrib(cbid);
           }
-
-          else {
-
-            do {
-
-              if (uVar4 == *(uint *)(iVar5 + 0x10)) {
-
-                if (iVar5 == 0) goto LAB_0052e42b;
-
-                iVar5 = *(int *)(iVar5 + 8);
-
-                goto LAB_0052e432;
-
-              }
-
-              iVar5 = *(int *)(iVar5 + 0xc);
-
-            } while (iVar5 != 0);
-
-            iVar5 = 0;
-
-          }
-
-LAB_0052e432:
-
-          if (iVar5 == 0) {
-
-            uVar6 = 0;
-
-          }
-
-          else {
-
-            if (*(int *)(iVar5 + 0x3c) == 0) {
-
-              FUN_004f1e20(1,1);
-
-            }
-
-            if (*(int *)(iVar5 + 0x38) == 0x1a) {
-
-              if (*(int *)(iVar5 + 0x3c) == 0) {
-
-                uVar6 = 0;
-
-              }
-
-              else {
-
-                uVar6 = (uint)*(byte *)(*(int *)(iVar5 + 0x3c) + 0x4c8);
-
-              }
-
-            }
-
-            else {
-
-              uVar6 = 0;
-
-            }
-
-          }
-
-          if (uVar6 == 1 || (int)(uVar6 - 1) < 0) {
-
-            iVar5 = 0;
-
-          }
-
-          else {
-
-            iVar5 = *(int *)(*(int *)(*(int *)(*(int *)(DAT_00b041fc + 0xf10) + 0x10) +
-
-                                     (*(uint *)(*(int *)(DAT_00b041fc + 0xf10) + 8) & uVar4) * 4) +
-
-                            4);
-
-            if (iVar5 == 0) {
-
-LAB_0052e4a4:
-
-              iVar5 = 0;
-
-            }
-
-            else {
-
-              do {
-
-                if (uVar4 == *(uint *)(iVar5 + 0x10)) {
-
-                  if (iVar5 == 0) goto LAB_0052e4a4;
-
-                  iVar5 = *(int *)(iVar5 + 8);
-
-                  goto LAB_0052e4ab;
-
-                }
-
-                iVar5 = *(int *)(iVar5 + 0xc);
-
-              } while (iVar5 != 0);
-
-              iVar5 = 0;
-
-            }
-
-LAB_0052e4ab:
-
-            if (iVar5 == 0) {
-
-              iVar5 = -1;
-
-            }
-
-            else {
-
-              if (*(int *)(iVar5 + 0x3c) == 0) {
-
-                FUN_004f1e20(1,1);
-
-              }
-
-              if (*(int *)(iVar5 + 0x38) == 0x1a) {
-
-                if (*(int *)(iVar5 + 0x3c) == 0) {
-
-                  iVar5 = -1;
-
-                }
-
-                else {
-
-                  iVar5 = *(byte *)(*(int *)(iVar5 + 0x3c) + 0x4c8) - 1;
-
-                }
-
-              }
-
-              else {
-
-                iVar5 = -1;
-
-              }
-
-            }
-
-          }
-
-          unaff_EBX = unaff_EBX + iVar5;
-
-          param_2 = unaff_retaddr;
-
         }
-
-        iVar3 = iVar3 + 4;
-
+        iVar3 += 4;
       } while (iVar3 < 0x14);
 
-      local_30 = local_30 + unaff_EBX;
-
-      fVar1 = (float)unaff_EBX * _DAT_009cdff4;
-
-      aiStack_18[uVar8] = unaff_EBX;
-
-      dVar10 = ceil((double)fVar1);
-
-      if (0 < (int)ROUND(dVar10)) {
-
-        ceil((double)fVar1);
-
+      local_30 += row_cost;
+      float fVar1 = static_cast<float>(row_cost) * _DAT_009cdff4;
+      aiStack_18[uVar8] = row_cost;
+      double d = std::ceil(static_cast<double>(fVar1));
+      if (static_cast<int>(d) > 0) {
+        (void)std::ceil(static_cast<double>(fVar1));
       }
-
-      unaff_EBX = CONCAT22((short)((uint)unaff_EBX >> 0x10),in_FPUControlWord);
-
-      uVar8 = uVar8 + 1;
-
-      uVar4 = (**(code **)(*param_2 + 0x60))();
-
-    } while (uVar8 < uVar4);
-
+      uVar8 += 1;
+      row_count = reinterpret_cast<CountFn>(vtbl[0x60 / 4])(param_2);
+    } while (uVar8 < static_cast<unsigned>(row_count));
   }
 
-  if (iVar7 != 0) {
-
-    if ((local_30 != -1) && (iVar7 = FUN_005206d0(uVar8,local_30), local_34 < iVar7)) {
-
-      local_34 = FUN_005206d0(uVar8,local_30);
-
+  if (saved_primary != 0) {
+    if (local_30 != -1) {
+      int t = FUN_005206d0(uVar8, local_30);
+      if (local_34 < t) local_34 = FUN_005206d0(uVar8, local_30);
     }
-
     iVar7 = 1;
-
-    piVar9 = aiStack_18;
-
+    int* piVar9 = aiStack_18;
     do {
-
       piVar9 = piVar9 + 1;
-
-      iVar3 = *piVar9;
-
-      if ((iVar3 != -1) && (iVar5 = FUN_005206d0(iVar7,iVar3), local_34 < iVar5)) {
-
-        local_34 = FUN_005206d0(iVar7,iVar3);
-
+      int c = *piVar9;
+      if (c != -1) {
+        int t = FUN_005206d0(static_cast<unsigned>(iVar7), c);
+        if (local_34 < t) local_34 = FUN_005206d0(static_cast<unsigned>(iVar7), c);
       }
-
-      iVar7 = iVar7 + 1;
-
+      iVar7 += 1;
     } while (iVar7 < 6);
-
     return local_34;
-
   }
-
   return 0;
-
 }

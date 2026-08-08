@@ -1,92 +1,57 @@
 // =============================================================================
-// FUN_00573ce0
+// FUN_00573ce0  (Ghidra twin of IgnoreList_EraseEntriesByTfid_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00573ce0
-// Address:   0x00573ce0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00573ce0–0x00573d4c exclusive (108 B / 0x6c)
+// Module:    autoassault.exe (image base 0x400000)
+// Canonical: IgnoreList_EraseEntriesByTfid_Inferred
+// Agent:     R13-040 OWN-ONLY dual 2026-08-05 (dual start 2686)
+// Exactness: Behavior-preserving; ABI sealed via disasm + read_memory.
+// Bit-for-bit vs retail EXE: DEFERRED (Terminal false).
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00573ce0 @ 0x00573ce0
-// Stable ID: aa_00573ce0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
+#include <cstring>
 
-// READABILITY (auto CF):
-//  - Body size: ~28 non-empty decompiler lines.
-//  - Control keywords: if×3, return×2, do×1, while×1.
-//  - Notable callees: FUN_00573ce0, memmove.
-//  - Return sites: 2.
+extern "C" void __cdecl operator_delete(void* p);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-uint32_t /* width from decompiler */ __thiscall
-
-FUN_00573ce0(int param_1,uint32_t /* width from decompiler */ param_2,uint32_t /* width from decompiler */ param_3,int param_4,int param_5)
-
-
-
+// __thiscall; RET 0x10; always returns 0
+// Stack: unused1, unused2, tfid_lo, tfid_hi (body reads only last two)
+int __thiscall FUN_00573ce0(
+    void* param_1,
+    int /*param_2*/,
+    int /*param_3*/,
+    int param_4,
+    int param_5)
 {
+  auto* host = reinterpret_cast<std::uint8_t*>(param_1);
+  auto** dst = *reinterpret_cast<void***>(host + 0x38);
 
-  void *pvVar1;
-
-  uint32_t /* width from decompiler */ *_Src;
-
-  uint32_t /* width from decompiler */ *_Dst;
-
-  
-
-  _Dst = *(uint32_t /* width from decompiler */ **)(param_1 + 0x38);
-
-  if (_Dst != *(uint32_t /* width from decompiler */ **)(param_1 + 0x3c)) {
-
-    _Src = _Dst + 1;
-
+  if (dst != *reinterpret_cast<void***>(host + 0x3c)) {
+    auto** src = dst + 1;
     do {
+      void* entry = *dst;
+      auto* e = reinterpret_cast<std::uint8_t*>(entry);
 
-      pvVar1 = (void *)*_Dst;
-
-      if ((*(int *)((int)pvVar1 + 8) == param_4) && (*(int *)((int)pvVar1 + 0xc) == param_5)) {
-
-        if (pvVar1 != (void *)0x0) {
-
-                    /* WARNING: Subroutine does not return */
-
-          operator_delete(pvVar1);
-
+      if (*reinterpret_cast<int*>(e + 0x08) == param_4 &&
+          *reinterpret_cast<int*>(e + 0x0c) == param_5) {
+        if (entry != nullptr) {
+          operator_delete(entry);
         }
-
-        *_Dst = 0;
-
-        memmove(_Dst,_Src,(*(int *)(param_1 + 0x3c) - (int)_Src >> 2) * 4);
-
-        *(int *)(param_1 + 0x3c) = *(int *)(param_1 + 0x3c) + -4;
-
+        *dst = nullptr;
+        auto* endp = *reinterpret_cast<std::uint8_t**>(host + 0x3c);
+        const auto n =
+            static_cast<std::size_t>(
+                (reinterpret_cast<std::uintptr_t>(endp) -
+                 reinterpret_cast<std::uintptr_t>(src)));
+        std::memmove(dst, src, n);
+        *reinterpret_cast<std::uintptr_t*>(host + 0x3c) -= 4;
+      } else {
+        dst = dst + 1;
+        src = src + 1;
       }
-
-      else {
-
-        _Dst = _Dst + 1;
-
-        _Src = _Src + 1;
-
-      }
-
-    } while (_Dst != *(uint32_t /* width from decompiler */ **)(param_1 + 0x3c));
-
+    } while (dst != *reinterpret_cast<void***>(host + 0x3c));
   }
 
   return 0;
-
 }

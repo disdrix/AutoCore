@@ -1,92 +1,52 @@
 // =============================================================================
-// FUN_005a27f0
+// FUN_005a27f0  (scaffold twin of StdTree_Rrotate_Isnil21_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_005a27f0
 // Address:   0x005a27f0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Body:      0x005a27f0–0x005a2841 inclusive (82 B / 0x52)
+// System:    MSVC std::_Tree right-rotate (isnil@+0x21 / color@+0x20)
+// Generated: 2026-08-05 R11-007 dual seal (scaffold 2026-07-23)
+// Exactness: Behavior-preserving rewrite of decompiler control flow.
+// Bit-for-bit vs retail EXE: DEFERRED.
+// Canonical: StdTree_Rrotate_Isnil21_Inferred
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_005a27f0 @ 0x005a27f0
-// Stable ID: aa_005a27f0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// PURPOSE: MSVC _Tree right-rotate for isnil@+0x21 family. Leaf pointer surgery.
+// Twin Lrotate: FUN_0050e9f0. Parent dual: 0x00407200 InsertAndRebalance isnil21.
 
-// READABILITY (auto CF):
-//  - Body size: ~28 non-empty decompiler lines.
-//  - Control keywords: if×3, return×3.
-//  - Notable callees: FUN_005a27f0.
-//  - Return sites: 3.
+#include <cstdint>
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __thiscall FUN_005a27f0(int param_1,int *param_2)
-
-
-
+// __thiscall: ECX = tree*, stack = node* x; void; RET 4
+void __thiscall FUN_005a27f0(std::int32_t param_1, std::int32_t *param_2)
 {
-
-  int iVar1;
-
-  int *piVar2;
-
-  
+  std::int32_t iVar1;
+  std::int32_t *piVar2;
 
   iVar1 = *param_2;
-
-  *param_2 = *(int *)(iVar1 + 8);
-
-  if (*(char *)(*(int *)(iVar1 + 8) + 0x21) == '\0') {
-
-    *(int **)(*(int *)(iVar1 + 8) + 4) = param_2;
-
+  *param_2 = *reinterpret_cast<std::int32_t *>(iVar1 + 8);
+  if (*reinterpret_cast<char *>(
+          *reinterpret_cast<std::int32_t *>(iVar1 + 8) + 0x21) == '\0') {
+    *reinterpret_cast<std::int32_t **>(
+        *reinterpret_cast<std::int32_t *>(iVar1 + 8) + 4) = param_2;
   }
-
-  *(int *)(iVar1 + 4) = param_2[1];
-
-  if (param_2 == *(int **)(*(int *)(param_1 + 4) + 4)) {
-
-    *(int *)(*(int *)(param_1 + 4) + 4) = iVar1;
-
-    *(int **)(iVar1 + 8) = param_2;
-
+  *reinterpret_cast<std::int32_t *>(iVar1 + 4) = param_2[1];
+  if (param_2 == *reinterpret_cast<std::int32_t **>(
+                     *reinterpret_cast<std::int32_t *>(param_1 + 4) + 4)) {
+    *reinterpret_cast<std::int32_t *>(
+        *reinterpret_cast<std::int32_t *>(param_1 + 4) + 4) = iVar1;
+    *reinterpret_cast<std::int32_t **>(iVar1 + 8) = param_2;
     param_2[1] = iVar1;
-
     return;
-
   }
-
-  piVar2 = (int *)param_2[1];
-
-  if (param_2 == (int *)piVar2[2]) {
-
+  piVar2 = reinterpret_cast<std::int32_t *>(param_2[1]);
+  if (param_2 == reinterpret_cast<std::int32_t *>(piVar2[2])) {
     piVar2[2] = iVar1;
-
-    *(int **)(iVar1 + 8) = param_2;
-
+    *reinterpret_cast<std::int32_t **>(iVar1 + 8) = param_2;
     param_2[1] = iVar1;
-
     return;
-
   }
-
   *piVar2 = iVar1;
-
-  *(int **)(iVar1 + 8) = param_2;
-
+  *reinterpret_cast<std::int32_t **>(iVar1 + 8) = param_2;
   param_2[1] = iVar1;
-
   return;
-
 }

@@ -3,41 +3,48 @@
 | Field | Value |
 |---|---|
 | **Stable ID** | `aa_007aec70` |
-| **Canonical name** | `FUN_007aec70` |
-| **Address** | `0x007aec70` |
+| **Canonical name** | `CNDUIWindow_ReleaseOwnedRefPtrAt294_ClearText_Inferred` |
+| **Ghidra name** | `FUN_007aec70` |
+| **Address** | `0x007aec70`–`0x007aecc3` (**84 B** / `0x54`) |
 | **Module** | `autoassault.exe` (image base `0x400000`) |
-| **System** | unknown |
-| **Completion status** | **Partial scaffold** — raw/annotated/clean present; refine + dual review for important units |
+| **System** | CNDUIWindow complete-dtor helper |
+| **Completion status** | **Dual A/B sealed** (WQ9L-G, 2026-08-05) |
 | **Bit-for-bit / runtime / diff** | Open (deferred / not run) |
-
-## Alias
-
-Human name: `Named_CalleeOf_Named_VOG_DEBUG_STOP_007aec70` (callee of `Named_VOG_DEBUG_STOP`)
+| **Rejected alias** | `Named_CalleeOf_Named_VOG_DEBUG_STOP_007aec70` |
 
 ## Purpose
 
-Reconstructed from Ghidra decompile. See clean source and annotated notes for body.
+Partial teardown leaf of `CNDUIWindow_CompleteDtor`: optionally destroy/delete owned RefCountedPtr shell at `+0x294`, clear text via `vtbl[+0x2B4]("")`, zero `+0x29C`/`+0x2A0`.
 
-## Signature (decompiler-derived)
+## Signature
 
 ```c
-void __fastcall FUN_007aec70(int *param_1)
+// ECX = this; bare RET (C3); void
+void __fastcall FUN_007aec70(void* self);
 ```
 
 ## Artifacts
 
-- Raw: `docs/reconstruction/raw/aa_007aec70_FUN_007aec70.md`
+- Raw (+ re-verify): `docs/reconstruction/raw/aa_007aec70_FUN_007aec70.md`
 - Annotated: `docs/reconstruction/raw/aa_007aec70_FUN_007aec70.annotated.md`
-- Clean: `docs/reconstruction/reconstructed-exact/FUN_007aec70.cpp`
+- Clean: `docs/reconstruction/reconstructed-exact/CNDUIWindow_ReleaseOwnedRefPtrAt294_ClearText_Inferred.cpp`
+- Clean twin: `docs/reconstruction/reconstructed-exact/FUN_007aec70.cpp`
+- Named record: `docs/reconstruction/functions/aa_007aec70_CNDUIWindow_ReleaseOwnedRefPtrAt294_ClearText_Inferred.md`
+- Review A: `docs/reconstruction/reviews/A_aa_007aec70_CNDUIWindow_ReleaseOwnedRefPtrAt294_ClearText_Inferred.md`
+- Review B: `docs/reconstruction/reviews/B_aa_007aec70_CNDUIWindow_ReleaseOwnedRefPtrAt294_ClearText_Inferred.md`
 
 ## Callers / callees
 
-(Populate from Ghidra xrefs in follow-up.)
+- **Callers (code):** `CNDUIWindow_CompleteDtor` / `FUN_007b5be0` @ `0x007b5c83`
+- **DATA xrefs:** many subclass vtbl slots
+- **Callees:** `RefCountedPtr_Dtor_Inferred` (`FUN_0096efd0`), `operator_delete`
 
 ## Confidence
 
 | Claim | Level |
 |---|---|
-| Control flow from decompiler | High |
-| Parameter semantic names | Probable / Tentative until caller pass |
-| Types | Tentative |
+| Control flow from decompiler + bytes | High |
+| ECX this / bare RET | High |
+| Ownership flag gate | High |
+| Parameter product English | Tentative (`_Inferred`) |
+| Runtime Confirmed | Open (terminal false) |

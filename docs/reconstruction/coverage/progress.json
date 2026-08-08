@@ -1,15 +1,15 @@
 {
   "program": "autoassault.exe",
   "image_base": "0x400000",
-  "function_count_ghidra": 25666,
-  "inventory_source_total_field": 25666,
-  "inventory_listed": 25666,
+  "function_count_ghidra": 25671,
+  "inventory_source_total_field": 25671,
+  "inventory_listed": 25671,
   "function_records": 18200,
   "raw_captures_approx": 35240,
-  "reconstructed_exact_approx": 27370,
-  "reviews_approx": 4600,
-  "dual_A_approx": 2209,
-  "dual_depth_unique_va_approx": 2209,
+  "reconstructed_exact_approx": 27420,
+  "reviews_approx": 5018,
+  "dual_A_approx": 2726,
+  "dual_depth_unique_va_approx": 2726,
   "systems_mapped": 5,
   "bit_for_bit_deferred": true,
   "full_coverage": true,
@@ -20,18 +20,31 @@
     "input-drive-control",
     "interaction-activation"
   ],
-  "updated": "2026-08-04",
+  "updated": "2026-08-06",
   "trivial_batch_count": 8508,
   "trivial_batch_imports_count": 201,
-  "note": "Live Ghidra ~25666 funcs; inventory listed 25666 fully accounted (none=0). full_coverage=true is inventory stamp only. dual_ab_pairs=2209 << universe (~8.6%). terminal_full_coverage=false. Wave5-38 + WQ-007 residual duals landed. Bit-for-bit deferred.",
+  "note": "Verification-first policy (2026-08-06): never optimize for coverage metrics. full/reviewed/dual_ab_pairs are byproducts only \u2014 not completion. A unit is complete only under project verification requirements. Scaffolds/placeholders must not increase completion metrics. Live list_functions=25671; dual_ab_pairs=2726 (review depth). terminal_full_coverage=inventory stamp only. B1000 dual burst cancelled (0 duals). Residual dual volume frozen. Bit-for-bit deferred. Runtime open.",
   "inventory_pages": 52,
   "inventory_status": {
-    "full": 17158,
-    "trivial-batch": 8508
+    "full": 14437,
+    "trivial-batch": 8508,
+    "reviewed": 2726
   },
   "inventory_accounted": true,
-  "named_clean_aliases_approx": 10420,
-  "terminal_full_coverage": false,
+  "named_clean_aliases_approx": 10480,
+  "terminal_full_coverage": true,
   "function_count_ghidra_legacy_stamp": 26256,
-  "dual_ab_pairs": 2209
+  "dual_ab_pairs": 2726,
+  "audit_2026_08_05": {
+    "rating": "PARTIAL_FAILURE",
+    "note": "full/terminal_full_coverage = inventory three-rep accounting only; NOT dual-verified reconstruction. dual=2726; inventory reviewed=2726 after WQ-AUDIT-002 bulk promote. runtime open. residual dual waves frozen CAP-004. See audits/CURRENT_AUDIT.md",
+    "inventory_reviewed": 2726,
+    "dual_not_in_inventory_reviewed_approx": 0,
+    "function_records_partial_scaffold_pct_approx": 81.4
+  },
+  "residual_dual_waves_frozen": true,
+  "reconstruction_complete": false,
+  "project_verified_complete": false,
+  "dual_depth_complete": false,
+  "coverage_is_byproduct": true
 }

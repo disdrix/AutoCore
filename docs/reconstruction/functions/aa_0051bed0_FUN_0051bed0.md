@@ -3,37 +3,44 @@
 | Field | Value |
 |---|---|
 | **Stable ID** | `aa_0051bed0` |
-| **Canonical name** | `FUN_0051bed0` |
+| **Canonical name** | `Map_FreeSubtree_Isnil15_B` (prefer named record) |
 | **Address** | `0x0051bed0` |
 | **Module** | `autoassault.exe` (image base `0x400000`) |
-| **System** | unknown |
-| **Completion status** | **Partial scaffold** — raw/annotated/clean present; refine + dual review for important units |
+| **System** | STL / map-set (isnil@+0x15 free-subtree) |
+| **Completion status** | **partial** — dual A/B **accept-with-gaps** 2026-08-04 (WQ9G-D) |
 | **Bit-for-bit / runtime / diff** | Open (deferred / not run) |
 
 ## Purpose
 
-Reconstructed from Ghidra decompile. See clean source and annotated notes for body.
+Scaffold alias for `Map_FreeSubtree_Isnil15_B`. See named function record.
 
-## Signature (decompiler-derived)
+## Signature (sealed)
 
 ```c
-void FUN_0051bed0(void *param_1)
+void Map_FreeSubtree_Isnil15_B(void *node); // stack; RET 4
 ```
 
 ## Artifacts
 
-- Raw: `docs/reconstruction/raw/aa_0051bed0_FUN_0051bed0.md`
+- Named record: `docs/reconstruction/functions/aa_0051bed0_Map_FreeSubtree_Isnil15_B.md`
+- Raw (+ re-verify): `docs/reconstruction/raw/aa_0051bed0_FUN_0051bed0.md`
 - Annotated: `docs/reconstruction/raw/aa_0051bed0_FUN_0051bed0.annotated.md`
-- Clean: `docs/reconstruction/reconstructed-exact/FUN_0051bed0.cpp`
+- Clean named: `docs/reconstruction/reconstructed-exact/Map_FreeSubtree_Isnil15_B.cpp`
+- Clean FUN_*: `docs/reconstruction/reconstructed-exact/FUN_0051bed0.cpp`
+- Review A/B: `docs/reconstruction/reviews/A|B_aa_0051bed0_Map_FreeSubtree_Isnil15_B.md`
 
 ## Callers / callees
 
-(Populate from Ghidra xrefs in follow-up.)
+| Direction | Target | Notes |
+|---|---|---|
+| Caller | `Map_EraseRange_Isnil15_B` `0x0051d940` | full clear @ `0x0051d95c` |
+| Caller | self | right recurse |
+| Callee | `operator_delete` | |
 
 ## Confidence
 
 | Claim | Level |
 |---|---|
-| Control flow from decompiler | High |
-| Parameter semantic names | Probable / Tentative until caller pass |
-| Types | Tentative |
+| Prefer named `Map_FreeSubtree_Isnil15_B` | **High** |
+| Byte-correct left-walk free algebra | **Confirmed** |
+| Runtime / bit-exact | Open |

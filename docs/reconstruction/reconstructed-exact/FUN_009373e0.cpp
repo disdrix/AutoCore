@@ -1,70 +1,59 @@
-// =============================================================================
-// FUN_009373e0
+﻿// =============================================================================
+// FUN_009373e0  (twin of Client_DialogGate_OpenIndex10_ParkDriveAxes_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_009373e0
-// Address:   0x009373e0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x009373e0 – 0x00937462  (autoassault.exe, image base 0x400000)
+// Size:      131 B / 0x83
+// System:    input-drive-control
+// Generated: 2026-08-05 MEGA-024 dual seal
+// Exactness: Behavior-preserving rewrite of machine control flow. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED.
+// Canonical named twin: Client_DialogGate_OpenIndex10_ParkDriveAxes_Inferred.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_009373e0 @ 0x009373e0
-// Stable ID: aa_009373e0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// PURPOSE: Dialog-host gate → open dialog index 10 → mission-dialog caption
+// stamp → park vehicle thr0/steer0/HB1 when vehicle present.
+//
+// ABI: EDI=client; stack dword stamp; RET 4. See named twin for full notes.
 
-// READABILITY (auto CF):
-//  - Body size: ~17 non-empty decompiler lines.
-//  - Control keywords: if×2, return×2.
-//  - Notable callees: FUN_007fef20, FUN_008aa4b0, FUN_009373e0, VehicleEntity_SetHandbrake, VehicleEntity_SetLongitudinalInput, VehicleEntity_SetSteerInput.
-//  - Return sites: 2.
+#include <cstdint>
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+extern "C" void __thiscall Client_OpenDialogByIndex(void* self, int dialogIndex,
+                                                    char forceCloseIfOpen,
+                                                    char allowWhileDriving);
+extern "C" void MissionDialog_SetNpcObjectAndNameCaption_Inferred(void* dialogHost,
+                                                                    int npcOrClear);
+extern "C" void __thiscall VehicleEntity_SetLongitudinalInput(void* self, float v);
+extern "C" void __thiscall VehicleEntity_SetSteerInput(void* self, float v);
+extern "C" void __thiscall VehicleEntity_SetHandbrake(void* self, uint8_t on);
 
-void FUN_009373e0(void)
-
-
-
+void FUN_009373e0(void* client /*EDI*/, int npcOrClear)
 {
-
-  int unaff_EDI;
-
-  
-
-  if ((*(int **)(unaff_EDI + 0xf40) != (int *)0x0) &&
-
-     (**(int **)(unaff_EDI + 0xf40) == *(int *)(unaff_EDI + 0xf38))) {
-
-    FUN_007fef20(10,0,0);
-
-    FUN_008aa4b0();
-
-    if ((*(int *)(unaff_EDI + 0xe98) != 0) && (*(int *)(*(int *)(unaff_EDI + 0xe98) + 0x250) != 0))
-
-    {
-
-      VehicleEntity_SetLongitudinalInput(0);
-
-      VehicleEntity_SetSteerInput(0);
-
-      VehicleEntity_SetHandbrake();
-
-      return;
-
-    }
-
+  void** hostSlot = *reinterpret_cast<void***>(reinterpret_cast<char*>(client) + 0xf40);
+  if (hostSlot == nullptr) {
+    return;
+  }
+  if (*hostSlot != *reinterpret_cast<void**>(reinterpret_cast<char*>(client) + 0xf38)) {
+    return;
   }
 
-  return;
+  Client_OpenDialogByIndex(client, 10, 0, 0);
 
+  void* missionDialog =
+      *reinterpret_cast<void**>(reinterpret_cast<char*>(client) + 0x1058);
+  MissionDialog_SetNpcObjectAndNameCaption_Inferred(missionDialog, npcOrClear);
+
+  void* actor = *reinterpret_cast<void**>(reinterpret_cast<char*>(client) + 0xe98);
+  if (actor == nullptr) {
+    return;
+  }
+  void* vehicle =
+      *reinterpret_cast<void**>(reinterpret_cast<char*>(actor) + 0x250);
+  if (vehicle == nullptr) {
+    return;
+  }
+
+  VehicleEntity_SetLongitudinalInput(vehicle, 0.0f);
+  VehicleEntity_SetSteerInput(vehicle, 0.0f);
+  VehicleEntity_SetHandbrake(vehicle, 1);
 }

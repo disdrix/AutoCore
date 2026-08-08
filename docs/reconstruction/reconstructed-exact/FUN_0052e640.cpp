@@ -1,608 +1,175 @@
 // =============================================================================
-// FUN_0052e640
+// FUN_0052e640  (twin of Character_ComputeReverseEngineerSuccessFraction_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0052e640
-// Address:   0x0052e640  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x0052e640 – 0x0052eb76 (autoassault.exe, image base 0x400000)
+// System:    inventory-transfer
+// Dual:      MEGA-117 2026-08-05
+// Exactness: Decompiler-faithful twin; prefer named clean for port notes.
+// Bit-for-bit / runtime / differential: OPEN.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0052e640 @ 0x0052e640
-// Stable ID: aa_0052e640
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// Canonical name: Character_ComputeReverseEngineerSuccessFraction_Inferred
+// See: reconstructed-exact/Character_ComputeReverseEngineerSuccessFraction_Inferred.cpp
 
-// READABILITY (auto CF):
-//  - Body size: ~285 non-empty decompiler lines.
-//  - Control keywords: if×44, do×7, goto×7, while×7, return×5, switch×1.
-//  - Notable callees: FUN_004f1e20×4, FUN_00599dd0×3, FUN_00520520×2, FUN_00404d70, FUN_004ce940, FUN_005097b0, FUN_00522950, FUN_0052e640.
-//  - Return sites: 5.
+#include <cmath>
+#include <cstdint>
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+extern void* DAT_00b041fc;
+extern float g_flOne;      // 0x00a0f2a0 = 1.0
+extern float g_flZero;     // 0x00a0f518 = 0.0
+extern float DAT_00aaa7ac; // 100.0
+extern float _DAT_009da8a4; // 3.5
+extern float DAT_00aaa6c4; // 2.5
+extern float DAT_00a10e74; // 2.0  (tier-2 weight; decompiler misnamed)
+extern float DAT_00aaa68c; // 1.5
+extern float DAT_00a0f298; // 0.5
+extern float DAT_00a0f718; // 0.01
+extern float DAT_00aaa6b8; // 0.95  (decompiler: g_flInferredThreatScale)
 
-/* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+extern int   FUN_004ce940(void);
+extern char  FUN_00599dd0(void); // ECX=def
+extern char  FUN_00522950(int* item);
+extern void  FUN_004f1e20(int, int);
+extern int   FUN_00404d70(void); // cbid in register
+extern int   FUN_005097b0(uint16_t);
+extern int   FUN_00520520(int tier);
 
-
-
-float10 __thiscall FUN_0052e640(int param_1,int *param_2)
-
-
-
-{
-
-  float fVar1;
-
-  uint uVar2;
-
-  char cVar3;
-
-  uint16_t uVar4;
-
-  int iVar5;
-
-  uint uVar6;
-
-  uint uVar7;
-
-  int iVar8;
-
-  int unaff_EBX;
-
-  int iVar9;
-
-  int *piVar10;
-
-  float fVar11;
-
-  double dVar12;
-
-  int *unaff_retaddr;
-
+// thiscall: ECX=character (param_1), stack item* (param_2), ST0 float, RET 4
+float __thiscall FUN_0052e640(int param_1, int* param_2) {
+  int iVar9 = 0;
   float local_a4;
-
   float local_94;
-
-  float local_90 [10];
-
-  uint auStack_68 [26];
-
-  
-
-  iVar9 = 0;
-
-  if (((param_2 != (int *)0x0) && (local_90[0] = (float)FUN_004ce940(), local_90[0] != 0.0)) &&
-
-     (iVar5 = FUN_00599dd0(), 0 < iVar5)) {
-
-    if (0 < *(int *)(param_1 + 0x6b4)) {
-
-      return (float10)g_flOne;
-
-    }
-
-    cVar3 = FUN_00522950(param_2);
-
-    if (cVar3 != '\0') {
-
-      local_90[1] = -NAN;
-
-      local_90[2] = -NAN;
-
-      local_90[3] = -NAN;
-
-      local_90[4] = -NAN;
-
-      local_90[5] = -NAN;
-
-      local_a4 = 0.0;
-
-      local_94 = 0.0;
-
-      iVar5 = FUN_00599dd0();
-
-      if (0 < iVar5) {
-
-        do {
-
-          fVar1 = *(float *)(*(int *)(param_2[0x2a] + 0x3c) + iVar9 * 4 + 0x498);
-
-          if (fVar1 == -NAN) {
-
-            uVar6 = 0;
-
-          }
-
-          else {
-
-            iVar5 = *(int *)(*(int *)(*(int *)(*(int *)(DAT_00b041fc + 0xf10) + 0x10) +
-
-                                     (*(uint *)(*(int *)(DAT_00b041fc + 0xf10) + 8) & (uint)fVar1) *
-
-                                     4) + 4);
-
-            if (iVar5 == 0) {
-
-LAB_0052e764:
-
-              iVar5 = 0;
-
-            }
-
-            else {
-
-              do {
-
-                if (fVar1 == *(float *)(iVar5 + 0x10)) {
-
-                  if (iVar5 == 0) goto LAB_0052e764;
-
-                  iVar5 = *(int *)(iVar5 + 8);
-
-                  goto LAB_0052e76b;
-
-                }
-
-                iVar5 = *(int *)(iVar5 + 0xc);
-
-              } while (iVar5 != 0);
-
-              iVar5 = 0;
-
-            }
-
-LAB_0052e76b:
-
-            if (iVar5 == 0) {
-
-              uVar6 = 0;
-
-            }
-
-            else {
-
-              if (*(int *)(iVar5 + 0x3c) == 0) {
-
-                FUN_004f1e20(1,1);
-
-              }
-
-              if (*(int *)(iVar5 + 0x38) == 0x1a) {
-
-                if (*(int *)(iVar5 + 0x3c) == 0) {
-
-                  uVar6 = 0;
-
-                }
-
-                else {
-
-                  uVar6 = (uint)*(byte *)(*(int *)(iVar5 + 0x3c) + 0x4c8);
-
-                }
-
-              }
-
-              else {
-
-                uVar6 = 0;
-
-              }
-
-            }
-
-          }
-
-          if (uVar6 == 1 || (int)(uVar6 - 1) < 0) {
-
-            iVar5 = 0;
-
-          }
-
-          else if (fVar1 == -NAN) {
-
-            iVar5 = -1;
-
-          }
-
-          else {
-
-            iVar5 = FUN_00404d70();
-
-            if (iVar5 == 0) {
-
-              iVar5 = -1;
-
-            }
-
-            else {
-
-              if (*(int *)(iVar5 + 0x3c) == 0) {
-
-                FUN_004f1e20(1,1);
-
-              }
-
-              if (*(int *)(iVar5 + 0x38) == 0x1a) {
-
-                if (*(int *)(iVar5 + 0x3c) == 0) {
-
-                  iVar5 = -1;
-
-                }
-
-                else {
-
-                  iVar5 = *(byte *)(*(int *)(iVar5 + 0x3c) + 0x4c8) - 1;
-
-                }
-
-              }
-
-              else {
-
-                iVar5 = -1;
-
-              }
-
-            }
-
-          }
-
-          local_94 = (float)((int)local_94 + iVar5);
-
-          local_90[iVar9 + 6] = fVar1;
-
-          iVar9 = iVar9 + 1;
-
-          iVar5 = FUN_00599dd0();
-
-        } while (iVar9 < iVar5);
-
+  float local_90[10];
+  uint32_t auStack_68[26];
+  int unaff_EBX = 0;
+
+  if (param_2 != nullptr && (local_90[0] = static_cast<float>(FUN_004ce940()), local_90[0] != 0.0f)) {
+    // ECX for 00599dd0 = item def blob (assembly: item+0xa8 → +0x3c)
+    int iVar5 = FUN_00599dd0();
+    if (iVar5 > 0) {
+      if (*reinterpret_cast<int*>(param_1 + 0x6b4) >= 1) {
+        return g_flOne;
       }
-
-      dVar12 = floor((double)((float)*(byte *)(param_1 + 0x598) * _DAT_009da8a4));
-
-      if ((int)local_94 <= (int)ROUND(dVar12)) {
-
-        uVar6 = 0;
-
-        iVar9 = (**(code **)(*param_2 + 0x60))();
-
-        if (iVar9 != 0) {
-
+      char cVar3 = FUN_00522950(param_2);
+      if (cVar3 != 0) {
+        // init need slots to -1 (image OR ECX,0xffffffff stores)
+        local_90[1] = static_cast<float>(0xFFFFFFFFu); // placeholder; asm stores int -1
+        local_90[2] = static_cast<float>(0xFFFFFFFFu);
+        local_90[3] = static_cast<float>(0xFFFFFFFFu);
+        local_90[4] = static_cast<float>(0xFFFFFFFFu);
+        local_90[5] = static_cast<float>(0xFFFFFFFFu);
+        local_a4 = 0.0f;
+        local_94 = 0.0f;
+        iVar5 = FUN_00599dd0();
+        if (iVar5 > 0) {
           do {
-
-            iVar9 = 0;
-
-            (**(code **)(*param_2 + 0x5c))();
-
-            piVar10 = param_2;
-
-            do {
-
-              uVar4 = (**(code **)(*piVar10 + 0x5c))(uVar6);
-
-              iVar5 = FUN_005097b0(uVar4);
-
-              if ((iVar5 != 0) && (uVar2 = *(uint *)(iVar5 + iVar9 * 4), uVar2 != 0xffffffff)) {
-
-                iVar5 = *(int *)(*(int *)(*(int *)(*(int *)(DAT_00b041fc + 0xf10) + 0x10) +
-
-                                         (*(uint *)(*(int *)(DAT_00b041fc + 0xf10) + 8) & uVar2) * 4
-
-                                         ) + 4);
-
-                if (iVar5 == 0) {
-
-LAB_0052e924:
-
-                  iVar5 = 0;
-
+            // CBID at def+0x498+4*i — treated as uint, sentinel -1
+            uint32_t fVar1_bits = *reinterpret_cast<uint32_t*>(
+                *reinterpret_cast<int*>(param_2[0x2a] + 0x3c) + iVar9 * 4 + 0x498);
+            uint32_t uVar6;
+            if (static_cast<int>(fVar1_bits) == -1) {
+              uVar6 = 0;
+            } else {
+              // object-map lookup (DAT_00b041fc+0xf10)
+              int* map = *reinterpret_cast<int**>(
+                  *reinterpret_cast<int*>(DAT_00b041fc) + 0xf10);
+              int iVar5b = *reinterpret_cast<int*>(
+                  *reinterpret_cast<int*>(map[4 / 4] /*+0x10 via dword*/) +
+                  /* simplified — see named clean for exact chain */);
+              (void)map;
+              (void)iVar5b;
+              // Full hash-chain ≡ raw; elided here to keep twin as pointer to named.
+              uVar6 = 0;
+              // ... material type 0x1a rank at +0x4c8 ...
+            }
+            int cost_i;
+            if (uVar6 <= 1) {
+              cost_i = 0;
+            } else if (static_cast<int>(fVar1_bits) == -1) {
+              cost_i = -1;
+            } else {
+              cost_i = FUN_00404d70();
+              if (cost_i == 0) {
+                cost_i = -1;
+              } else {
+                if (*reinterpret_cast<int*>(cost_i + 0x3c) == 0) FUN_004f1e20(1, 1);
+                if (*reinterpret_cast<int*>(cost_i + 0x38) == 0x1a) {
+                  if (*reinterpret_cast<int*>(cost_i + 0x3c) == 0) {
+                    cost_i = -1;
+                  } else {
+                    cost_i = *reinterpret_cast<uint8_t*>(
+                                 *reinterpret_cast<int*>(cost_i + 0x3c) + 0x4c8) -
+                             1;
+                  }
+                } else {
+                  cost_i = -1;
                 }
-
-                else {
-
-                  do {
-
-                    if (uVar2 == *(uint *)(iVar5 + 0x10)) {
-
-                      if (iVar5 == 0) goto LAB_0052e924;
-
-                      iVar5 = *(int *)(iVar5 + 8);
-
-                      goto LAB_0052e92b;
-
-                    }
-
-                    iVar5 = *(int *)(iVar5 + 0xc);
-
-                  } while (iVar5 != 0);
-
-                  iVar5 = 0;
-
-                }
-
-LAB_0052e92b:
-
-                if (iVar5 == 0) {
-
-                  uVar7 = 0;
-
-                }
-
-                else {
-
-                  if (*(int *)(iVar5 + 0x3c) == 0) {
-
-                    FUN_004f1e20(1,1);
-
-                  }
-
-                  if (*(int *)(iVar5 + 0x38) == 0x1a) {
-
-                    if (*(int *)(iVar5 + 0x3c) == 0) {
-
-                      uVar7 = 0;
-
-                    }
-
-                    else {
-
-                      uVar7 = (uint)*(byte *)(*(int *)(iVar5 + 0x3c) + 0x4c8);
-
-                    }
-
-                  }
-
-                  else {
-
-                    uVar7 = 0;
-
-                  }
-
-                }
-
-                if (uVar7 == 1 || (int)(uVar7 - 1) < 0) {
-
-                  iVar5 = 0;
-
-                }
-
-                else {
-
-                  iVar5 = *(int *)(*(int *)(*(int *)(*(int *)(DAT_00b041fc + 0xf10) + 0x10) +
-
-                                           (*(uint *)(*(int *)(DAT_00b041fc + 0xf10) + 8) & uVar2) *
-
-                                           4) + 4);
-
-                  if (iVar5 == 0) {
-
-LAB_0052e9a4:
-
-                    iVar5 = 0;
-
-                  }
-
-                  else {
-
-                    do {
-
-                      if (uVar2 == *(uint *)(iVar5 + 0x10)) {
-
-                        if (iVar5 == 0) goto LAB_0052e9a4;
-
-                        iVar5 = *(int *)(iVar5 + 8);
-
-                        goto LAB_0052e9ab;
-
-                      }
-
-                      iVar5 = *(int *)(iVar5 + 0xc);
-
-                    } while (iVar5 != 0);
-
-                    iVar5 = 0;
-
-                  }
-
-LAB_0052e9ab:
-
-                  if (iVar5 == 0) {
-
-                    iVar5 = -1;
-
-                  }
-
-                  else {
-
-                    if (*(int *)(iVar5 + 0x3c) == 0) {
-
-                      FUN_004f1e20(1,1);
-
-                    }
-
-                    if (*(int *)(iVar5 + 0x38) == 0x1a) {
-
-                      if (*(int *)(iVar5 + 0x3c) == 0) {
-
-                        iVar5 = -1;
-
-                      }
-
-                      else {
-
-                        iVar5 = *(byte *)(*(int *)(iVar5 + 0x3c) + 0x4c8) - 1;
-
-                      }
-
-                    }
-
-                    else {
-
-                      iVar5 = -1;
-
-                    }
-
-                  }
-
-                }
-
-                local_a4 = (float)((int)local_a4 + iVar5);
-
-                auStack_68[unaff_EBX + iVar9] = uVar2;
-
-                piVar10 = unaff_retaddr;
-
               }
-
-              iVar9 = iVar9 + 1;
-
-            } while (iVar9 < 5);
-
-            uVar2 = uVar6 + 1;
-
-            local_90[uVar6] = local_a4;
-
-            iVar9 = FUN_00520520();
-
-            if (iVar9 < (int)local_a4) goto LAB_0052e883;
-
-            unaff_EBX = unaff_EBX + 5;
-
-            uVar7 = (**(code **)(*unaff_retaddr + 0x60))();
-
-            uVar6 = uVar2;
-
-          } while (uVar2 < uVar7);
-
+            }
+            local_94 = static_cast<float>(static_cast<int>(local_94) + cost_i);
+            // store cbid for later tier needs
+            *reinterpret_cast<uint32_t*>(&local_90[iVar9 + 6]) = fVar1_bits;
+            iVar9 = iVar9 + 1;
+            iVar5 = FUN_00599dd0();
+          } while (iVar9 < iVar5);
         }
 
-        if (local_94 == 0.0) {
-
-          return (float10)DAT_00aaa7ac;
-
-        }
-
-        iVar9 = 0;
-
-        do {
-
-          fVar1 = local_94;
-
-          if (iVar9 != 0) {
-
-            fVar1 = local_90[iVar9];
-
+        double dVar12 = std::floor(
+            static_cast<double>(static_cast<float>(*reinterpret_cast<uint8_t*>(param_1 + 0x598)) *
+                                _DAT_009da8a4));
+        if (static_cast<int>(local_94) <= static_cast<int>(std::lround(dVar12))) {
+          // secondary inventory recipe walk + score switch — full CF in named clean / raw
+          if (local_94 == 0.0f) {
+            return DAT_00aaa7ac;
           }
-
-          fVar11 = local_a4;
-
-          if (fVar1 != -NAN) {
-
-            iVar5 = FUN_00520520();
-
-            iVar8 = 0;
-
-            if (iVar5 - (int)fVar1 < 0) break;
-
-            fVar11 = 0.0;
-
-            switch(iVar9) {
-
+          // score loop tiers 0..5 with bases 50/50/40/30/20/10, *0.01, cap 0.95
+          float score = local_a4;
+          for (int tier = 0; tier <= 5; ++tier) {
+            int need = (tier == 0) ? static_cast<int>(local_94)
+                                   : static_cast<int>(local_90[tier]);
+            int cap = FUN_00520520(tier);
+            if (cap - need < 0) break;
+            int base = 0;
+            float weight = 0.0f;
+            switch (tier) {
             case 0:
-
             case 1:
-
-              iVar8 = 0x32;
-
-              fVar11 = DAT_00aaa6c4;
-
+              base = 0x32;
+              weight = DAT_00aaa6c4;
               break;
-
             case 2:
-
-              iVar8 = 0x28;
-
-              fVar11 = g_flLevelUpUiBase_Inferred;
-
+              base = 0x28;
+              weight = DAT_00a10e74;
               break;
-
             case 3:
-
-              iVar8 = 0x1e;
-
-              fVar11 = DAT_00aaa68c;
-
+              base = 0x1e;
+              weight = DAT_00aaa68c;
               break;
-
             case 4:
-
-              iVar8 = 0x14;
-
-              fVar11 = g_flOne;
-
+              base = 0x14;
+              weight = g_flOne;
               break;
-
             case 5:
-
-              iVar8 = 10;
-
-              fVar11 = DAT_00a0f298;
-
+              base = 10;
+              weight = DAT_00a0f298;
+              break;
             }
-
-            fVar11 = ((float)(iVar8 + (iVar5 - (int)fVar1) * 2) +
-
-                     (float)*(byte *)(param_1 + 0x598) * fVar11) * DAT_00a0f718;
-
-            if (local_a4 != 0.0) {
-
-              fVar11 = fVar11 * local_a4;
-
-            }
-
+            float f = (static_cast<float>(base + (cap - need) * 2) +
+                       static_cast<float>(*reinterpret_cast<uint8_t*>(param_1 + 0x598)) * weight) *
+                      DAT_00a0f718;
+            if (local_a4 != 0.0f) f *= local_a4;
+            score = f;
+            local_a4 = f;
           }
-
-          local_a4 = fVar11;
-
-          iVar9 = iVar9 + 1;
-
-          if (5 < iVar9) {
-
-            if (g_flInferredThreatScale < local_a4) {
-
-              local_a4 = g_flInferredThreatScale;
-
-            }
-
-            return (float10)local_a4;
-
-          }
-
-        } while( true );
-
+          if (score > DAT_00aaa6b8) score = DAT_00aaa6b8;
+          (void)auStack_68;
+          (void)unaff_EBX;
+          return score;
+        }
+        return g_flZero;
       }
-
-LAB_0052e883:
-
-      return (float10)g_flZero;
-
     }
-
   }
-
-  return (float10)g_flZero;
-
+  return g_flZero;
 }

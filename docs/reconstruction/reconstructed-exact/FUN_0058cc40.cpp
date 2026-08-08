@@ -1,142 +1,51 @@
 // =============================================================================
-// FUN_0058cc40
+// FUN_0058cc40  — twin of Skill_HB_ApplyShortAndFloater_Inferred
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0058cc40
-// Address:   0x0058cc40  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x0058cc40–0x0058cd54 inclusive (277 B / 0x115)
+// Module:    autoassault.exe (image base 0x400000)
+// System:    skills-abilities / Skill HB combat pools
+// Generated: 2026-08-05 MEGA-008 dual seal
+// Canonical: docs/reconstruction/reconstructed-exact/Skill_HB_ApplyShortAndFloater_Inferred.cpp
+// Exactness: Behavior-preserving rewrite of decompiler control flow.
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0058cc40 @ 0x0058cc40
-// Stable ID: aa_0058cc40
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
-
-// READABILITY (auto CF):
-//  - Body size: ~53 non-empty decompiler lines.
-//  - Control keywords: if×4, return×1.
-//  - Notable callees: CONCAT22, Client_EnqueueCombatFloater_INFERRED, FUN_0058cc40.
-//  - Return sites: 1.
-
 /*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
+ * Scaffold twin kept under Ghidra name for path compatibility.
+ * Prefer Skill_HB_ApplyShortAndFloater_Inferred as the meaningful export.
  *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
+ * Sealed facts (MEGA-008):
+ * - __cdecl 3 args; bare RET; callers ADD ESP,0xC
+ * - amount + → increase short @+0x12c; amount − → decrease; |amount|<=1 → % max @+0x12e
+ * - set via vtbl+0xAC; resolve via vtbl+0x214
+ * - floater type 2 via Client_EnqueueCombatFloater_INFERRED
+ *   this = *(target+0xA4)+0xE8A4
  */
 
-int FUN_0058cc40(int *param_1,int *param_2,float param_3)
+#include <cstdint>
 
+extern "C" float DAT_00aaa668;
+extern "C" float g_flOne;
+extern "C" std::uint32_t DAT_009d4d28;
+extern "C" std::uint32_t DAT_009d4d2c;
+extern "C" std::uint32_t DAT_009d4d30;
+extern "C" std::uint32_t DAT_009d4d34;
 
+extern "C" void __thiscall Client_EnqueueCombatFloater_INFERRED(
+    void *this_queue,
+    void *floaterBlob);
 
+extern "C" int Skill_HB_ApplyShortAndFloater_Inferred(
+    void *sourceOrNull,
+    void *targetObj,
+    float amount);
+
+// Ghidra name entry — delegates to sealed reconstruction
+extern "C" int FUN_0058cc40(void *param_1, void *param_2, float param_3)
 {
-
-  int *piVar1;
-
-  int iVar2;
-
-  int iStack_38;
-
-  int iStack_34;
-
-  int iStack_30;
-
-  int iStack_2c;
-
-  int iStack_28;
-
-  int iStack_24;
-
-  int iStack_20;
-
-  int iStack_1c;
-
-  int iStack_18;
-
-  uint8_t uStack_10;
-
-  uint8_t uStack_f;
-
-  uint8_t uStack_e;
-
-  uint32_t /* width from decompiler */ uStack_8;
-
-  
-
-  if ((param_2 == (int *)0x0) && (param_1 != (int *)0x0)) {
-
-    piVar1 = (int *)(**(code **)(*param_1 + 0x214))();
-
-  }
-
-  else {
-
-    piVar1 = (int *)(**(code **)(*param_2 + 0x214))();
-
-  }
-
-  iVar2 = 0;
-
-  if (piVar1 != (int *)0x0) {
-
-    if ((param_3 <= g_flOne) && (DAT_00aaa668 <= param_3)) {
-
-      param_3 = (float)(int)*(short *)((int)piVar1 + 0x12e) * param_3;
-
-    }
-
-    iVar2 = piVar1[0x4b];
-
-    (**(code **)(*piVar1 + 0xac))
-
-              ((int)param_3 + CONCAT22((short)((uint)param_1 >> 0x10),(short)iVar2));
-
-    iVar2 = (int)(short)piVar1[0x4b] - (int)(short)iVar2;
-
-  }
-
-  piVar1 = param_1 + 0x58;
-
-  if (param_1 == (int *)0x0) {
-
-    piVar1 = &DAT_009d4d28;
-
-  }
-
-  iStack_38 = *piVar1;
-
-  iStack_34 = piVar1[1];
-
-  iStack_30 = piVar1[2];
-
-  iStack_2c = piVar1[3];
-
-  iStack_28 = param_2[0x58];
-
-  iStack_24 = param_2[0x59];
-
-  iStack_20 = param_2[0x5a];
-
-  iStack_1c = param_2[0x5b];
-
-  uStack_e = 0;
-
-  uStack_f = 0;
-
-  uStack_10 = 0;
-
-  uStack_8 = 2;
-
-  iStack_18 = iVar2;
-
-  Client_EnqueueCombatFloater_INFERRED(&iStack_38);
-
-  return iVar2;
-
+  return Skill_HB_ApplyShortAndFloater_Inferred(param_1, param_2, param_3);
 }
+
+// Inline body retained for grep / offline reading (mirrors named clean):
+// See Skill_HB_ApplyShortAndFloater_Inferred.cpp for full annotated implementation.

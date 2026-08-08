@@ -1,294 +1,65 @@
-// =============================================================================
-// FUN_007f6db0
+﻿// =============================================================================
+// FUN_007f6db0  (clean twin of ActionMap_FindSlotByKeyMod_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_007f6db0
 // Address:   0x007f6db0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// System:    input-drive-control
+// Generated: 2026-07-23 scaffold; dual seal refine 2026-08-05 MEGA-018
 // Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Bit-for-bit vs retail EXE: DEFERRED.
+// Canonical named twin: ActionMap_FindSlotByKeyMod_Inferred.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_007f6db0 @ 0x007f6db0
-// Stable ID: aa_007f6db0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <stdint.h>
 
-// READABILITY (auto CF):
-//  - Body size: ~129 non-empty decompiler lines.
-//  - Control keywords: if×43, goto×16, return×12, do×4, while×4, switch×1.
-//  - Notable callees: FUN_007f6db0.
-//  - Return sites: 12.
-
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-int __fastcall FUN_007f6db0(uint32_t /* width from decompiler */ param_1,short param_2)
-
-
-
+// Ghidra name retained for address-keyed tooling. Prefer the named twin.
+uint16_t* FUN_007f6db0(
+    uint32_t mode,       // EAX
+    uint16_t keyCode,    // SI
+    uint16_t modState,   // DX
+    uint8_t* actionMap)  // EDI
 {
+  if (mode > 3u) {
+    return 0;
+  }
 
-  uint32_t /* width from decompiler */ in_EAX;
+  static const uint32_t kMax[4]  = { 5, 6, 0x78, 0x14 };
+  static const uint32_t kKey0[4] = { 0x06, 0x10A, 0x242, 0x1AA2 };
+  static const uint32_t kMod0[4] = { 0x30, 0x134, 0x26C, 0x1ACC };
 
-  short *psVar1;
+  const uint32_t maxSlots = kMax[mode];
+  const uint32_t key0Base = kKey0[mode];
+  uint16_t* cursor = (uint16_t*)(actionMap + kMod0[mode]);
 
-  int iVar2;
-
-  short unaff_SI;
-
-  int unaff_EDI;
-
-  
-
-  switch(in_EAX) {
-
-  case 0:
-
-    iVar2 = 0;
-
-    psVar1 = (short *)(unaff_EDI + 0x30);
-
-    do {
-
-      if (psVar1[-0x15] == unaff_SI) {
-
-        if (param_2 == 0) {
-
-          if (*psVar1 == 0) goto LAB_007f6dd2;
-
+  for (uint32_t i = 0; i < maxSlots; ++i) {
+    if (cursor[-0x15] == (short)keyCode) {
+      if (modState == 0) {
+        if (*cursor == 0) {
+          return (uint16_t*)(actionMap + key0Base + i * 0x34u);
         }
-
-        else if (*psVar1 != 0) goto LAB_007f6dd2;
-
-        if ((char)psVar1[3] != '\0') {
-
-LAB_007f6dd2:
-
-          return unaff_EDI + 6 + iVar2 * 0x34;
-
-        }
-
+      } else if (*cursor != 0) {
+        return (uint16_t*)(actionMap + key0Base + i * 0x34u);
       }
-
-      if (psVar1[-0x14] == unaff_SI) {
-
-        if (param_2 == 0) {
-
-          if (psVar1[1] == 0) goto LAB_007f6e02;
-
-        }
-
-        else if (psVar1[1] != 0) goto LAB_007f6e02;
-
-        if ((char)psVar1[3] != '\0') {
-
-LAB_007f6e02:
-
-          return unaff_EDI + 6 + iVar2 * 0x34;
-
-        }
-
+      if (*(uint8_t*)((uint8_t*)cursor + 6) != 0) {
+        return (uint16_t*)(actionMap + key0Base + i * 0x34u);
       }
+    }
 
-      iVar2 = iVar2 + 1;
-
-      psVar1 = psVar1 + 0x1a;
-
-    } while (iVar2 < 5);
-
-    break;
-
-  case 1:
-
-    iVar2 = 0;
-
-    psVar1 = (short *)(unaff_EDI + 0x134);
-
-    do {
-
-      if (psVar1[-0x15] == unaff_SI) {
-
-        if (param_2 == 0) {
-
-          if (*psVar1 == 0) goto LAB_007f6e48;
-
+    if (cursor[-0x14] == (short)keyCode) {
+      if (modState == 0) {
+        if (cursor[1] == 0) {
+          return (uint16_t*)(actionMap + key0Base + i * 0x34u);
         }
-
-        else if (*psVar1 != 0) goto LAB_007f6e48;
-
-        if ((char)psVar1[3] != '\0') {
-
-LAB_007f6e48:
-
-          return unaff_EDI + 0x10a + iVar2 * 0x34;
-
-        }
-
+      } else if (cursor[1] != 0) {
+        return (uint16_t*)(actionMap + key0Base + i * 0x34u);
       }
-
-      if (psVar1[-0x14] == unaff_SI) {
-
-        if (param_2 == 0) {
-
-          if (psVar1[1] == 0) goto LAB_007f6e7b;
-
-        }
-
-        else if (psVar1[1] != 0) goto LAB_007f6e7b;
-
-        if ((char)psVar1[3] != '\0') {
-
-LAB_007f6e7b:
-
-          return unaff_EDI + 0x10a + iVar2 * 0x34;
-
-        }
-
+      if (*(uint8_t*)((uint8_t*)cursor + 6) != 0) {
+        return (uint16_t*)(actionMap + key0Base + i * 0x34u);
       }
+    }
 
-      iVar2 = iVar2 + 1;
-
-      psVar1 = psVar1 + 0x1a;
-
-      if (5 < iVar2) {
-
-        return 0;
-
-      }
-
-    } while( true );
-
-  case 2:
-
-    iVar2 = 0;
-
-    psVar1 = (short *)(unaff_EDI + 0x26c);
-
-    do {
-
-      if (psVar1[-0x15] == unaff_SI) {
-
-        if (param_2 == 0) {
-
-          if (*psVar1 == 0) goto LAB_007f6ec4;
-
-        }
-
-        else if (*psVar1 != 0) goto LAB_007f6ec4;
-
-        if ((char)psVar1[3] != '\0') {
-
-LAB_007f6ec4:
-
-          return unaff_EDI + 0x242 + iVar2 * 0x34;
-
-        }
-
-      }
-
-      if (psVar1[-0x14] == unaff_SI) {
-
-        if (param_2 == 0) {
-
-          if (psVar1[1] == 0) goto LAB_007f6ef7;
-
-        }
-
-        else if (psVar1[1] != 0) goto LAB_007f6ef7;
-
-        if ((char)psVar1[3] != '\0') {
-
-LAB_007f6ef7:
-
-          return unaff_EDI + 0x242 + iVar2 * 0x34;
-
-        }
-
-      }
-
-      iVar2 = iVar2 + 1;
-
-      psVar1 = psVar1 + 0x1a;
-
-      if (0x77 < iVar2) {
-
-        return 0;
-
-      }
-
-    } while( true );
-
-  case 3:
-
-    iVar2 = 0;
-
-    psVar1 = (short *)(unaff_EDI + 0x1acc);
-
-    do {
-
-      if (psVar1[-0x15] == unaff_SI) {
-
-        if (param_2 == 0) {
-
-          if (*psVar1 == 0) goto LAB_007f6f41;
-
-        }
-
-        else if (*psVar1 != 0) goto LAB_007f6f41;
-
-        if ((char)psVar1[3] != '\0') {
-
-LAB_007f6f41:
-
-          return unaff_EDI + 0x1aa2 + iVar2 * 0x34;
-
-        }
-
-      }
-
-      if (psVar1[-0x14] == unaff_SI) {
-
-        if (param_2 == 0) {
-
-          if (psVar1[1] == 0) goto LAB_007f6f74;
-
-        }
-
-        else if (psVar1[1] != 0) goto LAB_007f6f74;
-
-        if ((char)psVar1[3] != '\0') {
-
-LAB_007f6f74:
-
-          return unaff_EDI + 0x1aa2 + iVar2 * 0x34;
-
-        }
-
-      }
-
-      iVar2 = iVar2 + 1;
-
-      psVar1 = psVar1 + 0x1a;
-
-      if (0x13 < iVar2) {
-
-        return 0;
-
-      }
-
-    } while( true );
-
+    cursor += 0x1a;
   }
 
   return 0;
-
 }

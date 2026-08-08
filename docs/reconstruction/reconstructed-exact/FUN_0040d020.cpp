@@ -1,44 +1,27 @@
 // =============================================================================
-// FUN_0040d020
+// FUN_0040d020  (named: Math_Vec3Length_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0040d020
 // Address:   0x0040d020  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// System:    interaction-activation (partition) / shared pure math leaf
+// Generated: 2026-08-05 MEGA-137 dual A/B seal (live decompile + read_memory)
 // Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0040d020 @ 0x0040d020
-// Stable ID: aa_0040d020
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// PURPOSE:
+// Euclidean 3-float length leaf: return sqrt(x*x + y*y + z*z) in ST0.
+// Twin clean: Math_Vec3Length_Inferred.cpp
 
-// READABILITY (auto CF):
-//  - Body size: ~5 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_0040d020, SQRT.
-//  - Return sites: 1.
+// ABI (sealed): __cdecl; three float stack args; ST0 return; plain RET.
+// BODY: 0x0040d020–0x0040d03e (31 B). CALLEES: none.
+// CALLERS: Client_InteractClickPickTarget (×2), FUN_005ba440 (×1).
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+typedef long double float10;
 
-float10 FUN_0040d020(float param_1,float param_2,float param_3)
-
-
-
+float10 FUN_0040d020(float param_1, float param_2, float param_3)
 {
-
   return SQRT((float10)param_3 * (float10)param_3 +
-
-              (float10)param_2 * (float10)param_2 + (float10)param_1 * (float10)param_1);
-
+              (float10)param_2 * (float10)param_2 +
+              (float10)param_1 * (float10)param_1);
 }

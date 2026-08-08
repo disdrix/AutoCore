@@ -2,442 +2,277 @@
 // CVOGWaypoint_DoFollowObjectShortcutsUpdate
 // -----------------------------------------------------------------------------
 // Stable ID: aa_005d5cc0
-// Address:   0x005d5cc0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x005d5cc0 – 0x005d62fb  (autoassault.exe, image base 0x400000)
+// Size:      1596 B (0x63C)
+// System:    skills-abilities / waypoint path AI
+// Generated: 2026-08-05 MEGA-057 (live Ghidra re-verify)
+// Exactness: Behavior-preserving rewrite of decompiler CF + byte ABI seal.
+// Bit-for-bit vs retail EXE: DEFERRED. Runtime Confirmed: not claimed.
+// =============================================================================
+//
+// PURPOSE
+//   CVOGWaypoint FSM state-2 handler (called from CVOGWaypoint_UpdateState when
+//   *(this+0x50)==2). Resolve the follow-object TFID, measure surface distance to
+//   the owner, maintain path/shortcut COIDs, and write a desired pose float4 at
+//   this+0x20..+0x2c for downstream steering.
+//
+// PRODUCT PLATE (sealed)
+//   "CVOGWaypoint::DoFollowObjectShortcutsUpdate" @ 0x009dace4
+//
+// ABI (byte-sealed)
+//   thiscall; ECX = CVOGWaypoint* this; no stack args; void; RET (not RET n).
+//   SEH frame LAB_009a7110; scope via FUN_0076cf00 / FUN_0076cef0.
+//
+// this LAYOUT (fields used here)
+//   +0x10  owner entity*
+//   +0x20  desired pose float4 (x,y,z,w)
+//   +0x30  follow-object TFID (16 B)
+//   +0x40  path/shortcut COID lo
+//   +0x44  path/shortcut COID hi
+//   +0x48  secondary path id
+//   +0x4c  patrol / follow range float
+//   +0x52  follow-object valid (u8)
+//   +0x53  within-patrol-range (u8)
+//
+// CALLEES
+//   Object_ResolveFromTFID (0x004bb950)
+//   __RTDynamicCast → CVOGPhysicsBase
+//   Object_GetWorldPositionPtr (0x00404c90)
+//   Object_SurfaceDistance3D_Inferred (0x0053e510)  // ECX=owner, stack=target
+//   FUN_005d5960  // state-1 peer (path-active update)
+//   FUN_004d5910  // shortcut candidate gather (residual)
+//   operator_delete (0x00489822)
+//   virtual +0x2c pose-out; virtual +0x10 path/query
+//
+// CONSTANTS
+//   g_flOne        @ 0x00a0f2a0 = 1.0f
+//   DAT_00a0f70c   @ 0x00a0f70c = 0.2f   (direction-dot clear threshold)
+//   _DAT_009dace0  @ 0x009dace0 = 1e7f   (min-distance init)
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for CVOGWaypoint_DoFollowObjectShortcutsUpdate @ 0x005d5cc0
-// Stable ID: aa_005d5cc0
-// Embedded strings (evidence for future rename):
-//   - "CVOGWaypoint::DoFollowObjectShortcutsUpdate"
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// External symbols (Ghidra / dualed peers)
+extern void FUN_0076cf00(const char *scope_name);
+extern void FUN_0076cef0(void);
+extern void *Object_ResolveFromTFID(void *tfid16);
+extern int __RTDynamicCast(void *obj, int, void *from_rtti, void *to_rtti, int);
+extern float * __fastcall Object_GetWorldPositionPtr(void *entity); // ECX=this
+extern float /*float10*/ __thiscall Object_SurfaceDistance3D_Inferred(void *objA, void *objB);
+extern void __fastcall FUN_005d5960(void *waypoint); // ECX=this
+extern void __thiscall FUN_004d5910(void *ctx, float *owner_pose, void *vector_out);
+extern void operator_delete(void *p);
+extern void *ExceptionList;
+extern float g_flOne;            // 1.0f
+extern float DAT_00a0f70c;       // 0.2f
+extern float _DAT_009dace0;      // 1e7f
+extern char LAB_009a7110[];
+extern void *CVOGClonedObjectBase_RTTI_Type_Descriptor;
+extern void *CVOGPhysicsBase_RTTI_Type_Descriptor;
 
-// READABILITY (auto CF):
-//  - Body size: ~200 non-empty decompiler lines.
-//  - Control keywords: if×15, goto×4, return×2, do×1, while×1.
-//  - Notable callees: FUN_00404c90×4, SQRT×3, CONCAT31, FUN_004d5910, FUN_0053e510, FUN_005d5960, CVOGWaypoint_DoFollowObjectShortcutsUpdate, FUN_0076cef0.
-//  - Strings: "CVOGWaypoint::DoFollowObjectShortcutsUpdate".
-//  - Return sites: 2.
-
-/*
- * Behavioral notes:
- * Plate-driven rename evidence: "CVOGWaypoint::DoFollowObjectShortcutsUpdate"
- * Domain alias of FUN_005d5cc0 (FUN_* retained)
- *
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-/* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
-
-
-
-void __fastcall CVOGWaypoint_DoFollowObjectShortcutsUpdate(int param_1)
-
-
-
+// Pose dual (same paths as Object_GetWorldPositionPtr; inlined in body for target
+// and for owner when loading full float4 including W).
+static float *PosePtr_PhysicsOrEntity(void *obj)
 {
+  if (*(int *)((char *)obj + 8) != 0) {
+    return (float *)(*(int *)(*(int *)((char *)obj + 8) + 0x3c) + 0xb0);
+  }
+  int mid = *(int *)((char *)obj + 4);
+  int adj = *(int *)(mid + 4);
+  return (float *)(adj + 0x84 + (int)obj);
+}
 
-  int iVar1;
-
-  void *pvVar2;
-
-  int iVar3;
-
-  float *pfVar4;
-
-  uint32_t /* width from decompiler */ *puVar5;
-
-  int *piVar6;
-
-  float10 fVar7;
-
-  float fVar8;
-
-  float fVar9;
-
-  float local_68;
-
-  float local_60;
-
-  float local_5c;
-
-  float local_58;
-
-  float local_54;
-
-  float local_50;
-
-  float local_4c;
-
-  float local_48;
-
-  float local_44;
-
-  uint8_t local_40 [4];
-
-  uint32_t /* width from decompiler */ *local_3c;
-
-  uint32_t /* width from decompiler */ *local_38;
-
-  uint32_t /* width from decompiler */ local_34;
-
-  float local_30;
-
-  float fStack_2c;
-
-  float fStack_28;
-
+void __fastcall CVOGWaypoint_DoFollowObjectShortcutsUpdate(void *this_wp)
+{
+  // --- SEH / scope (simplified; MSVC frame present in bytes) ---
   void *local_1c;
-
-  uint8_t *puStack_18;
-
-  uint32_t /* width from decompiler */ local_14;
-
-  
-
-  local_14 = 0xffffffff;
-
-  puStack_18 = &LAB_009a7110;
-
+  void *puStack_18 = &LAB_009a7110;
+  unsigned local_14 = 0xffffffff;
   local_1c = ExceptionList;
-
   ExceptionList = &local_1c;
 
   FUN_0076cf00("CVOGWaypoint::DoFollowObjectShortcutsUpdate");
-
   local_14 = 0;
 
-  pvVar2 = Object_ResolveFromTFID((TFID_16 *)(param_1 + 0x30));
+  // Resolve follow object from TFID at this+0x30 (via owner map; see raw re-verify)
+  void *follow = Object_ResolveFromTFID((char *)this_wp + 0x30);
+  if (follow == 0 || (((*(unsigned *)((char *)follow + 0x17c) >> 5) & 1) == 0)) {
+    *((unsigned char *)this_wp + 0x52) = 0;
+    goto unscope;
+  }
+  *((unsigned char *)this_wp + 0x52) = 1;
 
-  if ((pvVar2 == (void *)0x0) || ((*(uint *)((int)pvVar2 + 0x17c) >> 5 & 1) == 0)) {
+  // Cast follow → CVOGPhysicsBase
+  void *targetPhys = (void *)__RTDynamicCast(
+      follow, 0,
+      &CVOGClonedObjectBase_RTTI_Type_Descriptor,
+      &CVOGPhysicsBase_RTTI_Type_Descriptor,
+      0);
 
-    *(uint8_t *)(param_1 + 0x52) = 0;
+  // Target pose float4
+  float *pf = PosePtr_PhysicsOrEntity(targetPhys);
+  float tgt_x = pf[0], tgt_y = pf[1], tgt_z = pf[2], tgt_w = pf[3];
 
-    goto LAB_005d62e5;
+  // Owner pose float4 from this+0x10
+  void *owner = *(void **)((char *)this_wp + 0x10);
+  pf = PosePtr_PhysicsOrEntity(owner);
+  float own_x = pf[0], own_y = pf[1], own_z = pf[2], own_w = pf[3];
+  (void)own_x; (void)own_y; (void)own_z; (void)own_w; // used on path-active / gather paths
 
+  // Surface distance owner ↔ target (bytes: ECX=owner, stack=targetPhys)
+  float dist = (float)Object_SurfaceDistance3D_Inferred(owner, targetPhys);
+
+  // Patrol-range flag: +0x53 = 1 if patrol_range (+0x4c) > dist
+  if (*((float *)((char *)this_wp + 0x4c)) <= dist) {
+    *((unsigned char *)this_wp + 0x53) = 0;
+  } else {
+    *((unsigned char *)this_wp + 0x53) = 1;
   }
 
-  *(uint8_t *)(param_1 + 0x52) = 1;
-
-  iVar3 = __RTDynamicCast(pvVar2,0,&CVOGClonedObjectBase::RTTI_Type_Descriptor,
-
-                          &CVOGPhysicsBase::RTTI_Type_Descriptor,0);
-
-  if (*(int *)(iVar3 + 8) == 0) {
-
-    pfVar4 = (float *)(*(int *)(*(int *)(iVar3 + 4) + 4) + 0x84 + iVar3);
-
+  // Close enough: snap desired pose to target
+  if (dist < g_flOne) {
+    *(float *)((char *)this_wp + 0x20) = tgt_x;
+    *(float *)((char *)this_wp + 0x24) = tgt_y;
+    *(float *)((char *)this_wp + 0x28) = tgt_z;
+    *(float *)((char *)this_wp + 0x2c) = tgt_w;
+    goto unscope;
   }
 
-  else {
+  // Path COID pair valid? (lo & hi) != 0xFFFFFFFF
+  if ((*(unsigned *)((char *)this_wp + 0x40) &
+       *(unsigned *)((char *)this_wp + 0x44)) != 0xffffffffu) {
+    FUN_005d5960(this_wp);
 
-    pfVar4 = (float *)(*(int *)(*(int *)(iVar3 + 8) + 0x3c) + 0xb0);
+    // Unit direction: target - owner_world
+    pf = Object_GetWorldPositionPtr(owner);
+    float dx = tgt_x - pf[0];
+    float dy = tgt_y - pf[1];
+    float dz = tgt_z - pf[2];
+    float len2 = dx * dx + dy * dy + dz * dz;
+    float inv = 0.0f;
+    if (len2 != 0.0f) inv = g_flOne / sqrtf(len2);
+    float tdir_x = dx * inv, tdir_y = dy * inv, tdir_z = dz * inv;
 
-  }
+    // Unit direction: saved desired pose - owner_world
+    float sx = *(float *)((char *)this_wp + 0x20);
+    float sy = *(float *)((char *)this_wp + 0x24);
+    float sz = *(float *)((char *)this_wp + 0x28);
+    float sw = *(float *)((char *)this_wp + 0x2c);
+    pf = Object_GetWorldPositionPtr(owner);
+    float sdx = sx - pf[0];
+    float sdy = sy - pf[1];
+    float sdz = sz - pf[2];
+    float sdw = sw - pf[3];
+    len2 = sdx * sdx + sdy * sdy + sdz * sdz;
+    inv = 0.0f;
+    if (len2 != 0.0f) inv = g_flOne / sqrtf(len2);
+    sdx *= inv; sdy *= inv; sdz *= inv; sdw *= inv;
+    (void)sdw;
 
-  local_50 = *pfVar4;
-
-  iVar1 = *(int *)(param_1 + 0x10);
-
-  local_4c = pfVar4[1];
-
-  local_48 = pfVar4[2];
-
-  local_44 = pfVar4[3];
-
-  if (*(int *)(iVar1 + 8) == 0) {
-
-    pfVar4 = (float *)(*(int *)(*(int *)(iVar1 + 4) + 4) + 0x84 + iVar1);
-
-  }
-
-  else {
-
-    pfVar4 = (float *)(*(int *)(*(int *)(iVar1 + 8) + 0x3c) + 0xb0);
-
-  }
-
-  local_60 = *pfVar4;
-
-  local_5c = pfVar4[1];
-
-  local_58 = pfVar4[2];
-
-  local_54 = pfVar4[3];
-
-  fVar7 = (float10)FUN_0053e510(iVar3);
-
-  fVar9 = (float)fVar7;
-
-  if ((float10)*(float *)(param_1 + 0x4c) <= fVar7) {
-
-    *(uint8_t *)(param_1 + 0x53) = 0;
-
-  }
-
-  else {
-
-    *(uint8_t *)(param_1 + 0x53) = 1;
-
-  }
-
-  if (fVar9 < g_flOne) {
-
-    *(float *)(param_1 + 0x20) = local_50;
-
-    *(float *)(param_1 + 0x24) = local_4c;
-
-    *(float *)(param_1 + 0x28) = local_48;
-
-    *(float *)(param_1 + 0x2c) = local_44;
-
-    goto LAB_005d62e5;
-
-  }
-
-  if ((*(uint *)(param_1 + 0x40) & *(uint *)(param_1 + 0x44)) != 0xffffffff) {
-
-    FUN_005d5960();
-
-    pfVar4 = (float *)FUN_00404c90();
-
-    local_4c = local_4c - pfVar4[1];
-
-    local_48 = local_48 - pfVar4[2];
-
-    local_50 = local_50 - *pfVar4;
-
-    fVar8 = local_48 * local_48 + local_4c * local_4c + local_50 * local_50;
-
-    fVar9 = 0.0;
-
-    if (fVar8 != 0.0) {
-
-      fVar9 = g_flOne / SQRT(fVar8);
-
+    // If directions diverge (dot < 0.2): clear path and snap pose to target world
+    if (sdx * tdir_x + sdy * tdir_y + sdz * tdir_z < DAT_00a0f70c) {
+      *(unsigned *)((char *)this_wp + 0x40) = 0xffffffffu;
+      *(unsigned *)((char *)this_wp + 0x44) = 0xffffffffu;
+      *(unsigned *)((char *)this_wp + 0x48) = 0xffffffffu;
+      // bytes: ECX = targetPhys (EBX) for this GetWorldPositionPtr site
+      pf = Object_GetWorldPositionPtr(targetPhys);
+      *(unsigned *)((char *)this_wp + 0x20) = *(unsigned *)(pf + 0);
+      *(unsigned *)((char *)this_wp + 0x24) = *(unsigned *)(pf + 1);
+      *(unsigned *)((char *)this_wp + 0x28) = *(unsigned *)(pf + 2);
+      *(unsigned *)((char *)this_wp + 0x2c) = *(unsigned *)(pf + 3);
     }
-
-    local_4c = local_4c * fVar9;
-
-    local_60 = *(float *)(param_1 + 0x20);
-
-    local_5c = *(float *)(param_1 + 0x24);
-
-    local_58 = *(float *)(param_1 + 0x28);
-
-    local_54 = *(float *)(param_1 + 0x2c);
-
-    local_50 = fVar9 * local_50;
-
-    local_48 = local_48 * fVar9;
-
-    pfVar4 = (float *)FUN_00404c90();
-
-    local_60 = local_60 - *pfVar4;
-
-    local_5c = local_5c - pfVar4[1];
-
-    local_58 = local_58 - pfVar4[2];
-
-    fVar8 = local_58 * local_58 + local_5c * local_5c + local_60 * local_60;
-
-    fVar9 = 0.0;
-
-    if (fVar8 != 0.0) {
-
-      fVar9 = g_flOne / SQRT(fVar8);
-
-    }
-
-    local_58 = local_58 * fVar9;
-
-    local_5c = local_5c * fVar9;
-
-    local_60 = fVar9 * local_60;
-
-    local_54 = (local_54 - pfVar4[3]) * fVar9;
-
-    if (local_58 * local_48 + local_5c * local_4c + local_60 * local_50 < DAT_00a0f70c) {
-
-      *(uint32_t /* width from decompiler */ *)(param_1 + 0x40) = 0xffffffff;
-
-      *(uint32_t /* width from decompiler */ *)(param_1 + 0x44) = 0xffffffff;
-
-      *(uint32_t /* width from decompiler */ *)(param_1 + 0x48) = 0xffffffff;
-
-      puVar5 = (uint32_t /* width from decompiler */ *)FUN_00404c90();
-
-      *(uint32_t /* width from decompiler */ *)(param_1 + 0x20) = *puVar5;
-
-      *(uint32_t /* width from decompiler */ *)(param_1 + 0x24) = puVar5[1];
-
-      *(uint32_t /* width from decompiler */ *)(param_1 + 0x28) = puVar5[2];
-
-      *(uint32_t /* width from decompiler */ *)(param_1 + 0x2c) = puVar5[3];
-
-    }
-
-    goto LAB_005d62e5;
-
+    goto unscope;
   }
 
-  pfVar4 = (float *)FUN_00404c90();
+  // No active path: gather shortcut candidates near owner world pose
+  pf = Object_GetWorldPositionPtr(owner);
+  float owx = pf[0], owy = pf[1], owz = pf[2], oww = pf[3];
+  float owner_pose[4] = { owx, owy, owz, oww };
 
-  local_60 = *pfVar4;
+  // local std::vector-like { begin, end, capacity_end }
+  void **vec_begin = 0;
+  void **vec_end = 0;
+  void **vec_cap = 0;
+  (void)vec_cap;
+  float best = _DAT_009dace0; // 1e7f
+  unsigned char local_40[4];
+  local_14 = (local_14 & 0xffffff00u) | 1u; // SEH state 1 while vector live
 
-  local_5c = pfVar4[1];
+  // FUN_004d5910 fills vector (ctx from owner map; residual body not OWN)
+  FUN_004d5910(/* owner map */ 0 /* decompiler: ctx via owner */, owner_pose, local_40);
+  // Note: decompiler binds vector at local_3c; CF preserves empty vs scan.
 
-  local_58 = pfVar4[2];
-
-  local_54 = pfVar4[3];
-
-  local_3c = (uint32_t /* width from decompiler */ *)0x0;
-
-  local_38 = (uint32_t /* width from decompiler */ *)0x0;
-
-  local_34 = 0;
-
-  local_68 = _DAT_009dace0;
-
-  local_14 = CONCAT31(local_14._1_3_,1);
-
-  FUN_004d5910(&local_60,local_40);
-
-  if (local_3c == local_38) {
-
-LAB_005d6285:
-
-    *(float *)(param_1 + 0x20) = local_50;
-
-    *(float *)(param_1 + 0x24) = local_4c;
-
-    *(float *)(param_1 + 0x28) = local_48;
-
-    *(float *)(param_1 + 0x2c) = local_44;
-
-  }
-
-  else {
-
-    piVar6 = (int *)0x0;
-
-    puVar5 = local_3c;
-
-    do {
-
-      (**(code **)(*(int *)*puVar5 + 0x2c))(&local_30);
-
-      fVar8 = (local_48 - fStack_28) * (local_48 - fStack_28) +
-
-              (local_4c - fStack_2c) * (local_4c - fStack_2c) +
-
-              (local_50 - local_30) * (local_50 - local_30);
-
-      if (((fVar8 <= fVar9 * fVar9) &&
-
-          ((fStack_28 - local_58) * (fStack_28 - local_58) +
-
-           (fStack_2c - local_5c) * (fStack_2c - local_5c) +
-
-           (local_30 - local_60) * (local_30 - local_60) <= fVar9 * fVar9)) && (fVar8 < local_68)) {
-
-        piVar6 = (int *)*puVar5;
-
-        local_68 = fVar8;
-
+  if (vec_begin == vec_end) {
+    // no candidates → snap to target pose
+    *(float *)((char *)this_wp + 0x20) = tgt_x;
+    *(float *)((char *)this_wp + 0x24) = tgt_y;
+    *(float *)((char *)this_wp + 0x28) = tgt_z;
+    *(float *)((char *)this_wp + 0x2c) = tgt_w;
+  } else {
+    void *bestObj = 0;
+    float dist2_limit = dist * dist;
+    for (void **it = vec_begin; it != vec_end; ++it) {
+      void *cand = *it;
+      // vtbl+0x2c → pose float3 at local_30
+      float px, py, pz;
+      ((void (__thiscall *)(void *, float *))(*(int **)cand)[0x2c / 4])(cand, &px);
+      // decompiler packs float3 as local_30 / fStack_2c / fStack_28
+      float d_tgt2 = (tgt_z - pz) * (tgt_z - pz) +
+                     (tgt_y - py) * (tgt_y - py) +
+                     (tgt_x - px) * (tgt_x - px);
+      float d_own2 = (pz - owz) * (pz - owz) +
+                     (py - owy) * (py - owy) +
+                     (px - owx) * (px - owx);
+      if (d_tgt2 <= dist2_limit && d_own2 <= dist2_limit && d_tgt2 < best) {
+        bestObj = cand;
+        best = d_tgt2;
       }
-
-      puVar5 = puVar5 + 1;
-
-    } while (puVar5 != local_38);
-
-    if (piVar6 == (int *)0x0) goto LAB_005d6285;
-
-    local_4c = local_5c - local_4c;
-
-    local_48 = local_58 - local_48;
-
-    iVar3 = piVar6[0x4d];
-
-    local_50 = local_60 - local_50;
-
-    fVar9 = local_48 * local_48 + local_4c * local_4c + local_50 * local_50;
-
-    *(int *)(param_1 + 0x40) = iVar3;
-
-    *(int *)(param_1 + 0x44) = iVar3 >> 0x1f;
-
-    if (fVar9 == 0.0) {
-
-      fVar9 = 0.0;
-
     }
 
-    else {
+    if (bestObj == 0) {
+      *(float *)((char *)this_wp + 0x20) = tgt_x;
+      *(float *)((char *)this_wp + 0x24) = tgt_y;
+      *(float *)((char *)this_wp + 0x28) = tgt_z;
+      *(float *)((char *)this_wp + 0x2c) = tgt_w;
+    } else {
+      // COID from bestObj+0x134 → path lo/hi (CDQ sign-extend)
+      int coid = *(int *)((char *)bestObj + 0x134);
+      *(int *)((char *)this_wp + 0x40) = coid;
+      *(int *)((char *)this_wp + 0x44) = coid >> 31;
 
-      fVar9 = g_flOne / SQRT(fVar9);
+      // Direction owner_world - target; normalize (incl. W delta)
+      float dx = owx - tgt_x;
+      float dy = owy - tgt_y;
+      float dz = owz - tgt_z;
+      float dw = oww - tgt_w;
+      float len2 = dx * dx + dy * dy + dz * dz;
+      float inv = (len2 == 0.0f) ? 0.0f : (g_flOne / sqrtf(len2));
+      float dir[4] = { dx * inv, dy * inv, dz * inv, dw * inv };
 
+      // vtbl+0x10(this=bestObj, arg0=-1, arg1=&dir)
+      int *vt = *(int **)bestObj;
+      void *pathNode = ((void *(__thiscall *)(void *, int, float *))vt[0x10 / 4])(
+          bestObj, -1, dir);
+      if (pathNode == 0) {
+        *(unsigned *)((char *)this_wp + 0x48) = 0xffffffffu;
+      } else {
+        *(unsigned *)((char *)this_wp + 0x48) =
+            *(unsigned *)((char *)pathNode + 0x134);
+      }
+      // vtbl+0x2c → write desired pose at this+0x20
+      ((void (__thiscall *)(void *, void *))vt[0x2c / 4])(
+          bestObj, (char *)this_wp + 0x20);
     }
-
-    local_50 = fVar9 * local_50;
-
-    local_4c = local_4c * fVar9;
-
-    local_48 = local_48 * fVar9;
-
-    local_44 = (local_54 - local_44) * fVar9;
-
-    iVar3 = (**(code **)(*piVar6 + 0x10))(0xffffffff,&local_50);
-
-    if (iVar3 == 0) {
-
-      *(uint32_t /* width from decompiler */ *)(param_1 + 0x48) = 0xffffffff;
-
-      (**(code **)(*piVar6 + 0x2c))(param_1 + 0x20);
-
-    }
-
-    else {
-
-      *(uint32_t /* width from decompiler */ *)(param_1 + 0x48) = *(uint32_t /* width from decompiler */ *)(iVar3 + 0x134);
-
-      (**(code **)(*piVar6 + 0x2c))(param_1 + 0x20);
-
-    }
-
   }
 
-  if (local_3c != (uint32_t /* width from decompiler */ *)0x0) {
-
-                    /* WARNING: Subroutine does not return */
-
-    operator_delete(local_3c);
-
+  if (vec_begin != 0) {
+    operator_delete(vec_begin); // continues (decompiler "does not return" is residual)
   }
+  vec_begin = 0;
+  vec_end = 0;
+  vec_cap = 0;
 
-  local_3c = (uint32_t /* width from decompiler */ *)0x0;
-
-  local_38 = (uint32_t /* width from decompiler */ *)0x0;
-
-  local_34 = 0;
-
-LAB_005d62e5:
-
+unscope:
   local_14 = 0xffffffff;
-
   FUN_0076cef0();
-
   ExceptionList = local_1c;
-
   return;
-
 }

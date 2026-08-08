@@ -1,46 +1,30 @@
 // =============================================================================
-// FUN_00402280
+// FUN_00402280  — machine twin of StdList_Destroy_FreeHead_ViaClearEsi_Inferred
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00402280
 // Address:   0x00402280  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Body:      0x00402280–0x0040229c inclusive (29 B / 0x1D)
+// Wave:      MEGA-067 OWN-ONLY dual 2026-08-05
+// Canonical: StdList_Destroy_FreeHead_ViaClearEsi_Inferred
+// Exactness: Behavior-preserving; full body from read_memory (not decomp-only).
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00402280 @ 0x00402280
-// Stable ID: aa_00402280
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~6 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_00402280, FUN_00415e90.
-//  - Return sites: 1.
+extern "C" void __cdecl operator_delete(void* p);
+extern "C" void StdList_Clear_ESI(void* list /* ESI */);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __fastcall FUN_00402280(int param_1)
-
-
-
+// Ghidra symbol kept for VA-keyed consumers; prefer the named clean.
+extern "C" void __fastcall FUN_00402280(int param_1)
 {
+  // ECX = list shell* (head @ +4, size @ +8)
+  std::uint8_t* list = reinterpret_cast<std::uint8_t*>(param_1);
 
-  FUN_00415e90();
+  // CALL 00415e90 with ESI = list
+  StdList_Clear_ESI(list);
 
-                    /* WARNING: Subroutine does not return */
-
-  operator_delete(*(void **)(param_1 + 4));
-
+  void* head = *reinterpret_cast<void**>(list + 4);
+  operator_delete(head);
+  *reinterpret_cast<void**>(list + 4) = nullptr;
 }

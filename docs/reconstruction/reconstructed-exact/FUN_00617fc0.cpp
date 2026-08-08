@@ -1,140 +1,26 @@
 // =============================================================================
-// FUN_00617fc0
+// FUN_00617fc0  — twin of CVOGHBSkill_Reflect_SpawnActionsForTargetList_Inferred
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00617fc0
 // Address:   0x00617fc0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Body:      0x00617fc0 – 0x006180fb inclusive (316 B / 0x13C)
+// System:    skills-abilities
+// Generated: 2026-08-05 R12-039 dual seal (machine-name twin)
+// See:       CVOGHBSkill_Reflect_SpawnActionsForTargetList_Inferred.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00617fc0 @ 0x00617fc0
-// Stable ID: aa_00617fc0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~52 non-empty decompiler lines.
-//  - Control keywords: if×5, do×1, return×1, goto×1, while×1.
-//  - Notable callees: CONCAT31, CVOGHBBase_Start, CVOGHBList_Enqueue, FUN_00617ad0, FUN_00617fc0, __RTDynamicCast.
-//  - Return sites: 1.
+// Forward to named clean unit (same body; Ghidra symbol retained for ledger twin).
+extern "C" std::uint32_t __stdcall
+CVOGHBSkill_Reflect_SpawnActionsForTargetList_Inferred(
+    void *pSourceObj, void *pSkillBlob, void *pWorld, void *pList,
+    void *pTfid16, std::uint32_t arg7);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-uint32_t /* width from decompiler */
-
-FUN_00617fc0(uint32_t /* width from decompiler */ param_1,uint32_t /* width from decompiler */ param_2,int param_3,int param_4,uint32_t /* width from decompiler */ param_5,
-
-            uint32_t /* width from decompiler */ param_6)
-
-
-
+extern "C" std::uint32_t __stdcall FUN_00617fc0(
+    void *param_1, void *param_2, void *param_3, void *param_4, void *param_5,
+    std::uint32_t param_6)
 {
-
-  int *piVar1;
-
-  int iVar2;
-
-  CVOGHBBase *pAction;
-
-  char local_d;
-
-  void *local_c;
-
-  uint8_t *puStack_8;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
-
-  local_4 = 0xffffffff;
-
-  puStack_8 = &LAB_009a86cb;
-
-  local_c = ExceptionList;
-
-  local_d = '\0';
-
-  ExceptionList = &local_c;
-
-LAB_00617ff0:
-
-  do {
-
-    piVar1 = (int *)(local_d * 0x10 + param_4);
-
-    if (((*piVar1 == -1) && (piVar1[1] == -1)) && ((char)piVar1[2] == '\0')) {
-
-      ExceptionList = local_c;
-
-      return 1;
-
-    }
-
-    iVar2 = CVOGReaction_ResolveObjectTarget
-
-                      (CONCAT31((int3)((uint)piVar1 >> 8),(char)piVar1[2]),*piVar1,piVar1[1]);
-
-    if (iVar2 != 0) {
-
-      if (*(int *)(*(int *)(iVar2 + 0xa8) + 0x38) == 0xe) {
-
-        iVar2 = __RTDynamicCast(iVar2,0,&CVOGClonedObjectBase::RTTI_Type_Descriptor,
-
-                                &CVOGVehicle::RTTI_Type_Descriptor,0);
-
-        iVar2 = *(int *)(*(int *)(*(int *)(iVar2 + 4) + 4) + 0xb0 + iVar2);
-
-      }
-
-      pAction = operator_new(0x6d0);
-
-      local_4 = 0;
-
-      if (pAction == (CVOGHBBase *)0x0) {
-
-        pAction = (CVOGHBBase *)0x0;
-
-      }
-
-      else {
-
-        FUN_00617ad0(param_1,param_2,param_3,iVar2,param_5,param_6);
-
-        pAction->pVTable = &PTR_FUN_009d0f7c;
-
-      }
-
-      local_4 = 0xffffffff;
-
-      if (pAction->pOwnerObject != (void *)0x0) {
-
-        CVOGHBList_Enqueue(*(void **)(param_3 + 0xe4ec),pAction);
-
-        CVOGHBBase_Start(pAction);
-
-        local_d = local_d + '\x01';
-
-        goto LAB_00617ff0;
-
-      }
-
-      (**(code **)pAction->pVTable)(1);
-
-    }
-
-    local_d = local_d + '\x01';
-
-  } while( true );
-
+  return CVOGHBSkill_Reflect_SpawnActionsForTargetList_Inferred(
+      param_1, param_2, param_3, param_4, param_5, param_6);
 }

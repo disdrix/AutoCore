@@ -1,130 +1,84 @@
-// =============================================================================
-// FUN_006226a0
+﻿// =============================================================================
+// FUN_006226a0  — twin of CVOGHBSkill_OnKill_SpawnPerTargetHB_Inferred
 // -----------------------------------------------------------------------------
 // Stable ID: aa_006226a0
 // Address:   0x006226a0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    skills-abilities
+// Generated: 2026-08-05 R11-020 dual (refresh of 2026-07-23 scaffold)
+// Exactness: Behavior-preserving; see named clean for typed plate.
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_006226a0 @ 0x006226a0
-// Stable ID: aa_006226a0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// PURPOSE: CVOGHBSkill_OnKill vtbl+0x2c multi-target HB fanout.
+// RTTI: .?AVCVOGHBSkill_OnKill@@  (COL 0x00aae288 → type_info 0x00af1dc8)
+// Named clean: CVOGHBSkill_OnKill_SpawnPerTargetHB_Inferred.cpp
 
-// READABILITY (auto CF):
-//  - Body size: ~47 non-empty decompiler lines.
-//  - Control keywords: if×4, do×1, return×1, goto×1, while×1.
-//  - Notable callees: CONCAT31, CVOGHBBase_Start, CVOGHBList_Enqueue, FUN_005788d0, FUN_006226a0.
-//  - Return sites: 1.
+// READABILITY:
+//  - Body: 0x006226a0–0x006227a7 (0x108 B); RET 0x18
+//  - Loop over TargetEntry[i] stride 0x10 until sentinel (-1,-1,type0)
+//  - Resolve via world+0xe4e8; new(0x6c0)+CVOGHBSkillBase_ctor+OnKill vtbl
+//  - Owner → Enqueue(world+0xe4ec)+Start; else vtbl[0](1)
+//  - Return 1 only at sentinel
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+#include <cstdint>
 
-uint32_t /* width from decompiler */
+struct CVOGHBBase {
+  void* pVTable;
+  void* pOwnerObject; // +0x18
+};
 
-FUN_006226a0(uint32_t /* width from decompiler */ param_1,uint32_t /* width from decompiler */ param_2,int param_3,int param_4,uint32_t /* width from decompiler */ param_5,
+extern void* operator_new(unsigned);
+extern CVOGHBBase* CVOGHBSkillBase_ctor(CVOGHBBase*, void*, void*, void*, void*, uint32_t*, uint32_t);
+extern void* __thiscall CVOGReaction_ResolveObjectTarget(void*, char, uint32_t, uint32_t);
+extern unsigned CVOGHBList_Enqueue(void*, CVOGHBBase*);
+extern void CVOGHBBase_Start(CVOGHBBase*);
+extern void* PTR_FUN_009d16e4[];
 
-            uint32_t /* width from decompiler */ param_6)
-
-
-
+uint32_t __thiscall FUN_006226a0(
+    void* /*this_unused*/,
+    void* param_1,
+    void* param_2,
+    void* param_3,
+    int param_4,
+    uint32_t* param_5,
+    uint32_t param_6)
 {
+  char local_d = 0;
+  // SEH omitted
 
-  int *piVar1;
-
-  int iVar2;
-
-  CVOGHBBase *pAction;
-
-  char local_d;
-
-  void *local_c;
-
-  uint8_t *puStack_8;
-
-  uint32_t /* width from decompiler */ local_4;
-
-  
-
-  local_4 = 0xffffffff;
-
-  puStack_8 = &LAB_009a897b;
-
-  local_c = ExceptionList;
-
-  local_d = '\0';
-
-  ExceptionList = &local_c;
-
-LAB_006226d0:
-
-  do {
-
-    piVar1 = (int *)(local_d * 0x10 + param_4);
-
-    if (((*piVar1 == -1) && (piVar1[1] == -1)) && ((char)piVar1[2] == '\0')) {
-
-      ExceptionList = local_c;
-
+  for (;;) {
+    int* piVar1 = reinterpret_cast<int*>(local_d * 0x10 + param_4);
+    if (piVar1[0] == -1 && piVar1[1] == -1 &&
+        *reinterpret_cast<char*>(reinterpret_cast<char*>(piVar1) + 8) == 0) {
       return 1;
-
     }
 
-    iVar2 = CVOGReaction_ResolveObjectTarget
-
-                      (CONCAT31((int3)((uint)piVar1 >> 8),(char)piVar1[2]),*piVar1,piVar1[1]);
+    void* reaction = *reinterpret_cast<void**>(
+        reinterpret_cast<char*>(param_3) + 0xe4e8);
+    char type = *reinterpret_cast<char*>(reinterpret_cast<char*>(piVar1) + 8);
+    int iVar2 = reinterpret_cast<int>(CVOGReaction_ResolveObjectTarget(
+        reaction, type,
+        static_cast<uint32_t>(piVar1[0]),
+        static_cast<uint32_t>(piVar1[1])));
 
     if (iVar2 != 0) {
-
-      pAction = operator_new(0x6c0);
-
-      local_4 = 0;
-
-      if (pAction == (CVOGHBBase *)0x0) {
-
-        pAction = (CVOGHBBase *)0x0;
-
+      CVOGHBBase* pAction = static_cast<CVOGHBBase*>(operator_new(0x6c0));
+      if (pAction != nullptr) {
+        CVOGHBSkillBase_ctor(pAction, param_1, param_2, param_3,
+                             reinterpret_cast<void*>(iVar2), param_5, param_6);
+        pAction->pVTable = &PTR_FUN_009d16e4[0];
       }
-
-      else {
-
-        FUN_005788d0(param_1,param_2,param_3,iVar2,param_5,param_6);
-
-        pAction->pVTable = &PTR_FUN_009d16e4;
-
-      }
-
-      local_4 = 0xffffffff;
-
-      if (pAction->pOwnerObject != (void *)0x0) {
-
-        CVOGHBList_Enqueue(*(void **)(param_3 + 0xe4ec),pAction);
-
+      if (pAction->pOwnerObject != nullptr) {
+        CVOGHBList_Enqueue(
+            *reinterpret_cast<void**>(reinterpret_cast<char*>(param_3) + 0xe4ec),
+            pAction);
         CVOGHBBase_Start(pAction);
-
-        local_d = local_d + '\x01';
-
-        goto LAB_006226d0;
-
+      } else {
+        auto** vt = reinterpret_cast<void**>(pAction->pVTable);
+        using DtorFn = void(__thiscall*)(CVOGHBBase*, int);
+        reinterpret_cast<DtorFn>(vt[0])(pAction, 1);
       }
-
-      (**(code **)pAction->pVTable)(1);
-
     }
-
-    local_d = local_d + '\x01';
-
-  } while( true );
-
+    local_d = static_cast<char>(local_d + 1);
+  }
 }

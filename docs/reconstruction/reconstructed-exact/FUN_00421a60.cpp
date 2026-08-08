@@ -1,60 +1,22 @@
 // =============================================================================
-// FUN_00421a60
+// FUN_00421a60  (clean twin alias of StdTree_Max_Isnil21_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00421a60
 // Address:   0x00421a60  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Body:      0x00421a60–0x00421a7c exclusive (28 B)
+// System:    MSVC std::_Tree max / rightmost (isnil@+0x21)
+// Generated: 2026-08-05 R13-001 dual
+// Exactness: Behavior-preserving; see StdTree_Max_Isnil21_Inferred.cpp for plate.
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00421a60 @ 0x00421a60
-// Stable ID: aa_00421a60
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~12 non-empty decompiler lines.
-//  - Control keywords: while×1, return×1.
-//  - Notable callees: FUN_00421a60.
-//  - Return sites: 1.
+// Forward to named plate (same ABI: cdecl, EAX return).
+extern "C" std::int32_t *StdTree_Max_Isnil21_Inferred(std::int32_t *node);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void FUN_00421a60(int param_1)
-
-
-
+// Ghidra alias — decompiler shows void; bytes return node* in EAX.
+extern "C" std::int32_t *FUN_00421a60(std::int32_t *param_1)
 {
-
-  char cVar1;
-
-  int iVar2;
-
-  
-
-  iVar2 = *(int *)(param_1 + 8);
-
-  cVar1 = *(char *)(iVar2 + 0x21);
-
-  while (cVar1 == '\0') {
-
-    iVar2 = *(int *)(iVar2 + 8);
-
-    cVar1 = *(char *)(iVar2 + 0x21);
-
-  }
-
-  return;
-
+  return StdTree_Max_Isnil21_Inferred(param_1);
 }

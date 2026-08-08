@@ -1,48 +1,34 @@
 // =============================================================================
-// FUN_00599550
+// FUN_00599550  — twin of CVOGHBMoveVehicleToMouse_ctor
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00599550
-// Address:   0x00599550  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00599550–0x0059956f inclusive (32 B / 0x20)
+//            autoassault.exe, image base 0x400000
+// System:    input-drive-control
+// Generated: 2026-07-23 scaffold; R13-007 dual refresh 2026-08-05
+// Exactness: Behavior-preserving rewrite of decompiler + machine CF.
+// Bit-for-bit vs retail EXE: DEFERRED.
+// Dual A/B: accept-with-gaps (R13-007) — see CVOGHBMoveVehicleToMouse_ctor.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00599550 @ 0x00599550
-// Stable ID: aa_00599550
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~7 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_00599550, FUN_00636bd0.
-//  - Return sites: 1.
+extern "C" void *__thiscall FUN_00636bd0(void *self, void *pEntity);
+extern void *PTR_FUN_009d5590;
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+// Canonical: CVOGHBMoveVehicleToMouse_ctor
+// thiscall ECX=this; stack pEntity, pHostCtx; RET 8; EAX=this.
+// Base MoveVehicle ctor then install ToMouse vtbl; store pHostCtx at +0x40.
 
-uint32_t /* width from decompiler */ * __thiscall FUN_00599550(uint32_t /* width from decompiler */ *param_1,uint32_t /* width from decompiler */ param_2,uint32_t /* width from decompiler */ param_3)
-
-
-
+extern "C" void *__thiscall FUN_00599550(
+    void *param_1 /* ECX */,
+    void *param_2 /* pEntity */,
+    void *param_3 /* pHostCtx → +0x40 */)
 {
+  FUN_00636bd0(param_1, param_2);
 
-  FUN_00636bd0(param_2);
-
-  *param_1 = &PTR_FUN_009d5590;
-
-  param_1[0x10] = param_3;
+  *reinterpret_cast<void **>(param_1) = &PTR_FUN_009d5590;
+  *reinterpret_cast<void **>(reinterpret_cast<char *>(param_1) + 0x40) = param_3;
 
   return param_1;
-
 }

@@ -1,11 +1,15 @@
 // =============================================================================
+// RETIRED SCAFFOLD (R10-014 2026-08-05) — do not use as product name
+// Canonical: Mission_FormatDialogTokenValue_Inferred
+//   docs/reconstruction/reconstructed-exact/Mission_FormatDialogTokenValue_Inferred.cpp
+// =============================================================================
 // Named_CalleeOf_Named_CalleeOf_Named_CalleeOf_Mission_Dialog_has_005792d0
 // -----------------------------------------------------------------------------
 // Stable ID: aa_005792d0
 // Callee of Named_CalleeOf_Named_CalleeOf_Mission_Dialog_has_no_choices_fro
 // Address:   0x005792d0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// System:    missions-progression (was unknown)
+// Generated: 2026-07-23 from raw capture; RETIRED by R10-014 dual
 // Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
 // Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
 // =============================================================================

@@ -1,94 +1,42 @@
 // =============================================================================
-// FUN_00403c60
+// FUN_00403c60  (clean twin → StdTree_LowerBound_StringKey_Isnil131_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00403c60
-// Address:   0x00403c60  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00403c60–0x00403ca6  (71 B / 0x47)  autoassault.exe base 0x400000
+// Canonical: StdTree_LowerBound_StringKey_Isnil131_Inferred
+// Generated: 2026-08-05 MEGA-041 — Ghidra-symbol twin of named clean.
+// Exactness: Decompiler CF preserved. ABI: map in EAX (in_EAX), key on stack, RET 4.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00403c60 @ 0x00403c60
-// Stable ID: aa_00403c60
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// See StdTree_LowerBound_StringKey_Isnil131_Inferred.cpp for plate + family notes.
 
-// READABILITY (auto CF):
-//  - Body size: ~29 non-empty decompiler lines.
-//  - Control keywords: while×1, if×1, return×1.
-//  - Notable callees: FUN_00403c60.
-//  - Return sites: 1.
+#include <stdint.h>
+#include <string>
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-uint32_t /* width from decompiler */ *
-
-FUN_00403c60(basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> *param_1)
-
-
-
+// Ghidra decompile twin — in_EAX is the real map register (not a phantom).
+uint32_t *FUN_00403c60(std::string *param_1)
 {
-
   char cVar1;
-
-  uint32_t /* width from decompiler */ *puVar2;
-
+  uint32_t *puVar2;
   bool bVar3;
+  int in_EAX; /* map* — live ABI loads from EAX at entry */
+  uint32_t *puVar4;
+  uint32_t *puVar5;
 
-  int in_EAX;
-
-  uint32_t /* width from decompiler */ *puVar4;
-
-  uint32_t /* width from decompiler */ *puVar5;
-
-  
-
-  puVar5 = (uint32_t /* width from decompiler */ *)(*(uint32_t /* width from decompiler */ **)(in_EAX + 4))[1];
-
+  puVar5 = (uint32_t *)(*(uint32_t **)(in_EAX + 4))[1];
   cVar1 = *(char *)((int)puVar5 + 0x131);
-
-  puVar2 = *(uint32_t /* width from decompiler */ **)(in_EAX + 4);
-
+  puVar2 = *(uint32_t **)(in_EAX + 4);
   while (cVar1 == '\0') {
-
-    bVar3 = std::operator<<char,struct_std::char_traits<char>,class_std::allocator<char>_>
-
-                      ((basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>
-
-                        *)(puVar5 + 3),param_1);
-
+    bVar3 = *reinterpret_cast<std::string *>(puVar5 + 3) < *param_1;
     if (bVar3) {
-
-      puVar4 = (uint32_t /* width from decompiler */ *)puVar5[2];
-
+      puVar4 = (uint32_t *)puVar5[2];
       puVar5 = puVar2;
-
+    } else {
+      puVar4 = (uint32_t *)*puVar5;
     }
-
-    else {
-
-      puVar4 = (uint32_t /* width from decompiler */ *)*puVar5;
-
-    }
-
     puVar2 = puVar5;
-
     puVar5 = puVar4;
-
     cVar1 = *(char *)((int)puVar4 + 0x131);
-
   }
-
   return puVar2;
-
 }

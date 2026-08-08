@@ -1,68 +1,51 @@
-// =============================================================================
+﻿// =============================================================================
 // FUN_00418d70
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00418d70
 // Address:   0x00418d70  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
+// Body:      0x00418d70–0x00418dc6 exclusive (86 B / 0x56)
+// System:    util / container (std::vector elem stride 8)
+// Generated: 2026-08-05 R10-025 dual seal twin of named plate
 // Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Bit-for-bit vs retail EXE: DEFERRED.
+// Named:     StdVector_PushBack_Elem8_EcxVec_StackVal_Inferred
+// Dual A/B:  accept-with-gaps (2026-08-05)
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00418d70 @ 0x00418d70
-// Stable ID: aa_00418d70
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~16 non-empty decompiler lines.
-//  - Control keywords: return×2, if×1.
-//  - Notable callees: FUN_00418d70, FUN_00418e10.
-//  - Return sites: 2.
+extern "C" void FUN_00418e10(
+    void* vec /*ECX*/,
+    void** outIt,
+    void* where,
+    const void* value);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __thiscall FUN_00418d70(int param_1,uint32_t /* width from decompiler */ *param_2)
-
-
-
+// Ghidra twin — same body as named plate.
+extern "C" void FUN_00418d70(void* vec /*ECX*/, const uint32_t* value /*stack*/)
 {
-
-  int iVar1;
-
-  uint32_t /* width from decompiler */ *puVar2;
-
-  
-
-  iVar1 = *(int *)(param_1 + 4);
-
-  if ((iVar1 != 0) &&
-
-     ((uint)(*(int *)(param_1 + 8) - iVar1 >> 3) < (uint)(*(int *)(param_1 + 0xc) - iVar1 >> 3))) {
-
-    puVar2 = *(uint32_t /* width from decompiler */ **)(param_1 + 8);
-
-    *puVar2 = *param_2;
-
-    puVar2[1] = param_2[1];
-
-    *(uint32_t /* width from decompiler */ **)(param_1 + 8) = puVar2 + 2;
-
-    return;
-
+  int begin = *reinterpret_cast<int*>(reinterpret_cast<char*>(vec) + 4);
+  unsigned size;
+  if (begin == 0) {
+    size = 0;
+  } else {
+    size = static_cast<unsigned>(
+        (*reinterpret_cast<int*>(reinterpret_cast<char*>(vec) + 8) - begin) >> 3);
   }
 
-  FUN_00418e10(&param_2,*(uint32_t /* width from decompiler */ *)(param_1 + 8),param_2);
+  if (begin != 0) {
+    unsigned capacity = static_cast<unsigned>(
+        (*reinterpret_cast<int*>(reinterpret_cast<char*>(vec) + 0xc) - begin) >> 3);
+    if (size < capacity) {
+      uint32_t* end =
+          *reinterpret_cast<uint32_t**>(reinterpret_cast<char*>(vec) + 8);
+      end[0] = value[0];
+      end[1] = value[1];
+      *reinterpret_cast<uint32_t**>(reinterpret_cast<char*>(vec) + 8) = end + 2;
+      return;
+    }
+  }
 
-  return;
-
+  void* outScratch = const_cast<uint32_t*>(value);
+  void* end = *reinterpret_cast<void**>(reinterpret_cast<char*>(vec) + 8);
+  FUN_00418e10(vec, &outScratch, end, value);
 }

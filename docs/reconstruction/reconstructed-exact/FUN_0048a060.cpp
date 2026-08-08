@@ -1,54 +1,39 @@
 // =============================================================================
-// FUN_0048a060
+// FUN_0048a060  (scaffold twin — prefer SoftCastHitList_SortIfCountGt1_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0048a060
 // Address:   0x0048a060  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    interaction-activation
+// Generated: 2026-08-05 MEGA-116 — machine ABI correction of 2026-07-23 scaffold
+// Exactness: Behavior-preserving. Named clean is authoritative for ports.
+// =============================================================================
+//
+// PURPOSE: Soft-cast hit-list sort gate (count>1) → FUN_00489f20.
+// Canonical: SoftCastHitList_SortIfCountGt1_Inferred
+//
+// ABI CORRECTION vs scaffold:
+//   Scaffold used decompiler void __fastcall(uint param_1).
+//   Sealed: thiscall ECX=this SoftCastHitList*; bare RET; no stack args.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0048a060 @ 0x0048a060
-// Stable ID: aa_0048a060
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~9 non-empty decompiler lines.
-//  - Control keywords: if×1, return×1.
-//  - Notable callees: FUN_00489f20, FUN_0048a060.
-//  - Return sites: 1.
+extern "C" void __cdecl FUN_00489f20(void *array_base, int lo, int hi,
+                                     uint32_t sort_cookie);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __fastcall FUN_0048a060(uint param_1)
-
-
-
+// Ghidra symbol retained for xref continuity; prefer the named clean.
+void __thiscall FUN_0048a060(void *self_hit_list)
 {
+  uint32_t sort_cookie =
+      static_cast<uint32_t>(reinterpret_cast<uintptr_t>(self_hit_list)) &
+      0xFFFFFF00u;
 
-  uint32_t /* width from decompiler */ local_4;
+  int count = *reinterpret_cast<int *>(
+      reinterpret_cast<uint8_t *>(self_hit_list) + 0x14);
 
-  
-
-  local_4 = param_1 & 0xffffff00;
-
-  if (1 < *(int *)(param_1 + 0x14)) {
-
-    FUN_00489f20(*(uint32_t /* width from decompiler */ *)(param_1 + 0x10),0,*(int *)(param_1 + 0x14) + -1,local_4);
-
+  if (count > 1) {
+    void *array_base = *reinterpret_cast<void **>(
+        reinterpret_cast<uint8_t *>(self_hit_list) + 0x10);
+    FUN_00489f20(array_base, 0, count - 1, sort_cookie);
   }
-
-  return;
-
 }

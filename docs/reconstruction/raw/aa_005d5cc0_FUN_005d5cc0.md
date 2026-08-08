@@ -221,3 +221,75 @@ LAB_005d62e5:
   return;
 }
 ```
+
+---
+
+## Re-verify append — 2026-08-05 MEGA-057
+
+| Field | Value |
+|---|---|
+| **Agent** | OWN-ONLY dual **MEGA-057** (exclusive VA `0x005d5cc0`) |
+| **Tool** | Ghidra MCP `decompile_function` + `analyze_function_complete` + `disassemble_function` + `get_function_by_address` + `get_function_callers` / `get_function_xrefs` + `read_memory`. **No** `disassemble_bytes`. |
+| **Live decompile** | ≡ 2026-07-23 raw body (SEH scope; plate string; TFID resolve; RTDynamicCast→physics; dual pose; surface-distance gate; path-slot branch; shortcut-vector pick; unscope). |
+| **Body** | `0x005d5cc0`–`0x005d62fb` inclusive (**1596 B** / `0x63C`); ends `POP EBP; RET` (no stack free). |
+| **Next sibling** | `CVOGWaypoint_UpdateState` @ `0x005d6300` (sole caller; state case **2**). |
+| **Xrefs** | 1× UNCONDITIONAL_CALL from `CVOGWaypoint_UpdateState` @ `0x005d6353`. |
+| **Callers** | `CVOGWaypoint_UpdateState` only. |
+| **Callees (live)** | `FUN_0076cf00`, `Object_ResolveFromTFID` (`0x004bb950`), `__RTDynamicCast` (`0x004898a4`), `Object_SurfaceDistance3D_Inferred` (`0x0053e510`), `FUN_005d5960`, `Object_GetWorldPositionPtr` (`0x00404c90`), `FUN_004d5910`, `operator_delete` (`0x00489822`), `FUN_0076cef0`; plus virtuals `vtbl+0x2c` (pose out) and `vtbl+0x10` (path/query). |
+| **Plate string** | `"CVOGWaypoint::DoFollowObjectShortcutsUpdate"` @ `0x009dace4` (`read_memory`). |
+| **Constants** | `g_flOne` @ `0x00a0f2a0` = **1.0f**; `DAT_00a0f70c` = **0.2f**; `_DAT_009dace0` = **1e7f** (min-dist init sentinel). |
+
+### ABI seal (`disassemble_function`)
+
+- **thiscall**: `MOV ESI, ECX` at entry; no stack args consumed; epilogue **`RET`** (not `RET n`).
+- `ECX` = `CVOGWaypoint* this` (waypoint object).
+- SEH: push `-1`; push `LAB_009a7110` (`0x009a7110`); FS:[0] chain; restore before return.
+- Stack align: `AND ESP, 0xfffffff0`; `SUB ESP, 0x58`; save EBX/ESI/EDI.
+
+### CF stages (sealed)
+
+1. Scope enter `FUN_0076cf00("CVOGWaypoint::DoFollowObjectShortcutsUpdate")`.
+2. Resolve follow TFID at `this+0x30` via owner table → `Object_ResolveFromTFID` (`0x004bb950`).
+3. If null **or** `(*(obj+0x17c) >> 5) & 1 == 0` → `*(this+0x52)=0`; unscope; return.
+4. Else `*(this+0x52)=1`.
+5. `__RTDynamicCast(obj, 0, CVOGClonedObjectBase, CVOGPhysicsBase, 0)` → physics `EBX`.
+6. Load **target** pose XYZ/W (4 floats) via physics host gate (`+8` → rb `+0xb0`) else entity `+0x84` dual (same as `Object_GetWorldPositionPtr`).
+7. Load **owner** pose from `*(this+0x10)` with same dual path.
+8. `Object_SurfaceDistance3D_Inferred(owner, target)` (bytes: **ECX=owner**, stack=target; decompiler residual shows only target).
+9. Compare distance to `*(float*)(this+0x4c)` (patrol radius from InitFromSpawn) → set `*(this+0x53)` 0/1.
+10. If distance **< 1.0f**: copy target pose → `this+0x20..+0x2c`; unscope; return.
+11. If `(this+0x40) & (this+0x44) != 0xFFFFFFFF` (path COID pair valid):
+    - `FUN_005d5960(this)` (state-1 peer handler; residual OWN elsewhere).
+    - Normalize (target−owner_pos) and (saved_pose−owner_pos); if **dot < 0.2f** clear `+0x40/+0x44/+0x48` to −1 and snap pose from owner world pos; unscope.
+12. Else (no path): copy owner world pos; init empty vector; seed min dist `1e7f`; `FUN_004d5910(owner_ctx, &owner_pose, &vector_buf)` (shortcut gather residual).
+13. Scan candidates: for each, vtbl+0x2c → pose; keep nearest with both distances ≤ `dist²` and better min; on pick store COID from `obj+0x134` into `this+0x40/+0x44` (sign-extend high); normalize direction; vtbl+0x10(−1, dir) → optional `+0x48` from result`+0x134`; vtbl+0x2c → write `this+0x20`.
+14. If no candidate: copy target pose to `this+0x20..+0x2c`.
+15. Free vector buffer if non-null (`operator_delete`); unscope `FUN_0076cef0`; return.
+
+### Decompiler residuals (bytes win)
+
+| Residual | Correction |
+|---|---|
+| `__fastcall` / `void` only | **thiscall** ECX=this; void; **RET** |
+| `FUN_0053e510(iVar3)` single-arg | **ECX = owner `*(this+0x10)`**, stack = target physics |
+| `operator_delete` "does not return" | Continues; clears vector heads then unscope |
+| `Object_ResolveFromTFID` direct on TFID | Walks owner MI table `this+0x10` → map → `CALL 0x004bb950` with TFID `this+0x30` |
+
+### Field map (this / CVOGWaypoint)
+
+| Offset | Role | Conf |
+|---|---|---|
+| `+0x10` | owner / entity host | **High** |
+| `+0x20..+0x2c` | desired pose float4 out | **High** |
+| `+0x30` | follow-object TFID (16 B) | **High** |
+| `+0x40/+0x44` | path / shortcut COID lo/hi | **High** |
+| `+0x48` | secondary path id (or −1) | **High** |
+| `+0x4c` | patrol / follow range float | **High** |
+| `+0x50` | FSM state (caller switch; case 2 → this) | **High** (caller) |
+| `+0x52` | follow-object valid flag | **High** |
+| `+0x53` | in-range / within-patrol flag | **High** |
+
+### Name
+
+- Product plate: **`CVOGWaypoint::DoFollowObjectShortcutsUpdate`** → clean `CVOGWaypoint_DoFollowObjectShortcutsUpdate` (not `_Inferred`; not `CVOGHBAI*` invent).
+- Retire scaffold: `Named_CalleeOf_CVOGWaypoint_UpdateState_005d5cc0`.

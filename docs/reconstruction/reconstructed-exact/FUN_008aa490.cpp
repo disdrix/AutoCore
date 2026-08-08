@@ -1,54 +1,41 @@
 // =============================================================================
-// FUN_008aa490
+// FUN_008aa490  (Ghidra twin of MissionDialog_SetTurnInReadyFlag_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_008aa490
-// Address:   0x008aa490  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x008aa490–0x008aa4a6 inclusive (23 B / 0x17)
+// Wave:      MEGA-078 OWN-ONLY dual 2026-08-05
+// System:    missions-progression
+// Exactness: Behavior-preserving rewrite. Prefer named clean:
+//            MissionDialog_SetTurnInReadyFlag_Inferred.cpp
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_008aa490 @ 0x008aa490
-// Stable ID: aa_008aa490
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~9 non-empty decompiler lines.
-//  - Control keywords: if×1, return×1.
-//  - Notable callees: FUN_008aa490.
-//  - Return sites: 1.
+using VFunc_SetFlag = void(__thiscall*)(void* self, uint32_t flagArg);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __fastcall FUN_008aa490(uint32_t /* width from decompiler */ param_1,uint32_t /* width from decompiler */ param_2)
-
-
-
+// Retail ABI: EAX = dialog host, DL = flag char; bare RET.
+extern "C" void FUN_008aa490(void /* EAX=dialog, DL=flag */)
 {
+  void* dialog;
+  uint32_t flagEdx;
 
-  int in_EAX;
-
-  
-
-  *(char *)(in_EAX + 0x580) = (char)param_2;
-
-  if (*(int **)(in_EAX + 0x6e8) != (int *)0x0) {
-
-    (**(code **)(**(int **)(in_EAX + 0x6e8) + 4))(param_2);
-
+#if defined(_MSC_VER) && defined(_M_IX86)
+  __asm {
+    mov dialog, eax
+    mov flagEdx, edx
   }
+#else
+  dialog = nullptr;
+  flagEdx = 0;
+#endif
 
-  return;
+  auto* base = reinterpret_cast<uint8_t*>(dialog);
+  void* child = *reinterpret_cast<void**>(base + 0x6e8);
+  *(base + 0x580) = static_cast<uint8_t>(flagEdx & 0xFF);
 
+  if (child != nullptr) {
+    void** childVtbl = *reinterpret_cast<void***>(child);
+    reinterpret_cast<VFunc_SetFlag>(childVtbl[1])(child, flagEdx);
+  }
 }

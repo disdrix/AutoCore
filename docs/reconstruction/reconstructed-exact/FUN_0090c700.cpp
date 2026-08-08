@@ -1,84 +1,55 @@
 // =============================================================================
-// FUN_0090c700
+// FUN_0090c700  — twin of MedalUI_PrepClearButtonSlots_Inferred (aa_0090c700)
 // -----------------------------------------------------------------------------
-// Stable ID: aa_0090c700
-// Address:   0x0090c700  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x0090c700–0x0090c74c inclusive (77 B / 0x4D)
+// Wave:      MEGA-102 OWN-ONLY dual 2026-08-05
+// System:    missions-progression / Medal UI prep
+// Exactness: Behavior-preserving rewrite. Prefer named clean source.
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0090c700 @ 0x0090c700
-// Stable ID: aa_0090c700
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~24 non-empty decompiler lines.
-//  - Control keywords: if×3, do×1, while×1, return×1.
-//  - Notable callees: FUN_0090c700.
-//  - Return sites: 1.
+using VFunc0_RetChar = char(__thiscall*)(void* self);
+using VFunc1_Ptr     = void(__thiscall*)(void* self, void* child);
+using ScalarDtor     = void(__thiscall*)(void* self, int flags);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void FUN_0090c700(void)
-
-
-
+// EDI = host (caller-seeded). Bare RET. void.
+extern "C" void FUN_0090c700(void /* EDI = host */)
 {
+  void* host;
+  uint32_t* slot;
+  int remaining;
 
-  char cVar1;
+#if defined(_MSC_VER) && defined(_M_IX86)
+  __asm {
+    mov host, edi
+  }
+#else
+  host = nullptr;
+#endif
 
-  int iVar2;
-
-  int *piVar3;
-
-  int *unaff_EDI;
-
-  
-
-  piVar3 = unaff_EDI + 0x150;
-
-  iVar2 = 0x18;
+  // LEA ESI,[EDI+0x540]; MOV EBX,0x18
+  slot = reinterpret_cast<uint32_t*>(
+      reinterpret_cast<uint8_t*>(host) + 0x540);
+  remaining = 0x18;
 
   do {
-
-    if (*piVar3 != 0) {
-
-      cVar1 = (**(code **)(*unaff_EDI + 0x3d8))();
-
-      if (cVar1 != '\0') {
-
-        (**(code **)(*unaff_EDI + 0xb0))(*piVar3);
-
+    if (*slot != 0) {
+      void** hostVtbl = *reinterpret_cast<void***>(host);
+      char active = reinterpret_cast<VFunc0_RetChar>(hostVtbl[0x3d8 / 4])(host);
+      if (active != 0) {
+        reinterpret_cast<VFunc1_Ptr>(hostVtbl[0xb0 / 4])(
+            host, reinterpret_cast<void*>(*slot));
       }
-
-      if ((uint32_t /* width from decompiler */ *)*piVar3 != (uint32_t /* width from decompiler */ *)0x0) {
-
-        (*(code *)**(uint32_t /* width from decompiler */ **)*piVar3)(1);
-
+      if (*slot != 0) {
+        void* widget = reinterpret_cast<void*>(*slot);
+        void** wVtbl = *reinterpret_cast<void***>(widget);
+        reinterpret_cast<ScalarDtor>(wVtbl[0])(widget, 1);
       }
-
-      *piVar3 = 0;
-
+      *slot = 0;
     }
-
-    piVar3 = piVar3 + 1;
-
-    iVar2 = iVar2 + -1;
-
-  } while (iVar2 != 0);
-
-  return;
-
+    slot += 1;
+    remaining -= 1;
+  } while (remaining != 0);
 }

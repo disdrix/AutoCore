@@ -1,64 +1,34 @@
 // =============================================================================
-// FUN_005226e0
+// FUN_005226e0  (clean twin of Character_SumCommodityTierMaxCapacities_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_005226e0
 // Address:   0x005226e0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    inventory-transfer
+// Generated: 2026-08-05 R13-034 dual seal
+// Exactness: Behavior-preserving rewrite of decompiler control flow + bytes ABI.
+// Bit-for-bit vs retail EXE: DEFERRED
 // =============================================================================
+// Prefer named twin: Character_SumCommodityTierMaxCapacities_Inferred.cpp
 
-// PURPOSE (auto): Scaffold unit for FUN_005226e0 @ 0x005226e0
-// Stable ID: aa_005226e0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~14 non-empty decompiler lines.
-//  - Control keywords: do×1, while×1, return×1.
-//  - Notable callees: FUN_00520340, FUN_005226e0.
-//  - Return sites: 1.
+struct Character;
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+extern int __thiscall Character_CalcCommodityTierMaxCapacity_Inferred(
+    Character* self,
+    uint32_t tier);
 
-int FUN_005226e0(void)
-
-
-
+// Ghidra symbol retained for path parity with scaffold twin.
+int __thiscall FUN_005226e0(Character* self)
 {
-
-  int iVar1;
-
-  int iVar2;
-
-  int iVar3;
-
-  
-
-  iVar3 = 0;
-
-  iVar1 = 0;
+  int sum = 0;
+  int tier = 0;
 
   do {
+    tier = tier + 1;
+    sum += Character_CalcCommodityTierMaxCapacity_Inferred(
+        self, static_cast<uint32_t>(tier));
+  } while (tier < 5);
 
-    iVar1 = iVar1 + 1;
-
-    iVar2 = FUN_00520340(iVar1);
-
-    iVar3 = iVar3 + iVar2;
-
-  } while (iVar1 < 5);
-
-  return iVar3;
-
+  return sum;
 }

@@ -1,52 +1,22 @@
 // =============================================================================
-// FUN_0051de60
+// FUN_0051de60  (scaffold twin of SkillCNDHash_ScalarDeletingDtor_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0051de60
-// Address:   0x0051de60  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x0051de60–0x0051de7d inclusive (30 B)
+// Wave:      2026-08-04 WQ9F-H OWN dual A/B
+// Named:     reconstructed-exact/SkillCNDHash_ScalarDeletingDtor_Inferred.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0051de60 @ 0x0051de60
-// Stable ID: aa_0051de60
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~9 non-empty decompiler lines.
-//  - Control keywords: return×2, if×1.
-//  - Notable callees: FUN_0051de60, FUN_0051de80.
-//  - Return sites: 2.
+extern "C" void __thiscall FUN_0051de80(void* self);
+extern "C" void __cdecl operator_delete(void* p);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void * __thiscall FUN_0051de60(void *param_1,byte param_2)
-
-
-
+extern "C" void* __thiscall FUN_0051de60(void* self, uint8_t flags)
 {
-
-  FUN_0051de80();
-
-  if ((param_2 & 1) != 0) {
-
-                    /* WARNING: Subroutine does not return */
-
-    operator_delete(param_1);
-
+  FUN_0051de80(self);
+  if ((flags & 1u) != 0u) {
+    operator_delete(self);
   }
-
-  return param_1;
-
+  return self;
 }

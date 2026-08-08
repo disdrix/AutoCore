@@ -1,50 +1,50 @@
 // =============================================================================
-// FUN_00933310
+// FUN_00933310  (twin of Client_UI_RefreshInventoryWindows_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00933310
 // Address:   0x00933310  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Prefer:    reconstructed-exact/Client_UI_RefreshInventoryWindows_Inferred.cpp
+// Generated: 2026-08-05 MEGA-099 — Ghidra-symbol twin kept for index stability.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00933310 @ 0x00933310
-// Stable ID: aa_00933310
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~7 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_00402b30, FUN_00933310.
-//  - Return sites: 1.
+struct MapShell_Isnil31;
+struct InsertPair_Isnil31;
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+extern "C" InsertPair_Isnil31 *FUN_00402b30(
+    MapShell_Isnil31 *map /*EAX*/,
+    InsertPair_Isnil31 *out /*stack*/,
+    const void *value /*EBX*/);
 
-void FUN_00933310(void)
-
-
-
+// Assembly-corrected ABI (decompiler void(void) rejected).
+extern "C" void FUN_00933310(
+    /*EAX*/ void *itemOrObject,
+    /*CL*/  uint8_t flag,
+    /*stack*/ void *client,
+    int a1,
+    int a2,
+    int a3,
+    int a4)
 {
+  alignas(4) uint8_t value_blob[0x20]{};
+  InsertPair_Isnil31 out{};
 
-  uint32_t /* width from decompiler */ in_stack_00000010;
+  *reinterpret_cast<uint32_t *>(value_blob + 0x00) =
+      static_cast<uint32_t>(reinterpret_cast<uintptr_t>(itemOrObject));
+  *reinterpret_cast<uint32_t *>(value_blob + 0x08) =
+      *reinterpret_cast<uint32_t *>(value_blob + 0x00);
 
-  uint32_t /* width from decompiler */ in_stack_00000014;
+  uint32_t pack = 0;
+  reinterpret_cast<uint8_t *>(&pack)[0] = static_cast<uint8_t>(a1);
+  reinterpret_cast<uint8_t *>(&pack)[1] = flag;
+  *reinterpret_cast<uint32_t *>(value_blob + 0x0C) = pack;
+  *reinterpret_cast<uint32_t *>(value_blob + 0x10) = static_cast<uint32_t>(a2);
+  *reinterpret_cast<uint32_t *>(value_blob + 0x18) = static_cast<uint32_t>(a3);
+  *reinterpret_cast<uint32_t *>(value_blob + 0x1C) = static_cast<uint32_t>(a4);
 
-  
+  auto *map = reinterpret_cast<MapShell_Isnil31 *>(
+      reinterpret_cast<uint8_t *>(client) + 0xF14);
 
-  FUN_00402b30(&stack0x00000010);
-
-  return;
-
+  (void)FUN_00402b30(map, &out, value_blob);
 }

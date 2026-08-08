@@ -1,86 +1,35 @@
 // =============================================================================
-// FUN_00520340
+// FUN_00520340  (clean twin → Character_CalcCommodityTierMaxCapacity_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00520340
 // Address:   0x00520340  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    inventory-transfer
+// Generated: 2026-08-05 R12-018 dual seal
+// Exactness: Behavior-preserving rewrite of decompiler control flow.
+// Bit-for-bit vs retail EXE: DEFERRED
 // =============================================================================
+//
+// Named clean twin: Character_CalcCommodityTierMaxCapacity_Inferred.cpp
+// This file keeps the Ghidra symbol as the primary identifier for twin lookup.
 
-// PURPOSE (auto): Scaffold unit for FUN_00520340 @ 0x00520340
-// Stable ID: aa_00520340
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cmath>
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~24 non-empty decompiler lines.
-//  - Control keywords: return×6, switch×1.
-//  - Notable callees: ROUND×5, floor×5, FUN_00520340.
-//  - Return sites: 6.
+struct Character;
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+static constexpr float kTierScale[6] = {
+    0.0f, 3.5f, 2.8f, 2.1f, 1.4f, 0.7f,
+};
 
-/* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
-
-
-
-int __thiscall FUN_00520340(int param_1,uint32_t /* width from decompiler */ param_2)
-
-
-
+// Ghidra: FUN_00520340
+int __thiscall FUN_00520340(Character* self, uint32_t tier)
 {
-
-  double dVar1;
-
-  
-
-  switch(param_2) {
-
-  case 1:
-
-    dVar1 = floor((double)((float)*(byte *)(param_1 + 0x599) * _DAT_009da8a4));
-
-    return (int)ROUND(dVar1);
-
-  case 2:
-
-    dVar1 = floor((double)((float)*(byte *)(param_1 + 0x599) * _DAT_00aaaa3c));
-
-    return (int)ROUND(dVar1);
-
-  case 3:
-
-    dVar1 = floor((double)((float)*(byte *)(param_1 + 0x599) * _DAT_009cefc0));
-
-    return (int)ROUND(dVar1);
-
-  case 4:
-
-    dVar1 = floor((double)((float)*(byte *)(param_1 + 0x599) * _DAT_009cefbc));
-
-    return (int)ROUND(dVar1);
-
-  case 5:
-
-    dVar1 = floor((double)((float)*(byte *)(param_1 + 0x599) * DAT_00a0f710));
-
-    return (int)ROUND(dVar1);
-
-  default:
-
+  if (tier < 1u || tier > 5u) {
     return 0;
-
   }
 
+  const auto* base = reinterpret_cast<const uint8_t*>(self);
+  const uint32_t level = base[0x599];
+  const double prod = static_cast<double>(static_cast<float>(level) * kTierScale[tier]);
+  return static_cast<int>(std::floor(prod));
 }

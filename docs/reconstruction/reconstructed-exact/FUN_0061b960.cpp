@@ -1,50 +1,36 @@
 // =============================================================================
-// FUN_0061b960
+// FUN_0061b960  (scaffold twin → Skill_HB_CopyTfid16At668_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0061b960
 // Address:   0x0061b960  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    skills-abilities
+// Dual:      2026-08-05 MEGA-016 OWN-ONLY
+//
+// Canonical clean source:
+//   docs/reconstruction/reconstructed-exact/Skill_HB_CopyTfid16At668_Inferred.cpp
+//
+// This file keeps the Ghidra machine name as a twin entry point for path
+// stability. Prefer the named clean source for ports.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0061b960 @ 0x0061b960
-// Stable ID: aa_0061b960
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~8 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_0061b960.
-//  - Return sites: 1.
+struct TFID_16 {
+  std::uint32_t dwCoidLo;
+  std::uint32_t dwCoidHi;
+  std::uint32_t uGlobalAndPad;
+  std::uint32_t uPadTail;
+};
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __thiscall FUN_0061b960(int param_1,uint32_t /* width from decompiler */ *param_2)
-
-
-
+// Ghidra: void __thiscall FUN_0061b960(int param_1, undefined4 *param_2)
+// Sealed ABI: ret 4; EAX = out; ECX = this; four dwords from this+0x668.
+TFID_16 *__thiscall FUN_0061b960(void *param_1, TFID_16 *param_2)
 {
-
-  *param_2 = *(uint32_t /* width from decompiler */ *)(param_1 + 0x668);
-
-  param_2[1] = *(uint32_t /* width from decompiler */ *)(param_1 + 0x66c);
-
-  param_2[2] = *(uint32_t /* width from decompiler */ *)(param_1 + 0x670);
-
-  param_2[3] = *(uint32_t /* width from decompiler */ *)(param_1 + 0x674);
-
-  return;
-
+  const auto *src = reinterpret_cast<const std::uint32_t *>(
+      reinterpret_cast<const char *>(param_1) + 0x668);
+  param_2->dwCoidLo = src[0];
+  param_2->dwCoidHi = src[1];
+  param_2->uGlobalAndPad = src[2];
+  param_2->uPadTail = src[3];
+  return param_2;
 }

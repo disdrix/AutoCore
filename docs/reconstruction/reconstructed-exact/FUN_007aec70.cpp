@@ -1,72 +1,33 @@
 // =============================================================================
-// FUN_007aec70
+// FUN_007aec70  (twin of CNDUIWindow_ReleaseOwnedRefPtrAt294_ClearText_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_007aec70
 // Address:   0x007aec70  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Body:      0x007aec70–0x007aecc3 inclusive (84 B / 0x54)
+// Wave:      WQ9L-G OWN-ONLY dual 2026-08-05
+// Canonical: CNDUIWindow_ReleaseOwnedRefPtrAt294_ClearText_Inferred
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_007aec70 @ 0x007aec70
-// Stable ID: aa_007aec70
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~18 non-empty decompiler lines.
-//  - Control keywords: if×2, return×2.
-//  - Notable callees: FUN_007aec70, FUN_0096efd0.
-//  - Return sites: 2.
+extern "C" void __fastcall RefCountedPtr_Dtor_Inferred(void** self);
+extern "C" void __cdecl operator_delete(void* p);
+extern const char DAT_00a1419b;
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __fastcall FUN_007aec70(int *param_1)
-
-
-
+extern "C" void __fastcall FUN_007aec70(uint8_t* self /*ECX*/)
 {
-
-  void *pvVar1;
-
-  
-
-  pvVar1 = (void *)param_1[0xa5];
-
-  if (pvVar1 != (void *)0x0) {
-
-    if (*(char *)((int)param_1 + 0xbb) != '\0') {
-
-      FUN_0096efd0();
-
-                    /* WARNING: Subroutine does not return */
-
-      operator_delete(pvVar1);
-
+  void* shell = *reinterpret_cast<void**>(self + 0x294);
+  if (shell != nullptr) {
+    if (self[0xBB] != 0) {
+      RefCountedPtr_Dtor_Inferred(reinterpret_cast<void**>(shell));
+      operator_delete(shell);
     }
-
-    param_1[0xa5] = 0;
-
-    *(uint8_t *)((int)param_1 + 0xbb) = 0;
-
-    (**(code **)(*param_1 + 0x2b4))(&DAT_00a1419b);
-
+    *reinterpret_cast<void**>(self + 0x294) = nullptr;
+    self[0xBB] = 0;
+    void** vtbl = *reinterpret_cast<void***>(self);
+    using Vfn = void(__thiscall*)(void* self, const char* text);
+    reinterpret_cast<Vfn>(vtbl[0x2B4 / 4])(self, &DAT_00a1419b);
   }
-
-  param_1[0xa7] = 0;
-
-  param_1[0xa8] = 0;
-
-  return;
-
+  *reinterpret_cast<uint32_t*>(self + 0x29C) = 0;
+  *reinterpret_cast<uint32_t*>(self + 0x2A0) = 0;
 }

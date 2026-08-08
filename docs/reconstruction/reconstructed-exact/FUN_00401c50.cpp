@@ -1,136 +1,34 @@
 // =============================================================================
-// FUN_00401c50
+// FUN_00401c50 — scaffold twin of StdMap_StringKey_InsertOrFind_Via401db0_Inferred
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00401c50
-// Address:   0x00401c50  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00401c50–0x00401d26 inclusive (215 B / 0xD7)
+// Agent:     MEGA-064 OWN-ONLY dual 2026-08-05
+// Canonical: docs/reconstruction/reconstructed-exact/
+//            StdMap_StringKey_InsertOrFind_Via401db0_Inferred.cpp
+// Exactness: Ghidra symbol retained for xref continuity; prefer named clean.
+// Terminal:  false
 // =============================================================================
+//
+// Prior Named_CalleeOf_Named_CalleeOf_Mission_Attempting_to_open_null_d_00401c50
+// scaffold RETIRED — chain-of-caller plate is not product English.
+//
+// See named clean for full ABI/structs/CF. This twin keeps FUN_* entry for
+// tools that resolve by Ghidra symbol only.
 
-// PURPOSE (auto): Scaffold unit for FUN_00401c50 @ 0x00401c50
-// Stable ID: aa_00401c50
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~50 non-empty decompiler lines.
-//  - Control keywords: if×4, return×3, while×1.
-//  - Notable callees: FUN_00401db0×2, FUN_00401c50, FUN_004313d0.
-//  - Return sites: 3.
+// Forward to named reconstruction (link-time / documentation twin).
+extern "C" void* StdMap_StringKey_InsertOrFind_Via401db0_Inferred(
+    void* map /*stack*/,
+    const void* key /*EAX*/,
+    void* out /*EBX*/);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void FUN_00401c50(int param_1)
-
-
-
+// Ghidra symbol alias — same body, same ABI (stack map + EAX key + EBX out; RET 4).
+extern "C" void* FUN_00401c50(
+    void* map /*stack*/,
+    const void* key /*EAX*/,
+    void* out /*EBX*/)
 {
-
-  char cVar1;
-
-  uint32_t /* width from decompiler */ *puVar2;
-
-  bool bVar3;
-
-  bool bVar4;
-
-  basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> *in_EAX;
-
-  uint32_t /* width from decompiler */ *puVar5;
-
-  uint32_t /* width from decompiler */ *unaff_EBX;
-
-  uint32_t /* width from decompiler */ *puVar6;
-
-  
-
-  puVar5 = (uint32_t /* width from decompiler */ *)(*(uint32_t /* width from decompiler */ **)(param_1 + 4))[1];
-
-  bVar3 = true;
-
-  cVar1 = *(char *)((int)puVar5 + 0x2d);
-
-  puVar2 = *(uint32_t /* width from decompiler */ **)(param_1 + 4);
-
-  while (cVar1 == '\0') {
-
-    bVar3 = std::operator<<char,struct_std::char_traits<char>,class_std::allocator<char>_>
-
-                      (in_EAX,(basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>
-
-                               *)(puVar5 + 3));
-
-    if (bVar3) {
-
-      puVar6 = (uint32_t /* width from decompiler */ *)*puVar5;
-
-    }
-
-    else {
-
-      puVar6 = (uint32_t /* width from decompiler */ *)puVar5[2];
-
-    }
-
-    puVar2 = puVar5;
-
-    puVar5 = puVar6;
-
-    cVar1 = *(char *)((int)puVar6 + 0x2d);
-
-  }
-
-  if (bVar3 != false) {
-
-    if (puVar2 == (uint32_t /* width from decompiler */ *)**(int **)(param_1 + 4)) {
-
-      puVar5 = (uint32_t /* width from decompiler */ *)FUN_00401db0(&param_1,1,in_EAX);
-
-      *unaff_EBX = *puVar5;
-
-      *(uint8_t *)(unaff_EBX + 1) = 1;
-
-      return;
-
-    }
-
-    FUN_004313d0();
-
-  }
-
-  bVar4 = std::operator<<char,struct_std::char_traits<char>,class_std::allocator<char>_>
-
-                    ((basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> *
-
-                     )(puVar2 + 3),in_EAX);
-
-  if (bVar4) {
-
-    puVar5 = (uint32_t /* width from decompiler */ *)FUN_00401db0(&param_1,bVar3,in_EAX);
-
-    *unaff_EBX = *puVar5;
-
-    *(uint8_t *)(unaff_EBX + 1) = 1;
-
-    return;
-
-  }
-
-  *unaff_EBX = puVar2;
-
-  *(uint8_t *)(unaff_EBX + 1) = 0;
-
-  return;
-
+  return StdMap_StringKey_InsertOrFind_Via401db0_Inferred(map, key, out);
 }

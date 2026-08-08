@@ -1,76 +1,56 @@
 // =============================================================================
-// FUN_00756be0
+// FUN_00756be0  (twin of gfxUIWindow_DetachParent_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00756be0
-// Address:   0x00756be0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00756be0–0x00756c44 inclusive (101 B / 0x65)
+// Module:    autoassault.exe (image base 0x400000)
+// System:    gfxUIWindow / CNDUIDialog child-list unlink
+// Generated: 2026-08-05 MEGA-121 dual seal (replaces 2026-07-23 scaffold)
+// Exactness: Behavior-preserving rewrite of decompiler control flow.
+// Bit-for-bit vs retail EXE: DEFERRED.
 // =============================================================================
+//
+// Canonical named unit: gfxUIWindow_DetachParent_Inferred.cpp
+// Scaffold Named_CalleeOf_Named_gfxUIWindow_00756be0.cpp RETIRED.
 
-// PURPOSE (auto): Scaffold unit for FUN_00756be0 @ 0x00756be0
-// Stable ID: aa_00756be0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
+#include <cstring>
 
-// READABILITY (auto CF):
-//  - Body size: ~20 non-empty decompiler lines.
-//  - Control keywords: if×3, return×2, do×1, while×1.
-//  - Notable callees: FUN_00756be0, memmove.
-//  - Return sites: 2.
-
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-uint32_t /* width from decompiler */ __thiscall FUN_00756be0(int param_1,int param_2)
-
-
-
+// __thiscall: ECX = parent; stack = child*; RET 4
+// 0 = erased from parent vector + cleared child+0x88; 0xffffffff = not found
+extern "C" std::uint32_t __thiscall FUN_00756be0(void *parent, void *child)
 {
+  auto *const p = reinterpret_cast<std::uint8_t *>(parent);
+  auto *const c = reinterpret_cast<std::uint8_t *>(child);
 
-  int *piVar1;
+  auto **end = *reinterpret_cast<void ***>(p + 0x98);
+  auto **it  = *reinterpret_cast<void ***>(p + 0x94);
 
-  int *_Dst;
-
-  
-
-  piVar1 = *(int **)(param_1 + 0x98);
-
-  _Dst = *(int **)(param_1 + 0x94);
-
-  if (_Dst != piVar1) {
-
+  if (it != end) {
     do {
+      if (*it == child) {
+        break;
+      }
+      ++it;
+    } while (it != end);
 
-      if (*_Dst == param_2) break;
+    if (it != end) {
+      void **const found = it;
+      void **const src   = found + 1;
+      const auto end_bytes =
+          reinterpret_cast<std::uintptr_t>(
+              *reinterpret_cast<void ***>(p + 0x98));
+      const auto src_bytes = reinterpret_cast<std::uintptr_t>(src);
+      const std::size_t nbytes =
+          static_cast<std::size_t>(((end_bytes - src_bytes) >> 2) * 4);
 
-      _Dst = _Dst + 1;
-
-    } while (_Dst != piVar1);
-
-    if (_Dst != piVar1) {
-
-      memmove(_Dst,_Dst + 1,(*(int *)(param_1 + 0x98) - (int)(_Dst + 1) >> 2) * 4);
-
-      *(int *)(param_1 + 0x98) = *(int *)(param_1 + 0x98) + -4;
-
-      *(uint32_t /* width from decompiler */ *)(param_2 + 0x88) = 0;
-
+      std::memmove(found, src, nbytes);
+      *reinterpret_cast<std::uint32_t *>(p + 0x98) =
+          *reinterpret_cast<std::uint32_t *>(p + 0x98) - 4;
+      *reinterpret_cast<std::uint32_t *>(c + 0x88) = 0;
       return 0;
-
     }
-
   }
 
-  return 0xffffffff;
-
+  return 0xffffffffu;
 }

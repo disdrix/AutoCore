@@ -1,70 +1,17 @@
-// =============================================================================
-// Named_CalleeOf_Named_VOG_DEBUG_STOP_00418d70
+﻿// =============================================================================
+// Named_CalleeOf_Named_VOG_DEBUG_STOP_00418d70  (SUPERSEDED plate)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00418d70
-// Callee of Named_VOG_DEBUG_STOP (+3 other named callers)
-// Address:   0x00418d70  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00418d70
+// Status:    SUPERSEDED 2026-08-05 by R10-025 dual seal
+// Canonical: StdVector_PushBack_Elem8_EcxVec_StackVal_Inferred
+// Reason:    Prior name was parent-string only ("VOG_DEBUG_STOP" is the
+//            parent failure path, not this function). Body is generic
+//            vector::push_back for 8-byte POD (thiscall ECX=vec, stack val*).
+// See:       StdVector_PushBack_Elem8_EcxVec_StackVal_Inferred.cpp
+//            FUN_00418d70.cpp
+//            docs/agents/task-dual-ab-00418d70-r10-report.md
 // =============================================================================
 
-// PURPOSE (auto): Called from Named_VOG_DEBUG_STOP: callee helper with no high-value strings in clean/raw. Role inferred from parent name only; refine when decompile strings or xrefs improve. Named_VOG_DEBUG_STOP (+3 other named callers).
-// Readability: control flow preserved from Ghidra decompile; types tentative.
-
-// READABILITY (auto CF):
-//  - Body size: ~16 non-empty decompiler lines.
-//  - Control keywords: return×2, if×1.
-//  - Notable callees: FUN_00418d70, FUN_00418e10.
-//  - Return sites: 2.
-
-/*
- * Behavioral notes:
- * Callee of Named_VOG_DEBUG_STOP (+3 other named callers)
- * Xref/callee-driven rename (parent seed scan)
- *
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __thiscall Named_CalleeOf_Named_VOG_DEBUG_STOP_00418d70(int param_1,uint32_t /* width from decompiler */ *param_2)
-
-
-
-{
-
-  int iVar1;
-
-  uint32_t /* width from decompiler */ *puVar2;
-
-  
-
-  iVar1 = *(int *)(param_1 + 4);
-
-  if ((iVar1 != 0) &&
-
-     ((uint)(*(int *)(param_1 + 8) - iVar1 >> 3) < (uint)(*(int *)(param_1 + 0xc) - iVar1 >> 3))) {
-
-    puVar2 = *(uint32_t /* width from decompiler */ **)(param_1 + 8);
-
-    *puVar2 = *param_2;
-
-    puVar2[1] = param_2[1];
-
-    *(uint32_t /* width from decompiler */ **)(param_1 + 8) = puVar2 + 2;
-
-    return;
-
-  }
-
-  FUN_00418e10(&param_2,*(uint32_t /* width from decompiler */ *)(param_1 + 8),param_2);
-
-  return;
-
-}
+// This file intentionally left as a redirect stub so old links resolve.
+// Do not treat Named_CalleeOf_Named_VOG_DEBUG_STOP_00418d70 as canonical.

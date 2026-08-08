@@ -1,15 +1,15 @@
 // =============================================================================
-// UI_mail_bg_frame_deposit
+// UI_mail_bg_frame_deposit  — SUPERSEDED scaffold alias (do not use as primary)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_008b84a0
 // Address:   0x008b84a0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// R13-013 (2026-08-05): renamed to UI_Mail2dPanel_BuildChrome_Inferred
+//   → reconstructed-exact/UI_Mail2dPanel_BuildChrome_Inferred.cpp
+// This filename retained only as legacy twin; plate "bg_frame_deposit" is one
+// send-arm child XML, not the method role.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for UI_mail_bg_frame_deposit @ 0x008b84a0
+// PURPOSE: legacy scaffold twin for aa_008b84a0 — prefer named clean.
 // Stable ID: aa_008b84a0
 // Embedded strings (evidence for future rename):
 //   - "i_d_mail_2d_tab_receive.xml"

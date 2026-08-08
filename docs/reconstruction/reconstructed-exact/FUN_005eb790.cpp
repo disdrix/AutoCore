@@ -1,52 +1,33 @@
 // =============================================================================
-// FUN_005eb790
+// FUN_005eb790  (clean twin of VOGPhysics_QueryCollect_Ctor_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_005eb790
 // Address:   0x005eb790  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Range:     0x005eb790–0x005eb7c0 inclusive (49 B / 0x31); pad CC after
+// System:    interaction-activation
+// Generated: 2026-08-05 R12-037 dual seal
+// Exactness: Behavior-preserving rewrite of decompiler/assembly control flow.
+// Bit-for-bit vs retail EXE: DEFERRED.
+// Runtime Confirmed: OPEN (no Launcher this wave).
+// Named twin: VOGPhysics_QueryCollect_Ctor_Inferred.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_005eb790 @ 0x005eb790
-// Stable ID: aa_005eb790
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~9 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_005eb210, FUN_005eb790.
-//  - Return sites: 1.
+extern uint32_t * __thiscall FUN_005eb210(uint32_t *self /* ECX */, uint32_t params);
+extern uint32_t PTR_FUN_009dce20;
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-uint32_t /* width from decompiler */ * __thiscall FUN_005eb790(uint32_t /* width from decompiler */ *param_1,uint32_t /* width from decompiler */ param_2)
-
-
-
+uint32_t * __thiscall FUN_005eb790(
+    uint32_t *param_1 /* ECX = self */,
+    uint32_t param_2 /* stack = params */)
 {
+  FUN_005eb210(param_1, param_2);
 
-  FUN_005eb210(param_2);
-
-  *param_1 = &PTR_FUN_009dce20;
+  *param_1 = (uint32_t)(uintptr_t)&PTR_FUN_009dce20;
 
   param_1[0x30] = 0;
-
   param_1[0x31] = 0;
-
-  param_1[0x32] = 0x80000000;
+  param_1[0x32] = 0x80000000u;
 
   return param_1;
-
 }

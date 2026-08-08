@@ -1,88 +1,23 @@
-// =============================================================================
-// FUN_00538ab0
+﻿// =============================================================================
+// FUN_00538ab0  (twin of DisciplineDefMap_ExactFindByIntKey_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00538ab0
 // Address:   0x00538ab0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    skills-abilities
+// Dual:      R13-037 OWN-ONLY 2026-08-05 (dual start 2686)
+// Exactness: Behavior-preserving rewrite of decompiler + asm-sealed CF.
+// Bit-for-bit vs retail EXE: DEFERRED.
+// Runtime Confirmed: NOT claimed.
 // =============================================================================
+// Prefer named twin: DisciplineDefMap_ExactFindByIntKey_Inferred.cpp
+// Scaffold name Named_CalleeOf_Named_CalleeOf_Named_VOG_DEBUG_STOP_00538ab0 retired.
 
-// PURPOSE (auto): Scaffold unit for FUN_00538ab0 @ 0x00538ab0
-// Stable ID: aa_00538ab0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <stdint.h>
 
-// READABILITY (auto CF):
-//  - Body size: ~26 non-empty decompiler lines.
-//  - Control keywords: if×3, return×2, do×1, while×1.
-//  - Notable callees: FUN_00538ab0.
-//  - Return sites: 2.
+extern "C" void *__thiscall DisciplineDefMap_ExactFindByIntKey_Inferred(
+    void *self, void **pOut, const int *pKey);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __thiscall FUN_00538ab0(int param_1,uint32_t /* width from decompiler */ *param_2,int *param_3)
-
-
-
+extern "C" void *__thiscall FUN_00538ab0(void *param_1, void **param_2, const int *param_3)
 {
-
-  uint32_t /* width from decompiler */ *puVar1;
-
-  uint32_t /* width from decompiler */ *puVar2;
-
-  uint32_t /* width from decompiler */ *puVar3;
-
-  
-
-  puVar3 = *(uint32_t /* width from decompiler */ **)(param_1 + 4);
-
-  if (*(char *)((int)puVar3[1] + 0x20d) == '\0') {
-
-    puVar1 = (uint32_t /* width from decompiler */ *)puVar3[1];
-
-    do {
-
-      if ((int)puVar1[3] < *param_3) {
-
-        puVar2 = (uint32_t /* width from decompiler */ *)puVar1[2];
-
-      }
-
-      else {
-
-        puVar2 = (uint32_t /* width from decompiler */ *)*puVar1;
-
-        puVar3 = puVar1;
-
-      }
-
-      puVar1 = puVar2;
-
-    } while (*(char *)((int)puVar2 + 0x20d) == '\0');
-
-  }
-
-  if ((puVar3 != *(uint32_t /* width from decompiler */ **)(param_1 + 4)) && ((int)puVar3[3] <= *param_3)) {
-
-    *param_2 = puVar3;
-
-    return;
-
-  }
-
-  *param_2 = *(uint32_t /* width from decompiler */ **)(param_1 + 4);
-
-  return;
-
+  return DisciplineDefMap_ExactFindByIntKey_Inferred(param_1, param_2, param_3);
 }

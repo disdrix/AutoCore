@@ -1,50 +1,28 @@
-// =============================================================================
-// FUN_006c7fa0
+﻿// =============================================================================
+// FUN_006c7fa0  (twin of PhysicsShape_Sphere_CtorFromRadius_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_006c7fa0
 // Address:   0x006c7fa0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    interaction-activation / physics sphere shape
+// Generated: 2026-08-05 MEGA-071 dual seal (was 2026-07-23 scaffold)
+// Exactness: Behavior-preserving rewrite of decompiler control flow.
+// Bit-for-bit vs retail EXE: DEFERRED.
+// Canonical name: PhysicsShape_Sphere_CtorFromRadius_Inferred
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_006c7fa0 @ 0x006c7fa0
-// Stable ID: aa_006c7fa0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~8 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_006c7fa0.
-//  - Return sites: 1.
+extern "C" void *PTR_FUN_00a0d610[];
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __thiscall FUN_006c7fa0(uint32_t /* width from decompiler */ *param_1,uint32_t /* width from decompiler */ param_2)
-
-
-
+// __thiscall: ECX = this; stack float; RET 4; EAX = this
+extern "C" void *__thiscall FUN_006c7fa0(void *self, float radius)
 {
-
-  *(uint16_t *)((int)param_1 + 6) = 1;
-
-  param_1[2] = 0;
-
-  param_1[3] = param_2;
-
-  *param_1 = &PTR_FUN_00a0d610;
-
-  return;
-
+  *reinterpret_cast<std::uint16_t *>(reinterpret_cast<std::uint8_t *>(self) + 6) =
+      1;
+  *reinterpret_cast<std::uint32_t *>(reinterpret_cast<std::uint8_t *>(self) + 8) =
+      0;
+  *reinterpret_cast<float *>(reinterpret_cast<std::uint8_t *>(self) + 0xc) =
+      radius;
+  *reinterpret_cast<void ***>(self) = PTR_FUN_00a0d610;
+  return self;
 }

@@ -1,136 +1,84 @@
 // =============================================================================
-// FUN_004e52a0
+// FUN_004e52a0  (scaffold twin of StdTree_EraseRange_Isnil21_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_004e52a0
 // Address:   0x004e52a0  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    skills-abilities
+// Generated: 2026-08-05 R13-025 dual (was 2026-07-23 scaffold)
+// Exactness: Behavior-preserving rewrite of decompiler control flow.
+// Bit-for-bit vs retail EXE: DEFERRED.
+// Canonical: StdTree_EraseRange_Isnil21_Inferred
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_004e52a0 @ 0x004e52a0
-// Stable ID: aa_004e52a0
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+// See: StdTree_EraseRange_Isnil21_Inferred.cpp for named clean body.
+// This twin keeps the Ghidra symbol for inventory / emit tooling.
 
-// READABILITY (auto CF):
-//  - Body size: ~50 non-empty decompiler lines.
-//  - Control keywords: if×3, while×3, return×2.
-//  - Notable callees: FUN_004e2e40, FUN_004e3e70, FUN_004e52a0.
-//  - Return sites: 2.
+#include <cstdint>
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+struct MapNode_Isnil21 {
+  MapNode_Isnil21* left;
+  MapNode_Isnil21* parent;
+  MapNode_Isnil21* right;
+  std::uint8_t pad_0c[0x14];
+  std::uint8_t color;
+  std::uint8_t isnil;
+};
 
-void __thiscall FUN_004e52a0(int param_1,uint32_t /* width from decompiler */ *param_2,int *param_3,int *param_4)
+struct MapShell_Isnil21 {
+  void* unused0;
+  MapNode_Isnil21* head;
+  std::uint32_t size;
+};
 
+extern "C" void __thiscall FUN_004e2e40(MapShell_Isnil21* map,
+                                        MapNode_Isnil21* node);
+extern "C" void __thiscall FUN_004e3e70(MapShell_Isnil21* map,
+                                        MapNode_Isnil21** outIt,
+                                        MapNode_Isnil21* node);
 
-
+extern "C" void __thiscall FUN_004e52a0(
+    MapShell_Isnil21* map,
+    MapNode_Isnil21** outIt,
+    MapNode_Isnil21* first,
+    MapNode_Isnil21* last)
 {
+  MapNode_Isnil21* head = map->head;
 
-  char cVar1;
-
-  int *piVar2;
-
-  int *piVar3;
-
-  int *piVar4;
-
-  int *piVar5;
-
-  int *piVar6;
-
-  
-
-  piVar4 = param_4;
-
-  piVar6 = *(int **)(param_1 + 4);
-
-  piVar3 = param_3;
-
-  if ((param_3 == (int *)*piVar6) && (param_4 == piVar6)) {
-
-    FUN_004e2e40(piVar6[1]);
-
-    *(int *)(*(int *)(param_1 + 4) + 4) = *(int *)(param_1 + 4);
-
-    *(uint32_t /* width from decompiler */ *)(param_1 + 8) = 0;
-
-    *(uint32_t /* width from decompiler */ *)*(uint32_t /* width from decompiler */ *)(param_1 + 4) = *(uint32_t /* width from decompiler */ *)(param_1 + 4);
-
-    *(int *)(*(int *)(param_1 + 4) + 8) = *(int *)(param_1 + 4);
-
-    *param_2 = **(uint32_t /* width from decompiler */ **)(param_1 + 4);
-
+  if (first == head->left && last == head) {
+    FUN_004e2e40(map, head->parent);
+    head->parent = head;
+    map->size = 0;
+    head->left = head;
+    head->right = head;
+    *outIt = head->left;
     return;
-
   }
 
-  while (piVar3 != piVar4) {
-
-    piVar6 = piVar3;
-
-    if (*(char *)((int)piVar3 + 0x21) == '\0') {
-
-      piVar6 = (int *)piVar3[2];
-
-      if (*(char *)((int)piVar6 + 0x21) == '\0') {
-
-        cVar1 = *(char *)(*piVar6 + 0x21);
-
-        piVar2 = (int *)*piVar6;
-
-        while (cVar1 == '\0') {
-
-          cVar1 = *(char *)(*piVar2 + 0x21);
-
-          piVar6 = piVar2;
-
-          piVar2 = (int *)*piVar2;
-
+  while (first != last) {
+    MapNode_Isnil21* next = first;
+    if (first->isnil == 0) {
+      MapNode_Isnil21* r = first->right;
+      if (r->isnil == 0) {
+        next = r;
+        MapNode_Isnil21* l = next->left;
+        while (l->isnil == 0) {
+          next = l;
+          l = l->left;
         }
-
-      }
-
-      else {
-
-        cVar1 = *(char *)(piVar3[1] + 0x21);
-
-        piVar5 = (int *)piVar3[1];
-
-        piVar2 = piVar3;
-
-        while ((piVar6 = piVar5, cVar1 == '\0' && (piVar2 == (int *)piVar6[2]))) {
-
-          cVar1 = *(char *)(piVar6[1] + 0x21);
-
-          piVar5 = (int *)piVar6[1];
-
-          piVar2 = piVar6;
-
+      } else {
+        MapNode_Isnil21* p = first->parent;
+        MapNode_Isnil21* cur = first;
+        while (p->isnil == 0 && cur == p->right) {
+          cur = p;
+          p = p->parent;
         }
-
+        next = p;
       }
-
     }
-
-    FUN_004e3e70(&param_3,piVar3);
-
-    piVar3 = piVar6;
-
+    MapNode_Isnil21* slot = first;
+    FUN_004e3e70(map, &slot, first);
+    first = next;
   }
 
-  *param_2 = piVar3;
-
-  return;
-
+  *outIt = first;
 }

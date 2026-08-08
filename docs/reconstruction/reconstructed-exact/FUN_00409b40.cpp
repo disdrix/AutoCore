@@ -1,53 +1,29 @@
-// =============================================================================
-// FUN_00409b40
+﻿// =============================================================================
+// FUN_00409b40  (scaffold twin → StdVector_UninitCopyTrampoline_Elem12_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_00409b40
-// Address:   0x00409b40  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x00409b40–0x00409b5a inclusive (27 B / 0x1b)
+// Wave:      2026-08-05 R10-008 OWN dual A/B seal
+// Prefer:    StdVector_UninitCopyTrampoline_Elem12_Inferred.cpp
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_00409b40 @ 0x00409b40
-// Stable ID: aa_00409b40
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~5 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_00409b40, FUN_0040a590.
-//  - Return sites: 1.
+extern "C" void *StdVector_UninitializedCopy_Elem12_Inferred(
+    /*ECX*/ const void *src_end,
+    /*stack*/ const void *src_begin,
+    /*stack*/ void *dest);
 
-// READABILITY:
-// Control-flow (from raw @ 0x00409b40; evidence only — no invented semantics):
-//  - Entry: `void __fastcall FUN_00409b40(undefined4 param_1,undefined4 param_2,undefined4 param_3)`.
-//  - Calls: FUN_0040a590(param_3,param_2,param_1,param_3).
-//  - Returns (1 site(s)): `void`.
-
-
-
-
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-void __fastcall FUN_00409b40(uint32_t /* width from decompiler */ param_1,uint32_t /* width from decompiler */ param_2,uint32_t /* width from decompiler */ param_3)
-
-
-
+// ECX=host_unused; EDX=dest; stack begin,end; EAX=dest_end; RET 8
+extern "C" void *__fastcall FUN_00409b40(
+    void * /*ECX*/ host_unused,
+    void * /*EDX*/ dest,
+    const void *src_begin,
+    const void *src_end)
 {
-
-  FUN_0040a590(param_3,param_2,param_1,param_3);
-
-  return;
-
+  (void)host_unused;
+  return StdVector_UninitializedCopy_Elem12_Inferred(
+      /*ECX*/ src_end,
+      /*stack*/ src_begin,
+      /*stack*/ dest);
 }

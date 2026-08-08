@@ -32,3 +32,21 @@ undefined4 FUN_004bb0d0(undefined4 *param_1)
   return 0;
 }
 ```
+
+---
+
+## v2026-08-04 WQ9R-D dual seal append
+
+| Field | Value |
+|---|---|
+| **Tool** | Ghidra MCP `batch_decompile` + `read_memory` + `analyze_function_complete` + xrefs |
+| **Canonical (sealed)** | `Object_ResolveTfIdVtbl1dc_Inferred` |
+| **Body** | `0x004bb0d0`–`0x004bb0f9` (42 B) |
+| **Body hex** | `8b4424048b5004528b108a40085250e88cfdffff85c0740d8b108bc8ff92dc010000c2040033c0c20400` |
+| **ABI** | ECX = resolve ctx (passthrough); stack blob*; `RET 4` |
+| **Virtual** | `vtbl+0x1dc` (`FF 92 DC 01 00 00`) |
+| **Callee** | `CVOGReaction_ResolveObjectTarget` @ `0x004bae70` |
+| **Xrefs** | 9 |
+| **Dual** | accept-with-gaps A+B |
+
+Integrity: prior raw body preserved; this section append-only.

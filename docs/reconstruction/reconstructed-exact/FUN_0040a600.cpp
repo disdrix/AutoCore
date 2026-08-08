@@ -1,68 +1,43 @@
-// =============================================================================
-// FUN_0040a600
+﻿// =============================================================================
+// FUN_0040a600  (scaffold twin of SkillSet_Vector_UninitializedCopy_0x18_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_0040a600
-// Address:   0x0040a600  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// Address:   0x0040a600–0x0040a664 inclusive (101 B)
+// System:    skills-abilities / STL SkillSet vector
+// Generated: 2026-08-05 MEGA-055 — twin kept; prefer named clean plate
+// Named:     reconstructed-exact/SkillSet_Vector_UninitializedCopy_0x18_Inferred.cpp
+// Retired:   Named_CalleeOf_Skill_Uses_SkillSet_GetEntryCount_0040a600.cpp
+// Exactness: Behavior-preserving; not modernization. Bit-for-bit: DEFERRED.
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_0040a600 @ 0x0040a600
-// Stable ID: aa_0040a600
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~16 non-empty decompiler lines.
-//  - Control keywords: for×1, return×1.
-//  - Notable callees: FUN_0040a600, FUN_00412b10.
-//  - Return sites: 1.
+// Callee FUN_00412b10: EAX=dest, ECX=src; copy 6 dwords if dest != null.
+extern "C" void FUN_00412b10(void);
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
-
-int __thiscall FUN_0040a600(int param_1,int param_2,int param_3)
-
-
-
+// Decompiler shape (Ghidra); real ABI is ECX=end + cdecl stack first/dest (see named plate).
+extern "C" int __cdecl FUN_0040a600(int src_end_as_ecx_register_arg,
+                                    int src_first,
+                                    int dest)
 {
+  // SEH: PUSH -1; PUSH LAB_009bd090; FS:[0] link — omitted
+  void* local_10;
+  uint8_t* puStack_c;
+  uint32_t local_8;
 
-  void *local_10;
+  (void)local_10;
+  (void)puStack_c;
+  (void)local_8;
 
-  uint8_t *puStack_c;
+  // Register ECX carries src_end on entry (Ghidra param_1).
+  int src_end = src_end_as_ecx_register_arg;
+  int cur = src_first;
+  int out = dest;
 
-  uint32_t /* width from decompiler */ local_8;
-
-  
-
-  puStack_c = &LAB_009bd090;
-
-  local_10 = ExceptionList;
-
-  local_8 = 0;
-
-  ExceptionList = &local_10;
-
-  for (; param_2 != param_1; param_2 = param_2 + 0x18) {
-
+  for (; cur != src_end; cur += 0x18) {
+    // bytes: MOV ECX,ESI; MOV EAX,EDI; CALL FUN_00412b10
     FUN_00412b10();
-
-    param_3 = param_3 + 0x18;
-
+    out += 0x18;
   }
-
-  ExceptionList = local_10;
-
-  return param_3;
-
+  return out;
 }

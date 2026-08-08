@@ -1,44 +1,23 @@
 // =============================================================================
-// FUN_004e5810
+// FUN_004e5810  (scaffold twin — prefer Object_CopyTfidVectorAtE7f8_Inferred)
 // -----------------------------------------------------------------------------
 // Stable ID: aa_004e5810
 // Address:   0x004e5810  (autoassault.exe, image base 0x400000)
-// System:    unknown
-// Generated: 2026-07-23 from raw capture (scaffold; refine for important units)
-// Exactness: Behavior-preserving rewrite of decompiler control flow. Not modernization.
-// Bit-for-bit vs retail EXE: DEFERRED (loaded image may differ slightly).
+// System:    inventory-transfer
+// Generated: 2026-08-05 R13-026 dual (forwards to named clean)
+// Exactness: Behavior-preserving. Not modernization.
+// Bit-for-bit vs retail EXE: DEFERRED.
+// Terminal:  false
 // =============================================================================
 
-// PURPOSE (auto): Scaffold unit for FUN_004e5810 @ 0x004e5810
-// Stable ID: aa_004e5810
-// No high-value strings recovered; name via xrefs/callers in follow-up.
-// Readability: control flow preserved from Ghidra decompile; types tentative.
+#include <cstdint>
 
-// READABILITY (auto CF):
-//  - Body size: ~5 non-empty decompiler lines.
-//  - Control keywords: return×1.
-//  - Notable callees: FUN_004e53e0, FUN_004e5810.
-//  - Return sites: 1.
+struct VectorU64Shell;
 
-/*
- * Behavioral notes:
- * - Derived from Ghidra decompile; names prefer Ghidra symbols / plate comments.
- * - Remaining FUN_* / DAT_* identifiers are unresolved pending type recovery.
- * - Runtime / differential verification: OPEN unless matrix says otherwise.
- *
- * Readability pass:
- * - undefinedN widths preserved as fixed-width integers where decompiler width is known.
- * - Control flow and call order preserved from authoritative raw.
- */
+extern "C" VectorU64Shell *__thiscall Object_CopyTfidVectorAtE7f8_Inferred(
+    void *self, VectorU64Shell *out);
 
-uint32_t /* width from decompiler */ __thiscall FUN_004e5810(int param_1,uint32_t /* width from decompiler */ param_2)
-
-
-
+extern "C" VectorU64Shell *__thiscall FUN_004e5810(void *self, VectorU64Shell *out)
 {
-
-  FUN_004e53e0(param_1 + 0xe7f8);
-
-  return param_2;
-
+  return Object_CopyTfidVectorAtE7f8_Inferred(self, out);
 }

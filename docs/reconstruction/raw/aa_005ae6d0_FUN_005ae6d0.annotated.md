@@ -1,178 +1,92 @@
-# Annotated low-level: FUN_005ae6d0
+# Annotated low-level: FUN_005ae6d0 → StdTree_EraseAndRebalance_Isnil21_Inferred
 
 | Field | Value |
 |---|---|
 | Stable ID | `aa_005ae6d0` |
 | VA | `0x005ae6d0` |
-| System | unknown |
-| Date | 2026-07-23 |
+| Body | `0x005ae6d0`–`0x005ae986` exclusive (**694 B** / `0x2B6`) |
+| Canonical name | `StdTree_EraseAndRebalance_Isnil21_Inferred` |
+| Ghidra symbol | `FUN_005ae6d0` |
+| System | MSVC std `_Tree` erase + RB rebalance (isnil@+0x21) |
+| Date | 2026-08-05 (R12-035 OWN dual; scaffold 2026-07-23) |
 
 ## Machine-level notes
 
-- Source: raw capture for `aa_005ae6d0`.
-- Prefer assembly when decompiler conflicts.
-- Recover types for still-generic parameters via callers/xrefs.
-- Map DAT_* globals and FUN_* callees in follow-up waves.
+- **ABI:** `__thiscall`; ECX = map shell; stack `Node** outIt`, `Node* node`; **`ret 8`**.
+- **Layout:** left@+0, parent@+4, right@+8, value@+0xC (16 B / Val16), color@**+0x20**, isnil@**+0x21**; node alloc **0x28**; map+4=head, map+8=size; head+0=leftmost, head+4=root, head+8=rightmost.
+- **Nil throw:** `cmp byte [node+0x21],0` → `"invalid map/set<T> iterator"` @ `0x00a152f0` → `_CxxThrowException(..., DAT_00acc34c)`.
+- **Successor:** `FUN_004e12c0` (isnil21 iterator++) before unlink.
+- **Unlink:** splice replacement child; fix parent link; update head leftmost (`FUN_004cb2c0` min) / rightmost (`FUN_00421a60` max) / root.
+- **Two-child path:** bytes at `0x005ae7f0`–`0x005ae835` (decomp marks unreachable) — successor-swap / transplant; present in retail.
+- **RB fixup:** if erased color black (`[node+0x20]==1`): while not root and sibling black-children recolor; Lrotate `FUN_0050e9f0` / Rrotate `FUN_005a27f0` (parent dual).
+- **Epilogue (decomp misses):** `operator_delete(node)` → if size>0 then size-- → `*outIt = succ` → SEH teardown → `add esp,0x54; ret 8`.
+- **Sole caller:** range erase `FUN_005af2e0` @ `0x005af37f` (`MOV ECX,EDI` seals thiscall).
 
-## Pseudocode (annotated copy of raw)
+## Pseudocode (annotated)
 
 ```c
-/* WARNING: Removing unreachable block (ram,0x005ae7f0) */
-/* WARNING: Removing unreachable block (ram,0x005ae800) */
-/* WARNING: Removing unreachable block (ram,0x005ae809) */
-/* WARNING: Removing unreachable block (ram,0x005ae80c) */
-/* WARNING: Removing unreachable block (ram,0x005ae7fc) */
-/* WARNING: Removing unreachable block (ram,0x005ae81a) */
-/* WARNING: Removing unreachable block (ram,0x005ae827) */
-/* WARNING: Removing unreachable block (ram,0x005ae832) */
-/* WARNING: Removing unreachable block (ram,0x005ae82e) */
-/* WARNING: Removing unreachable block (ram,0x005ae822) */
-/* WARNING: Removing unreachable block (ram,0x005ae835) */
-
-void __thiscall FUN_005ae6d0(int param_1,undefined4 param_2,int *param_3)
-
-{
-  undefined4 *puVar1;
-  int iVar2;
-  int *piVar3;
-  undefined4 uVar4;
-  int *piVar5;
-  int *piVar6;
-  basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> local_50 [28];
-  undefined **local_34 [3];
-  basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_> local_28 [28];
-  void *pvStack_c;
-  undefined1 *puStack_8;
-  int local_4;
-  
-  local_4 = 0xffffffff;
-  puStack_8 = &LAB_009a65a2;
-  pvStack_c = ExceptionList;
-  if (*(char *)((int)param_3 + 0x21) != '\0') {
-    ExceptionList = &pvStack_c;
-    std::basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>::
-    basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>
-              (local_50,"invalid map/set<T> iterator");
-    local_4 = 0;
-    exception::exception((exception *)local_34);
-    local_4._0_1_ = 1;
-    local_34[0] = &PTR_FUN_009c7628;
-    std::basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>::
-    basic_string<char,struct_std::char_traits<char>,class_std::allocator<char>_>(local_28,local_50);
-    local_4 = (uint)local_4._1_3_ << 8;
-    local_34[0] = &PTR_FUN_009c7640;
-                    /* WARNING: Subroutine does not return */
-    _CxxThrowException(local_34,(ThrowInfo *)&DAT_00acc34c);
-  }
-  ExceptionList = &pvStack_c;
-  FUN_004e12c0();
-  piVar6 = (int *)*param_3;
-  if (*(char *)((int)piVar6 + 0x21) == '\0') {
-    if (*(char *)(param_3[2] + 0x21) == '\0') {
-      piVar6 = (int *)param_3[2];
-    }
-  }
-  else {
-    piVar6 = (int *)param_3[2];
-  }
-  piVar5 = (int *)param_3[1];
-  if (*(char *)((int)piVar6 + 0x21) == '\0') {
-    piVar6[1] = (int)piVar5;
-  }
-  if (*(int **)(*(int *)(param_1 + 4) + 4) == param_3) {
-    *(int **)(*(int *)(param_1 + 4) + 4) = piVar6;
-  }
-  else if ((int *)*piVar5 == param_3) {
-    *piVar5 = (int)piVar6;
-  }
-  else {
-    piVar5[2] = (int)piVar6;
-  }
-  puVar1 = *(undefined4 **)(param_1 + 4);
-  if ((int *)*puVar1 == param_3) {
-    piVar3 = piVar5;
-    if (*(char *)((int)piVar6 + 0x21) == '\0') {
-      piVar3 = (int *)FUN_004cb2c0(piVar6);
-    }
-    *puVar1 = piVar3;
-  }
-  iVar2 = *(int *)(param_1 + 4);
-  if (*(int **)(iVar2 + 8) == param_3) {
-    if (*(char *)((int)piVar6 + 0x21) == '\0') {
-      uVar4 = FUN_00421a60(piVar6);
-      *(undefined4 *)(iVar2 + 8) = uVar4;
-    }
-    else {
-      *(int **)(iVar2 + 8) = piVar5;
-    }
-  }
-  if ((char)param_3[8] == '\x01') {
-    if (piVar6 != *(int **)(*(int *)(param_1 + 4) + 4)) {
-      do {
-        piVar3 = piVar5;
-        if ((char)piVar6[8] != '\x01') break;
-        piVar5 = (int *)*piVar3;
-        if (piVar6 == piVar5) {
-          piVar5 = (int *)piVar3[2];
-          if ((char)piVar5[8] == '\0') {
-            *(undefined1 *)(piVar5 + 8) = 1;
-            *(undefined1 *)(piVar3 + 8) = 0;
-            FUN_0050e9f0(piVar3);
-            piVar5 = (int *)piVar3[2];
-          }
-          if (*(char *)((int)piVar5 + 0x21) == '\0') {
-            if ((*(char *)(*piVar5 + 0x20) != '\x01') || (*(char *)(piVar5[2] + 0x20) != '\x01')) {
-              if (*(char *)(piVar5[2] + 0x20) == '\x01') {
-                *(undefined1 *)(*piVar5 + 0x20) = 1;
-                *(undefined1 *)(piVar5 + 8) = 0;
-                FUN_005a27f0(piVar5);
-                piVar5 = (int *)piVar3[2];
-              }
-              *(char *)(piVar5 + 8) = (char)piVar3[8];
-              *(undefined1 *)(piVar3 + 8) = 1;
-              *(undefined1 *)(piVar5[2] + 0x20) = 1;
-              FUN_0050e9f0(piVar3);
-              break;
-            }
-LAB_005ae902:
-            *(undefined1 *)(piVar5 + 8) = 0;
-          }
-        }
-        else {
-          if ((char)piVar5[8] == '\0') {
-            *(undefined1 *)(piVar5 + 8) = 1;
-            *(undefined1 *)(piVar3 + 8) = 0;
-            FUN_005a27f0(piVar3);
-            piVar5 = (int *)*piVar3;
-          }
-          if (*(char *)((int)piVar5 + 0x21) == '\0') {
-            if ((*(char *)(piVar5[2] + 0x20) == '\x01') && (*(char *)(*piVar5 + 0x20) == '\x01'))
-            goto LAB_005ae902;
-            if (*(char *)(*piVar5 + 0x20) == '\x01') {
-              *(undefined1 *)(piVar5[2] + 0x20) = 1;
-              *(undefined1 *)(piVar5 + 8) = 0;
-              FUN_0050e9f0(piVar5);
-              piVar5 = (int *)*piVar3;
-            }
-            *(char *)(piVar5 + 8) = (char)piVar3[8];
-            *(undefined1 *)(piVar3 + 8) = 1;
-            *(undefined1 *)(*piVar5 + 0x20) = 1;
-            FUN_005a27f0(piVar3);
-            break;
-          }
-        }
-        piVar5 = (int *)piVar3[1];
-        piVar6 = piVar3;
-      } while (piVar3 != *(int **)(*(int *)(param_1 + 4) + 4));
-    }
-    *(undefined1 *)(piVar6 + 8) = 1;
-  }
-                    /* WARNING: Subroutine does not return */
-  operator_delete(param_3);
+// thiscall: ECX = MapShell_Isnil21* map
+// stack:    Node** outIt, Node* node
+// ret 8
+void __thiscall StdTree_EraseAndRebalance_Isnil21_Inferred(
+    MapShell_Isnil21 *map, Node **outIt, Node *node)
+{
+  // SEH: LAB_009a65a2
+  if (node->isnil) { // +0x21
+    // throw "invalid map/set<T> iterator" via DAT_00acc34c
+  }
+
+  FUN_004e12c0(/* successor into shadow / outIt path */); // isnil21 ++
+
+  // --- unlink (1-child / 0-child primary path in decomp) ---
+  // repl = left if present else right; if both children, two-child splice
+  //   (bytes @ 005ae7f0+; decomp "unreachable")
+  // parent rehang; if root → head->parent = repl
+  // if node was leftmost → head->left = min(repl) via FUN_004cb2c0
+  // if node was rightmost → head->right = max(repl) via FUN_00421a60
+
+  // --- RB rebalance if erased was black (color@+0x20 == 1) ---
+  // while repl != root && repl color black:
+  //   if left-of-parent: sibling = parent->right
+  //     if sibling red: recolor; Lrotate(parent) via FUN_0050e9f0
+  //     if both sibling children black: recolor sibling red; climb
+  //     else: if right-child black: recolor; Rrotate(sibling) via FUN_005a27f0
+  //           recolor; Lrotate(parent)
+  //   else: mirror with Rrotate / Lrotate swapped
+  // paint repl black
+
+  operator_delete(node);
+  if (map->size > 0) map->size--;
+  *outIt = /* successor */;
+  // ret 8
 }
 ```
 
-## Open questions
+## Callee map
 
-- Confirm calling convention and full signature against callers.
-- Recover meaningful types for still-generic parameters.
+| Symbol | Role | Dual status |
+|---|---|---|
+| `FUN_004e12c0` | successor / ++ isnil21 | residual |
+| `FUN_004cb2c0` | min / leftmost isnil21 | residual |
+| `FUN_00421a60` | max / rightmost isnil21 | residual |
+| `FUN_0050e9f0` | Lrotate isnil21 | R10-030 dualed |
+| `FUN_005a27f0` | Rrotate isnil21 | R11-007 dualed (parent) |
+| `operator_delete` | free node | CRT |
+| throw plate | string + `_CxxThrowException` | shared STL |
+
+## Callers
+
+| Caller | Site | Note |
+|---|---|---|
+| `FUN_005af2e0` | `0x005af37f` | range erase loop; `MOV ECX,EDI` |
+
+## Confidence
+
+| Claim | Level |
+|---|---|
+| CF throw / unlink / rebalance | **High** (live ≡ raw) |
+| ABI thiscall + ret 8 + size-- | **High** (bytes) |
+| isnil@+0x21 / color@+0x20 | **High** (bytes + rotate peers) |
+| Two-child splice plate | **Probable** (bytes present; decomp gap) |
+| Product map English | **Inferred** / open |
+| Runtime / differential | Open |
