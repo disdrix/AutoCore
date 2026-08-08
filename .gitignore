@@ -304,3 +304,6 @@ src/.claude/settings.local.json
 /docs/agents
 /docs/reconstruction
 /.grok/workflows
+# Discord bot secrets (local only — copy from appsettings.discord.example.json)
+src/AutoCore.Launcher/appsettings.discord.json
+**/appsettings.discord.env.json

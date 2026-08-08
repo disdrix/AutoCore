@@ -29,12 +29,15 @@ public class AutoPatrolTests
     private const int ContId = 707;
 
     private readonly List<BasePacket> _sent = new();
+    private readonly List<string> _diag = new();
 
     [TestInitialize]
     public void SetUp()
     {
         _sent.Clear();
+        _diag.Clear();
         TNLConnection.TestPacketSink = (_, p) => _sent.Add(p);
+        MissionFlowDiag.TestSink = msg => _diag.Add(msg);
         AssetManager.Instance.ClearTestMissions();
         TriggerManager.Instance.ClearAllForTests();
     }
@@ -43,9 +46,11 @@ public class AutoPatrolTests
     public void TearDown()
     {
         TNLConnection.TestPacketSink = null;
+        MissionFlowDiag.TestSink = null;
         AssetManager.Instance.ClearTestMissions();
         TriggerManager.Instance.ClearAllForTests();
         _sent.Clear();
+        _diag.Clear();
     }
 
     [TestMethod]
@@ -281,7 +286,7 @@ public class AutoPatrolTests
         var quest = new CharacterQuest(MissionId, 2); // already past patrol
         quest.PopulateFromAssets();
         character.CurrentQuests.Add(quest);
-        character.MapPresence.EnsureContinent(ContId);
+        character.MapPresence.EnsureContinent(ContId, map.InstanceSerial);
         _sent.Clear();
 
         NpcInteractHandler.HandleAutoPatrol(conn, new AutoPatrolPacket
@@ -697,6 +702,278 @@ public class AutoPatrolTests
         Assert.IsTrue(character.CompletedMissionIds.Contains(MissionId));
     }
 
+    [TestMethod]
+    public void HandleAutoPatrol_AlreadyCountedPad_RepeatedPackets_DoNotSpamDiag()
+    {
+        // Client re-sends AutoPatrol every tick while standing in a pad volume.
+        // After the first hit is applied, further identical packets must not flood MISSION-DIAG
+        // or re-send mid-route ObjectiveState.
+        const long pad0 = 98100;
+        const long pad1 = 98101;
+        var objA = MissionObjective.CreateForTests(ObjectiveIdA, 0, MissionId, 1);
+        var patrol = new ObjectiveRequirementPatrol(objA)
+        {
+            AutoComplete = true,
+            AutoCompleteDistance = 30f,
+            TargetCount = 2,
+            Sequential = true,
+            FirstStateSlot = 0,
+        };
+        patrol.GenericTargets[0] = pad0;
+        patrol.GenericTargets[1] = pad1;
+        objA.Requirements.Add(patrol);
+        AssetManager.Instance.SetTestMission(Mission.CreateForTests(MissionId, objA));
+
+        var (conn, character, map) = CreatePlayer();
+        PlaceWaypoint(map, pad0, new Vector3(0, 0, 0));
+        PlaceWaypoint(map, pad1, new Vector3(10, 0, 0));
+        character.CurrentVehicle.Position = new Vector3(0, 0, 0);
+        GiveQuest(character, MissionId);
+
+        NpcInteractHandler.HandleAutoPatrol(conn, new AutoPatrolPacket
+        {
+            Target = new TFID(pad0, false),
+        });
+        Assert.AreEqual(1, character.CurrentQuests[0].ObjectiveProgress[0]);
+        var diagAfterFirst = _diag.Count;
+        var stateAfterFirst = _sent.OfType<ObjectiveStatePacket>().Count();
+
+        _diag.Clear();
+        _sent.Clear();
+        for (var i = 0; i < 50; i++)
+        {
+            NpcInteractHandler.HandleAutoPatrol(conn, new AutoPatrolPacket
+            {
+                Target = new TFID(pad0, false),
+            });
+        }
+
+        Assert.AreEqual(1, character.CurrentQuests[0].ObjectiveProgress[0], "re-hits must not double-count");
+        Assert.AreEqual(0, _diag.Count,
+            "redundant AutoPatrol ticks must not emit MISSION-DIAG (was " + string.Join(" | ", _diag) + ")");
+        Assert.AreEqual(0, _sent.OfType<ObjectiveStatePacket>().Count(),
+            "redundant ticks must not re-send ObjectiveState");
+        Assert.IsTrue(diagAfterFirst > 0 || stateAfterFirst > 0,
+            "sanity: first hit should have produced progress work");
+    }
+
+    [TestMethod]
+    public void HandleAutoPatrol_NewPadAfterDedupe_StillProgresses()
+    {
+        const long pad0 = 98110;
+        const long pad1 = 98111;
+        var objA = MissionObjective.CreateForTests(ObjectiveIdA, 0, MissionId, 1);
+        var patrol = new ObjectiveRequirementPatrol(objA)
+        {
+            AutoComplete = true,
+            AutoCompleteDistance = 30f,
+            TargetCount = 2,
+            Sequential = true,
+            FirstStateSlot = 0,
+        };
+        patrol.GenericTargets[0] = pad0;
+        patrol.GenericTargets[1] = pad1;
+        objA.Requirements.Add(patrol);
+        AssetManager.Instance.SetTestMission(Mission.CreateForTests(MissionId, objA));
+
+        var (conn, character, map) = CreatePlayer();
+        PlaceWaypoint(map, pad0, new Vector3(0, 0, 0));
+        PlaceWaypoint(map, pad1, new Vector3(10, 0, 0));
+        character.CurrentVehicle.Position = new Vector3(0, 0, 0);
+        GiveQuest(character, MissionId);
+
+        NpcInteractHandler.HandleAutoPatrol(conn, new AutoPatrolPacket
+        {
+            Target = new TFID(pad0, false),
+        });
+        // Spam pad0 so presence dedupe arms.
+        for (var i = 0; i < 10; i++)
+        {
+            NpcInteractHandler.HandleAutoPatrol(conn, new AutoPatrolPacket
+            {
+                Target = new TFID(pad0, false),
+            });
+        }
+
+        character.CurrentVehicle.Position = new Vector3(10, 0, 0);
+        _diag.Clear();
+        NpcInteractHandler.HandleAutoPatrol(conn, new AutoPatrolPacket
+        {
+            Target = new TFID(pad1, false),
+        });
+
+        Assert.IsTrue(character.CompletedMissionIds.Contains(MissionId),
+            "next pad must still complete after prior pad was deduped");
+    }
+
+    [TestMethod]
+    public void HandleAutoPatrol_AfterAdvance_SameCoidOnLaterSeq_StillWorks()
+    {
+        // Two sequential single-pad objectives that reuse the same waypoint COID.
+        // Dedupe key must include seq/progress so advance is not blocked.
+        const long pad = 98120;
+        var objA = MissionObjective.CreateForTests(ObjectiveIdA, 0, MissionId, 1);
+        var patrolA = new ObjectiveRequirementPatrol(objA)
+        {
+            AutoComplete = true,
+            AutoCompleteDistance = 30f,
+            TargetCount = 1,
+        };
+        patrolA.GenericTargets[0] = pad;
+        objA.Requirements.Add(patrolA);
+
+        var objB = MissionObjective.CreateForTests(ObjectiveIdB, 1, MissionId, 1);
+        var patrolB = new ObjectiveRequirementPatrol(objB)
+        {
+            AutoComplete = true,
+            AutoCompleteDistance = 30f,
+            TargetCount = 1,
+        };
+        patrolB.GenericTargets[0] = pad;
+        objB.Requirements.Add(patrolB);
+        AssetManager.Instance.SetTestMission(Mission.CreateForTests(MissionId, objA, objB));
+
+        var (conn, character, map) = CreatePlayer();
+        PlaceWaypoint(map, pad, new Vector3(0, 0, 0));
+        character.CurrentVehicle.Position = new Vector3(0, 0, 0);
+        GiveQuest(character, MissionId);
+
+        NpcInteractHandler.HandleAutoPatrol(conn, new AutoPatrolPacket
+        {
+            Target = new TFID(pad, false),
+        });
+        Assert.AreEqual(1, character.CurrentQuests[0].ActiveObjectiveSequence);
+
+        // Client still spamming finished pad while server is on seq1 with same COID.
+        for (var i = 0; i < 5; i++)
+        {
+            NpcInteractHandler.HandleAutoPatrol(conn, new AutoPatrolPacket
+            {
+                Target = new TFID(pad, false),
+            });
+        }
+
+        Assert.IsTrue(character.CompletedMissionIds.Contains(MissionId),
+            "same COID on next sequence must still complete (dedupe must include seq)");
+    }
+
+    [TestMethod]
+    public void HandleAutoPatrol_StaleNoMatch_RepeatedPackets_DoNotSpamDiag()
+    {
+        // After one-shot stale resync, further AutoPatrols on the finished pad must stay quiet.
+        const int deliverObj = ObjectiveIdA;
+        const int patrolObj = ObjectiveIdB;
+        const int finalDeliverObj = 92202;
+        const long pad = WaypointCoid;
+        const int deliverNpc = 93400;
+
+        var d0 = MissionObjective.CreateForTests(deliverObj, 0, MissionId, 1);
+        d0.Requirements.Add(new ObjectiveRequirementDeliver(d0)
+        {
+            NPCTargetCBID = deliverNpc,
+            NPCTargetCompletes = true,
+            FirstStateSlot = 0,
+        });
+        var patrol = MissionObjective.CreateForTests(patrolObj, 1, MissionId, 1);
+        var patrolReq = new ObjectiveRequirementPatrol(patrol)
+        {
+            AutoComplete = true,
+            AutoCompleteDistance = 30f,
+            TargetCount = 1,
+        };
+        patrolReq.GenericTargets[0] = pad;
+        patrol.Requirements.Add(patrolReq);
+        var d2 = MissionObjective.CreateForTests(finalDeliverObj, 2, MissionId, 1);
+        d2.Requirements.Add(new ObjectiveRequirementDeliver(d2)
+        {
+            NPCTargetCBID = deliverNpc,
+            NPCTargetCompletes = true,
+            FirstStateSlot = 0,
+            TakeItemAtEnd = true,
+        });
+        AssetManager.Instance.SetTestMission(Mission.CreateForTests(MissionId, d0, patrol, d2));
+
+        var (conn, character, map) = CreatePlayer();
+        character.CurrentVehicle.Position = new Vector3(0, 0, 0);
+        var quest = new CharacterQuest(MissionId, 2);
+        quest.PopulateFromAssets();
+        character.CurrentQuests.Add(quest);
+        character.MapPresence.EnsureContinent(ContId, map.InstanceSerial);
+
+        NpcInteractHandler.HandleAutoPatrol(conn, new AutoPatrolPacket
+        {
+            Target = new TFID(pad, false),
+        });
+        Assert.IsTrue(character.MapPresence.HasStalePatrolResync(MissionId));
+
+        _diag.Clear();
+        _sent.Clear();
+        for (var i = 0; i < 40; i++)
+        {
+            NpcInteractHandler.HandleAutoPatrol(conn, new AutoPatrolPacket
+            {
+                Target = new TFID(pad, false),
+            });
+        }
+
+        Assert.AreEqual(0, _diag.Count,
+            "stale pad spam after resync must not flood MISSION-DIAG");
+        Assert.AreEqual(0, _sent.OfType<CompleteDynamicObjectivePacket>().Count(),
+            "stale pad spam must not re-send CompleteDynamicObjective");
+    }
+
+    [TestMethod]
+    public void HandleAutoPatrol_SiblingDeliverAlreadyReady_RepeatedPackets_Quiet()
+    {
+        const int deliverCbid = 4244;
+        var obj = MissionObjective.CreateForTests(ObjectiveIdA, 0, MissionId, 1);
+        var patrol = new ObjectiveRequirementPatrol(obj)
+        {
+            AutoComplete = true,
+            AutoCompleteDistance = 30f,
+            FirstStateSlot = 0,
+        };
+        patrol.GenericTargets[0] = WaypointCoid;
+        obj.Requirements.Add(patrol);
+        obj.Requirements.Add(new ObjectiveRequirementDeliver(obj)
+        {
+            NPCTargetCBID = deliverCbid,
+            NPCTargetCompletes = true,
+        });
+        AssetManager.Instance.SetTestMission(Mission.CreateForTests(MissionId, obj));
+
+        var (conn, character, map) = CreatePlayer();
+        PlaceWaypoint(map, WaypointCoid, new Vector3(0, 0, 0));
+        character.CurrentVehicle.Position = new Vector3(0, 0, 0);
+        GiveQuest(character, MissionId);
+
+        // Pretend pad NPC was already set up (client still AutoPatrols every tick).
+        character.MapPresence.EnsureContinent(ContId, map.InstanceSerial);
+        character.MapPresence.MarkDeliverTurnInReady(deliverCbid);
+        // MapHasPresentEntityWithCbidForTests needs a live entity with that CBID.
+        var npc = new Creature();
+        npc.SetCoid(88_600, false);
+        npc.SetCbidForTests(deliverCbid);
+        npc.SetMap(map);
+
+        _diag.Clear();
+        for (var i = 0; i < 40; i++)
+        {
+            NpcInteractHandler.HandleAutoPatrol(conn, new AutoPatrolPacket
+            {
+                Target = new TFID(WaypointCoid, false),
+            });
+        }
+
+        Assert.AreEqual(1, character.CurrentQuests.Count, "sibling deliver must keep mission active");
+        // At most one SIBLING-DELIVER (or zero if already ready on first tick); never linear in N.
+        var siblingLogs = _diag.Count(l => l.Contains("SIBLING-DELIVER", StringComparison.Ordinal));
+        Assert.IsTrue(siblingLogs <= 1,
+            $"expected ≤1 sibling-deliver diag lines, got {siblingLogs}: {string.Join(" | ", _diag)}");
+        var autoPatrolDiag = _diag.Count(l => l.Contains("AutoPatrol", StringComparison.Ordinal));
+        Assert.IsTrue(autoPatrolDiag <= 1,
+            $"expected ≤1 AutoPatrol diag after ready, got {autoPatrolDiag}");
+    }
 
     private static void SeedPatrolMission(
         int missionId,

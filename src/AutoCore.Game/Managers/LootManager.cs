@@ -14,6 +14,7 @@ using AutoCore.Game.Packets;
 using AutoCore.Game.Packets.Sector;
 using AutoCore.Game.Structures;
 using AutoCore.Utils;
+using AutoCore.Utils.Logging;
 using AutoCore.Utils.Memory;
 
 /// <summary>
@@ -669,14 +670,20 @@ public class LootManager : Singleton<LootManager>
         return null;
     }
 
-    private static void TryGiveCredits(Character killer, int amount)
+    internal static void TryGiveCredits(Character killer, int amount)
     {
         if (killer == null || amount <= 0)
             return;
 
         try
         {
-            var result = CurrencySync.AddCredits(persistence: null, killer, amount);
+            // SS-27: kill-loot credits must go through the character's bound inventory
+            // persistence. A raw CurrencySync.AddCredits(persistence: null, ...) here hit the
+            // "no inventory persistence bound; balance not saved" branch, so credits earned
+            // from kills silently vanished on server restart.
+            var result = killer.Inventory != null
+                ? killer.Inventory.AddCredits(killer, amount, CurrencyChangeReason.KillLoot)
+                : CurrencySync.AddCredits(persistence: null, killer, amount, CurrencyChangeReason.KillLoot);
             if (result.DeltaPacket != null && killer.OwningConnection != null)
                 killer.OwningConnection.SendGamePacket(result.DeltaPacket);
         }
@@ -947,6 +954,13 @@ public class LootManager : Singleton<LootManager>
 
         Logger.WriteLog(LogType.Debug,
             $"LootManager.AutoLootItem: {displayName} (CBID {cbid}) → cargo coid={inventoryCoid} for character coid={character.ObjectId?.Coid}");
+
+        GameLog.Audit("LootReceived",
+            ("CharacterId", character.ObjectId.Coid),
+            ("ItemCbid", cbid),
+            ("ItemCoid", claim.AddedItem?.Coid ?? inventoryCoid),
+            ("MapId", character.Map?.ContinentId),
+            ("Source", "AutoLoot"));
         return true;
     }
 

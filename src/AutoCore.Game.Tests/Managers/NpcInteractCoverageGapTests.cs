@@ -41,6 +41,7 @@ public class NpcInteractCoverageGapTests
     {
         _sent.Clear();
         _incomplete.Clear();
+        IncompleteHandlerLog.ResetOnceKeysForTests();
         TNLConnection.TestPacketSink = (_, p) => _sent.Add(p);
         IncompleteHandlerLog.TestSink = msg => _incomplete.Add(msg);
         AssetManager.Instance.ClearTestMissions();

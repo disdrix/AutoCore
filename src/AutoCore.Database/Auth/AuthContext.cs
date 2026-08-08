@@ -12,11 +12,13 @@ public class AuthContext : DbContext
 
     public DbSet<Account> Accounts { get; set; }
     public DbSet<GlobalServer> GlobalServers { get; set; }
+    public DbSet<DiscordAccountLink> DiscordAccountLinks { get; set; }
 
     public AuthContext()
     {
         Accounts = Set<Account>();
         GlobalServers = Set<GlobalServer>();
+        DiscordAccountLinks = Set<DiscordAccountLink>();
     }
 
     /// <summary>Options-based constructor for unit tests (InMemory / SQLite) without MySQL.</summary>
@@ -25,6 +27,18 @@ public class AuthContext : DbContext
     {
         Accounts = Set<Account>();
         GlobalServers = Set<GlobalServer>();
+        DiscordAccountLinks = Set<DiscordAccountLink>();
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<DiscordAccountLink>(entity =>
+        {
+            entity.HasIndex(e => e.AccountId).IsUnique();
+            entity.HasIndex(e => e.DiscordUserId);
+        });
     }
 
     public static void InitializeConnectionString(string connectionString)
@@ -41,7 +55,49 @@ public class AuthContext : DbContext
     {
         using var context = new AuthContext();
         context.Database.EnsureCreated();
+        // EnsureCreated is a no-op when the database already exists — still add the Discord
+        // link table for deployments that predate the optional Discord module.
+        EnsureDiscordAccountLinkTable(context);
         SeedDefaultAccount(context);
+    }
+
+    /// <summary>
+    /// Creates <c>discord_account_link</c> if missing (MySQL). Safe to call repeatedly.
+    /// InMemory / non-relational providers no-op after EnsureCreated.
+    /// </summary>
+    public static void EnsureDiscordAccountLinkTable()
+    {
+        using var context = new AuthContext();
+        EnsureDiscordAccountLinkTable(context);
+    }
+
+    internal static void EnsureDiscordAccountLinkTable(AuthContext context)
+    {
+        try
+        {
+            // Skip when the provider cannot execute raw SQL (e.g. pure InMemory without relational).
+            if (!context.Database.IsRelational())
+                return;
+
+            context.Database.ExecuteSqlRaw(
+                """
+                CREATE TABLE IF NOT EXISTS `discord_account_link` (
+                  `Id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                  `DiscordUserId` BIGINT UNSIGNED NOT NULL,
+                  `AccountId` INT UNSIGNED NOT NULL,
+                  `CreatedAt` DATETIME(6) NOT NULL,
+                  `CreatedByUsername` LONGTEXT NULL,
+                  PRIMARY KEY (`Id`),
+                  UNIQUE KEY `IX_discord_account_link_AccountId` (`AccountId`),
+                  KEY `IX_discord_account_link_DiscordUserId` (`DiscordUserId`)
+                ) CHARACTER SET=utf8mb4;
+                """);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException and not OutOfMemoryException)
+        {
+            // Log and continue — fresh EnsureCreated already materializes the table via the model.
+            Logger.WriteException(LogType.Warning, "ensure discord_account_link table", ex);
+        }
     }
 
     /// <summary>Options-based EnsureCreated for unit tests without MySQL.</summary>

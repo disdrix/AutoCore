@@ -4,11 +4,13 @@ using System.Diagnostics.CodeAnalysis;
 namespace AutoCore.Sector;
 
 using AutoCore.Auth.Network;
+using AutoCore.Database.Auth;
 using AutoCore.Global.Network;
 using AutoCore.Launcher.Bootstrap;
 using AutoCore.Sector.Network;
 using AutoCore.Utils;
 using AutoCore.Utils.Commands;
+using AutoCore.Utils.Logging;
 using AutoCore.Utils.Reliability;
 
 public class Program : ExitableProgram
@@ -20,6 +22,7 @@ public class Program : ExitableProgram
     private static ILauncherServerHost? AuthHost { get; set; }
     private static ILauncherServerHost? GlobalHost { get; set; }
     private static ILauncherServerHost? SectorHost { get; set; }
+    private static ILauncherServerHost? DiscordHost { get; set; }
 
     /// <summary>
     /// Process host entry: loads configs and starts Auth/Global/Sector. Config validation is
@@ -56,12 +59,25 @@ public class Program : ExitableProgram
         var authConfig = LauncherConfigLoader.LoadAuthConfig();
         var globalConfig = LauncherConfigLoader.LoadGlobalConfig();
         var sectorConfig = LauncherConfigLoader.LoadSectorConfig();
+        var discordConfig = LauncherConfigLoader.LoadDiscordConfig();
 
         LauncherConfigValidator.ValidateOrThrow(authConfig, globalConfig, sectorConfig);
+
+        // Apply logging configuration for the whole hosted process (the Launcher previously
+        // never did this, leaving LoggerConfig in appsettings dead and structured logging off).
+        LauncherLoggerSetup.Apply(sectorConfig);
 
         AuthHost = new AuthLauncherServerHost(AuthServer, authConfig);
         GlobalHost = new GlobalLauncherServerHost(GlobalServer, globalConfig);
         SectorHost = new SectorLauncherServerHost(SectorServer, sectorConfig);
+
+        if (discordConfig.Enabled)
+        {
+            DiscordHost = new DiscordLauncherServerHost(
+                discordConfig,
+                static () => new AuthContext(),
+                new AuthServerPlayerCountSource(AuthServer));
+        }
 
         var initResult = LauncherInitOrchestrator.Run(
             authConfig,
@@ -70,7 +86,8 @@ public class Program : ExitableProgram
             new DefaultLauncherGameBootstrap(),
             AuthHost,
             GlobalHost,
-            SectorHost);
+            SectorHost,
+            discordHost: DiscordHost);
 
         if (!initResult.Success)
         {
@@ -85,6 +102,12 @@ public class Program : ExitableProgram
             return;
         }
 
+        GameLog.Info("ServerReady",
+            ("ServerName", "Launcher"),
+            ("BuildVersion", ServerIdentity.BuildVersion),
+            ("CommitHash", ServerIdentity.CommitHash),
+            ("ServerInstanceId", ServerIdentity.ServerInstanceId));
+
         AuthServer.ProcessCommands();
 
         GC.Collect();
@@ -96,22 +119,27 @@ public class Program : ExitableProgram
     private static bool ExitHandlerProc(byte sig)
     {
         Logger.WriteLog(LogType.Initialize, "Shutting down the servers...");
+        GameLog.Info("ServerShutdownRequested", ("ServerName", "Launcher"));
 
         // SS-07: this runs on the console control-handler thread. Each server is isolated so a
         // failure shutting one down still lets the other two release their ports and sockets.
         if (SectorHost is not null && GlobalHost is not null && AuthHost is not null)
         {
             Guard.Run("Launcher shutdown", () =>
-                LauncherShutdownCoordinator.Shutdown(SectorHost, GlobalHost, AuthHost));
+                LauncherShutdownCoordinator.Shutdown(SectorHost, GlobalHost, AuthHost, discordHost: DiscordHost));
         }
         else
         {
+            if (DiscordHost is not null)
+                Guard.Run("Discord bot shutdown", DiscordHost.Shutdown);
             Guard.Run("Sector server shutdown", SectorServer.Shutdown);
             Guard.Run("Global server shutdown", GlobalServer.Shutdown);
             Guard.Run("Auth server shutdown", AuthServer.Shutdown);
         }
 
         Logger.WriteLog(LogType.Initialize, "Server shutdowns completed!");
+        GameLog.Info("ServerStopped", ("ServerName", "Launcher"));
+        GameLog.Flush(TimeSpan.FromSeconds(5));
 
         Logger.WriteLog(LogType.Error, "Press any key to exit...");
 

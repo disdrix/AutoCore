@@ -7,12 +7,33 @@ using AutoCore.Game.Packets.Sector;
 using AutoCore.Game.Structures;
 using AutoCore.Game.TNL.Ghost;
 using AutoCore.Utils;
+using AutoCore.Utils.Logging;
 using AutoCore.Utils.Memory;
 using AutoCore.Utils.Reliability;
 
 public class MapManager : Singleton<MapManager>
 {
     private Dictionary<int, SectorMap> SectorMaps { get; } = new();
+
+    /// <summary>
+    /// Private per-player copies of instanced continents (see <see cref="InstancedContinents"/>),
+    /// keyed by (continentId, owning character coid). Shared maps stay in <see cref="SectorMaps"/>.
+    /// </summary>
+    private Dictionary<(int ContinentId, long OwnerCoid), SectorMap> InstanceMaps { get; } = new();
+
+    /// <summary>
+    /// Flat snapshot of shared + instance maps for the per-tick loops. Rebuilt only on
+    /// register/unregister so hot loops allocate nothing.
+    /// </summary>
+    private SectorMap[] _allMapsCache = Array.Empty<SectorMap>();
+
+    internal SectorMap[] AllMaps() => _allMapsCache;
+
+    /// <summary>Test seam: snapshot of every registered map (shared + instances).</summary>
+    internal SectorMap[] AllMapsForTests() => AllMaps();
+
+    private void RebuildAllMapsCache()
+        => _allMapsCache = SectorMaps.Values.Concat(InstanceMaps.Values).ToArray();
 
     /// <summary>
     /// Optional map resolver for unit tests. When set, <see cref="TransferCharacterToMap"/>
@@ -31,10 +52,31 @@ public class MapManager : Singleton<MapManager>
     {
         ArgumentNullException.ThrowIfNull(map);
         SectorMaps[map.ContinentId] = map;
+        RebuildAllMapsCache();
     }
 
+    /// <summary>Test seam: register a pre-built instance map without GLM/fam load.</summary>
+    internal void RegisterInstanceForTests(SectorMap map, long ownerCoid)
+    {
+        ArgumentNullException.ThrowIfNull(map);
+        map.MarkAsInstance(ownerCoid);
+        InstanceMaps[(map.ContinentId, ownerCoid)] = map;
+        RebuildAllMapsCache();
+    }
+
+    /// <summary>
+    /// Test seam: substitutes <c>new SectorMap(continentId)</c> in <see cref="GetMapForCharacter"/>
+    /// so instance-registry logic runs without GLM/fam asset I/O.
+    /// </summary>
+    internal Func<int, SectorMap> CreateInstanceForTests { get; set; }
+
     /// <summary>Test seam: drop all registered maps (including ones injected by tests).</summary>
-    internal void ClearMapsForTests() => SectorMaps.Clear();
+    internal void ClearMapsForTests()
+    {
+        SectorMaps.Clear();
+        InstanceMaps.Clear();
+        RebuildAllMapsCache();
+    }
 
     /// <summary>
     /// Loads all continent maps via live <see cref="SetupMap"/>. Empty-catalog soft-fail is
@@ -91,10 +133,10 @@ public class MapManager : Singleton<MapManager>
         // SS-12: isolate per map so one bad grid cannot skip re-bucketing for every other map,
         // which would leave interest queries reading stale positions server-wide.
         Guard.ForEach(
-            SectorMaps.ToArray(),
+            AllMaps(),
             "grid rebucket sweep",
-            entry => entry.Value.Grid.RebucketSweep(),
-            describe: entry => $"map {entry.Key}");
+            map => map.Grid.RebucketSweep(),
+            describe: map => $"map {map.ContinentId}#{map.InstanceSerial}");
     }
 
     /// <summary>
@@ -109,14 +151,14 @@ public class MapManager : Singleton<MapManager>
         // SS-12: isolate per map. NpcTicker already isolates individual NPCs, but a failure in
         // map-level setup must not stop the remaining maps from ticking their AI.
         Guard.ForEach(
-            SectorMaps.ToArray(),
+            AllMaps(),
             "NPC map tick",
-            entry =>
+            map =>
             {
-                if (entry.Value.PlayerCount > 0)
-                    Npc.NpcTicker.Tick(entry.Value, nowMs, deltaSeconds);
+                if (map.PlayerCount > 0)
+                    Npc.NpcTicker.Tick(map, nowMs, deltaSeconds);
             },
-            describe: entry => $"map {entry.Key}");
+            describe: map => $"map {map.ContinentId}#{map.InstanceSerial}");
     }
 
     /// <summary>
@@ -133,7 +175,7 @@ public class MapManager : Singleton<MapManager>
     public int ForcePathVehiclePoseDirty()
     {
         var n = 0;
-        foreach (var map in SectorMaps.Values)
+        foreach (var map in AllMaps())
         {
             if (map.PlayerCount <= 0)
                 continue;
@@ -166,6 +208,7 @@ public class MapManager : Singleton<MapManager>
             throw new Exception($"Map {continentId} is already setup!");
 
         SectorMaps[continentId] = new SectorMap(continentId);
+        RebuildAllMapsCache();
     }
 
     private bool TrySetupMap(int continentId, out string error)
@@ -204,6 +247,7 @@ public class MapManager : Singleton<MapManager>
         try
         {
             SectorMaps[continentId] = new SectorMap(continentId);
+            RebuildAllMapsCache();
             Logger.WriteLog(LogType.Initialize, $"MapManager: Dynamically loaded map {continentId} ({continentObject.DisplayName})");
             return true;
         }
@@ -228,8 +272,106 @@ public class MapManager : Singleton<MapManager>
         throw new Exception($"Unknown map ({continentId}) requested! {error}");
     }
 
+    /// <summary>
+    /// Resolves the map a character should enter. Shared continents return the one shared
+    /// <see cref="SectorMap"/> (identical to <see cref="GetMap"/>). Instanced continents
+    /// (<see cref="InstancedContinents"/>) ALWAYS create a fresh private copy — retail relog
+    /// policy; persisted character state replays into it via PerPlayerLoad +
+    /// ApplyMissionPhaseWorldState — except when the character is still live on their current
+    /// instance (same-continent warp/transfer), which is reused rather than torn down.
+    /// </summary>
+    public SectorMap GetMapForCharacter(int continentId, Character character)
+    {
+        ArgumentNullException.ThrowIfNull(character);
+
+        if (!InstancedContinents.IsInstanced(continentId))
+            return GetMap(continentId);
+
+        var ownerCoid = character.ObjectId.Coid;
+        var key = (continentId, ownerCoid);
+
+        if (InstanceMaps.TryGetValue(key, out var existing))
+        {
+            // Same-continent re-entry (/warp, TransferMap reaction to the current continent):
+            // the character is still on the live instance — never tear down an occupied map.
+            if (existing.Players.Contains(character))
+                return existing;
+
+            // Disposal is synchronous in LeaveMap, so a leftover entry indicates a prior fault.
+            Logger.WriteLog(LogType.Error,
+                "MapManager: stale instance {0} of continent {1} (owner {2}) found on entry — disposing before fresh create",
+                existing.InstanceSerial,
+                continentId,
+                ownerCoid);
+            DisposeInstance(existing, ownerCoid);
+        }
+
+        var instance = CreateInstanceForTests != null
+            ? CreateInstanceForTests(continentId)
+            : CreateInstanceLive(continentId);
+        instance.MarkAsInstance(ownerCoid);
+        InstanceMaps[key] = instance;
+        RebuildAllMapsCache();
+
+        Logger.WriteLog(LogType.Debug,
+            "MapManager: created instance {0} of continent {1} (owner {2})",
+            instance.InstanceSerial,
+            continentId,
+            ownerCoid);
+        return instance;
+    }
+
+    /// <summary>Live per-player instance bootstrap from AssetManager map data / GLM.</summary>
+    [ExcludeFromCodeCoverage(Justification = "Live map asset I/O via SectorMap(int); tests use CreateInstanceForTests.")]
+    private static SectorMap CreateInstanceLive(int continentId) => new(continentId);
+
+    /// <summary>
+    /// Unregisters and tears down a per-player instance. Registry removal is
+    /// ReferenceEquals-guarded so a late dispose of an old copy can never evict a fresh
+    /// re-registration under the same key. Unregisters FIRST so a teardown fault can never
+    /// leak a dead map into the tick loops (SS-30); per-entity faults are contained inside
+    /// <see cref="SectorMap.TearDownLocalEntities"/>.
+    /// </summary>
+    public void DisposeInstance(SectorMap map, long ownerCoid)
+    {
+        ArgumentNullException.ThrowIfNull(map);
+
+        var key = (map.ContinentId, ownerCoid);
+        if (InstanceMaps.TryGetValue(key, out var stored) && ReferenceEquals(stored, map))
+        {
+            InstanceMaps.Remove(key);
+            RebuildAllMapsCache();
+        }
+
+        Guard.Run(
+            $"instance teardown (continent {map.ContinentId}#{map.InstanceSerial})",
+            map.TearDownLocalEntities);
+
+        // Purge cross-cutting singleton state keyed on this instance's serial/identity.
+        Guard.Run(
+            $"instance latch purge (continent {map.ContinentId}#{map.InstanceSerial})",
+            () =>
+            {
+                TriggerManager.Instance.ClearInstance(map.InstanceSerial);
+                Combat.MapPropCorpseDespawn.CancelForMap(map);
+                Combat.VehicleMapPropRam.ClearForInstance(map.InstanceSerial);
+            });
+
+        Logger.WriteLog(LogType.Debug,
+            "MapManager: instance {0} of continent {1} disposed (owner {2})",
+            map.InstanceSerial,
+            map.ContinentId,
+            ownerCoid);
+    }
+
     public bool TransferCharacterToMap(Character character, int continentId)
     {
+        // Operation scope only — control flow (early returns, catch-all) is unchanged.
+        var transferOperation = GameLog.Operation("MapTransfer",
+            ("CharacterId", character?.ObjectId.Coid),
+            ("FromMapId", character?.Map?.ContinentId),
+            ("ToMapId", continentId));
+
         try
         {
             if (!MapTransferPreconditions.TryValidate(character, out var failure))
@@ -243,6 +385,7 @@ public class MapManager : Singleton<MapManager>
                     _ => MapTransferPreconditions.Describe(failure)
                 };
                 Logger.WriteLog(LogType.Error, detail);
+                transferOperation.Fail(null, ("Reason", failure.ToString()));
                 return false;
             }
 
@@ -250,10 +393,11 @@ public class MapManager : Singleton<MapManager>
 
             var map = ResolveMapForTests != null
                 ? ResolveMapForTests(continentId)
-                : GetMap(continentId);
+                : GetMapForCharacter(continentId, character);
             if (map == null)
             {
                 Logger.WriteLog(LogType.Error, $"Trying to transfer to non-existant map: {continentId}!");
+                transferOperation.Fail(null, ("Reason", "UnknownMap"));
                 return false;
             }
 
@@ -295,10 +439,12 @@ public class MapManager : Singleton<MapManager>
             Logger.WriteLog(LogType.Network,
                 $"Transferred character {character.ObjectId.Coid} to map {continentId} and re-established ghosting.");
 
+            transferOperation.Complete();
             return true;
         }
         catch (Exception ex)
         {
+            transferOperation.Fail(ex);
             Logger.WriteException(LogType.Error, $"Failed to transfer character to map {continentId}", ex);
             return false;
         }

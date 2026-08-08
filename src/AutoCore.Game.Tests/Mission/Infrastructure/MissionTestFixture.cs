@@ -108,6 +108,7 @@ public sealed class MissionTestFixture : IDisposable
 
         var character = new Character();
         character.SetCoid(characterCoid ?? NextCoid(), true);
+        character.GMLevel = 1; // SS-28: mission chat commands under test are admin tools
         character.SetOwningConnection(connection);
         connection.CurrentCharacter = character;
 

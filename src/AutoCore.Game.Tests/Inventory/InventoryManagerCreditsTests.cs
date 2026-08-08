@@ -16,7 +16,7 @@ public class InventoryManagerCreditsTests
         var inventory = new InventoryManager(persistence);
         var character = CreateCharacter(inventory, coid: 42, startingCredits: 100);
 
-        var result = inventory.AddCredits(character, 50);
+        var result = inventory.AddCredits(character, 50, CurrencyChangeReason.Unknown);
 
         Assert.AreEqual(100L, result.Previous);
         Assert.AreEqual(150L, result.NewBalance);
@@ -35,7 +35,7 @@ public class InventoryManagerCreditsTests
         var inventory = new InventoryManager(persistence);
         var character = CreateCharacter(inventory, coid: 7, startingCredits: 30);
 
-        var result = inventory.AddCredits(character, -100);
+        var result = inventory.AddCredits(character, -100, CurrencyChangeReason.Unknown);
 
         Assert.AreEqual(30L, result.Previous);
         Assert.AreEqual(0L, result.NewBalance);
@@ -50,7 +50,7 @@ public class InventoryManagerCreditsTests
         var inventory = new InventoryManager(new RecordingInventoryPersistence());
         var character = CreateCharacter(inventory, coid: 1, startingCredits: 10);
 
-        var result = inventory.AddCredits(character, 0);
+        var result = inventory.AddCredits(character, 0, CurrencyChangeReason.Unknown);
 
         Assert.AreEqual(0L, result.AppliedDelta);
         Assert.IsNull(result.DeltaPacket);
@@ -63,7 +63,7 @@ public class InventoryManagerCreditsTests
         var inventory = new InventoryManager(persistence);
         var character = CreateCharacter(inventory, coid: 9, startingCredits: 1);
 
-        var balance = inventory.SetCreditsAbsolute(character, 999_888_777_666L);
+        var balance = inventory.SetCreditsAbsolute(character, 999_888_777_666L, CurrencyChangeReason.Unknown);
 
         Assert.AreEqual(999_888_777_666L, balance);
         Assert.AreEqual(balance, character.Credits);
@@ -74,14 +74,14 @@ public class InventoryManagerCreditsTests
     public void AddCredits_NullCharacter_Throws()
     {
         var inventory = new InventoryManager(new RecordingInventoryPersistence());
-        Assert.ThrowsException<ArgumentNullException>(() => inventory.AddCredits(null, 1));
+        Assert.ThrowsException<ArgumentNullException>(() => inventory.AddCredits(null, 1, CurrencyChangeReason.Unknown));
     }
 
     [TestMethod]
     public void SetCreditsAbsolute_NullCharacter_Throws()
     {
         var inventory = new InventoryManager(new RecordingInventoryPersistence());
-        Assert.ThrowsException<ArgumentNullException>(() => inventory.SetCreditsAbsolute(null, 1));
+        Assert.ThrowsException<ArgumentNullException>(() => inventory.SetCreditsAbsolute(null, 1, CurrencyChangeReason.Unknown));
     }
 
     [TestMethod]
@@ -91,7 +91,7 @@ public class InventoryManagerCreditsTests
         var inventory = new InventoryManager(persistence);
         var character = CreateCharacter(inventory, coid: 8, startingCredits: 5);
 
-        var result = inventory.AddCredits(character, -20, allowDebt: true);
+        var result = inventory.AddCredits(character, -20, CurrencyChangeReason.Unknown, allowDebt: true);
 
         Assert.AreEqual(-15L, result.NewBalance);
         Assert.AreEqual(-15L, character.Credits);
@@ -104,7 +104,7 @@ public class InventoryManagerCreditsTests
         var inventory = new InventoryManager(persistence);
         var character = CreateCharacter(inventory, coid: 3, startingCredits: 100);
 
-        var balance = inventory.SetCreditsAbsolute(character, -50);
+        var balance = inventory.SetCreditsAbsolute(character, -50, CurrencyChangeReason.Unknown);
 
         Assert.AreEqual(0L, balance);
         Assert.AreEqual(0L, character.Credits);

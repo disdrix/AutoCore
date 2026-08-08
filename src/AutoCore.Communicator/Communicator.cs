@@ -6,6 +6,8 @@ namespace AutoCore.Communicator;
 
 using AutoCore.Communicator.Packets;
 using AutoCore.Utils;
+using AutoCore.Utils.Logging;
+using AutoCore.Utils.Reliability;
 using AutoCore.Utils.Networking;
 using AutoCore.Utils.Packets;
 using AutoCore.Utils.Memory;
@@ -202,6 +204,13 @@ public class Communicator
     /// </para>
     /// </summary>
     private void OnSocketReceive(NonContiguousMemoryStream incomingStream, int length)
+    {
+        // Phase 5E: isolate one bad message so the communicator pump survives.
+        using var _ = LogContext.Push(("Subsystem", "Communicator"), ("CommunicatorType", Type.ToString()));
+        Guard.Run($"communicator receive ({Type})", () => OnSocketReceiveCore(incomingStream, length));
+    }
+
+    private void OnSocketReceiveCore(NonContiguousMemoryStream incomingStream, int length)
     {
         var startPosition = incomingStream.Position;
 

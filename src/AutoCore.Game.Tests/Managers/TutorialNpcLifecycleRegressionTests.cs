@@ -353,7 +353,7 @@ public class TutorialNpcLifecycleRegressionTests
 
         // Clear personal suppress as if client reloaded fam; latch still blocks rem.
         character.MapPresence.Clear();
-        character.MapPresence.EnsureContinent(map.ContinentId);
+        character.MapPresence.EnsureContinent(map.ContinentId, map.InstanceSerial);
         FireActivateOnRem(map, vehicle);
 
         Assert.AreEqual(firesAfterFirst, GetTriggerFireCount(map, RemInitiatorCoid),

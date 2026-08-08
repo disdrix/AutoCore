@@ -4,6 +4,7 @@ using AutoCore.Database.Char;
 using AutoCore.Database.Char.Models;
 using AutoCore.Game.Packets.Login;
 using AutoCore.Game.TNL;
+using AutoCore.Utils.Logging;
 using AutoCore.Utils.Memory;
 using AutoCore.Utils.Timer;
 
@@ -38,7 +39,12 @@ public class LoginManager : Singleton<LoginManager>
                     .ToList();
 
                 foreach (var rem in toRemove)
+                {
                     GlobalLogins.Remove(rem);
+
+                    // An expired ticket explains a later "NoTicket" rejection for this account.
+                    GameLog.Info("LoginTicketExpired", ("AccountId", rem));
+                }
             }
         });
     }
@@ -94,6 +100,9 @@ public class LoginManager : Singleton<LoginManager>
         }
 
         AutoCore.Utils.Logger.WriteLog(AutoCore.Utils.LogType.Network, $"ExpectLoginToGlobal: Created login entry for account {accountId} ({username}), expires in {LoginTimoutInMs}ms");
+
+        // NEVER log the auth key itself — it is a one-time credential.
+        GameLog.Info("LoginTicketIssued", ("AccountId", accountId), ("Username", username));
         return true;
     }
 
@@ -109,6 +118,7 @@ public class LoginManager : Singleton<LoginManager>
             if (!GlobalLogins.TryGetValue(packet.UserId, out var entry))
             {
                 AutoCore.Utils.Logger.WriteLog(AutoCore.Utils.LogType.Error, $"LoginToGlobal: No login entry found for account {packet.UserId} (username: '{packet.Username}')");
+                EmitLoginRejected(packet, "NoTicket");
                 return false;
             }
 
@@ -116,6 +126,7 @@ public class LoginManager : Singleton<LoginManager>
             {
                 AutoCore.Utils.Logger.WriteLog(AutoCore.Utils.LogType.Error, $"LoginToGlobal: AuthKey mismatch for account {packet.UserId}. Expected: {entry.AuthKey}, Got: {packet.AuthKey}");
                 GlobalLogins.Remove(packet.UserId);
+                EmitLoginRejected(packet, "KeyMismatch");
                 return false;
             }
 
@@ -123,6 +134,7 @@ public class LoginManager : Singleton<LoginManager>
             {
                 AutoCore.Utils.Logger.WriteLog(AutoCore.Utils.LogType.Error, $"LoginToGlobal: Username mismatch for account {packet.UserId}. Expected: '{entry.Username}', Got: '{packet.Username}'");
                 GlobalLogins.Remove(packet.UserId);
+                EmitLoginRejected(packet, "UserMismatch");
                 return false;
             }
 
@@ -152,7 +164,20 @@ public class LoginManager : Singleton<LoginManager>
         client.Account = account;
 
         AutoCore.Utils.Logger.WriteLog(AutoCore.Utils.LogType.Network, $"LoginToGlobal: Successfully authenticated account {packet.UserId} ({packet.Username})");
+
+        GameLog.Info("GlobalLoginSucceeded",
+            ("AccountId", packet.UserId),
+            ("SessionId", client.SessionId));
         return true;
+    }
+
+    /// <summary>Rejection event with a specific reason. NEVER logs the auth key value.</summary>
+    private static void EmitLoginRejected(LoginRequestPacket packet, string reason)
+    {
+        GameLog.Warn("GlobalLoginRejected", "AUTH-002",
+            ("Reason", reason),
+            ("AccountId", packet.UserId),
+            ("Username", packet.Username));
     }
 
     public bool LoginToSector(TNLConnection client, uint accountId)

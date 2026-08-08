@@ -202,6 +202,7 @@ public class MissionPersistenceTests
         manager.PersistQuestRow = (coid, missionId, op) => writes.Add((coid, missionId, op.Kind));
 
         var character = new Character();
+        character.GMLevel = 1;
         character.SetCoid(7300, true);
         var connection = new TNLConnection();
         TNLConnection.TestPacketSink = (_, _) => { };
@@ -229,6 +230,7 @@ public class MissionPersistenceTests
         manager.PersistQuestRow = (coid, missionId, op) => writes.Add((coid, missionId, op.Kind, op.ActiveObjectiveSequence));
 
         var character = new Character();
+        character.GMLevel = 1;
         character.SetCoid(4001, true);
         var quest = new CharacterQuest(555, 2);
         quest.ObjectiveProgress[0] = 4;
@@ -303,6 +305,7 @@ public class MissionPersistenceTests
         AssetManager.Instance.SetTestMission(Mission.CreateForTests(900, o0, o1));
 
         var character = new Character();
+        character.GMLevel = 1;
         character.SetCoid(5001, true);
 
         var questRow = new CharacterQuestData
@@ -333,6 +336,7 @@ public class MissionPersistenceTests
     public void LoadMissions_EmptyRows_ClearsState()
     {
         var character = new Character();
+        character.GMLevel = 1;
         character.SetCoid(5002, true);
         character.CurrentQuests.Add(new CharacterQuest(1, 0));
         character.CompletedMissionIds.Add(1);
@@ -526,6 +530,7 @@ public class MissionPersistenceTests
         AssetManager.Instance.SetTestMission(Mission.CreateForTests(700, o0));
 
         var character = new Character();
+        character.GMLevel = 1;
         character.SetCoid(7100, true);
         character.CompletedMissionIds.Add(554);
         var quest = new CharacterQuest(700, 0);
@@ -571,6 +576,7 @@ public class MissionPersistenceTests
         MissionPersistence.Instance.DeleteAllRows = coid => deleted = coid;
 
         var character = new Character();
+        character.GMLevel = 1;
         character.SetCoid(7200, true);
         character.CompletedMissionIds.Add(554);
         character.CurrentQuests.Add(new CharacterQuest(700, 0));
@@ -592,6 +598,7 @@ public class MissionPersistenceTests
         MissionPersistence.Instance.DeleteAllRows = coid => allDeleted = coid;
 
         var character = new Character();
+        character.GMLevel = 1;
         character.SetCoid(7300, true);
         character.CompletedMissionIds.Add(554);
         character.CurrentQuests.Add(new CharacterQuest(700, 0));
@@ -625,6 +632,7 @@ public class MissionPersistenceTests
         manager.PersistQuestRow = (coid, missionId, op) => writes.Add((coid, missionId, op.Kind));
 
         var character = new Character();
+        character.GMLevel = 1;
         character.SetCoid(7400, true);
         var connection = new TNLConnection();
         character.SetOwningConnection(connection);
@@ -660,6 +668,7 @@ public class MissionPersistenceTests
     public void GiveMission_UnknownMission_DoesNotGrant()
     {
         var character = new Character();
+        character.GMLevel = 1;
         character.SetCoid(7401, true);
 
         var result = AutoCore.Game.Chat.ChatCommandService.Instance.Execute(character, "/giveMission 999999");
@@ -672,11 +681,12 @@ public class MissionPersistenceTests
     [TestMethod]
     public void GiveMission_UsageAndNoCharacter()
     {
-        var usage = AutoCore.Game.Chat.ChatCommandService.Instance.Execute(new Character(), "/giveMission");
+        var gm = new Character { GMLevel = 1 };
+        var usage = AutoCore.Game.Chat.ChatCommandService.Instance.Execute(gm, "/giveMission");
         Assert.IsTrue(usage.Handled);
         StringAssert.Contains(usage.Message, "Usage");
 
-        var invalid = AutoCore.Game.Chat.ChatCommandService.Instance.Execute(new Character(), "/giveMission notanumber");
+        var invalid = AutoCore.Game.Chat.ChatCommandService.Instance.Execute(new Character { GMLevel = 1 }, "/giveMission notanumber");
         Assert.IsTrue(invalid.Handled);
         StringAssert.Contains(invalid.Message, "Usage");
 
@@ -690,6 +700,7 @@ public class MissionPersistenceTests
     {
         SeedMission(555, repeatable: 0, (5550, 0, 1));
         var character = new Character();
+        character.GMLevel = 1;
         character.SetCoid(7402, true);
         var quest = new CharacterQuest(555, 0);
         quest.PopulateFromAssets();
@@ -723,6 +734,7 @@ public class MissionPersistenceTests
         manager.PersistQuestRow = (coid, missionId, op) => writes.Add((coid, missionId, op.Kind));
 
         var character = new Character();
+        character.GMLevel = 1;
         character.SetCoid(7500, true);
         var quest = new CharacterQuest(560, 0);
         quest.PopulateFromAssets();
@@ -762,6 +774,7 @@ public class MissionPersistenceTests
     {
         SeedMission(561, repeatable: 0, (5610, 0, 1));
         var character = new Character();
+        character.GMLevel = 1;
         character.SetCoid(7501, true);
 
         var result = AutoCore.Game.Chat.ChatCommandService.Instance.Execute(character, "/completeMission 561");
@@ -775,6 +788,7 @@ public class MissionPersistenceTests
     public void CompleteMission_AlreadyCompleted_ReportsStatus()
     {
         var character = new Character();
+        character.GMLevel = 1;
         character.SetCoid(7502, true);
         character.CompletedMissionIds.Add(562);
 
@@ -787,7 +801,7 @@ public class MissionPersistenceTests
     [TestMethod]
     public void CompleteMission_UsageAndNoCharacter()
     {
-        var usage = AutoCore.Game.Chat.ChatCommandService.Instance.Execute(new Character(), "/completeMission");
+        var usage = AutoCore.Game.Chat.ChatCommandService.Instance.Execute(new Character { GMLevel = 1 }, "/completeMission");
         Assert.IsTrue(usage.Handled);
         StringAssert.Contains(usage.Message, "Usage");
 
@@ -827,6 +841,7 @@ public class MissionPersistenceTests
         try
         {
             var character = new Character();
+        character.GMLevel = 1;
             character.SetCoid(8101, true);
             manager.OnQuestChanged(character, new CharacterQuest(501, 0));
 
@@ -932,6 +947,7 @@ public class MissionPersistenceTests
         manager.DeleteActiveRows = c => deleted = c;
 
         var character = new Character();
+        character.GMLevel = 1;
         character.SetCoid(8201, true);
         manager.OnQuestChanged(character, new CharacterQuest(601, 0));
         manager.OnMissionCompleted(8201, 602);
@@ -976,6 +992,7 @@ public class MissionPersistenceTests
         try
         {
             var character = new Character();
+        character.GMLevel = 1;
             character.SetCoid(8301, true);
             manager.OnQuestChanged(character, new CharacterQuest(701, 0));
             Assert.IsTrue(firstEntered.Wait(TimeSpan.FromSeconds(3)), "first background write must start");
@@ -1019,6 +1036,7 @@ public class MissionPersistenceTests
         try
         {
             var character = new Character();
+        character.GMLevel = 1;
             character.SetCoid(8401, true);
             manager.OnQuestChanged(character, new CharacterQuest(801, 0));
 
@@ -1052,6 +1070,7 @@ public class MissionPersistenceTests
         try
         {
             var character = new Character();
+        character.GMLevel = 1;
             character.SetCoid(8501, true);
             manager.OnQuestChanged(character, new CharacterQuest(901, 0));
             Assert.IsTrue(gate.Wait(TimeSpan.FromSeconds(3)));
@@ -1099,6 +1118,7 @@ public class MissionPersistenceTests
         connection.SetGhostTo(false);
 
         var character = new Character();
+        character.GMLevel = 1;
         character.SetCoid(150, true);
         character.SetOwningConnection(connection);
 

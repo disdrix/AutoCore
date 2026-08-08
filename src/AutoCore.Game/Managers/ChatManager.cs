@@ -12,6 +12,7 @@ using AutoCore.Game.Packets.Sector;
 using AutoCore.Game.Structures;
 using AutoCore.Game.TNL;
 using AutoCore.Utils;
+using AutoCore.Utils.Logging;
 using AutoCore.Utils.Memory;
 
 public class ChatManager : Singleton<ChatManager>
@@ -108,6 +109,14 @@ public class ChatManager : Singleton<ChatManager>
 
         var character = connection.CurrentCharacter;
 
+        var commandToken = parts[0];
+        GameLog.Audit("ChatCommandExecuted",
+            ("Command", commandToken),
+            ("CharacterId", character?.ObjectId.Coid),
+            ("AccountId", connection.Account?.Id));
+        if (parts.Length > 1)
+            GameLog.Debug("ChatCommandArgs", ("Command", commandToken), ("ArgCount", parts.Length - 1));
+
         var commandResult = ChatCommandService.Instance.Execute(character, command);
         if (commandResult.Handled)
         {
@@ -115,6 +124,15 @@ public class ChatManager : Singleton<ChatManager>
                 connection.SendGamePacket(packet);
 
             respPacket.Message = commandResult.Message;
+            SendChatCommandResponse(connection, respPacket);
+            return;
+        }
+
+        // SS-28: ChatCommandService already gated its handled set; fallback mutators need the same gate.
+        var fallbackToken = parts[0];
+        if (ChatAdminGate.IsMutatingCommand(fallbackToken) && !ChatAdminGate.Authorize(character, fallbackToken))
+        {
+            respPacket.Message = "Permission denied (GM required).";
             SendChatCommandResponse(connection, respPacket);
             return;
         }
@@ -399,9 +417,10 @@ public class ChatManager : Singleton<ChatManager>
                     break;
                 }
 
-                // Deal 10000 damage
+                // Deal 10000 damage (attacker-attributed so combat AI + /reportbug fire)
                 const int killDamage = 10000;
-                var actualDamage = target.TakeDamage(killDamage);
+                var attacker = character.CurrentVehicle ?? (ClonedObjectBase)character;
+                var actualDamage = target.TakeDamage(killDamage, attacker);
 
                 try
                 {

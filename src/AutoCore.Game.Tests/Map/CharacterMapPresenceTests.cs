@@ -44,7 +44,7 @@ public class CharacterMapPresenceTests
     public void Ledger_Suppress_IsPresentForCharacter_RespectsFamDefault()
     {
         var presence = new CharacterMapPresence();
-        presence.EnsureContinent(ContId);
+        presence.EnsureContinent(ContId, 1);
 
         Assert.IsTrue(presence.IsPresentForCharacter(DialogSpawnCoid, famDefaultActive: true));
         presence.Suppress(DialogSpawnCoid);
@@ -56,7 +56,7 @@ public class CharacterMapPresenceTests
     public void Ledger_Materialize_OverridesSuppress()
     {
         var presence = new CharacterMapPresence();
-        presence.EnsureContinent(ContId);
+        presence.EnsureContinent(ContId, 1);
         presence.Suppress(PlaceBCreatureCoid);
         presence.Materialize(PlaceBCreatureCoid);
         Assert.IsFalse(presence.IsSuppressed(PlaceBCreatureCoid));
@@ -67,9 +67,9 @@ public class CharacterMapPresenceTests
     public void Ledger_EnsureContinent_ClearsWhenMapChanges()
     {
         var presence = new CharacterMapPresence();
-        presence.EnsureContinent(ContId);
+        presence.EnsureContinent(ContId, 1);
         presence.Suppress(1);
-        presence.EnsureContinent(ContId + 1);
+        presence.EnsureContinent(ContId + 1, 1);
         Assert.IsFalse(presence.IsSuppressed(1));
         Assert.AreEqual(ContId + 1, presence.ContinentId);
     }
@@ -225,7 +225,7 @@ public class CharacterMapPresenceTests
         var ch = new Character();
         ch.SetCoid(coid, true);
         ch.SetMap(map);
-        ch.MapPresence.EnsureContinent(map.ContinentId);
+        ch.MapPresence.EnsureContinent(map.ContinentId, map.InstanceSerial);
         return ch;
     }
 

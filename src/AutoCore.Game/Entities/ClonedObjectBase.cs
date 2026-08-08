@@ -147,6 +147,11 @@ public abstract class ClonedObjectBase
         var actual = TakeDamage(damage);
         if (actual > 0 && attacker != null)
             Npc.NpcCombatAi.OnDamaged(this, attacker);
+
+        // High-fidelity /reportbug: damage involving a player (as victim or attacker).
+        if (actual > 0)
+            Diagnostics.PlayerCombatTrace.OnDamage(this, attacker, actual);
+
         return actual;
     }
 

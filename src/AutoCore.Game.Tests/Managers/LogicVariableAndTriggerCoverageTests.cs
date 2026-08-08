@@ -602,12 +602,12 @@ public class LogicVariableAndTriggerCoverageTests
         vehicle.Position = new Vector3(0, 0, 0);
 
         TriggerManager.Instance.CheckTriggersFor(vehicle);
-        TriggerManager.Instance.ClearTriggersFor(vehicle.ObjectId.Coid);
+        TriggerManager.Instance.ClearTriggersFor(map, vehicle.ObjectId.Coid);
         TriggerManager.Instance.CheckTriggersFor(vehicle);
         Assert.IsTrue(trigger.FireCount >= 2);
 
-        TriggerManager.Instance.ResetTriggerFor(vehicle.ObjectId.Coid, 7);
-        TriggerManager.Instance.ClearTrigger(7);
+        TriggerManager.Instance.ResetTriggerFor(map, vehicle.ObjectId.Coid, 7);
+        TriggerManager.Instance.ClearTrigger(map, 7);
         TriggerManager.Instance.FireTriggerReactions(null, trigger);
         TriggerManager.Instance.FireTriggerReactions(vehicle, null);
         TriggerManager.Instance.CheckTriggersFor(null);

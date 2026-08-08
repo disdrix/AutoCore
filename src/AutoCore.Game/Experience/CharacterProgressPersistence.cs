@@ -3,6 +3,7 @@ namespace AutoCore.Game.Experience;
 using AutoCore.Database.Char;
 using AutoCore.Game.Diagnostics;
 using AutoCore.Utils;
+using AutoCore.Utils.Logging;
 using Microsoft.EntityFrameworkCore;
 
 /// <summary>
@@ -56,7 +57,7 @@ public sealed class CharacterProgressPersistence : ICharacterProgressPersistence
         character.AttributeCombat = progress.AttributeCombat;
         character.AttributeTheory = progress.AttributeTheory;
         character.AttributePerception = progress.AttributePerception;
-        context.SaveChanges();
+        DbOperationTiming.Run("CharacterProgressPersistence.SaveProgress", () => context.SaveChanges());
 
         if (LogFilters.SaveProgress)
         {

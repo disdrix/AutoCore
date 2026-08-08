@@ -1,3 +1,4 @@
+using AutoCore.Utils.Logging;
 namespace AutoCore.Game.Diagnostics;
 
 using System.Text;
@@ -230,6 +231,30 @@ public static class LogFilters
                 Logger.WriteLog(LogType.Command, "Log filters: loot work preset.\n" + FormatStatus());
                 break;
 
+            case "player":
+            {
+                // log player <characterId|sessionId> [minutes]
+                if (parts.Length < 3)
+                {
+                    Logger.WriteLog(LogType.Command, "Usage: log player <characterId|sessionId> [minutes]");
+                    return;
+                }
+                var minutes = 15;
+                if (parts.Length >= 4 && int.TryParse(parts[3], out var m) && m > 0)
+                    minutes = m;
+                if (long.TryParse(parts[2], out var characterId))
+                {
+                    PlayerDiagnostics.EnrollCharacter(characterId, minutes);
+                    Logger.WriteLog(LogType.Command, "Enrolled CharacterId={0} for {1} minutes of Debug/Trace.", characterId, minutes);
+                }
+                else
+                {
+                    PlayerDiagnostics.EnrollSession(parts[2], minutes);
+                    Logger.WriteLog(LogType.Command, "Enrolled SessionId={0} for {1} minutes of Debug/Trace.", parts[2], minutes);
+                }
+                return;
+            }
+
             case "set":
                 if (parts.Length < 4 || !TryParseBool(parts[3], out var setVal))
                 {
@@ -255,6 +280,7 @@ public static class LogFilters
                       log set <Name> <true|false>  Flip one category (live)
                       log quiet                    Loot + MapPropRam + TakeDamage (+ errors always)
                       log loot                     Loot work: Loot+MapPropRam on, packet spam off
+                      log player <id|session> [m]  Elevate Debug/Trace for a player (default 15 min)
                       log reset                    Defaults
                       log help                     This text
 

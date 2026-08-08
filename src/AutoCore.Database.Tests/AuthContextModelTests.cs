@@ -24,6 +24,7 @@ public class AuthContextModelTests
         Assert.IsTrue(context.Database.CanConnect());
         Assert.IsNotNull(context.Model.FindEntityType(typeof(Account)));
         Assert.IsNotNull(context.Model.FindEntityType(typeof(GlobalServer)));
+        Assert.IsNotNull(context.Model.FindEntityType(typeof(DiscordAccountLink)));
     }
 
     [TestCleanup]
@@ -240,5 +241,6 @@ public class AuthContextModelTests
         using var context = CreateContext();
         Assert.IsNotNull(context.Accounts);
         Assert.IsNotNull(context.GlobalServers);
+        Assert.IsNotNull(context.DiscordAccountLinks);
     }
 }

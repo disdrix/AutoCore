@@ -12,6 +12,7 @@ using AutoCore.Game.Packets.Sector;
 using AutoCore.Game.Structures;
 using AutoCore.Game.TNL;
 using AutoCore.Utils;
+using AutoCore.Utils.Logging;
 
 /// <summary>
 /// Vendor store open (OpenStore 0x206C) and buy/sell (<see cref="GameOpcode.StoreTransactionRequest"/>).
@@ -166,12 +167,18 @@ public static class VendorStoreService
 
     /// <summary>
     /// Handle C2S StoreTransactionRequest (buy/sell). Dumps wire payload, applies economy when possible.
+    /// Phase 3D: each flow gets a TX-xxxxxxxx TransactionId in LogContext so CurrencyChanged /
+    /// Item* / Vendor* events join in the NDJSON audit trail.
     /// </summary>
     public static void HandleTransaction(TNLConnection conn, StoreTransactionRequestPacket packet)
     {
         var character = conn?.CurrentCharacter;
         if (character?.Map == null || packet == null)
             return;
+
+        // Phase 3D: TX id joins CurrencyChanged / Item* / Vendor* events in the audit trail.
+        var txId = "TX-" + Guid.NewGuid().ToString("N")[..8];
+        using var txScope = LogContext.Push(("TransactionId", txId));
 
         Logger.WriteLog(LogType.Debug,
             "StoreTransaction: charCoid={0} isBuy={1} qty={2} item=({3},{4}) rawLen={5} hex={6}",
@@ -190,14 +197,59 @@ public static class VendorStoreService
         long relatedA = 0;
         long relatedB = packet.Item?.Coid ?? 0;
         bool ok;
+        string rejectReason = null;
+        bool isBuyback = false;
         if (packet.IsBuy)
         {
-            ok = TryBuy(conn, character, packet, out var grantCoid, out relatedA, out relatedB);
+            GameLog.Audit("VendorPurchaseStarted",
+                ("TransactionId", txId),
+                ("CharacterId", character.ObjectId.Coid),
+                ("ItemCoid", packet.Item?.Coid ?? 0),
+                ("Quantity", Math.Max(1, packet.Quantity)));
+
+            ok = TryBuy(conn, character, packet, out var grantCoid, out relatedA, out relatedB, out rejectReason, out isBuyback);
             responseItemCoid = ok && grantCoid > 0 ? grantCoid : (packet.Item?.Coid ?? 0);
+
+            if (ok)
+            {
+                GameLog.Audit("VendorPurchaseCompleted",
+                    ("TransactionId", txId),
+                    ("CharacterId", character.ObjectId.Coid),
+                    ("ItemCoid", responseItemCoid),
+                    ("Quantity", Math.Max(1, packet.Quantity)),
+                    ("Buyback", isBuyback),
+                    ("Credits", character.Credits));
+            }
+            else
+            {
+                GameLog.Warn("VendorPurchaseRejected", "ECO-001",
+                    ("TransactionId", txId),
+                    ("CharacterId", character.ObjectId.Coid),
+                    ("ItemCoid", packet.Item?.Coid ?? 0),
+                    ("Reason", rejectReason ?? "Unknown"),
+                    ("Buyback", isBuyback));
+            }
         }
         else
         {
-            ok = TrySell(conn, character, packet, out postResponsePackets);
+            ok = TrySell(conn, character, packet, out postResponsePackets, out rejectReason);
+            if (ok)
+            {
+                GameLog.Audit("VendorSaleCompleted",
+                    ("TransactionId", txId),
+                    ("CharacterId", character.ObjectId.Coid),
+                    ("ItemCoid", packet.Item?.Coid ?? 0),
+                    ("Quantity", Math.Max(1, packet.Quantity)),
+                    ("Credits", character.Credits));
+            }
+            else
+            {
+                GameLog.Warn("VendorSaleRejected", "ECO-002",
+                    ("TransactionId", txId),
+                    ("CharacterId", character.ObjectId.Coid),
+                    ("ItemCoid", packet.Item?.Coid ?? 0),
+                    ("Reason", rejectReason ?? "Unknown"));
+            }
         }
 
         // Always ack with the full 0x30 layout (FUN_00810670).
@@ -229,9 +281,24 @@ public static class VendorStoreService
         out long relatedCharacterCoid,
         out long storeSlotCoid)
     {
+        return TryBuy(conn, character, packet, out grantedCoid, out relatedCharacterCoid, out storeSlotCoid, out _, out _);
+    }
+
+    static bool TryBuy(
+        TNLConnection conn,
+        Character character,
+        StoreTransactionRequestPacket packet,
+        out long grantedCoid,
+        out long relatedCharacterCoid,
+        out long storeSlotCoid,
+        out string rejectReason,
+        out bool isBuyback)
+    {
         grantedCoid = 0;
         relatedCharacterCoid = character?.ObjectId.Coid ?? 0;
         storeSlotCoid = packet?.Item?.Coid ?? 0;
+        rejectReason = null;
+        isBuyback = false;
 
         var storeCoid = packet?.StoreCoid > 0
             ? packet.StoreCoid
@@ -239,6 +306,7 @@ public static class VendorStoreService
         if (storeCoid <= 0)
         {
             Logger.WriteLog(LogType.Debug, "StoreTransaction buy: no open store session for char={0}", character.ObjectId.Coid);
+            rejectReason = "NoSession";
             return false;
         }
 
@@ -253,13 +321,15 @@ public static class VendorStoreService
         // Do not Create a new object — client still holds that TFID on the store UI.
         if (TryResolveBuyback(character.ObjectId.Coid, itemCoid, qty, out var buyback, out var buybackQty))
         {
+            isBuyback = true;
             return CompleteBuyback(
                 conn,
                 character,
                 buyback,
                 itemCoid,
                 buybackQty,
-                out grantedCoid);
+                out grantedCoid,
+                out rejectReason);
         }
 
         // 2) Catalog / session stock lines.
@@ -283,6 +353,7 @@ public static class VendorStoreService
                 stock == null
                     ? "(null)"
                     : string.Join(',', stock.Where(s => s.CBID > 0).Select(s => s.CBID).Take(12)));
+            rejectReason = "UnknownItem";
             return false;
         }
 
@@ -290,6 +361,7 @@ public static class VendorStoreService
         if (entry == null)
         {
             Logger.WriteLog(LogType.Debug, "StoreTransaction buy: CBID {0} not in catalog", line.CBID);
+            rejectReason = "UnknownItem";
             return false;
         }
 
@@ -304,7 +376,8 @@ public static class VendorStoreService
             storeSlotCoid: itemCoid,
             out grantedCoid,
             onSuccess: null,
-            sourceTag: "catalog");
+            sourceTag: "catalog",
+            out rejectReason);
     }
 
     /// <summary>
@@ -318,11 +391,16 @@ public static class VendorStoreService
         StoreBuybackListing buyback,
         long soldItemCoid,
         int qty,
-        out long grantedCoid)
+        out long grantedCoid,
+        out string rejectReason)
     {
         grantedCoid = 0;
+        rejectReason = null;
         if (buyback == null || soldItemCoid <= 0 || qty < 1 || character?.Inventory == null)
+        {
+            rejectReason = "UnknownItem";
             return false;
+        }
 
         var total = buyback.UnitPrice * (long)qty;
         if (total < 0)
@@ -334,12 +412,14 @@ public static class VendorStoreService
                 "StoreTransaction buy: insufficient credits need={0} have={1} source=buyback",
                 total,
                 character.Credits);
+            rejectReason = "InsufficientCredits";
             return false;
         }
 
         if (!InventoryItemTypePolicy.IsInventoryCapable(buyback.Type))
         {
             Logger.WriteLog(LogType.Debug, "StoreTransaction buyback: CBID {0} not inventory-capable", buyback.Cbid);
+            rejectReason = "NotInventoryCapable";
             return false;
         }
 
@@ -360,12 +440,13 @@ public static class VendorStoreService
                 "StoreTransaction buyback: restore failed coid={0}: {1}",
                 soldItemCoid,
                 result.Message);
+            rejectReason = "NoInventorySpace";
             return false;
         }
 
         if (total > 0)
         {
-            var creditResult = character.Inventory.AddCredits(character, -total);
+            var creditResult = character.Inventory.AddCredits(character, -total, CurrencyChangeReason.VendorBuyback);
             if (creditResult.DeltaPacket != null)
                 conn.SendGamePacket(creditResult.DeltaPacket);
         }
@@ -398,11 +479,16 @@ public static class VendorStoreService
         long storeSlotCoid,
         out long grantedCoid,
         Action onSuccess,
-        string sourceTag)
+        string sourceTag,
+        out string rejectReason)
     {
         grantedCoid = 0;
+        rejectReason = null;
         if (cbid <= 0 || qty < 1 || character?.Inventory == null)
+        {
+            rejectReason = "UnknownItem";
             return false;
+        }
 
         var total = unitPrice * (long)qty;
         if (total < 0)
@@ -415,6 +501,7 @@ public static class VendorStoreService
                 total,
                 character.Credits,
                 sourceTag);
+            rejectReason = "InsufficientCredits";
             return false;
         }
 
@@ -423,12 +510,16 @@ public static class VendorStoreService
         if (!InventoryItemTypePolicy.IsInventoryCapable(entry.Type))
         {
             Logger.WriteLog(LogType.Debug, "StoreTransaction buy: CBID {0} not inventory-capable", cbid);
+            rejectReason = "NotInventoryCapable";
             return false;
         }
 
         var runtime = new InventoryRuntime(character);
         if (!runtime.CanAllocateItem)
+        {
+            rejectReason = "NoInventorySpace";
             return false;
+        }
 
         var coid = runtime.AllocateItemCoid();
         var creator = TestItemCreator ?? new InventoryItemCreator();
@@ -446,12 +537,13 @@ public static class VendorStoreService
                 "StoreTransaction buy: AddItem failed for CBID {0}: {1}",
                 cbid,
                 result.Message ?? result.ToString());
+            rejectReason = "NoInventorySpace";
             return false;
         }
 
         if (total > 0)
         {
-            var creditResult = character.Inventory.AddCredits(character, -total);
+            var creditResult = character.Inventory.AddCredits(character, -total, CurrencyChangeReason.VendorBuy);
             if (creditResult.DeltaPacket != null)
                 conn.SendGamePacket(creditResult.DeltaPacket);
         }
@@ -552,15 +644,30 @@ public static class VendorStoreService
         StoreTransactionRequestPacket packet,
         out List<BasePacket> postResponsePackets)
     {
+        return TrySell(conn, character, packet, out postResponsePackets, out _);
+    }
+
+    static bool TrySell(
+        TNLConnection conn,
+        Character character,
+        StoreTransactionRequestPacket packet,
+        out List<BasePacket> postResponsePackets,
+        out string rejectReason)
+    {
         postResponsePackets = null;
+        rejectReason = null;
         var itemCoid = packet.Item?.Coid ?? 0;
         if (itemCoid <= 0 || character.Inventory == null)
+        {
+            rejectReason = "UnknownItem";
             return false;
+        }
 
         var invItem = character.Inventory.FindByCoid(itemCoid);
         if (invItem == null)
         {
             Logger.WriteLog(LogType.Debug, "StoreTransaction sell: item coid={0} not in cargo", itemCoid);
+            rejectReason = "UnknownItem";
             return false;
         }
 
@@ -569,6 +676,7 @@ public static class VendorStoreService
         if (unit <= 0)
         {
             Logger.WriteLog(LogType.Debug, "StoreTransaction sell: CBID {0} not sellable", invItem.Cbid);
+            rejectReason = "NotSellable";
             return false;
         }
 
@@ -588,12 +696,13 @@ public static class VendorStoreService
                 "StoreTransaction sell: RemoveCargoByCoid failed coid={0}: {1}",
                 itemCoid,
                 remove.Message);
+            rejectReason = "RemoveFailed";
             return false;
         }
 
         if (total > 0)
         {
-            var creditResult = character.Inventory.AddCredits(character, total);
+            var creditResult = character.Inventory.AddCredits(character, total, CurrencyChangeReason.VendorSell);
             if (creditResult.DeltaPacket != null)
                 conn.SendGamePacket(creditResult.DeltaPacket);
         }

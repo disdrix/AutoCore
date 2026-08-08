@@ -38,15 +38,27 @@ public static class SafeTask
             return;
         }
 
+        // Capture the enqueue site's ambient diagnostic context so a later fault is
+        // attributable to the session/packet that detached the work, not to the (empty)
+        // ThreadPool continuation. Restore is scoped to the logging only — task
+        // semantics and the completion hook are unchanged.
+        var enqueueContext = Logging.LogContext.Capture();
+
         task.ContinueWith(
             completed =>
             {
                 try
                 {
                     if (completed.IsFaulted)
-                        ReportFailures(completed, operation, onError);
+                    {
+                        using (Logging.LogContext.Restore(enqueueContext))
+                            ReportFailures(completed, operation, onError);
+                    }
                     else if (completed.IsCanceled)
-                        Logger.WriteLog(LogType.Debug, $"{operation} was cancelled.");
+                    {
+                        using (Logging.LogContext.Restore(enqueueContext))
+                            Logger.WriteLog(LogType.Debug, $"{operation} was cancelled.");
+                    }
                 }
                 finally
                 {

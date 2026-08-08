@@ -159,25 +159,26 @@ public class GraphicsObjectCoverageTests
     }
 
     [TestMethod]
-    public void OnBecameDamagable_DoesNotCreatePlainGhostObject()
+    public void OnBecameDamagable_CreatesLazyCombatGhostAndCreatePacket()
     {
         var (character, map) = CreatePlayer();
         var prop = new GraphicsObject(GraphicsObjectType.Graphics);
         prop.InitializeHealthForTests(5);
         prop.SetCoid(90, false);
+        prop.SetCbidForTests(9001);
         prop.SetMap(map);
         prop.SetInvincible(true);
         prop.SetInvincible(false);
-        // Explicit CreateGhost still works for tests; automatic combat ghosting is disabled
-        // (plain GhostObject local TFID → client AV 0x005B0EFF).
-        Assert.IsNull(prop.Ghost);
-        prop.CreateGhost();
-        Assert.IsNotNull(prop.Ghost);
+        Assert.IsNotNull(prop.Ghost, "lazy combat ghost for map-prop HP bar");
+        Assert.IsTrue(
+            _sent.OfType<CreateSimpleObjectPacket>().Any(p => p.ObjectId?.Coid == 90),
+            "CreateSimpleObject before ghost scope");
     }
 
     [TestMethod]
-    public void OnBecameDamagable_CharacterWithoutConnection_StillNoAutoGhost()
+    public void OnBecameDamagable_CharacterWithoutConnection_StillCreatesGhost()
     {
+        // Ghost is created even without a player connection; scope/create is a no-op until one exists.
         var map = CreateMapOnly();
         var character = new Character();
         character.SetCoid(33, true);
@@ -189,7 +190,8 @@ public class GraphicsObjectCoverageTests
         prop.SetCoid(91, false);
         prop.SetMap(map);
         prop.SetInvincible(false);
-        Assert.IsNull(prop.Ghost);
+        Assert.IsNotNull(prop.Ghost);
+        Assert.AreEqual(0, _sent.OfType<CreateSimpleObjectPacket>().Count());
     }
 
     [TestMethod]
@@ -252,7 +254,7 @@ public class GraphicsObjectCoverageTests
     }
 
     [TestMethod]
-    public void ScopeGhost_ForcedFailure_OnlyWhenGhostExists()
+    public void ScopeGhost_ForcedFailure_DoesNotThrow_AndKeepsGhost()
     {
         var (character, map) = CreatePlayer();
         var prop = new GraphicsObject(GraphicsObjectType.Graphics);
@@ -263,11 +265,7 @@ public class GraphicsObjectCoverageTests
         {
             GraphicsObject.ForceNetworkHelperFailureForTests = true;
             prop.SetInvincible(false);
-            Assert.IsNull(prop.Ghost, "auto combat ghost disabled (client AV 0x005B0EFF)");
-            // Explicit ghost + scope still exercises error path.
-            prop.CreateGhost();
-            prop.SetInvincible(false);
-            Assert.IsNotNull(prop.Ghost);
+            Assert.IsNotNull(prop.Ghost, "ghost still allocated when scope/create fails");
         }
         finally
         {

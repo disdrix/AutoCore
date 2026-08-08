@@ -6,6 +6,7 @@ using AutoCore.Game.Packets.Sector;
 using AutoCore.Game.Structures;
 using AutoCore.Game.TNL.Ghost;
 using AutoCore.Utils;
+using AutoCore.Utils.Logging;
 using AutoCore.Utils.Memory;
 
 /// <summary>
@@ -72,7 +73,10 @@ public class RespawnManager : Singleton<RespawnManager>
             return false;
         }
 
-        var sameMap = character.Map != null && character.Map.ContinentId == destMap.ContinentId;
+        // Reference equality, NOT continent-id equality: two per-player instances of the same
+        // continent carry equal ids but are different worlds — an airlift on the wrong one
+        // would strand the player outside their own instance.
+        var sameMap = character.Map != null && ReferenceEquals(character.Map, destMap);
 
         if (!sameMap)
         {
@@ -87,6 +91,10 @@ public class RespawnManager : Singleton<RespawnManager>
 
             Logger.WriteLog(LogType.Network,
                 $"RespawnInSector: character {character.ObjectId.Coid} transferred to map {destMap.ContinentId} at {position}");
+            GameLog.Audit("PlayerRespawned",
+                ("CharacterId", character.ObjectId.Coid),
+                ("MapId", destMap.ContinentId),
+                ("SameMap", false));
             return true;
         }
 
@@ -104,6 +112,10 @@ public class RespawnManager : Singleton<RespawnManager>
 
         Logger.WriteLog(LogType.Network,
             $"RespawnInSector: character {character.ObjectId.Coid} airlift to {position} on map {destMap.ContinentId} specialTarget={character.ObjectId.Coid}");
+        GameLog.Audit("PlayerRespawned",
+            ("CharacterId", character.ObjectId.Coid),
+            ("MapId", destMap.ContinentId),
+            ("SameMap", true));
         return true;
     }
 
@@ -140,7 +152,7 @@ public class RespawnManager : Singleton<RespawnManager>
             else if (ResolveMapForTests != null)
                 destMap = ResolveMapForTests(targetMapId);
             else
-                destMap = MapManager.Instance.GetMap(targetMapId);
+                destMap = MapManager.Instance.GetMapForCharacter(targetMapId, character);
         }
         catch (Exception ex)
         {

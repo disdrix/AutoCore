@@ -20,6 +20,7 @@ using AutoCore.Game.Managers;
 using AutoCore.Game.Packets;
 using AutoCore.Game.TNL.Ghost;
 using AutoCore.Utils;
+using AutoCore.Utils.Logging;
 using AutoCore.Utils.Reliability;
 
 public partial class TNLConnection : GhostConnection
@@ -32,6 +33,19 @@ public partial class TNLConnection : GhostConnection
     private uint Key { get; set; }
     private long PlayerCoid { get; set; }
     private ushort FragmentCounter { get; set; } = 1;
+
+    /// <summary>
+    /// Server-generated session identity for structured logging. Never client-controlled:
+    /// <see cref="PlayerCoid"/> is written by the client via <see cref="ReadConnectRequest"/>
+    /// and must not be trusted as identity.
+    /// </summary>
+    public string SessionId { get; } = Guid.NewGuid().ToString("N")[..16];
+
+    /// <summary>UTC time this connection object was created; basis for SessionDurationMs.</summary>
+    public DateTime SessionStartedUtc { get; } = DateTime.UtcNow;
+
+    /// <summary>Per-connection packet counter; combined with <see cref="SessionId"/> as CorrelationId.</summary>
+    private ulong _packetCorrelationCounter;
 
     /// <summary>
     /// Immediately emits a queued ghost update for a state transition that the client must apply
@@ -721,7 +735,10 @@ public partial class TNLConnection : GhostConnection
     /// + <see cref="TestPacketSink"/> without going through this RPC entrypoint.
     /// </summary>
     [ExcludeFromCodeCoverage(Justification = "Live TNL inbound dispatch; handlers unit-tested via InvokeHandler + TestPacketSink.")]
-    private void HandlePacket(ByteBuffer buffer)
+        /// <summary>Test seam: dispatch a raw opcode frame through the live HandlePacket path.</summary>
+    internal void HandlePacketForTests(ByteBuffer buffer) => HandlePacket(buffer);
+
+private void HandlePacket(ByteBuffer buffer)
     {
         // SS-11: everything below is client-controlled. This prologue used to sit OUTSIDE the
         // try that guards the dispatch switch, so a frame shorter than four bytes threw
@@ -771,6 +788,9 @@ public partial class TNLConnection : GhostConnection
         if (!Enum.IsDefined(typeof(GameOpcode), gameOpcode))
         {
             Logger.WriteLog(LogType.Warning, "Unknown GameOpcode received from client: 0x{0:X} ({1})", rawOpcode, rawOpcode);
+            GameLog.Warn("UnknownOpcodeReceived", "NET-001",
+                ("Opcode", rawOpcode),
+                ("SessionId", SessionId));
             return;
         }
 
@@ -785,6 +805,12 @@ public partial class TNLConnection : GhostConnection
                     Logger.WriteLog(LogType.Network, "Incoming Packet: {0}", gameOpcode);
                 break;
         }
+
+        // Ambient session scope: every log line inside the dispatch (including the ~700
+        // legacy Logger lines mirrored by the dual-write layer) becomes attributable to
+        // this session/packet. Explicitly NOT a log line itself — the two movement opcodes
+        // stay log-free on their per-tick hot path.
+        using var packetScope = LogContext.Push(BuildPacketScope(gameOpcode));
 
         try
         {
@@ -996,6 +1022,9 @@ public partial class TNLConnection : GhostConnection
 
                 default:
                     Logger.WriteLog(LogType.Error, "Unhandled Opcode: {0}", gameOpcode);
+                    GameLog.Warn("UnknownOpcodeReceived", "NET-001",
+                        ("Opcode", gameOpcode.ToString()),
+                        ("SessionId", SessionId));
                     break;
             }
         }
@@ -1004,6 +1033,53 @@ public partial class TNLConnection : GhostConnection
             // Per-packet isolation: one bad packet fails that packet only. The connection and
             // the sector tick both continue.
             Logger.WriteException(LogType.Error, $"handling inbound packet {gameOpcode}", e);
+            GameLog.Warn("MalformedPacketRejected", "NET-002",
+                ("Opcode", gameOpcode.ToString()),
+                ("SessionId", SessionId),
+                ("ExceptionType", e.GetType().Name));
+        }
+    }
+
+    /// <summary>
+    /// Properties for the per-packet ambient <see cref="LogContext"/> scope: session identity,
+    /// a session-derived correlation id, the opcode, and — once bound — character/account identity.
+    /// </summary>
+    private (string, object)[] BuildPacketScope(GameOpcode gameOpcode)
+    {
+        try
+        {
+            var correlationId = SessionId + "-" + Interlocked.Increment(ref _packetCorrelationCounter);
+
+            var props = new List<(string, object)>(8)
+            {
+                ("SessionId", SessionId),
+                ("ConnectionId", GetPlayerCOID()),
+                ("CorrelationId", correlationId),
+                ("Opcode", gameOpcode.ToString()),
+            };
+
+            var character = CurrentCharacter;
+            if (character != null)
+            {
+                props.Add(("CharacterId", character.ObjectId.Coid));
+
+                // Name reads DBData, which characters constructed without a DB row do not have.
+                string characterName = null;
+                try { characterName = character.Name; }
+                catch { /* diagnostics only — a nameless character must not fail dispatch */ }
+                if (characterName != null)
+                    props.Add(("CharacterName", characterName));
+            }
+
+            if (Account != null)
+                props.Add(("AccountId", Account.Id));
+
+            return props.ToArray();
+        }
+        catch
+        {
+            // Scope building is diagnostics, never control flow: dispatch must proceed.
+            return Array.Empty<(string, object)>();
         }
     }
     #endregion
@@ -1226,11 +1302,32 @@ public partial class TNLConnection : GhostConnection
 
     public override void OnConnectionTerminated(TerminationReason reason, string reasonString)
     {
+        // Capture before EndCharacterSession clears CurrentCharacter so SessionEnded can
+        // still name the character the session was for.
+        var character = CurrentCharacter;
+
         EndCharacterSession();
 
         var accountInfo = Account != null ? $"Account: {Account.Id} ({Account.Name})" : "Not authenticated";
         var address = SafeNetAddressString();
         Logger.WriteLog(LogType.Network, $"Client ({PlayerCoid}) disconnected from {address}. Reason: {reason}, Details: {reasonString}, {accountInfo}");
+
+        var props = new List<(string, object)>(8)
+        {
+            ("SessionId", SessionId),
+            ("ConnectionId", GetPlayerCOID()),
+            ("Reason", reason.ToString()),
+            ("Detail", reasonString),
+            ("SessionDurationMs", (long)(DateTime.UtcNow - SessionStartedUtc).TotalMilliseconds),
+        };
+
+        if (character != null)
+            props.Add(("CharacterId", character.ObjectId.Coid));
+
+        if (Account != null)
+            props.Add(("AccountId", Account.Id));
+
+        GameLog.Info("SessionEnded", props.ToArray());
     }
 
     /// <summary>Net address for logging; unit tests may construct connections without a bound address.</summary>
@@ -1271,12 +1368,15 @@ public partial class TNLConnection : GhostConnection
         }
 
         // Persist before SetMap(null) so Map.ContinentId is still available.
+        var saveOperation = GameLog.Operation("CharacterWorldStateSave", ("CharacterId", character.ObjectId.Coid));
         try
         {
             CharacterWorldStatePersistence.PersistFromCharacter(character, WorldStatePersistence);
+            saveOperation.Complete();
         }
         catch (Exception ex)
         {
+            saveOperation.Fail(ex);
             Logger.WriteException(LogType.Error, $"EndCharacterSession: failed to persist world state for coid {character.ObjectId.Coid}", ex);
         }
 

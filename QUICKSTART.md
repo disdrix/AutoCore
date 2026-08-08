@@ -55,6 +55,8 @@ Edit these files:
 "GamePath": "C:\\Path\\To\\Auto Assault\\game\\Auto Assault new"
 ```
 
+**appsettings.discord.json** (optional, gitignored) — copy from `appsettings.discord.example.json` and leave `Enabled: false` unless you want the Discord bot. See [`docs/discord.md`](docs/discord.md).
+
 ### 3. Run the Server (10 seconds)
 
 ```powershell

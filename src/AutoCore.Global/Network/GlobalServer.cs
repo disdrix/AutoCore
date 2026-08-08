@@ -80,6 +80,28 @@ public partial class GlobalServer : BaseServer, ILoopable
         LoginManager.Instance.Update(delta);
     }
 
+    /// <summary>
+    /// Live Global client count for Auth server-list / Discord presence.
+    /// Counts non-null <see cref="TNLInterface.MapConnections"/> under the same lock as Pulse.
+    /// </summary>
+    internal ushort GetOnlinePlayerCount()
+    {
+        lock (_interfaceLock)
+        {
+            if (Interface == null)
+                return 0;
+
+            var count = 0;
+            foreach (var conn in Interface.MapConnections.Values)
+            {
+                if (conn != null)
+                    count++;
+            }
+
+            return count > ushort.MaxValue ? ushort.MaxValue : (ushort)count;
+        }
+    }
+
     public bool Start()
     {
         // If no config file has been found, these values are 0 by default

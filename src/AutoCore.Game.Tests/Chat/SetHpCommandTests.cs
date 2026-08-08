@@ -24,6 +24,7 @@ public class SetHpCommandTests
         vehicle = new Vehicle();
         // Default SimpleObject ctor sets HP = MaxHP = 500.
         var character = new Character();
+        character.GMLevel = 1;
         character.SetCoid(9001, true);
         character.SetCurrentVehicleForTests(vehicle);
         return character;
@@ -42,6 +43,7 @@ public class SetHpCommandTests
     public void SetHP_WithoutVehicle_ReturnsError()
     {
         var character = new Character();
+        character.GMLevel = 1;
 
         var result = ChatCommandService.Instance.Execute(character, "/setHP 50");
 
@@ -134,6 +136,7 @@ public class SetHpCommandTests
     public void SetMaxHP_WithoutVehicle_ReturnsError()
     {
         var character = new Character();
+        character.GMLevel = 1;
 
         var result = ChatCommandService.Instance.Execute(character, "/setMaxHP 1000");
 
@@ -253,6 +256,7 @@ public class SetHpCommandTests
         var connection = new TNLConnection();
         character.SetOwningConnection(connection);
         connection.CurrentCharacter = character;
+            character.GMLevel = 1;
 
         var sent = new System.Collections.Generic.List<BasePacket>();
         TNLConnection.TestPacketSink = (_, packet) => sent.Add(packet);
@@ -280,6 +284,7 @@ public class SetHpCommandTests
         var connection = new TNLConnection();
         character.SetOwningConnection(connection);
         connection.CurrentCharacter = character;
+            character.GMLevel = 1;
 
         var sent = new System.Collections.Generic.List<BasePacket>();
         TNLConnection.TestPacketSink = (_, packet) => sent.Add(packet);
@@ -325,6 +330,7 @@ public class SetHpCommandTests
     public void Shield_WithoutVehicle_ReturnsError()
     {
         var character = new Character();
+        character.GMLevel = 1;
         var result = ChatCommandService.Instance.Execute(character, "/shield 10");
         Assert.IsTrue(result.Handled);
         StringAssert.Contains(result.Message, "vehicle");

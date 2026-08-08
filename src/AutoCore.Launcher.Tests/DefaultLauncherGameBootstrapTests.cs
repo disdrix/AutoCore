@@ -110,6 +110,28 @@ public class DefaultLauncherGameBootstrapTests
         Assert.IsTrue(bootstrap.InitializeMapManager());
     }
 
+    /// <summary>
+    /// The Launcher hosts Auth/Global/Sector in one process and never runs
+    /// <c>AutoCore.Sector/Program.cs</c>, so it must enable starting-area instancing itself.
+    /// Without this, 698/707/708 silently fall back to one shared map and every player in
+    /// Ark Bay sees every other player.
+    /// </summary>
+    [TestMethod]
+    public void InitializeMapManager_EnablesStartingAreaInstancing()
+    {
+        AutoCore.Game.Map.InstancedContinents.SetForTests(null);
+        Assert.IsFalse(AutoCore.Game.Map.InstancedContinents.IsInstanced(707),
+            "Precondition: instancing is off before bootstrap runs.");
+
+        new DefaultLauncherGameBootstrap().InitializeMapManager();
+
+        Assert.IsTrue(AutoCore.Game.Map.InstancedContinents.IsInstanced(698));
+        Assert.IsTrue(AutoCore.Game.Map.InstancedContinents.IsInstanced(707));
+        Assert.IsTrue(AutoCore.Game.Map.InstancedContinents.IsInstanced(708));
+        Assert.IsFalse(AutoCore.Game.Map.InstancedContinents.IsInstanced(1),
+            "Non-starting-area continents must stay shared.");
+    }
+
     private static void ResetConnectionString(Type contextType, string? unset)
     {
         var property = contextType.GetProperty(

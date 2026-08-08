@@ -509,7 +509,7 @@ public class Reaction : ClonedObjectBase
 
         var character = GetCharacterFromActivator(activator);
         if (character != null)
-            character.MapPresence.EnsureContinent(map.ContinentId);
+            character.MapPresence.EnsureContinent(map.ContinentId, map.InstanceSerial);
 
         var sharedWorld = Template.DoForAllPlayers;
 
@@ -699,7 +699,7 @@ public class Reaction : ClonedObjectBase
             var character = GetCharacterFromActivator(activator);
             if (character != null)
             {
-                character.MapPresence.EnsureContinent(map.ContinentId);
+                character.MapPresence.EnsureContinent(map.ContinentId, map.InstanceSerial);
                 foreach (var objectCoid in Template.Objects)
                     SuppressPresenceForCharacter(character, map, objectCoid, label);
                 return true;
@@ -1438,6 +1438,7 @@ public class Reaction : ClonedObjectBase
         // If ActOnActivator is true or Objects is empty, we reset based on GenericVar1 which may contain a trigger coid
         
         var objectCoid = activator.ObjectId.Coid;
+        var map = activator.Map;
 
         if (Template.Objects.Count > 0)
         {
@@ -1445,14 +1446,14 @@ public class Reaction : ClonedObjectBase
             foreach (var triggerCoid in Template.Objects)
             {
                 Logger.WriteLog(LogType.Debug, $"ResetTrigger reaction {Template.COID}: Resetting trigger {triggerCoid} for object {objectCoid}");
-                TriggerManager.Instance.ResetTriggerFor(objectCoid, triggerCoid);
+                TriggerManager.Instance.ResetTriggerFor(map, objectCoid, triggerCoid);
             }
         }
         else if (Template.GenericVar1 != 0)
         {
             // Reset the trigger specified by GenericVar1
             Logger.WriteLog(LogType.Debug, $"ResetTrigger reaction {Template.COID}: Resetting trigger {Template.GenericVar1} for object {objectCoid}");
-            TriggerManager.Instance.ResetTriggerFor(objectCoid, Template.GenericVar1);
+            TriggerManager.Instance.ResetTriggerFor(map, objectCoid, Template.GenericVar1);
         }
         else
         {

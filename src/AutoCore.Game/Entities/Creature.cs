@@ -9,6 +9,7 @@ using AutoCore.Game.Npc;
 using AutoCore.Game.Packets.Sector;
 using AutoCore.Game.Structures;
 using AutoCore.Game.TNL.Ghost;
+using AutoCore.Utils.Logging;
 
 public class Creature : SimpleObject
 {
@@ -128,6 +129,16 @@ public class Creature : SimpleObject
         {
             var murdererObj = ObjectManager.Instance.GetObject(Murderer);
             killerCharacter = murdererObj?.GetSuperCharacter(false);
+        }
+
+        if (killerCharacter != null)
+        {
+            GameLog.Info("NpcKilled",
+                ("VictimCoid", ObjectId.Coid),
+                ("VictimCbid", CBID),
+                ("KillerId", killerCharacter.ObjectId.Coid),
+                ("DeathType", deathType.ToString()),
+                ("MapId", map?.ContinentId));
         }
 
         // SpawnPoint TriggerEvents before leave-map (same pattern as Vehicle).

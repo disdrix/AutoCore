@@ -6,6 +6,7 @@ using AutoCore.Database.Char.Models;
 using AutoCore.Game.Entities;
 using AutoCore.Game.Structures;
 using AutoCore.Utils;
+using AutoCore.Utils.Logging;
 
 /// <summary>
 /// EF-backed world-state persistence. Opens a short-lived <see cref="CharContext"/> per call.
@@ -108,7 +109,7 @@ public sealed class CharacterWorldStatePersistence : ICharacterWorldStatePersist
             }
         }
 
-        store.SaveChanges();
+        DbOperationTiming.Run("CharacterWorldStatePersistence.Save", () => store.SaveChanges());
         Logger.WriteLog(LogType.Debug,
             $"CharacterWorldStatePersistence.Save: character={snapshot.CharacterCoid} continent={snapshot.ContinentId} " +
             $"pos=({snapshot.PositionX},{snapshot.PositionY},{snapshot.PositionZ}) " +

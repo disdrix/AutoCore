@@ -5,6 +5,14 @@
 - [Quick Start](../QUICKSTART.md) — run the stack in minutes
 - [Setup](../SETUP.md) — detailed server configuration
 - [Client setup](../CLIENT_SETUP.md) — point the retail client at your server
+- [Discord bot (optional)](discord.md) — presence + DM account create / password change
+
+## Observability
+
+- [Logging / observability audit (LG register)](logging-observability-audit.md) — design D1–D8, limitations, playtest recipes
+- [Structured log event catalog](logging-event-catalog.md) — every GameLog event name + error codes
+- [Exception-safety audit (SS-nn)](exception-safety-audit.md) — crash boundaries and accepted risk
+- [Logging overhaul plan / handoff](migrateGoals.md) — phased plan (phases 0–6 complete)
 
 ## Core systems
 

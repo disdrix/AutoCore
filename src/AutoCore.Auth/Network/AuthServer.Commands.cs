@@ -1,10 +1,8 @@
 ﻿namespace AutoCore.Auth.Network;
 
 using AutoCore.Database.Auth;
-using AutoCore.Database.Auth.Models;
 using AutoCore.Utils.Commands;
 using AutoCore.Utils;
-using Microsoft.EntityFrameworkCore;
 
 public partial class AuthServer
 {
@@ -42,37 +40,16 @@ public partial class AuthServer
         {
             using var context = CreateAuthContext();
 
-            // SS-15 / §10: check the predictable condition instead of inferring it from a
-            // swallowed exception. The old bare catch reported *every* failure — connection
-            // refused, schema mismatch, permission denied — as "already taken".
-            if (context.Accounts.Any(a => a.Username == userName || a.Email == email))
+            // SS-15: shared AccountService checks duplicates up-front and handles DbUpdateException
+            // races. Never log the password.
+            var result = AccountService.TryCreate(context, email, userName, password ?? string.Empty);
+            if (!result.Success)
             {
-                Logger.WriteLog(LogType.Command, "Username or email is already taken!");
+                Logger.WriteLog(LogType.Command, result.Message);
                 return;
             }
 
-            var salt = Account.CreateSalt();
-
-            context.Accounts.Add(new Account
-            {
-                Email = email,
-                Username = userName,
-                Password = Account.Hash(password ?? string.Empty, salt),
-                Salt = salt,
-                JoinDate = DateTime.Now
-            });
-            context.SaveChanges();
-
-            // Never log the password: this line previously echoed the plaintext credential
-            // into the console and the log file.
             Logger.WriteLog(LogType.Command, $"Created account: {userName}!");
-        }
-        catch (DbUpdateException ex)
-        {
-            // Unique-index violation: another create won the race between the check and the
-            // insert. Still a duplicate, but log the real cause rather than guessing.
-            Logger.WriteException(LogType.Warning, $"create account '{userName}'", ex);
-            Logger.WriteLog(LogType.Command, "Username or email is already taken!");
         }
         catch (Exception ex)
         {

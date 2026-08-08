@@ -38,6 +38,31 @@ public class SectorMap
     public static bool SendGroupReactionCall { get; set; } = true;
 
     public int ContinentId { get; }
+
+    private static int _nextInstanceSerial;
+
+    /// <summary>
+    /// Process-unique serial assigned to every <see cref="SectorMap"/> at construction (shared
+    /// and instanced alike — uniform keying). Singleton state that outlives a map object
+    /// (trigger latches, presence ledgers, combat cooldowns) keys on this instead of bare COIDs,
+    /// because per-player instances of the same continent mint identical local COIDs
+    /// (both count from <c>MapData.HighestCoid + 1</c>).
+    /// </summary>
+    public int InstanceSerial { get; } = Interlocked.Increment(ref _nextInstanceSerial);
+
+    /// <summary>True when this map is a private per-player copy (see <see cref="InstancedContinents"/>).</summary>
+    public bool IsInstance { get; private set; }
+
+    /// <summary>Owning character coid for an instance map; 0 for shared maps.</summary>
+    public long InstanceOwnerCoid { get; private set; }
+
+    /// <summary>Marks this map as a private instance owned by <paramref name="ownerCoid"/>.</summary>
+    internal void MarkAsInstance(long ownerCoid)
+    {
+        IsInstance = true;
+        InstanceOwnerCoid = ownerCoid;
+    }
+
     public long LocalCoidCounter { get; set; }
     public MapData MapData { get; private set; }
     public ContinentObject ContinentObject => MapData.ContinentObject;
@@ -105,6 +130,11 @@ public class SectorMap
         typeof(SectorMap).GetField($"<{nameof(Grid)}>k__BackingField",
             System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
             .SetValue(map, new SpatialHashGrid());
+        // GetUninitializedObject skips field initializers; assign the serial explicitly so test
+        // maps get unique identities like production ones.
+        typeof(SectorMap).GetField($"<{nameof(InstanceSerial)}>k__BackingField",
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+            .SetValue(map, Interlocked.Increment(ref _nextInstanceSerial));
 
         map.LocalCoidCounter = mapData.HighestCoid + 1;
         return map;
@@ -258,7 +288,7 @@ public class SectorMap
         {
             PlayerCount++;
             Players.Add(character);
-            character.MapPresence.EnsureContinent(ContinentId);
+            character.MapPresence.EnsureContinent(ContinentId, InstanceSerial);
 
             // Solo enter: scrub leaked Final Exam combat vehicles and restore dialog NPCs.
             // Map-leave reset can miss if PlayerCount never hit 0 (stuck session / order bugs).
@@ -387,14 +417,30 @@ public class SectorMap
 
         Objects.Remove(clonedObject.ObjectId);
 
-        // Clear any trigger states for this object when it leaves the map
-        TriggerManager.Instance.ClearTriggersFor(clonedObject.ObjectId.Coid);
+        // Clear any trigger states for this object when it leaves THIS map — never a sibling
+        // instance's latches for the same coid.
+        TriggerManager.Instance.ClearTriggersFor(this, clonedObject.ObjectId.Coid);
 
         // Reaction Create/Delete mutate the live sector (delete standing Gunny, spawn combat
         // vehicle). MapData templates are process-global, so without a reset the next visitor
         // sees Final Exam mid-state while turning in earlier missions (Guns of the Expansion).
+        // Per-player instances are disposed outright instead — nobody re-visits a dead copy,
+        // and the shared-template restore must never run while sibling instances are live.
         if (clonedObject is Character && PlayerCount == 0 && !_resettingLocalWorld)
-            ResetLocalWorldToAuthored();
+        {
+            if (IsInstance)
+            {
+                // SS-30: disposal failure must never propagate into the leaving player's
+                // logout/transfer teardown (SetMap -> EndCharacterSession -> MainLoop).
+                Guard.Run(
+                    $"instance disposal (continent {ContinentId}#{InstanceSerial})",
+                    () => MapManager.Instance.DisposeInstance(this, InstanceOwnerCoid));
+            }
+            else
+            {
+                ResetLocalWorldToAuthored();
+            }
+        }
     }
 
     bool _resettingLocalWorld;
@@ -537,7 +583,7 @@ public class SectorMap
         }
 
         character.EnsureLogicVariables();
-        character.MapPresence.EnsureContinent(ContinentId);
+        character.MapPresence.EnsureContinent(ContinentId, InstanceSerial);
 
         var fired = 0;
         var firedCreateCoids = new HashSet<long>();
@@ -867,7 +913,7 @@ public class SectorMap
         if (character == null)
             return 0;
 
-        character.MapPresence.EnsureContinent(ContinentId);
+        character.MapPresence.EnsureContinent(ContinentId, InstanceSerial);
 
         // Hot path: AutoPatrol / movement re-entry after pad is already set up.
         if (MapHasPresentEntityWithCbid(character, deliverCbid)
@@ -1168,7 +1214,7 @@ public class SectorMap
         if (character == null || cbids == null || cbids.Count == 0)
             return;
 
-        character.MapPresence.EnsureContinent(ContinentId);
+        character.MapPresence.EnsureContinent(ContinentId, InstanceSerial);
 
         foreach (var kvp in MapData.Templates)
         {
@@ -1271,7 +1317,7 @@ public class SectorMap
             return;
 
         var character = activator.GetAsCharacter() ?? activator.GetSuperCharacter(false);
-        character?.MapPresence.EnsureContinent(ContinentId);
+        character?.MapPresence.EnsureContinent(ContinentId, InstanceSerial);
 
         foreach (var kvp in MapData.Templates)
         {
@@ -1427,37 +1473,11 @@ public class SectorMap
         _resettingLocalWorld = true;
         try
         {
-            // Snapshot: SetMap(null) mutates Objects via LeaveMap.
-            var snapshot = Objects.Values.ToList();
-            foreach (var obj in snapshot)
-            {
-                if (obj is Character)
-                    continue;
-
-                try
-                {
-                    obj.SetMap(null);
-                }
-                catch (Exception ex)
-                {
-                    Logger.WriteLog(LogType.Error,
-                        "SectorMap {0}: reset remove coid={1} failed: {2}",
-                        ContinentId,
-                        obj.ObjectId?.Coid ?? -1,
-                        ex.Message);
-                }
-            }
-
-            Objects.Clear();
-            Triggers.Clear();
-            Reactions.Clear();
-            NpcAiEntities.Clear();
-            Players.Clear();
-            PlayerCount = 0;
-            Grid = new SpatialHashGrid();
-            LocalCoidCounter = MapData.HighestCoid + 1;
+            TearDownLocalEntities();
 
             // Undo shared-template IsActive writes from older Create/Activate paths.
+            // EXCLUSIVE to the shared-map reset: MapData.Templates are process-global, so an
+            // instance disposal running this would leak state across sibling instances.
             foreach (var tpl in MapData.Templates.Values)
             {
                 if (tpl is SpawnPointTemplate spawnTpl)
@@ -1474,6 +1494,45 @@ public class SectorMap
         {
             _resettingLocalWorld = false;
         }
+    }
+
+    /// <summary>
+    /// Releases every non-Character entity and clears map-local collections. Shared by the
+    /// shared-map reset (which then restores templates and rebuilds via
+    /// <see cref="InitializeLocalObjects"/>) and instance disposal (which must NOT touch shared
+    /// <see cref="MapData"/> templates or rebuild a dead map).
+    /// </summary>
+    internal void TearDownLocalEntities()
+    {
+        // Snapshot: SetMap(null) mutates Objects via LeaveMap.
+        var snapshot = Objects.Values.ToList();
+        foreach (var obj in snapshot)
+        {
+            if (obj is Character)
+                continue;
+
+            try
+            {
+                obj.SetMap(null);
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteLog(LogType.Error,
+                    "SectorMap {0}: teardown remove coid={1} failed: {2}",
+                    ContinentId,
+                    obj.ObjectId?.Coid ?? -1,
+                    ex.Message);
+            }
+        }
+
+        Objects.Clear();
+        Triggers.Clear();
+        Reactions.Clear();
+        NpcAiEntities.Clear();
+        Players.Clear();
+        PlayerCount = 0;
+        Grid = new SpatialHashGrid();
+        LocalCoidCounter = MapData.HighestCoid + 1;
     }
 
     // Reusable per-map scratch buffers for the scope query. The scope query runs per connection per

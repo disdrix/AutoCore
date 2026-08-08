@@ -44,6 +44,12 @@ public abstract class BaseServer
     {
         Console.Title = $"AutoCore - {Type} Server";
 
+        Logging.GameLog.Info("ServerStarting",
+            ("ServerName", Type),
+            ("BuildVersion", Logging.ServerIdentity.BuildVersion),
+            ("CommitHash", Logging.ServerIdentity.CommitHash),
+            ("ServerInstanceId", Logging.ServerIdentity.ServerInstanceId));
+
         Logger.WriteLog(LogType.Initialize, @"                _         ______              ");
         Logger.WriteLog(LogType.Initialize, @"     /\        | |       / ____|              ");
         Logger.WriteLog(LogType.Initialize, @"    /  \  _   _| |_ ___ | |     ___  _ __ ___ ");

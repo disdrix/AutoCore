@@ -53,6 +53,13 @@ public sealed class DefaultLauncherGameBootstrap : ILauncherGameBootstrap
 
     public bool InitializeMapManager()
     {
+        // Per-player instancing for the starting areas (698/707/708). The Launcher hosts the
+        // sector in-process and never runs AutoCore.Sector/Program.cs, so it must enable this
+        // itself — otherwise those maps silently stay shared and players see each other.
+        // Safe in the combined process: Global's new-character path uses GetMap (shared copy),
+        // only the sector entry paths call GetMapForCharacter.
+        AutoCore.Game.Map.InstancedContinents.EnableForSector();
+
         if (MapManager.Instance.Initialize())
             return true;
 

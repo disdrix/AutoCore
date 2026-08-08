@@ -12,12 +12,12 @@ public class CharacterMapPresenceRegressionTests
     public void EnsureContinent_SameId_DoesNotClear()
     {
         var p = new CharacterMapPresence();
-        p.EnsureContinent(7);
+        p.EnsureContinent(7, 1);
         p.Suppress(10);
         p.Materialize(20);
         p.TrackOwnedCombat(30);
         p.MarkDeliverTurnInReady(12448);
-        p.EnsureContinent(7);
+        p.EnsureContinent(7, 1);
         Assert.IsTrue(p.IsSuppressed(10));
         Assert.IsTrue(p.IsMaterialized(20));
         Assert.IsTrue(p.OwnsCombat(30));
@@ -29,13 +29,13 @@ public class CharacterMapPresenceRegressionTests
     public void EnsureContinent_DifferentId_ClearsAllLedgers()
     {
         var p = new CharacterMapPresence();
-        p.EnsureContinent(1);
+        p.EnsureContinent(1, 1);
         p.Suppress(10);
         p.Materialize(20);
         p.TrackOwnedCombat(30);
         p.MarkDeliverTurnInReady(99);
         p.MarkStalePatrolResync(3979);
-        p.EnsureContinent(2);
+        p.EnsureContinent(2, 1);
         Assert.AreEqual(2, p.ContinentId);
         Assert.IsFalse(p.IsSuppressed(10));
         Assert.IsFalse(p.IsMaterialized(20));
@@ -48,7 +48,7 @@ public class CharacterMapPresenceRegressionTests
     public void Clear_ResetsContinentAndAllSets()
     {
         var p = new CharacterMapPresence();
-        p.EnsureContinent(3);
+        p.EnsureContinent(3, 1);
         p.Suppress(1);
         p.Materialize(2);
         p.TrackOwnedCombat(3);
@@ -143,7 +143,7 @@ public class CharacterMapPresenceRegressionTests
         Assert.IsTrue(p.IsDeliverTurnInReady(12448));
         p.MarkDeliverTurnInReady(12448); // idempotent
         Assert.IsTrue(p.IsDeliverTurnInReady(12448));
-        p.EnsureContinent(9);
+        p.EnsureContinent(9, 1);
         Assert.IsFalse(p.IsDeliverTurnInReady(12448));
     }
 }

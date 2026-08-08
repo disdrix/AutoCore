@@ -10,6 +10,7 @@ using AutoCore.Game.Inventory;
 using AutoCore.Game.Packets.Sector;
 using AutoCore.Game.TNL;
 using AutoCore.Utils;
+using AutoCore.Utils.Logging;
 using AutoCore.Utils.Reliability;
 
 public sealed class DevControlServer
@@ -197,6 +198,11 @@ public sealed class DevControlServer
     internal DevHttpResponse HandleRequest(DevHttpRequest request)
     {
         var path = request.Path;
+
+        // Security event: path/method only — never request bodies (may contain chat-command payloads).
+        GameLog.Info("DevControlRequest",
+            ("Method", request.Method ?? ""),
+            ("Path", path ?? ""));
 
         try
         {

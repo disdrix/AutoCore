@@ -20,6 +20,10 @@ public sealed class ChatCommandService
         if (parts.Length == 0)
             return new ChatCommandExecutionResult(false, string.Empty);
 
+        // SS-28: gate mutating commands before any state change.
+        if (!ChatAdminGate.Authorize(character, parts[0]))
+            return new ChatCommandExecutionResult(true, "Permission denied (GM required).");
+
         switch (parts[0])
         {
             case "/listItems":
@@ -64,6 +68,11 @@ public sealed class ChatCommandService
             case "/showMissions":
             case "/showmissions":
                 return ShowMissions(character);
+
+            case "/reportbug":
+            case "/bug":
+            case "/bugreport":
+                return ReportBug(character, command, parts);
 
             case "/clearAllMissions":
             case "/clearallmissions":
@@ -122,6 +131,19 @@ public sealed class ChatCommandService
             case "/resetskills":
                 return ResetSkills(character);
 
+            case "/kick":
+                return Kick(character, parts);
+
+            case "/ban":
+                return Ban(character, parts);
+
+            case "/unban":
+                return Unban(character, parts);
+
+            case "/listplayers":
+            case "/listPlayers":
+                return ListPlayers();
+
             default:
             {
                 // Case-insensitive aliases.
@@ -133,9 +155,42 @@ public sealed class ChatCommandService
                 if (cmd is "/addplayer" or "/newaccount" or "/player")
                     return CreatePlayer(parts);
 
+                if (cmd is "/listplayers")
+                    return ListPlayers();
+
+                if (cmd is "/kick")
+                    return Kick(character, parts);
+
+                if (cmd is "/ban")
+                    return Ban(character, parts);
+
+                if (cmd is "/unban")
+                    return Unban(character, parts);
+
                 return new ChatCommandExecutionResult(false, string.Empty);
             }
         }
+    }
+
+    private static ChatCommandExecutionResult ListPlayers()
+        => new(true, PlayerModerationService.Instance.ListPlayers());
+
+    private static ChatCommandExecutionResult Kick(Character character, string[] parts)
+    {
+        var query = parts.Length >= 2 ? string.Join(' ', parts.Skip(1)) : null;
+        return new ChatCommandExecutionResult(true, PlayerModerationService.Instance.Kick(query, character));
+    }
+
+    private static ChatCommandExecutionResult Ban(Character character, string[] parts)
+    {
+        var query = parts.Length >= 2 ? string.Join(' ', parts.Skip(1)) : null;
+        return new ChatCommandExecutionResult(true, PlayerModerationService.Instance.Ban(query, character));
+    }
+
+    private static ChatCommandExecutionResult Unban(Character character, string[] parts)
+    {
+        var query = parts.Length >= 2 ? string.Join(' ', parts.Skip(1)) : null;
+        return new ChatCommandExecutionResult(true, PlayerModerationService.Instance.Unban(query, character));
     }
 
     /// <summary>
@@ -233,6 +288,38 @@ public sealed class ChatCommandService
         var count = character.LearnedSkills.Count;
         CharacterSkillService.Instance.Reset(character);
         return new ChatCommandExecutionResult(true, $"Removed {count} learned skill(s) without refunding points. Relog to refresh the skill tree.");
+    }
+
+    /// <summary>
+    /// Player bug report: packs description + mission journal + last N action events into a zip
+    /// and uploads via <see cref="BugReportUploadBridge"/> (Discord when Launcher wired it).
+    /// Open to all players (not GM-gated). Usage: <c>/reportbug your text here</c>
+    /// </summary>
+    private static ChatCommandExecutionResult ReportBug(Character character, string fullCommand, string[] parts)
+    {
+        if (character == null)
+            return new ChatCommandExecutionResult(true, "No character loaded.");
+
+        // Everything after the command token is free text (may contain spaces).
+        var description = string.Empty;
+        if (!string.IsNullOrEmpty(fullCommand))
+        {
+            var firstSpace = fullCommand.IndexOf(' ');
+            if (firstSpace >= 0 && firstSpace + 1 < fullCommand.Length)
+                description = fullCommand[(firstSpace + 1)..].Trim();
+        }
+
+        if (string.IsNullOrWhiteSpace(description) && parts.Length < 2)
+        {
+            return new ChatCommandExecutionResult(true,
+                "Usage: /reportbug <what went wrong>  — attaches mission journal + recent actions and posts to the team.");
+        }
+
+        if (string.IsNullOrWhiteSpace(description) && parts.Length >= 2)
+            description = string.Join(' ', parts.Skip(1));
+
+        var result = BugReportService.Submit(character, description);
+        return new ChatCommandExecutionResult(true, result.PlayerMessage);
     }
 
     /// <summary>

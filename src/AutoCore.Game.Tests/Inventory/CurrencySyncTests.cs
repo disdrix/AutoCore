@@ -338,7 +338,7 @@ public class CurrencySyncTests
         var persistence = new RecordingInventoryPersistence();
         var character = CreateCharacter(10, 100);
 
-        var result = CurrencySync.AddCredits(persistence, character, 50);
+        var result = CurrencySync.AddCredits(persistence, character, 50, CurrencyChangeReason.Unknown);
 
         Assert.AreEqual(100L, result.Previous);
         Assert.AreEqual(150L, result.NewBalance);
@@ -354,7 +354,7 @@ public class CurrencySyncTests
         var persistence = new RecordingInventoryPersistence();
         var character = CreateCharacter(11, 30);
 
-        var result = CurrencySync.AddCredits(persistence, character, -100);
+        var result = CurrencySync.AddCredits(persistence, character, -100, CurrencyChangeReason.Unknown);
 
         Assert.AreEqual(0L, result.NewBalance);
         Assert.AreEqual(-30L, result.AppliedDelta);
@@ -367,7 +367,7 @@ public class CurrencySyncTests
         var persistence = new RecordingInventoryPersistence();
         var character = CreateCharacter(12, 10);
 
-        var result = CurrencySync.AddCredits(persistence, character, -40, allowDebt: true);
+        var result = CurrencySync.AddCredits(persistence, character, -40, CurrencyChangeReason.Unknown, allowDebt: true);
 
         Assert.AreEqual(-30L, result.NewBalance);
         Assert.AreEqual(-40L, result.AppliedDelta);
@@ -380,7 +380,8 @@ public class CurrencySyncTests
         var result = CurrencySync.AddCredits(
             new RecordingInventoryPersistence(),
             CreateCharacter(13, 5),
-            0);
+            0,
+            CurrencyChangeReason.Unknown);
 
         Assert.AreEqual(0L, result.AppliedDelta);
         Assert.IsNull(result.DeltaPacket);
@@ -390,7 +391,7 @@ public class CurrencySyncTests
     public void AddCredits_NullCharacter_Throws()
     {
         Assert.ThrowsException<ArgumentNullException>(() =>
-            CurrencySync.AddCredits(new RecordingInventoryPersistence(), null, 1));
+            CurrencySync.AddCredits(new RecordingInventoryPersistence(), null, 1, CurrencyChangeReason.Unknown));
     }
 
     [TestMethod]
@@ -399,7 +400,7 @@ public class CurrencySyncTests
         var persistence = new RecordingInventoryPersistence();
         var character = CreateCharacter(14, 1);
 
-        var balance = CurrencySync.SetCreditsAbsolute(persistence, character, 999_888_777_666L);
+        var balance = CurrencySync.SetCreditsAbsolute(persistence, character, 999_888_777_666L, CurrencyChangeReason.Unknown);
 
         Assert.AreEqual(999_888_777_666L, balance);
         Assert.AreEqual(balance, character.Credits);
@@ -412,7 +413,7 @@ public class CurrencySyncTests
         var persistence = new RecordingInventoryPersistence();
         var character = CreateCharacter(15, 50);
 
-        var balance = CurrencySync.SetCreditsAbsolute(persistence, character, -9);
+        var balance = CurrencySync.SetCreditsAbsolute(persistence, character, -9, CurrencyChangeReason.Unknown);
 
         Assert.AreEqual(0L, balance);
         Assert.AreEqual(0L, character.Credits);
@@ -424,7 +425,7 @@ public class CurrencySyncTests
         var persistence = new RecordingInventoryPersistence();
         var character = CreateCharacter(16, 0);
 
-        var balance = CurrencySync.SetCreditsAbsolute(persistence, character, -123, allowDebt: true);
+        var balance = CurrencySync.SetCreditsAbsolute(persistence, character, -123, CurrencyChangeReason.Unknown, allowDebt: true);
 
         Assert.AreEqual(-123L, balance);
         Assert.AreEqual(-123L, character.Credits);
@@ -434,7 +435,7 @@ public class CurrencySyncTests
     public void SetCreditsAbsolute_NullCharacter_Throws()
     {
         Assert.ThrowsException<ArgumentNullException>(() =>
-            CurrencySync.SetCreditsAbsolute(new RecordingInventoryPersistence(), null, 1));
+            CurrencySync.SetCreditsAbsolute(new RecordingInventoryPersistence(), null, 1, CurrencyChangeReason.Unknown));
     }
 
     [TestMethod]

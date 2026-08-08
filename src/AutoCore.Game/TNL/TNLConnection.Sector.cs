@@ -76,6 +76,9 @@ public partial class TNLConnection
                 });
                 // Client already spent optimistically; push server current so the HUD can restore.
                 CharacterLevelManager.Instance.SyncCurrentPowerGhost(CurrentCharacter);
+                Diagnostics.PlayerActionTrace.SkillCast(
+                    CurrentCharacter, packet.SkillId, 0, success: false,
+                    response: "NotLearned", targetCoid: packet.Target?.Coid ?? 0);
             }
             Logger.WriteLog(LogType.Debug, "Rejected RequestCastSkill skill={0}: skill is not learned", packet.SkillId);
             return;
@@ -106,7 +109,15 @@ public partial class TNLConnection
             Logger.WriteLog(LogType.Debug,
                 "RequestCastSkill failed: skill={0} rank={1} response={2} target={3} pos={4}",
                 packet.SkillId, rank, response, packet.Target, packet.TargetPosition);
+            Diagnostics.PlayerActionTrace.SkillCast(
+                CurrentCharacter, packet.SkillId, rank, success: false,
+                response: response.ToString(), targetCoid: packet.Target?.Coid ?? 0);
+            return;
         }
+
+        Diagnostics.PlayerActionTrace.SkillCast(
+            CurrentCharacter, packet.SkillId, rank, success: true,
+            response: "Ok", targetCoid: packet.Target?.Coid ?? 0);
     }
 
     private void HandleQuickBarUpdatePacket(BinaryReader reader)
@@ -143,7 +154,22 @@ public partial class TNLConnection
         var packet = new TransferFromGlobalPacket();
         packet.Read(reader);
 
-        // TODO: validate security key with info received from communicator or DB value or something...
+        AutoCore.Utils.Logging.GameLog.Info("SectorHandshakeStarted",
+            ("SessionId", SessionId),
+            ("CharacterId", packet.CharacterCoid));
+
+        // SS-29 (accepted risk, log-only): sector transfer security key is not enforced yet.
+        // Emit a structured warning when a non-zero key arrives so playtest logs surface the gap
+        // without disconnecting clients. Full validation is deferred.
+        if (packet.SecurityKey != 0)
+        {
+            AutoCore.Utils.Logging.GameLog.Warn("SecurityKeyMismatch", "SEC-002",
+                ("SessionId", SessionId),
+                ("CharacterId", packet.CharacterCoid),
+                ("SecurityKeyPresent", true),
+                ("Note", "Transfer key not validated (SS-29 accepted risk)"));
+        }
+
         using var context = new CharContext();
 
         CurrentCharacter = ObjectManager.Instance.GetOrLoadCharacter(packet.CharacterCoid, context);
@@ -163,7 +189,9 @@ public partial class TNLConnection
 
         var mapInfoPacket = new MapInfoPacket();
 
-        var map = MapManager.Instance.GetMap(CurrentCharacter.LastTownId);
+        // Instanced starting areas resolve to a fresh private copy per login (retail behavior);
+        // shared continents return the one shared map, identical to GetMap.
+        var map = MapManager.Instance.GetMapForCharacter(CurrentCharacter.LastTownId, CurrentCharacter);
 
         CurrentCharacter.SetOwningConnection(this);
         CurrentCharacter.GMLevel = Account.Level;
@@ -238,6 +266,12 @@ public partial class TNLConnection
         // owner-combat initial profile (no equipment/pose) to avoid clearing +0x258.
         if (character.CurrentVehicle?.Ghost != null)
             ObjectLocalScopeAlways(character.CurrentVehicle.Ghost);
+
+        AutoCore.Utils.Logging.GameLog.Info("CharacterSpawned",
+            ("SessionId", SessionId),
+            ("CharacterId", character.ObjectId.Coid),
+            ("CharacterName", character.Name),
+            ("AccountId", Account?.Id));
     }
 
     /// <summary>
@@ -899,12 +933,52 @@ public partial class TNLConnection
     }
 
     private void LogInventoryOperationResult(InventoryOperationResult result)
+        => LogInventoryOperationOutcome(result);
+
+    /// <summary>
+    /// Phase 3: FAILED inventory operations always emit <c>InventoryRequestRejected</c>
+    /// (INV-001) so rejections are visible without the debug gate; successful-operation
+    /// debug logging stays gated by <see cref="Diagnostics.ServerConfig.InventoryDebugPackets"/>.
+    /// </summary>
+    internal static void LogInventoryOperationOutcome(InventoryOperationResult result)
     {
+        if (result == null)
+            return;
+
+        if (IsInventoryOperationRejected(result))
+        {
+            AutoCore.Utils.Logging.GameLog.Warn(
+                "InventoryRequestRejected",
+                "INV-001",
+                ("Reason", result.LogMessage));
+        }
+
         if (!Diagnostics.ServerConfig.InventoryDebugPackets)
             return;
 
-        if (!string.IsNullOrWhiteSpace(result?.LogMessage))
+        if (!string.IsNullOrWhiteSpace(result.LogMessage))
             Logger.WriteLog(LogType.Debug, result.LogMessage);
+    }
+
+    /// <summary>True when the result carries a client response packet marked unsuccessful.</summary>
+    internal static bool IsInventoryOperationRejected(InventoryOperationResult result)
+    {
+        if (result?.Packets == null)
+            return false;
+
+        foreach (var packet in result.Packets)
+        {
+            switch (packet)
+            {
+                case InventoryGrabResponsePacket { WasSuccessful: false }:
+                case InventoryDropResponsePacket { WasSuccessful: false }:
+                case ItemDropResponsePacket { WasSuccessful: false }:
+                case InventoryAddItemResponsePacket { WasSuccessful: false }:
+                    return true;
+            }
+        }
+
+        return false;
     }
 
     private void SendInventoryOperationPackets(InventoryOperationResult result)

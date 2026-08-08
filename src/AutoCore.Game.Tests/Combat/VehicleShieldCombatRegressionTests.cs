@@ -352,6 +352,7 @@ public class VehicleShieldCombatRegressionTests
         var connection = new TNLConnection();
         character.SetOwningConnection(connection);
         connection.CurrentCharacter = character;
+            character.GMLevel = 1;
 
         var sent = new List<BasePacket>();
         TNLConnection.TestPacketSink = (_, packet) => sent.Add(packet);

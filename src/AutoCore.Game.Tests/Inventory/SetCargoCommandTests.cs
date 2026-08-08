@@ -36,6 +36,7 @@ public class SetCargoCommandTests
         var character = new Character();
         character.SetCoid(5001, true);
         character.AttachTestDataForTests();
+        character.GMLevel = 1;
         character.AttachInventoryForTests(inventory);
 
         var result = ChatCommandService.Instance.Execute(character, "/setcargo 5 8");

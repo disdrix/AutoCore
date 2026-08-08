@@ -50,8 +50,10 @@ public static class MapPropCorpseDespawn
 
         lock (Gate)
         {
-            // Replace existing schedule for same COID.
-            PendingEntries.RemoveAll(p => p.ObjectId.Coid == objectId.Coid);
+            // Replace existing schedule for same COID on the SAME map — per-player instances of
+            // one continent mint identical prop coids, and a global dedupe would cancel a
+            // sibling instance's pending despawn (leaking its corpse forever).
+            PendingEntries.RemoveAll(p => p.ObjectId.Coid == objectId.Coid && ReferenceEquals(p.Map, map));
             PendingEntries.Add(new PendingEntry
             {
                 Prop = prop,
@@ -109,6 +111,16 @@ public static class MapPropCorpseDespawn
         foreach (var p in all)
             Finalize(p);
         return all.Count;
+    }
+
+    /// <summary>Drops every pending despawn for one map. Called from instance disposal.</summary>
+    public static void CancelForMap(SectorMap map)
+    {
+        if (map == null)
+            return;
+
+        lock (Gate)
+            PendingEntries.RemoveAll(p => ReferenceEquals(p.Map, map));
     }
 
     internal static void ResetForTests()

@@ -68,6 +68,60 @@ public class LauncherInitOrderTests
     }
 
     [TestMethod]
+    public void Run_WithDiscordHost_StartsDiscordAfterAuthBeforeGlobal()
+    {
+        var events = new List<string>();
+        var discord = new FakeLauncherServerHost("Discord", eventLog: events);
+
+        var result = LauncherInitOrchestrator.Run(
+            TestConfigFactory.CreateValidAuth(),
+            TestConfigFactory.CreateValidGlobal(),
+            TestConfigFactory.CreateValidSector(),
+            new FakeLauncherGameBootstrap(events),
+            new FakeLauncherServerHost("Auth", eventLog: events),
+            new FakeLauncherServerHost("Global", eventLog: events),
+            new FakeLauncherServerHost("Sector", eventLog: events),
+            TestConfigFactory.PathExistsFor(TestConfigFactory.ExistingGamePath),
+            discordHost: discord);
+
+        Assert.IsTrue(result.Success, result.ErrorMessage);
+        CollectionAssert.AreEqual(
+            LauncherInitOrchestrator.ExpectedSuccessfulOrderWithDiscord.ToList(),
+            result.CompletedSteps.ToList());
+
+        var authStart = events.IndexOf("Auth.Start");
+        var discordSetup = events.IndexOf("Discord.Setup");
+        var discordStart = events.IndexOf("Discord.Start");
+        var globalSetup = events.IndexOf("Global.Setup");
+        Assert.IsTrue(authStart >= 0 && discordSetup > authStart);
+        Assert.IsTrue(discordStart > discordSetup);
+        Assert.IsTrue(globalSetup > discordStart);
+    }
+
+    [TestMethod]
+    public void Run_WhenDiscordStartFails_DoesNotStartGlobalOrSector()
+    {
+        var events = new List<string>();
+        var result = LauncherInitOrchestrator.Run(
+            TestConfigFactory.CreateValidAuth(),
+            TestConfigFactory.CreateValidGlobal(),
+            TestConfigFactory.CreateValidSector(),
+            new FakeLauncherGameBootstrap(events),
+            new FakeLauncherServerHost("Auth", eventLog: events),
+            new FakeLauncherServerHost("Global", eventLog: events),
+            new FakeLauncherServerHost("Sector", eventLog: events),
+            TestConfigFactory.PathExistsFor(TestConfigFactory.ExistingGamePath),
+            discordHost: new FakeLauncherServerHost("Discord", startSucceeds: false, eventLog: events));
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(LauncherInitStep.StartDiscord, result.FailedStep);
+        CollectionAssert.Contains(events, "Auth.Start");
+        CollectionAssert.Contains(events, "Discord.Start");
+        CollectionAssert.DoesNotContain(events, "Global.Setup");
+        CollectionAssert.DoesNotContain(events, "Sector.Setup");
+    }
+
+    [TestMethod]
     public void Run_WhenAssetInitFails_StopsBeforeServerStart()
     {
         var events = new List<string>();

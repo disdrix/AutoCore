@@ -74,7 +74,9 @@ public partial class GlobalServer
     {
         info.AgeLimit = Config.ServerInfoConfig.AgeLimit;
         info.PKFlag = Config.ServerInfoConfig.PKFlag;
-        info.CurrentPlayers = 0;
+        // Was hard-coded to 0, so Auth (and Discord presence via AuthServerPlayerCountSource)
+        // always reported an empty realm even with clients connected.
+        info.CurrentPlayers = GetOnlinePlayerCount();
         info.Port = Config.GameConfig.Port;
         info.MaxPlayers = Config.ServerInfoConfig.MaxPlayers;
     }

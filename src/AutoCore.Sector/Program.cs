@@ -94,6 +94,10 @@ public class Program : ExitableProgram
         // Initialize the loot manager (builds item index from CloneBase data)
         LootManager.Instance.Initialize();
 
+        // Per-player instancing for the starting areas (698/707/708). Sector only — Global
+        // must never allocate instances (its maps only seed new-character LastTownId/pose).
+        AutoCore.Game.Map.InstancedContinents.EnableForSector();
+
         if (!MapManager.Instance.Initialize())
         {
             Logger.WriteLog(LogType.Error, "MapManager initialization failed. Continuing anyway.");

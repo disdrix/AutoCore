@@ -1,6 +1,7 @@
 namespace AutoCore.Game.Managers;
 
 using AutoCore.Game.CloneBases;
+using AutoCore.Game.Diagnostics;
 using AutoCore.Game.Entities;
 using AutoCore.Game.Inventory;
 using AutoCore.Game.Map;
@@ -11,6 +12,7 @@ using AutoCore.Game.Packets.Sector;
 using AutoCore.Game.Structures;
 using AutoCore.Game.TNL;
 using AutoCore.Utils;
+using AutoCore.Utils.Logging;
 using AutoCore.Utils.Reliability;
 
 /// <summary>
@@ -242,7 +244,7 @@ public static class NpcInteractHandler
         if (targetCoid <= 0)
             return false;
 
-        character.MapPresence.EnsureContinent(character.Map.ContinentId);
+        character.MapPresence.EnsureContinent(character.Map.ContinentId, character.Map.InstanceSerial);
         if (character.MapPresence.IsSuppressed(targetCoid))
             return false;
 
@@ -262,6 +264,7 @@ public static class NpcInteractHandler
                 targetCoid,
                 character.ObjectId.Coid,
                 packet.ObjectiveId);
+            PlayerActionTrace.NpcInteract(character, targetCoid, 0, "NoNpc", packet.ObjectiveId);
             return false;
         }
 
@@ -284,14 +287,17 @@ public static class NpcInteractHandler
             var graceSq = MaxMissionInteractGrace * MaxMissionInteractGrace;
             if (dialogMissions.Count == 0 || distXZSq > graceSq)
             {
+                var dist = MathF.Sqrt(distXZSq);
                 Logger.WriteLog(LogType.Debug,
                     "UseObject: rejected out of range charCoid={0} npc={1} distXZ={2:F1} player={3} target={4} partners={5}",
                     character.ObjectId.Coid,
                     npc.ObjectId.Coid,
-                    MathF.Sqrt(distXZSq),
+                    dist,
                     playerPos,
                     targetPos,
                     dialogMissions.Count);
+                PlayerActionTrace.NpcInteract(character, npc.ObjectId.Coid, npcCbid, "OutOfRange",
+                    packet.ObjectiveId, dialogMissions.Count, dist);
                 return false;
             }
 
@@ -304,7 +310,7 @@ public static class NpcInteractHandler
         }
 
         if (dialogMissions.Count == 0)
-            return ConsumeEmptyMissionNpcInteract(npcCbid, npc.ObjectId.Coid, character.ObjectId.Coid, packet.ObjectiveId);
+            return ConsumeEmptyMissionNpcInteract(npcCbid, npc.ObjectId.Coid, character.ObjectId.Coid, packet.ObjectiveId, character);
 
         // Client often advances objectives (0x206C / local UI) before the server — e.g. patrol
         // done client-side while ActiveObjectiveSequence is still 0. Reconcile from objectiveId
@@ -318,10 +324,12 @@ public static class NpcInteractHandler
         // Re-build after reconcile so deliver-active sequence is reflected if hint advanced it.
         dialogMissions = BuildDialogMissions(character, npcCbid, packet.ObjectiveId);
         if (dialogMissions.Count == 0)
-            return ConsumeEmptyMissionNpcInteract(npcCbid, npc.ObjectId.Coid, character.ObjectId.Coid, packet.ObjectiveId);
+            return ConsumeEmptyMissionNpcInteract(npcCbid, npc.ObjectId.Coid, character.ObjectId.Coid, packet.ObjectiveId, character);
 
         PrepareClientTurnInDialog(conn, character, npcCbid, dialogMissions);
         SendNpcMissionDialog(conn, character, npc.ObjectId, npcCbid, dialogMissions);
+        PlayerActionTrace.NpcInteract(character, npc.ObjectId.Coid, npcCbid, "DialogOpened",
+            packet.ObjectiveId, dialogMissions.Count);
         return true;
     }
 
@@ -329,7 +337,7 @@ public static class NpcInteractHandler
     /// Known mission giver/deliver CBIDs with nothing to offer/turn in must still consume
     /// UseObject so spatial OpenStore / facilities do not open for nearby town stores.
     /// </summary>
-    static bool ConsumeEmptyMissionNpcInteract(int npcCbid, long npcCoid, long charCoid, int objectiveId)
+    static bool ConsumeEmptyMissionNpcInteract(int npcCbid, long npcCoid, long charCoid, int objectiveId, Character character = null)
     {
         if (!IsMissionGiverCbid(npcCbid))
         {
@@ -339,6 +347,8 @@ public static class NpcInteractHandler
                 npcCoid,
                 charCoid,
                 objectiveId);
+            if (character != null)
+                PlayerActionTrace.NpcInteract(character, npcCoid, npcCbid, "NoDialog", objectiveId);
             return false;
         }
 
@@ -348,6 +358,8 @@ public static class NpcInteractHandler
             npcCoid,
             charCoid,
             objectiveId);
+        if (character != null)
+            PlayerActionTrace.NpcInteract(character, npcCoid, npcCbid, "EmptyConsume", objectiveId);
         return true;
     }
 
@@ -708,6 +720,8 @@ public static class NpcInteractHandler
             packet.MissionId,
             packet.Accepted,
             giverCoid);
+        PlayerActionTrace.MissionDialogResponse(
+            character, packet.MissionId, packet.Accepted, giverCoid, "Received");
 
         // Same resolution as UseObject: direct COID, vehicle driver, nearby active deliver NPC.
         // Status-only "already active" happens when npcCbid is 0 or is the giver while deliver
@@ -1233,6 +1247,10 @@ public static class NpcInteractHandler
             missionId,
             character.ObjectId.Coid);
 
+        GameLog.Audit("MissionGranted",
+            ("MissionId", missionId),
+            ("CharacterId", character.ObjectId.Coid));
+
         // Mission-computed logic vars (type 9/11/12) may unlock gates / remote triggers;
         // world-phase replay restores pad Creates and condition-gated reaction lists.
         var grantActivator = character.CurrentVehicle ?? (ClonedObjectBase)character;
@@ -1339,6 +1357,10 @@ public static class NpcInteractHandler
             "FailMission: failed/abandoned mission {0} for charCoid={1}",
             missionId,
             character.ObjectId.Coid);
+
+        GameLog.Audit("MissionFailed",
+            ("MissionId", missionId),
+            ("CharacterId", character.ObjectId.Coid));
 
         var activator = character.CurrentVehicle ?? (ClonedObjectBase)character;
         TriggerManager.Instance.OnMissionStateChanged(activator);
@@ -1848,6 +1870,8 @@ public static class NpcInteractHandler
     /// C2S AutoPatrol (0x20B3): client is within auto-complete range of a patrol waypoint.
     /// Match packet target to the active AutoComplete patrol requirement, verify range, then
     /// advance the objective sequence or complete the mission.
+    /// Client re-sends every tick while inside the pad volume — redundant packets with the same
+    /// quest fingerprint are dropped immediately (presence dedupe) to avoid CPU/log DDoS.
     /// </summary>
     public static void HandleAutoPatrol(TNLConnection conn, AutoPatrolPacket packet)
     {
@@ -1858,40 +1882,40 @@ public static class NpcInteractHandler
         if (character?.Map == null)
             return;
 
-        // Town: character on foot; field/highway: vehicle chassis (same as UseObject / triggers).
-        var playerPos = GetPlayerInteractPosition(character);
-        var activator = TriggerManager.ResolvePlayerTriggerActivator(character) ?? (ClonedObjectBase)character;
-
         var targetCoid = packet.Target?.Coid ?? -1;
         if (targetCoid <= 0)
             return;
 
-        MissionFlowDiag.Log(
-            "AutoPatrol IN coid={0} char={1} cont={2} pos=({3:F1},{4:F1},{5:F1}) {6}",
-            targetCoid,
-            character.ObjectId.Coid,
-            character.Map.ContinentId,
-            playerPos.X, playerPos.Y, playerPos.Z,
-            MissionFlowDiag.QuestSummary(character));
+        character.MapPresence.EnsureContinent(character.Map.ContinentId, character.Map.InstanceSerial);
+        var fingerprint = BuildAutoPatrolQuestFingerprint(character);
+        if (character.MapPresence.ShouldSkipRedundantAutoPatrol(targetCoid, fingerprint))
+            return;
+
+        // Town: character on foot; field/highway: vehicle chassis (same as UseObject / triggers).
+        var playerPos = GetPlayerInteractPosition(character);
+        var activator = TriggerManager.ResolvePlayerTriggerActivator(character) ?? (ClonedObjectBase)character;
 
         // Client may already be on the patrol UI after local CompleteObjective while the server
         // is still on a prior deliver (dialog desync). Catch up before matching.
-        var seqBeforeReconcile = character.CurrentQuests
-            .Select(q => (q.MissionId, q.ActiveObjectiveSequence)).ToList();
+        var seqBefore = SnapshotQuestSequences(character);
         ReconcileClientAheadPatrolTarget(conn, character, targetCoid);
-        var seqAfterReconcile = character.CurrentQuests
-            .Select(q => (q.MissionId, q.ActiveObjectiveSequence)).ToList();
-        if (!seqBeforeReconcile.SequenceEqual(seqAfterReconcile))
+        var seqAfter = SnapshotQuestSequences(character);
+        if (!SequencesEqual(seqBefore, seqAfter))
         {
+            // Reconcile changed state — refresh fingerprint so dedupe keys stay correct.
+            fingerprint = BuildAutoPatrolQuestFingerprint(character);
             MissionFlowDiag.Log(
                 "AutoPatrol RECONCILE changed before={0} after={1} target={2}",
-                string.Join(',', seqBeforeReconcile.Select(t => $"m{t.MissionId}:s{t.ActiveObjectiveSequence}")),
-                string.Join(',', seqAfterReconcile.Select(t => $"m{t.MissionId}:s{t.ActiveObjectiveSequence}")),
+                FormatQuestSequences(seqBefore),
+                FormatQuestSequences(seqAfter),
                 targetCoid);
         }
 
         var anyQuest = false;
-        foreach (var quest in character.CurrentQuests.ToList())
+        // True when a listed AutoComplete pad matched but server range check failed.
+        // Must not presence-dedupe: player can walk closer with the same quest fingerprint.
+        var matchedOutOfRange = false;
+        foreach (var quest in character.CurrentQuests)
         {
             if (character.CompletedMissionIds.Contains(quest.MissionId))
                 continue;
@@ -1921,13 +1945,7 @@ public static class NpcInteractHandler
                 var distXZSq = DistXZSq(playerPos, targetPos);
                 if (distXZSq > radius * radius)
                 {
-                    MissionFlowDiag.Log(
-                        "AutoPatrol REJECT range target={0} distXZ={1:F1} radius={2:F1} mission={3} seq={4}",
-                        targetCoid,
-                        MathF.Sqrt(distXZSq),
-                        radius,
-                        quest.MissionId,
-                        quest.ActiveObjectiveSequence);
+                    matchedOutOfRange = true;
                     Logger.WriteLog(LogType.Debug,
                         "AutoPatrol: target={0} out of range distXZ={1:F1} radius={2:F1} mission={3}",
                         targetCoid,
@@ -1937,26 +1955,13 @@ public static class NpcInteractHandler
                     continue;
                 }
             }
-            else
-            {
-                MissionFlowDiag.Log(
-                    "AutoPatrol TRUST no-map-pos target={0} cont={1} mission={2} seq={3}",
-                    targetCoid,
-                    character.Map.ContinentId,
-                    quest.MissionId,
-                    quest.ActiveObjectiveSequence);
-                Logger.WriteLog(LogType.Debug,
-                    "AutoPatrol: target={0} listed, no map position on continent={1} mission={2} — trusting client range gate",
-                    targetCoid,
-                    character.Map.ContinentId,
-                    quest.MissionId);
-            }
 
             // Patrol + deliver on same objective (Final Exam class): reaching the pad waypoint
             // must not finish the mission — NPC deliver still required. Client sends AutoPatrol
             // every tick while in volume; EnsureDeliverTurnInNpc is idempotent after first setup.
             if (ObjectiveHasBlockingSiblingRequirements(objective, RequirementType.Patrol))
             {
+                var allReady = true;
                 foreach (var deliver in objective.Requirements.OfType<ObjectiveRequirementDeliver>())
                 {
                     if (!deliver.NPCTargetCompletes || deliver.NPCTargetCBID <= 0)
@@ -1971,6 +1976,7 @@ public static class NpcInteractHandler
                         continue;
                     }
 
+                    allReady = false;
                     MissionFlowDiag.Log(
                         "AutoPatrol SIBLING-DELIVER target={0} mission={1} seq={2} deliverCbid={3}",
                         targetCoid,
@@ -1987,6 +1993,11 @@ public static class NpcInteractHandler
                     character.Map?.EnsureDeliverTurnInNpc(activator, deliver.NPCTargetCBID);
                 }
 
+                // Only dedupe once every blocking deliver is ready. If Ensure failed (NPC not
+                // spawnable yet), allow later ticks to retry without flooding once ready.
+                if (allReady || SiblingDeliversReady(character, objective))
+                    character.MapPresence.NoteAutoPatrolHandled(targetCoid, fingerprint);
+
                 return;
             }
 
@@ -1994,27 +2005,14 @@ public static class NpcInteractHandler
             // before AdvanceOrComplete. Single-pad (Live and Direct class): immediate advance.
             var listedTargets = CountPatrolTargets(patrol);
             var neededPads = MissionPatrolProgress.NeededCount(patrol);
-            MissionFlowDiag.Log(
-                "AutoPatrol MATCH mission={0} seq={1} obj={2} target={3} listed={4} needed={5} targetCount={6} laps={7} seqOrder={8} progress={9}/{10}",
-                quest.MissionId,
-                quest.ActiveObjectiveSequence,
-                objective.ObjectiveId,
-                targetCoid,
-                listedTargets,
-                neededPads,
-                patrol.TargetCount,
-                patrol.Laps,
-                patrol.Sequential,
-                quest.ActiveObjectiveSequence < quest.ObjectiveProgress.Length
-                    ? quest.ObjectiveProgress[quest.ActiveObjectiveSequence]
-                    : -1,
-                quest.ActiveObjectiveSequence < quest.ObjectiveMax.Length
-                    ? quest.ObjectiveMax[quest.ActiveObjectiveSequence]
-                    : -1);
 
             // Prefer listedTargets > 1 (not only NeededCount) so Laps=1 multi-pad always gates.
             if (listedTargets > 1 || neededPads > 1)
             {
+                var seq = quest.ActiveObjectiveSequence;
+                var progressBefore = seq < quest.ObjectiveProgress.Length
+                    ? quest.ObjectiveProgress[seq]
+                    : 0;
                 if (!TryApplyMultiPadPatrolHit(
                         conn,
                         character,
@@ -2025,13 +2023,24 @@ public static class NpcInteractHandler
                         targetCoid,
                         neededPads))
                 {
+                    var progressAfter = seq < quest.ObjectiveProgress.Length
+                        ? quest.ObjectiveProgress[seq]
+                        : 0;
+                    // Only dedupe pure rejects (already-counted / wrong order). Mid-route accepts
+                    // (multi-lap same pad, next needed hit) must remain open; the following spam
+                    // tick will reject and then arm dedupe.
+                    if (progressAfter == progressBefore)
+                    {
+                        character.MapPresence.NoteAutoPatrolHandled(targetCoid, fingerprint);
+                    }
+
                     return;
                 }
 
                 // Complete — fall through to AdvanceOrComplete.
             }
 
-            LogPatrolIncomplete(patrol, quest, objective, targetCoid);
+            LogPatrolIncompleteOnce(patrol, quest, objective, targetCoid);
             MissionFlowDiag.Log(
                 "AutoPatrol ADVANCE mission={0} seq={1} obj={2} target={3} listedTargets={4}",
                 quest.MissionId,
@@ -2044,6 +2053,7 @@ public static class NpcInteractHandler
                 "AutoPatrol AFTER advance mission={0} {1}",
                 quest.MissionId,
                 MissionFlowDiag.QuestSummary(character));
+            // State changed — do not note old fingerprint; next packet uses new fingerprint.
             return;
         }
 
@@ -2051,15 +2061,22 @@ public static class NpcInteractHandler
         // client still AutoPatrols 10310). Force-complete the finished patrol on the client and
         // resync the active objective once so waypoints clear and turn-in UI can show.
         if (TryResyncClientPastPatrol(conn, character, targetCoid))
+        {
+            character.MapPresence.NoteAutoPatrolHandled(
+                targetCoid,
+                BuildAutoPatrolQuestFingerprint(character));
+            return;
+        }
+
+        // Out-of-range match is not a stable no-op — player may walk in.
+        if (matchedOutOfRange)
             return;
 
+        // No matching active patrol for this target at current state — mark so client spam
+        // while standing on a stale/wrong pad does not rescan every tick.
+        character.MapPresence.NoteAutoPatrolHandled(targetCoid, fingerprint);
         if (anyQuest)
         {
-            MissionFlowDiag.Log(
-                "AutoPatrol NO-MATCH target={0} char={1} {2}",
-                targetCoid,
-                character.ObjectId.Coid,
-                MissionFlowDiag.QuestSummary(character));
             Logger.WriteLog(LogType.Debug,
                 "AutoPatrol: no matching active patrol for target={0} charCoid={1} quests=[{2}]",
                 targetCoid,
@@ -2068,6 +2085,51 @@ public static class NpcInteractHandler
                     $"{q.MissionId}:seq{q.ActiveObjectiveSequence}")));
         }
     }
+
+    /// <summary>
+    /// Compact quest fingerprint for AutoPatrol dedupe: missionId:seq:progress per active quest.
+    /// Changes whenever pad progress or objective sequence advances so the next real hit is not skipped.
+    /// </summary>
+    private static string BuildAutoPatrolQuestFingerprint(Character character)
+    {
+        if (character?.CurrentQuests == null || character.CurrentQuests.Count == 0)
+            return "quests=[]";
+
+        // Stable enough for equality; order is list order (same as CurrentQuests).
+        return string.Join(';', character.CurrentQuests.Select(q =>
+        {
+            var prog = q.ActiveObjectiveSequence < q.ObjectiveProgress.Length
+                ? q.ObjectiveProgress[q.ActiveObjectiveSequence]
+                : -1;
+            return $"{q.MissionId}:{q.ActiveObjectiveSequence}:{prog}";
+        }));
+    }
+
+    private static List<(int MissionId, int Seq)> SnapshotQuestSequences(Character character)
+    {
+        var list = new List<(int, int)>(character.CurrentQuests.Count);
+        foreach (var q in character.CurrentQuests)
+            list.Add((q.MissionId, q.ActiveObjectiveSequence));
+        return list;
+    }
+
+    private static bool SequencesEqual(
+        List<(int MissionId, int Seq)> a,
+        List<(int MissionId, int Seq)> b)
+    {
+        if (a.Count != b.Count)
+            return false;
+        for (var i = 0; i < a.Count; i++)
+        {
+            if (a[i].MissionId != b[i].MissionId || a[i].Seq != b[i].Seq)
+                return false;
+        }
+
+        return true;
+    }
+
+    private static string FormatQuestSequences(List<(int MissionId, int Seq)> seqs)
+        => string.Join(',', seqs.Select(t => $"m{t.MissionId}:s{t.Seq}"));
 
     /// <summary>
     /// Client still AutoPatrols a pad from a finished objective sequence. Send 0x2070 for that
@@ -2082,7 +2144,7 @@ public static class NpcInteractHandler
         if (conn == null || character?.Map == null || targetCoid <= 0)
             return false;
 
-        character.MapPresence.EnsureContinent(character.Map.ContinentId);
+        character.MapPresence.EnsureContinent(character.Map.ContinentId, character.Map.InstanceSerial);
 
         foreach (var quest in character.CurrentQuests)
         {
@@ -2240,6 +2302,32 @@ public static class NpcInteractHandler
         RequirementType satisfiedType)
         => MissionWorldPhaseRules.HasBlockingDeliverSibling(objective, satisfiedType);
 
+    /// <summary>
+    /// True when every blocking deliver CBID on the objective is present and client-notified
+    /// for this character (AutoPatrol sibling path can go quiet).
+    /// </summary>
+    private static bool SiblingDeliversReady(Character character, MissionObjective objective)
+    {
+        if (character?.Map == null || objective?.Requirements == null)
+            return false;
+
+        var any = false;
+        foreach (var deliver in objective.Requirements.OfType<ObjectiveRequirementDeliver>())
+        {
+            if (!deliver.NPCTargetCompletes || deliver.NPCTargetCBID <= 0)
+                continue;
+
+            any = true;
+            if (!character.MapPresence.IsDeliverTurnInReady(deliver.NPCTargetCBID)
+                || !character.Map.MapHasPresentEntityWithCbidForTests(character, deliver.NPCTargetCBID))
+            {
+                return false;
+            }
+        }
+
+        return any;
+    }
+
     private static int CountPatrolTargets(ObjectiveRequirementPatrol patrol)
         => MissionPatrolProgress.CountListedTargets(patrol);
 
@@ -2265,13 +2353,8 @@ public static class NpcInteractHandler
         var hit = MissionPatrolProgress.TryApplyHit(patrol, current, targetCoid);
         if (!hit.Accepted)
         {
-            MissionFlowDiag.Log(
-                "AutoPatrol PAD-REJECT mission={0} seq={1} target={2} progress={3} needed={4}",
-                quest.MissionId,
-                seq,
-                targetCoid,
-                current,
-                neededPads);
+            // Already-counted / wrong-order re-hit while client stays in volume — silent.
+            // Caller notes presence dedupe so subsequent ticks skip the full handler.
             return false;
         }
 
@@ -2312,17 +2395,29 @@ public static class NpcInteractHandler
         return false;
     }
 
-    private static void LogPatrolIncomplete(
+    /// <summary>
+    /// One-shot incomplete-feature warnings per mission/objective (not every AutoPatrol tick).
+    /// </summary>
+    private static void LogPatrolIncompleteOnce(
         ObjectiveRequirementPatrol patrol,
         CharacterQuest quest,
         MissionObjective objective,
         long targetCoid)
     {
+        if (patrol == null || quest == null || objective == null)
+            return;
+
+        // Only remaining incomplete hooks: AutoFail distance monitor and ContinentId validation.
+        if (!patrol.AutoFail && patrol.ContinentId <= 0)
+            return;
+
+        var key = $"ap-inc:{quest.MissionId}:{objective.ObjectiveId}";
+        if (!IncompleteHandlerLog.TryMarkOnce(key))
+            return;
+
         var listed = CountPatrolTargets(patrol);
         var context =
             $"mission={quest.MissionId} seq={quest.ActiveObjectiveSequence} objective={objective.ObjectiveId} target={targetCoid} listedTargets={listed}";
-
-        // Multi-waypoint, Laps, and Sequential order are handled by MissionPatrolProgress.
 
         if (patrol.AutoFail)
         {
@@ -2631,6 +2726,11 @@ public static class NpcInteractHandler
             return;
         }
 
+        var txId = "TX-" + Guid.NewGuid().ToString("N")[..8];
+        using var txScope = LogContext.Push(("TransactionId", txId));
+        long xpAwarded = 0;
+        long creditsAwarded = 0;
+
         try
         {
             var xpAmount = Experience.ExperienceService.Instance.ComputeMissionXp(mission, objective);
@@ -2657,6 +2757,7 @@ public static class NpcInteractHandler
                 }
                 else
                 {
+                    xpAwarded = xpResult.AppliedAmount;
                     Logger.WriteLog(LogType.Network,
                         "Mission reward: source={0} coid={1} mission={2} obj={3} xp={4} total={5} level={6} notify={7}",
                         source,
@@ -2690,7 +2791,9 @@ public static class NpcInteractHandler
             {
                 try
                 {
-                    var creditResult = character.Inventory.AddCredits(character, creditAmount);
+                    var creditResult = character.Inventory.AddCredits(
+                        character, creditAmount, CurrencyChangeReason.MissionReward);
+                    creditsAwarded = creditResult.AppliedDelta;
                     SyncMissionCreditsToClient(character, creditResult.NewBalance);
 
                     Logger.WriteLog(LogType.Network,
@@ -2740,6 +2843,15 @@ public static class NpcInteractHandler
                         character.ToProgressSnapshot());
                 }
             }
+
+            GameLog.Audit("MissionCompleted",
+                ("TransactionId", txId),
+                ("MissionId", mission.Id),
+                ("CharacterId", character.ObjectId.Coid),
+                ("XpAwarded", xpAwarded),
+                ("CreditsAwarded", creditsAwarded),
+                ("Forced", string.Equals(source, "ForceCompleteMission", StringComparison.Ordinal)),
+                ("Source", source ?? ""));
         }
         catch (Exception ex)
         {
@@ -2779,7 +2891,7 @@ public static class NpcInteractHandler
 
         if (character != null)
         {
-            character.MapPresence.EnsureContinent(map.ContinentId);
+            character.MapPresence.EnsureContinent(map.ContinentId, map.InstanceSerial);
             if (character.MapPresence.IsSuppressed(coid))
                 return null;
         }

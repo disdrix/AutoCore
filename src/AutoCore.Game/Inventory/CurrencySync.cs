@@ -4,6 +4,7 @@ using AutoCore.Game.Entities;
 using AutoCore.Game.Managers;
 using AutoCore.Game.Packets.Sector;
 using AutoCore.Utils;
+using AutoCore.Utils.Logging;
 
 /// <summary>
 /// Server-authoritative currency (credits) and client sync helpers.
@@ -222,9 +223,9 @@ public static class CurrencySync
 
             // Explicit store (ChatManager passes InventoryPersistence.Instance); else inventory-bound store.
             if (persistence != null)
-                SetCreditsAbsolute(persistence, character, absolute);
+                SetCreditsAbsolute(persistence, character, absolute, CurrencyChangeReason.AdminCommand);
             else
-                character.Inventory.SetCreditsAbsolute(character, absolute);
+                character.Inventory.SetCreditsAbsolute(character, absolute, CurrencyChangeReason.AdminCommand);
 
             var packet = CreateAbsoluteCurrencyPacket(character, absolute);
 
@@ -273,6 +274,7 @@ public static class CurrencySync
         IInventoryPersistence persistence,
         Character character,
         long amount,
+        CurrencyChangeReason reason,
         bool allowDebt = false)
     {
         if (character == null)
@@ -298,6 +300,7 @@ public static class CurrencySync
         var applied = next - previous;
         character.SetCredits(next);
         PersistCredits(persistence, character, next);
+        AuditCurrencyChanged(character, reason, previous, applied, next);
 
         return new AddCreditsResult(
             previous,
@@ -311,6 +314,7 @@ public static class CurrencySync
         IInventoryPersistence persistence,
         Character character,
         long absoluteCredits,
+        CurrencyChangeReason reason,
         bool allowDebt = false)
     {
         if (character == null)
@@ -319,9 +323,31 @@ public static class CurrencySync
         if (!allowDebt && absoluteCredits < 0)
             absoluteCredits = 0;
 
+        var previous = character.Credits;
         character.SetCredits(absoluteCredits);
         PersistCredits(persistence, character, absoluteCredits);
+        AuditCurrencyChanged(character, reason, previous, absoluteCredits - previous, absoluteCredits);
         return absoluteCredits;
+    }
+
+    /// <summary>
+    /// Phase 3 audit trail: one <c>CurrencyChanged</c> per successful money mutation.
+    /// Invariant: Before + Delta == After.
+    /// </summary>
+    private static void AuditCurrencyChanged(
+        Character character,
+        CurrencyChangeReason reason,
+        long before,
+        long delta,
+        long after)
+    {
+        GameLog.Audit(
+            "CurrencyChanged",
+            ("CharacterId", ResolveCharacterCoid(character)),
+            ("Reason", reason),
+            ("Before", before),
+            ("Delta", delta),
+            ("After", after));
     }
 
     public static void PersistCredits(

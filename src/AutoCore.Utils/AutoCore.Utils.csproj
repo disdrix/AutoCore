@@ -7,6 +7,14 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="AutoCore.Utils.Tests" />
+    <!-- Structured-logging test seams (GameLog.SetSinkForTests etc.) are used by every test project. -->
+    <InternalsVisibleTo Include="AutoCore.Auth.Tests" />
+    <InternalsVisibleTo Include="AutoCore.Communicator.Tests" />
+    <InternalsVisibleTo Include="AutoCore.Database.Tests" />
+    <InternalsVisibleTo Include="AutoCore.Game.Tests" />
+    <InternalsVisibleTo Include="AutoCore.Global.Tests" />
+    <InternalsVisibleTo Include="AutoCore.Launcher.Tests" />
+    <InternalsVisibleTo Include="AutoCore.Sector.Tests" />
   </ItemGroup>
 
   <ItemGroup>

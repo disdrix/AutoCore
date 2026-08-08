@@ -217,6 +217,28 @@ You can also create additional accounts using the Auth server console command:
 auth.create <email> <username> <password>
 ```
 
+## Optional: Discord bot
+
+AutoCore can host an optional Discord bot (presence + DM account commands). It is **off by default**.
+
+1. Create a bot in the [Discord Developer Portal](https://discord.com/developers/applications) and invite it with scopes `bot` + `applications.commands`.
+2. Copy `appsettings.discord.example.json` to `appsettings.discord.json` next to the Launcher (gitignored), then edit:
+
+```json
+{
+  "Enabled": true,
+  "BotToken": "YOUR_BOT_TOKEN",
+  "GuildId": 123456789012345678,
+  "MaxAccountsPerDiscordUser": 1
+}
+```
+
+3. Restart Launcher. Players use slash commands in any channel (or DM):
+   - `/newaccount` — email, username, password
+   - `/changepassword` — username, new_password (linked accounts only)
+
+Full details: [`docs/discord.md`](docs/discord.md).
+
 ## Next Steps
 
 Once all servers are running:

@@ -111,7 +111,7 @@ public class MissionPhaseHeavyRegressionTests
         npc.LoadCloneBase(DeliverCbid);
         npc.SetupCBFields();
         npc.SetMap(map);
-        character.MapPresence.EnsureContinent(ContId);
+        character.MapPresence.EnsureContinent(ContId, map.InstanceSerial);
         character.MapPresence.Suppress(npc.ObjectId.Coid);
 
         _sent.Clear();
@@ -167,7 +167,7 @@ public class MissionPhaseHeavyRegressionTests
         suppressed.LoadCloneBase(DeliverCbid);
         suppressed.SetupCBFields();
         suppressed.SetMap(map);
-        character.MapPresence.EnsureContinent(ContId);
+        character.MapPresence.EnsureContinent(ContId, map.InstanceSerial);
         character.MapPresence.Suppress(suppressed.ObjectId.Coid);
 
         Assert.IsNull(NpcInteractHandler.TryResolveNearbyDeliverNpc(
@@ -275,7 +275,7 @@ public class MissionPhaseHeavyRegressionTests
         vehicle.SetMap(map);
 
         // Simulate prior phase suppress of the completed giver (common after class intros).
-        character.MapPresence.EnsureContinent(ContId);
+        character.MapPresence.EnsureContinent(ContId, map.InstanceSerial);
         character.MapPresence.Suppress(hutchinsSpawn);
         character.MapPresence.Suppress(hutchinsCreature);
         Assert.IsTrue(character.MapPresence.IsSuppressed(hutchinsCreature));
@@ -317,7 +317,7 @@ public class MissionPhaseHeavyRegressionTests
         PlaceDialog(map, hutchinsLike);
 
         character.CompletedMissionIds.Add(completedMissionId);
-        character.MapPresence.EnsureContinent(ContId);
+        character.MapPresence.EnsureContinent(ContId, map.InstanceSerial);
         character.MapPresence.Suppress(DialogSpawn);
         character.MapPresence.Suppress(DialogCreature);
         character.SetMap(map);
@@ -487,7 +487,7 @@ public class MissionPhaseHeavyRegressionTests
         npcVehicle.SetMap(map);
 
         character.CompletedMissionIds.Add(mid);
-        character.MapPresence.EnsureContinent(ContId);
+        character.MapPresence.EnsureContinent(ContId, map.InstanceSerial);
         character.MapPresence.Suppress(DialogSpawn);
         character.MapPresence.Suppress(vehicleCoid);
         character.SetMap(map);
@@ -606,7 +606,7 @@ public class MissionPhaseHeavyRegressionTests
         vehicle.SetMap(map);
 
         // Sticky suppress as if prior pad-complete phase had hidden the giver.
-        character.MapPresence.EnsureContinent(ContId);
+        character.MapPresence.EnsureContinent(ContId, map.InstanceSerial);
         character.MapPresence.Suppress(DialogSpawn);
         character.MapPresence.Suppress(DialogCreature);
 

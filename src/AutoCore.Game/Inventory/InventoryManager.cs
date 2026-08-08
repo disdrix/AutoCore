@@ -11,6 +11,7 @@ using AutoCore.Game.Packets;
 using AutoCore.Game.Packets.Sector;
 using AutoCore.Game.Structures;
 using AutoCore.Utils;
+using AutoCore.Utils.Logging;
 
 public sealed class InventoryManager
 {
@@ -1996,12 +1997,20 @@ public sealed class InventoryManager
     /// client <see cref="GiveCreditsPacket"/> for the applied delta (0x205E is additive on the client).
     /// Negative deltas floor at zero unless <paramref name="allowDebt"/> is true.
     /// </summary>
-    public AddCreditsResult AddCredits(Character character, long amount, bool allowDebt = false) =>
-        CurrencySync.AddCredits(_persistence, character, amount, allowDebt);
+    public AddCreditsResult AddCredits(
+        Character character,
+        long amount,
+        CurrencyChangeReason reason,
+        bool allowDebt = false) =>
+        CurrencySync.AddCredits(_persistence, character, amount, reason, allowDebt);
 
     /// <summary>Set absolute credits, persist, and return a CharacterLevel-friendly absolute value.</summary>
-    public long SetCreditsAbsolute(Character character, long absoluteCredits, bool allowDebt = false) =>
-        CurrencySync.SetCreditsAbsolute(_persistence, character, absoluteCredits, allowDebt);
+    public long SetCreditsAbsolute(
+        Character character,
+        long absoluteCredits,
+        CurrencyChangeReason reason,
+        bool allowDebt = false) =>
+        CurrencySync.SetCreditsAbsolute(_persistence, character, absoluteCredits, reason, allowDebt);
 
     public void ReloadCargo(long characterCoid)
     {
@@ -2037,9 +2046,48 @@ public sealed class InventoryManager
         }
     }
 
+    /// <summary>
+    /// Phase 3 audit trail: one audit event per inventory persistence verb, emitted before the
+    /// store write so the mutation that DID happen in memory is recorded even when persistence
+    /// throws. MapId is not reachable from these wrappers (only the character coid is in scope).
+    /// </summary>
+    private static void AuditItemMutation(
+        string eventName,
+        long characterCoid,
+        string container,
+        CharacterInventoryItem item)
+    {
+        GameLog.Audit(
+            eventName,
+            ("CharacterId", characterCoid),
+            ("Container", container),
+            ("ItemCoid", item?.Coid),
+            ("ItemCbid", item?.Cbid),
+            ("Quantity", item?.Quantity),
+            ("X", item?.InventoryPositionX),
+            ("Y", item?.InventoryPositionY));
+    }
+
+    // TODO(LG): player not notified of persist failure — the in-memory mutation succeeds and
+    // the client sees it, but the write is lost; DB-001 is the only trace.
+    private static void AuditPersistFailure(string verb, long characterCoid, long itemCoid)
+    {
+        GameLog.Error(
+            "InventoryPersistFailed",
+            "DB-001",
+            ("Verb", verb),
+            ("ItemCoid", itemCoid),
+            ("CharacterId", characterCoid));
+    }
+
     private void PersistCargoUpsert(long characterCoid, CharacterInventoryItem item)
     {
-        if (_persistence == null || characterCoid == 0 || item == null)
+        if (item == null)
+            return;
+
+        AuditItemMutation("ItemAdded", characterCoid, "Cargo", item);
+
+        if (_persistence == null || characterCoid == 0)
             return;
 
         try
@@ -2048,6 +2096,7 @@ public sealed class InventoryManager
         }
         catch (Exception ex)
         {
+            AuditPersistFailure("CargoUpsert", characterCoid, item.Coid);
             Logger.WriteLog(LogType.Error,
                 "PersistCargoUpsert failed char={0} coid={1} cbid={2}: {3}",
                 characterCoid,
@@ -2059,7 +2108,12 @@ public sealed class InventoryManager
 
     private void PersistCargoMove(long characterCoid, CharacterInventoryItem item)
     {
-        if (_persistence == null || characterCoid == 0 || item == null)
+        if (item == null)
+            return;
+
+        AuditItemMutation("ItemMoved", characterCoid, "Cargo", item);
+
+        if (_persistence == null || characterCoid == 0)
             return;
 
         try
@@ -2068,6 +2122,7 @@ public sealed class InventoryManager
         }
         catch (Exception ex)
         {
+            AuditPersistFailure("CargoMove", characterCoid, item.Coid);
             Logger.WriteLog(LogType.Error,
                 "PersistCargoMove failed char={0} coid={1}: {2}",
                 characterCoid,
@@ -2078,7 +2133,12 @@ public sealed class InventoryManager
 
     private void PersistLockerUpsert(long characterCoid, CharacterInventoryItem item)
     {
-        if (_persistence == null || characterCoid == 0 || item == null)
+        if (item == null)
+            return;
+
+        AuditItemMutation("ItemAdded", characterCoid, "Locker", item);
+
+        if (_persistence == null || characterCoid == 0)
             return;
 
         try
@@ -2087,6 +2147,7 @@ public sealed class InventoryManager
         }
         catch (Exception ex)
         {
+            AuditPersistFailure("LockerUpsert", characterCoid, item.Coid);
             Logger.WriteLog(LogType.Error,
                 "PersistLockerUpsert failed char={0} coid={1} cbid={2}: {3}",
                 characterCoid,
@@ -2098,7 +2159,12 @@ public sealed class InventoryManager
 
     private void PersistLockerMove(long characterCoid, CharacterInventoryItem item)
     {
-        if (_persistence == null || characterCoid == 0 || item == null)
+        if (item == null)
+            return;
+
+        AuditItemMutation("ItemMoved", characterCoid, "Locker", item);
+
+        if (_persistence == null || characterCoid == 0)
             return;
 
         try
@@ -2107,6 +2173,7 @@ public sealed class InventoryManager
         }
         catch (Exception ex)
         {
+            AuditPersistFailure("LockerMove", characterCoid, item.Coid);
             Logger.WriteLog(LogType.Error,
                 "PersistLockerMove failed char={0} coid={1}: {2}",
                 characterCoid,
@@ -2117,6 +2184,12 @@ public sealed class InventoryManager
 
     private void PersistLockerDelete(long characterCoid, long itemCoid)
     {
+        GameLog.Audit(
+            "ItemRemoved",
+            ("CharacterId", characterCoid),
+            ("Container", "Locker"),
+            ("ItemCoid", itemCoid));
+
         if (_persistence == null || characterCoid == 0)
             return;
 
@@ -2126,6 +2199,7 @@ public sealed class InventoryManager
         }
         catch (Exception ex)
         {
+            AuditPersistFailure("LockerDelete", characterCoid, itemCoid);
             Logger.WriteLog(LogType.Error,
                 "PersistLockerDelete failed char={0} coid={1}: {2}",
                 characterCoid,
@@ -2136,6 +2210,12 @@ public sealed class InventoryManager
 
     private void PersistCargoDelete(long characterCoid, long itemCoid)
     {
+        GameLog.Audit(
+            "ItemRemoved",
+            ("CharacterId", characterCoid),
+            ("Container", "Cargo"),
+            ("ItemCoid", itemCoid));
+
         if (_persistence == null || characterCoid == 0)
             return;
 
@@ -2145,6 +2225,7 @@ public sealed class InventoryManager
         }
         catch (Exception ex)
         {
+            AuditPersistFailure("CargoDelete", characterCoid, itemCoid);
             Logger.WriteLog(LogType.Error,
                 "PersistCargoDelete failed char={0} coid={1}: {2}",
                 characterCoid,
@@ -2155,6 +2236,8 @@ public sealed class InventoryManager
 
     private void PersistCargoClear(long characterCoid)
     {
+        GameLog.Audit("CargoCleared", ("CharacterId", characterCoid));
+
         if (_persistence == null || characterCoid == 0)
             return;
 
@@ -2164,6 +2247,7 @@ public sealed class InventoryManager
         }
         catch (Exception ex)
         {
+            AuditPersistFailure("CargoClear", characterCoid, itemCoid: 0);
             Logger.WriteLog(LogType.Error,
                 "PersistCargoClear failed char={0}: {1}",
                 characterCoid,
@@ -2193,7 +2277,17 @@ public sealed class InventoryManager
 
     private void PersistEquip(Vehicle vehicle, SimpleObject equippedItem)
     {
-        if (_persistence == null || vehicle == null)
+        if (vehicle == null)
+            return;
+
+        GameLog.Audit(
+            "ItemEquipped",
+            ("Container", "Hardpoint"),
+            ("VehicleCoid", vehicle.ObjectId.Coid),
+            ("ItemCoid", equippedItem?.ObjectId.Coid),
+            ("ItemCbid", equippedItem?.CBID));
+
+        if (_persistence == null)
             return;
 
         if (equippedItem != null)
@@ -2204,7 +2298,15 @@ public sealed class InventoryManager
 
     private void PersistUnequip(Vehicle vehicle)
     {
-        if (_persistence == null || vehicle == null)
+        if (vehicle == null)
+            return;
+
+        GameLog.Audit(
+            "ItemUnequipped",
+            ("Container", "Hardpoint"),
+            ("VehicleCoid", vehicle.ObjectId.Coid));
+
+        if (_persistence == null)
             return;
 
         _persistence.SaveVehicleEquipment(vehicle.ObjectId.Coid, vehicle.CreateEquipmentSnapshot());

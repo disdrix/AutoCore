@@ -1,13 +1,16 @@
 namespace AutoCore.Launcher.Bootstrap;
 
 /// <summary>
-/// Ordered Launcher shutdown: Sector → Global → Auth (reverse of start order).
+/// Ordered Launcher shutdown: Sector → Global → (optional Discord) → Auth (reverse of start).
 /// Pure coordination — never binds ports.
 /// </summary>
 public static class LauncherShutdownCoordinator
 {
     public static IReadOnlyList<string> ExpectedShutdownOrder { get; } =
         ["Sector", "Global", "Auth"];
+
+    public static IReadOnlyList<string> ExpectedShutdownOrderWithDiscord { get; } =
+        ["Sector", "Global", "Discord", "Auth"];
 
     /// <summary>
     /// Shuts down hosts in reverse start order. Honors cancellation between hosts so callers
@@ -17,18 +20,21 @@ public static class LauncherShutdownCoordinator
         ILauncherServerHost sectorHost,
         ILauncherServerHost globalHost,
         ILauncherServerHost authHost,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        ILauncherServerHost? discordHost = null)
     {
         ArgumentNullException.ThrowIfNull(sectorHost);
         ArgumentNullException.ThrowIfNull(globalHost);
         ArgumentNullException.ThrowIfNull(authHost);
 
-        var shutDown = new List<string>(ExpectedShutdownOrder.Count);
+        var shutDown = new List<string>(ExpectedShutdownOrderWithDiscord.Count);
 
         try
         {
             ShutdownOne(sectorHost, shutDown, cancellationToken);
             ShutdownOne(globalHost, shutDown, cancellationToken);
+            if (discordHost != null)
+                ShutdownOne(discordHost, shutDown, cancellationToken);
             ShutdownOne(authHost, shutDown, cancellationToken);
             return LauncherShutdownResult.CreateCompleted(shutDown);
         }

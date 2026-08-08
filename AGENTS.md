@@ -127,9 +127,37 @@ Completion requirements:
 * Coverage impact is acceptable.
 * Any remaining risks or skipped checks are documented clearly.
 
+## Per-player map instancing (starting areas)
+
+Continents **698 / 707 / 708** (Tierra Roja Dam, Hestia Ark Bay 313, The Wastes) are instanced:
+every player entering gets a private `SectorMap` copy, created by
+`MapManager.GetMapForCharacter` and disposed synchronously in `SectorMap.LeaveMap` when the
+owner leaves (SS-30). The set lives in `AutoCore.Game/Map/InstancedContinents.cs`. Invariants:
+
+* **Every sector host must call `InstancedContinents.EnableForSector()`.** There are two:
+  `AutoCore.Sector/Program.cs` (standalone) and
+  `AutoCore.Launcher/Bootstrap/DefaultLauncherGameBootstrap.InitializeMapManager` (the Launcher
+  hosts Auth/Global/Sector in one process and never runs `Sector/Program.cs`). Miss one and the
+  three maps silently fall back to shared — pinned by
+  `DefaultLauncherGameBootstrapTests.InitializeMapManager_EnablesStartingAreaInstancing`.
+  Standalone `AutoCore.Global/Program.cs` does **not** enable it and must not.
+* Instancing is gated at the **call site**, not the flag: Global's new-character path uses
+  `GetMap` (shared copy, only seeds `LastTownId`/pose); the sector entry paths use
+  `GetMapForCharacter`. That is why the flag being on in the combined Launcher process is safe.
+* Relog always lands in a **fresh** instance; persisted character state (position, journal,
+  mission-derived world state) replays into it. Nothing instance-scoped is persisted.
+* Instances of one continent mint **identical local COIDs**. Any singleton state keyed by COID
+  must also key on `SectorMap.InstanceSerial` (see `TriggerManager`, `CharacterMapPresence`,
+  `MapPropCorpseDespawn`, `VehicleMapPropRam`). Never compare maps by `ContinentId` to decide
+  "same map" — compare references.
+* Instance disposal must never write shared `MapData` templates (the `IsActive` restore is
+  exclusive to the shared-map `ResetLocalWorldToAuthored`).
+
 ## Exception safety and crash resistance
 
 The register of findings, fixes and accepted risk is **[`docs/exception-safety-audit.md`](docs/exception-safety-audit.md)**. Read it before changing an entry point, a loop, a packet handler, or anything that detaches work.
+
+Structured logging / playtest observability (LG register, event catalog, NDJSON dual-write) lives in **[`docs/logging-observability-audit.md`](docs/logging-observability-audit.md)** and **[`docs/logging-event-catalog.md`](docs/logging-event-catalog.md)**. New first-class `GameLog` event names must be added to the catalog (`LogEventCatalogSyncTests` enforces drift).
 
 ### Use the shared primitives
 

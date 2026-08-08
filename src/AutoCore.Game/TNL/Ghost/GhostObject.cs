@@ -254,17 +254,24 @@ public class GhostObject : NetObject
 
         if (stream.WriteFlag((updateMask & HealthMask) != 0))
         {
-            stream.WriteInt((uint)Parent.GetCurrentHP(), 18);
+            stream.WriteInt((uint)Math.Max(Parent.GetCurrentHP(), 0), 18);
 
             if (stream.WriteFlag(Parent.IsCorpse))
             {
                 if (stream.WriteFlag(true)) // this is only sent if the death was recent? idk, strange stuff
                 {
                     stream.WriteInt((uint)Parent.DeathType, 3);
-                    stream.Write(Parent.Murderer.Coid);
-                    stream.WriteFlag(Parent.Murderer.Global);
+                    stream.Write(Parent.Murderer?.Coid ?? 0);
+                    stream.WriteFlag(Parent.Murderer?.Global ?? false);
                 }
             }
+        }
+
+        // Same layout as GhostCreature: absolute max HP so target bars have a denominator
+        // when create-shell max is missing or stale.
+        if (stream.WriteFlag((updateMask & HealthMaxMask) != 0))
+        {
+            stream.WriteInt((uint)Math.Max(Parent.GetMaximumHP(), 0), 18);
         }
 
         if (stream.WriteFlag((updateMask & PositionMask) != 0))

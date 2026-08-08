@@ -24,6 +24,13 @@ public partial class AuthClient
     public uint OneTimeKey { get; }
     public uint SessionId1 { get; }
     public uint SessionId2 { get; }
+
+    /// <summary>
+    /// Server-generated session identity for structured logging (same format as the game
+    /// server's TNLConnection.SessionId). Never client-controlled and never a credential —
+    /// distinct from the SessionId1/2 protocol values exchanged with the client.
+    /// </summary>
+    public string SessionId { get; } = Guid.NewGuid().ToString("N")[..16];
     public Account? Account { get; internal set; }
     public ClientState State { get; internal set; }
     public Timer Timer { get; }

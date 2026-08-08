@@ -112,6 +112,7 @@ public class SkillPointsCommandTests
     private static Character MakeCharacter(long coid)
     {
         var character = new Character();
+        character.GMLevel = 1;
         character.SetCoid(coid, true);
         var dbData = new CharacterData { Coid = coid, Name = "SkillPts", Level = 1 };
         typeof(Character)

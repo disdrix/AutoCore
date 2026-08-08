@@ -22,6 +22,7 @@ using AutoCore.Game.Physics.Vehicle;
 using AutoCore.Game.Structures;
 using AutoCore.Game.TNL.Ghost;
 using AutoCore.Utils;
+using AutoCore.Utils.Logging;
 using AutoCore.Utils.Reliability;
 
 public class Vehicle : SimpleObject
@@ -2403,6 +2404,32 @@ public class Vehicle : SimpleObject
         {
             base.OnDeath(deathType);
 
+            // Phase 3F: combat tick is outside packet LogContext — attach identity explicitly.
+            // Never throw from audit (DBData may be unset in unit tests).
+            try
+            {
+                var victim = Owner?.GetAsCharacter();
+                if (victim != null)
+                {
+                    string victimName = null;
+                    try { victimName = victim.Name; } catch { /* DBData may be null in tests */ }
+
+                    GameLog.Audit("PlayerDied",
+                        ("CharacterId", victim.ObjectId.Coid),
+                        ("CharacterName", victimName),
+                        ("AccountId", victim.OwningConnection?.Account?.Id),
+                        ("SessionId", victim.OwningConnection?.SessionId),
+                        ("KillerId", Murderer.Coid),
+                        ("DeathType", deathType.ToString()),
+                        ("VehicleCoid", ObjectId.Coid),
+                        ("MapId", Map?.ContinentId));
+                }
+            }
+            catch
+            {
+                // logging must never break death
+            }
+
             // Ghidra: VehicleNet_UnpackGhostVehicle reads the HealthMask block as
             // currentHP + corpse, invokes the live HP setter, then sets vehicle state bit
             // +0x17c/0x100. Re-sending CreateVehicle allocates/materializes an object and does
@@ -2438,6 +2465,16 @@ public class Vehicle : SimpleObject
         Character killerCharacter = null;
         if (Murderer.Coid > 0)
             killerCharacter = ObjectManager.Instance.GetObject(Murderer)?.GetSuperCharacter(false);
+
+        if (killerCharacter != null)
+        {
+            GameLog.Info("NpcKilled",
+                ("VictimCoid", ObjectId.Coid),
+                ("VictimCbid", CBID),
+                ("KillerId", killerCharacter.ObjectId.Coid),
+                ("DeathType", deathType.ToString()),
+                ("MapId", map.ContinentId));
+        }
 
         // SpawnPoint TriggerEvents (pad Create after combat vehicle dies, etc.) before leave-map.
         NotifySpawnOwnerTriggerEventsOnDeath(map, killerCharacter);

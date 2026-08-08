@@ -67,6 +67,7 @@ public class ChatManagerResidualTests
         var character = new Character();
         character.SetCoid(6001, true);
         character.AttachTestDataForTests("chat-residual");
+        character.GMLevel = 1;
         character.SetOwningConnection(connection);
         connection.CurrentCharacter = character;
 

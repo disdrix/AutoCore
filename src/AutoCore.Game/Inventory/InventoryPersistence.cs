@@ -6,6 +6,7 @@ using AutoCore.Database.Char;
 using AutoCore.Database.Char.Models;
 using AutoCore.Game.Constants;
 using AutoCore.Utils;
+using AutoCore.Utils.Logging;
 using Microsoft.EntityFrameworkCore;
 
 /// <summary>
@@ -271,7 +272,7 @@ public sealed class InventoryPersistence : IInventoryPersistence
     {
         try
         {
-            context.SaveChanges();
+            DbOperationTiming.Run(operation, () => context.SaveChanges());
         }
         catch (Exception ex)
         {

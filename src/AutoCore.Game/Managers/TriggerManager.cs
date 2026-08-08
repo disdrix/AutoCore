@@ -19,19 +19,23 @@ public class TriggerManager : Singleton<TriggerManager>
     /// <summary>Hard cap on nested FireTriggerReactions / Activate cascades.</summary>
     public const int MaxCascadeDepth = 16;
 
-    // Physical enter latch: (ObjectCoid, TriggerCoid) currently inside and already fired.
-    private readonly ConcurrentDictionary<(long ObjectCoid, long TriggerCoid), bool> _activeTriggers = new();
+    // ALL latches are prefixed with SectorMap.InstanceSerial: per-player instances of the same
+    // continent mint identical local COIDs, so bare-COID keys would collide across instances
+    // (A's NPC latching a volume suppresses B's identical NPC; clears wipe every instance).
+
+    // Physical enter latch: (Serial, ObjectCoid, TriggerCoid) currently inside and already fired.
+    private readonly ConcurrentDictionary<(int Serial, long ObjectCoid, long TriggerCoid), bool> _activeTriggers = new();
 
     // Per-collider repair cadence. Multiple vehicles on one pad must never share a deadline.
-    private readonly ConcurrentDictionary<(long ObjectCoid, long TriggerCoid, long ReactionCoid), long> _nextSkillPulseMs = new();
+    private readonly ConcurrentDictionary<(int Serial, long ObjectCoid, long TriggerCoid, long ReactionCoid), long> _nextSkillPulseMs = new();
     internal const long SkillPulseIntervalMs = 1000;
 
     // One-shot for remote/condition-driven fires (mission change, variable set).
-    private readonly ConcurrentDictionary<(long ActorCoid, long TriggerCoid), bool> _firedConditionalTriggers = new();
+    private readonly ConcurrentDictionary<(int Serial, long ActorCoid, long TriggerCoid), bool> _firedConditionalTriggers = new();
 
     // Re-entrancy: cascade stack (not concurrent — game logic is single-threaded per sector).
     private int _cascadeDepth;
-    private readonly HashSet<long> _firingTriggerCoids = new();
+    private readonly HashSet<(int Serial, long TriggerCoid)> _firingTriggerCoids = new();
     private bool _missionReevalActive;
     private bool _missionReevalPending;
     private bool _variableReevalActive;
@@ -54,13 +58,14 @@ public class TriggerManager : Singleton<TriggerManager>
             return;
         }
 
-        var triggerCoid = trigger.ObjectId.Coid;
-        if (!_firingTriggerCoids.Add(triggerCoid))
+        var firingKey = (activator.Map.InstanceSerial, trigger.ObjectId.Coid);
+        if (!_firingTriggerCoids.Add(firingKey))
         {
             // Same trigger already on the call stack (e.g. Activate self-target / pulse loop).
+            // Per-serial: the same trigger coid firing in a sibling instance is legal.
             Logger.WriteLog(LogType.Debug,
                 "TriggerManager: skip re-entrant fire trigger={0}",
-                triggerCoid);
+                trigger.ObjectId.Coid);
             return;
         }
 
@@ -83,7 +88,7 @@ public class TriggerManager : Singleton<TriggerManager>
         finally
         {
             _cascadeDepth--;
-            _firingTriggerCoids.Remove(triggerCoid);
+            _firingTriggerCoids.Remove(firingKey);
         }
     }
 
@@ -157,6 +162,7 @@ public class TriggerManager : Singleton<TriggerManager>
         if (map is null)
             return;
 
+        var serial = map.InstanceSerial;
         var objectCoid = clonedObject.ObjectId.Coid;
 
         // Flush deferred SpawnPoint TriggerEvents when the player approaches Create targets
@@ -173,7 +179,7 @@ public class TriggerManager : Singleton<TriggerManager>
                 continue;
 
             var triggerCoid = trigger.ObjectId.Coid;
-            var key = (objectCoid, triggerCoid);
+            var key = (serial, objectCoid, triggerCoid);
 
             var canTrigger = trigger.CanTrigger(clonedObject);
             var alreadyTriggered = _activeTriggers.TryGetValue(key, out var isActive) && isActive;
@@ -193,7 +199,7 @@ public class TriggerManager : Singleton<TriggerManager>
             else if (alreadyTriggered)
             {
                 _activeTriggers.TryRemove(key, out _);
-                ClearSkillPulses(objectCoid, triggerCoid);
+                ClearSkillPulses(serial, objectCoid, triggerCoid);
             }
         }
     }
@@ -203,7 +209,7 @@ public class TriggerManager : Singleton<TriggerManager>
         foreach (var reactionCoid in trigger.Template.Reactions)
         {
             if (activator.Map?.GetObjectByCoid(reactionCoid) is Reaction { Template.ReactionType: ReactionType.SkillCast })
-                _nextSkillPulseMs[(activator.ObjectId.Coid, trigger.ObjectId.Coid, reactionCoid)] = nowMs + SkillPulseIntervalMs;
+                _nextSkillPulseMs[(activator.Map.InstanceSerial, activator.ObjectId.Coid, trigger.ObjectId.Coid, reactionCoid)] = nowMs + SkillPulseIntervalMs;
         }
     }
 
@@ -214,7 +220,7 @@ public class TriggerManager : Singleton<TriggerManager>
             if (activator.Map?.GetObjectByCoid(reactionCoid) is not Reaction { Template.ReactionType: ReactionType.SkillCast })
                 continue;
 
-            var key = (activator.ObjectId.Coid, trigger.ObjectId.Coid, reactionCoid);
+            var key = (activator.Map.InstanceSerial, activator.ObjectId.Coid, trigger.ObjectId.Coid, reactionCoid);
             if (!_nextSkillPulseMs.TryGetValue(key, out var nextPulseMs))
             {
                 _nextSkillPulseMs[key] = nowMs + SkillPulseIntervalMs;
@@ -235,10 +241,10 @@ public class TriggerManager : Singleton<TriggerManager>
         }
     }
 
-    private void ClearSkillPulses(long objectCoid, long triggerCoid)
+    private void ClearSkillPulses(int serial, long objectCoid, long triggerCoid)
     {
         foreach (var key in _nextSkillPulseMs.Keys
-                     .Where(key => key.ObjectCoid == objectCoid && key.TriggerCoid == triggerCoid)
+                     .Where(key => key.Serial == serial && key.ObjectCoid == objectCoid && key.TriggerCoid == triggerCoid)
                      .ToList())
         {
             _nextSkillPulseMs.TryRemove(key, out _);
@@ -456,7 +462,7 @@ public class TriggerManager : Singleton<TriggerManager>
                 continue;
             }
 
-            var key = (actorCoid, kvp.Key.Coid);
+            var key = (map.InstanceSerial, actorCoid, kvp.Key.Coid);
             if (_firedConditionalTriggers.ContainsKey(key))
                 continue;
 
@@ -532,35 +538,62 @@ public class TriggerManager : Singleton<TriggerManager>
             string.Join(',', trigger.Template.Reactions));
     }
 
-    public void ClearTriggersFor(long objectCoid)
+    /// <summary>Clears every latch this object holds on <paramref name="map"/> (LeaveMap path).</summary>
+    public void ClearTriggersFor(Map.SectorMap map, long objectCoid)
     {
-        foreach (var key in _activeTriggers.Keys.Where(k => k.ObjectCoid == objectCoid).ToList())
+        if (map == null)
+            return;
+
+        var serial = map.InstanceSerial;
+        foreach (var key in _activeTriggers.Keys.Where(k => k.Serial == serial && k.ObjectCoid == objectCoid).ToList())
             _activeTriggers.TryRemove(key, out _);
 
-        foreach (var key in _firedConditionalTriggers.Keys.Where(k => k.ActorCoid == objectCoid).ToList())
+        foreach (var key in _firedConditionalTriggers.Keys.Where(k => k.Serial == serial && k.ActorCoid == objectCoid).ToList())
             _firedConditionalTriggers.TryRemove(key, out _);
 
-        foreach (var key in _nextSkillPulseMs.Keys.Where(k => k.ObjectCoid == objectCoid).ToList())
+        foreach (var key in _nextSkillPulseMs.Keys.Where(k => k.Serial == serial && k.ObjectCoid == objectCoid).ToList())
             _nextSkillPulseMs.TryRemove(key, out _);
     }
 
-    public void ClearTrigger(long triggerCoid)
+    /// <summary>Clears every latch on one trigger of <paramref name="map"/> — never siblings'.</summary>
+    public void ClearTrigger(Map.SectorMap map, long triggerCoid)
     {
-        foreach (var key in _activeTriggers.Keys.Where(k => k.TriggerCoid == triggerCoid).ToList())
+        if (map == null)
+            return;
+
+        var serial = map.InstanceSerial;
+        foreach (var key in _activeTriggers.Keys.Where(k => k.Serial == serial && k.TriggerCoid == triggerCoid).ToList())
             _activeTriggers.TryRemove(key, out _);
 
-        foreach (var key in _firedConditionalTriggers.Keys.Where(k => k.TriggerCoid == triggerCoid).ToList())
+        foreach (var key in _firedConditionalTriggers.Keys.Where(k => k.Serial == serial && k.TriggerCoid == triggerCoid).ToList())
             _firedConditionalTriggers.TryRemove(key, out _);
 
-        foreach (var key in _nextSkillPulseMs.Keys.Where(k => k.TriggerCoid == triggerCoid).ToList())
+        foreach (var key in _nextSkillPulseMs.Keys.Where(k => k.Serial == serial && k.TriggerCoid == triggerCoid).ToList())
             _nextSkillPulseMs.TryRemove(key, out _);
     }
 
-    public void ResetTriggerFor(long objectCoid, long triggerCoid)
+    public void ResetTriggerFor(Map.SectorMap map, long objectCoid, long triggerCoid)
     {
-        _activeTriggers.TryRemove((objectCoid, triggerCoid), out _);
-        _firedConditionalTriggers.TryRemove((objectCoid, triggerCoid), out _);
-        ClearSkillPulses(objectCoid, triggerCoid);
+        if (map == null)
+            return;
+
+        var serial = map.InstanceSerial;
+        _activeTriggers.TryRemove((serial, objectCoid, triggerCoid), out _);
+        _firedConditionalTriggers.TryRemove((serial, objectCoid, triggerCoid), out _);
+        ClearSkillPulses(serial, objectCoid, triggerCoid);
+    }
+
+    /// <summary>Wipes every latch belonging to one map instance. Called from instance disposal.</summary>
+    public void ClearInstance(int instanceSerial)
+    {
+        foreach (var key in _activeTriggers.Keys.Where(k => k.Serial == instanceSerial).ToList())
+            _activeTriggers.TryRemove(key, out _);
+
+        foreach (var key in _firedConditionalTriggers.Keys.Where(k => k.Serial == instanceSerial).ToList())
+            _firedConditionalTriggers.TryRemove(key, out _);
+
+        foreach (var key in _nextSkillPulseMs.Keys.Where(k => k.Serial == instanceSerial).ToList())
+            _nextSkillPulseMs.TryRemove(key, out _);
     }
 
     /// <summary>Unit-test helper: wipe all latches (process-wide singleton).</summary>

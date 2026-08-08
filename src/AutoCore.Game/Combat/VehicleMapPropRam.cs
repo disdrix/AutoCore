@@ -46,8 +46,9 @@ public static class VehicleMapPropRam
     /// </summary>
     public const float LootForwardOffsetMeters = 3.5f;
 
-    // vehicleCoid -> (propCoid -> lastHitMs)
-    private static readonly Dictionary<long, Dictionary<long, int>> LastHitMsByVehicle = new();
+    // (instanceSerial, vehicleCoid) -> (propCoid -> lastHitMs). Serial-prefixed: NPC vehicle
+    // coids are identical across per-player instances of the same continent.
+    private static readonly Dictionary<(int Serial, long VehicleCoid), Dictionary<long, int>> LastHitMsByVehicle = new();
 
     [ThreadStatic]
     private static List<ClonedObjectBase> _spatialQueryBuffer;
@@ -120,7 +121,7 @@ public static class VehicleMapPropRam
         var hits = 0;
         if (closest != null
             && MaxHitsPerProcess > 0
-            && TryConsumeHitCooldown(vehicle.ObjectId.Coid, closest.ObjectId.Coid, now))
+            && TryConsumeHitCooldown(map.InstanceSerial, vehicle.ObjectId.Coid, closest.ObjectId.Coid, now))
         {
             hits = ApplyRamHit(vehicle, closest, speed);
         }
@@ -310,12 +311,13 @@ public static class VehicleMapPropRam
         return MathF.Sqrt(velocity.X * velocity.X + velocity.Y * velocity.Y + velocity.Z * velocity.Z);
     }
 
-    private static bool TryConsumeHitCooldown(long vehicleCoid, long propCoid, int nowMs)
+    private static bool TryConsumeHitCooldown(int instanceSerial, long vehicleCoid, long propCoid, int nowMs)
     {
-        if (!LastHitMsByVehicle.TryGetValue(vehicleCoid, out var byProp))
+        var key = (instanceSerial, vehicleCoid);
+        if (!LastHitMsByVehicle.TryGetValue(key, out var byProp))
         {
             byProp = new Dictionary<long, int>();
-            LastHitMsByVehicle[vehicleCoid] = byProp;
+            LastHitMsByVehicle[key] = byProp;
         }
 
         if (byProp.TryGetValue(propCoid, out var last) && unchecked(nowMs - last) < HitCooldownMs)
@@ -323,5 +325,16 @@ public static class VehicleMapPropRam
 
         byProp[propCoid] = nowMs;
         return true;
+    }
+
+    /// <summary>Test seam for <see cref="TryConsumeHitCooldown"/>.</summary>
+    internal static bool TryConsumeHitCooldownForTests(int instanceSerial, long vehicleCoid, long propCoid, int nowMs)
+        => TryConsumeHitCooldown(instanceSerial, vehicleCoid, propCoid, nowMs);
+
+    /// <summary>Drops every ram cooldown belonging to one map instance (disposal hygiene).</summary>
+    public static void ClearForInstance(int instanceSerial)
+    {
+        foreach (var key in LastHitMsByVehicle.Keys.Where(k => k.Serial == instanceSerial).ToList())
+            LastHitMsByVehicle.Remove(key);
     }
 }

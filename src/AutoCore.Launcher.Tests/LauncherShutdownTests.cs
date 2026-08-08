@@ -57,6 +57,26 @@ public class LauncherShutdownTests
     }
 
     [TestMethod]
+    public void Shutdown_WithDiscord_UsesSectorGlobalDiscordAuthOrder()
+    {
+        var events = new List<string>();
+        var sector = new FakeLauncherServerHost("Sector", eventLog: events);
+        var global = new FakeLauncherServerHost("Global", eventLog: events);
+        var discord = new FakeLauncherServerHost("Discord", eventLog: events);
+        var auth = new FakeLauncherServerHost("Auth", eventLog: events);
+
+        var result = LauncherShutdownCoordinator.Shutdown(sector, global, auth, discordHost: discord);
+
+        Assert.IsTrue(result.Completed);
+        CollectionAssert.AreEqual(
+            LauncherShutdownCoordinator.ExpectedShutdownOrderWithDiscord.ToList(),
+            result.ShutDownHosts.ToList());
+        CollectionAssert.AreEqual(
+            new[] { "Sector.Shutdown", "Global.Shutdown", "Discord.Shutdown", "Auth.Shutdown" },
+            events);
+    }
+
+    [TestMethod]
     public void Shutdown_WhenCancelledMidway_DoesNotHangAndStopsRemainingHosts()
     {
         using var cts = new CancellationTokenSource();

@@ -100,6 +100,7 @@ public class SimpleObject : GraphicsObject
         if (HP == newHp && !(newHp > 0 && wasCorpse))
             return;
 
+        var before = HP;
         var increased = newHp > HP;
         HP = newHp;
 
@@ -121,6 +122,23 @@ public class SimpleObject : GraphicsObject
         // Chat / admin / scripts that raise HP must also open type-7 health gates.
         if (increased)
             NotifyPlayerHealthChangedForTriggers();
+
+        // /reportbug: absolute HP changes that reach the client (skip silent pool seeding).
+        if (triggerGhostUpdate)
+        {
+            if (increased)
+            {
+                var healed = newHp - before;
+                if (healed > 0)
+                    Diagnostics.PlayerCombatTrace.OnHeal(this, healed, "SetCurrentHP");
+            }
+            else if (before > newHp)
+            {
+                var lost = before - newHp;
+                if (lost > 0)
+                    Diagnostics.PlayerCombatTrace.OnDamage(this, attacker: null, lost);
+            }
+        }
     }
 
     /// <summary>

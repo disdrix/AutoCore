@@ -2,6 +2,7 @@ namespace AutoCore.Game.Managers;
 
 using System.Collections.Concurrent;
 using AutoCore.Utils;
+using AutoCore.Utils.Logging;
 
 /// <summary>Intent for a pending mission-row write (latest-wins per character+mission).</summary>
 public enum QuestPersistKind
@@ -58,7 +59,23 @@ public sealed class MissionPersistenceQueue
     /// </summary>
     public const int MaxPersistAttempts = 5;
 
-    private readonly ConcurrentDictionary<(long Coid, int MissionId), QuestPersistOp> _pending = new();
+    /// <summary>
+    /// A pending op plus the ambient <see cref="LogContext"/> captured at enqueue time, so a
+    /// background flush failure is attributable to the session/character that caused the write.
+    /// </summary>
+    private readonly struct PendingWrite
+    {
+        public PendingWrite(QuestPersistOp op, LogContext context)
+        {
+            Op = op;
+            Context = context;
+        }
+
+        public QuestPersistOp Op { get; }
+        public LogContext Context { get; }
+    }
+
+    private readonly ConcurrentDictionary<(long Coid, int MissionId), PendingWrite> _pending = new();
     private readonly ConcurrentDictionary<(long Coid, int MissionId), int> _attempts = new();
 
     public int PendingCount => _pending.Count;
@@ -69,10 +86,11 @@ public sealed class MissionPersistenceQueue
     /// </summary>
     public int DeadLetteredCount { get; private set; }
 
-    /// <summary>Record or replace the pending op for (coid, missionId).</summary>
+    /// <summary>Record or replace the pending op for (coid, missionId), capturing the
+    /// caller's ambient LogContext for later attribution of flush failures.</summary>
     public void Enqueue(long coid, int missionId, QuestPersistOp op)
     {
-        _pending[(coid, missionId)] = op;
+        _pending[(coid, missionId)] = new PendingWrite(op, LogContext.Capture());
     }
 
     /// <summary>
@@ -93,8 +111,14 @@ public sealed class MissionPersistenceQueue
 
         foreach (var key in keys)
         {
-            if (!_pending.TryRemove(key, out var op))
+            if (!_pending.TryRemove(key, out var entry))
                 continue;
+
+            var op = entry.Op;
+
+            // Run the write (and any failure logging) under the context captured at enqueue
+            // time, so background-flush failures are attributable to the originating session.
+            using var enqueueScope = LogContext.Restore(entry.Context);
 
             try
             {
@@ -112,6 +136,8 @@ public sealed class MissionPersistenceQueue
                     // is an error, not a warning — it must be visible in production logs.
                     _attempts.TryRemove(key, out _);
                     DeadLetteredCount++;
+                    GameLog.Error("MissionPersistDeadLettered", "MIS-001",
+                        ("DeadLetteredCount", DeadLetteredCount));
 
                     Logger.WriteException(
                         LogType.Error,
@@ -128,8 +154,9 @@ public sealed class MissionPersistenceQueue
                     ex);
 
                 // Do not lose a mission mutation on a transient DB failure. Preserve a newer
-                // operation if one arrived while this write was in flight.
-                _pending.TryAdd(key, op);
+                // operation if one arrived while this write was in flight (keeping its
+                // original enqueue-time context).
+                _pending.TryAdd(key, entry);
             }
         }
 
@@ -157,7 +184,7 @@ public sealed class MissionPersistenceQueue
     {
         foreach (var key in _pending.Keys.Where(k => k.Coid == coid).ToArray())
         {
-            if (_pending.TryGetValue(key, out var op) && op.Kind == QuestPersistKind.Upsert)
+            if (_pending.TryGetValue(key, out var entry) && entry.Op.Kind == QuestPersistKind.Upsert)
                 _pending.TryRemove(key, out _);
         }
     }

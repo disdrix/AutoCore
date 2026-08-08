@@ -7,7 +7,9 @@ using AutoCore.Auth.Packets.Client;
 using AutoCore.Auth.Packets.Server;
 using AutoCore.Database.Auth;
 using AutoCore.Utils;
+using AutoCore.Utils.Logging;
 using AutoCore.Utils.Packets;
+using AutoCore.Utils.Reliability;
 
 public partial class AuthClient
 {
@@ -16,24 +18,35 @@ public partial class AuthClient
         if (packet is not IOpcodedPacket<ClientOpcode> authPacket)
             return;
 
-        switch (authPacket.Opcode)
+        // Ambient session scope so every log line inside auth dispatch is attributable.
+        using var sessionScope = Account == null
+            ? LogContext.Push(("SessionId", SessionId))
+            : LogContext.Push(("SessionId", SessionId), ("AccountId", Account.Id));
+
+        // SS-26: this is the auth server's dispatch boundary for client-controlled TCP input.
+        // Without the guard, one malformed packet whose handler throws propagates into the
+        // socket receive path and can tear down the auth pump for every client.
+        Guard.Run($"auth packet dispatch ({authPacket.Opcode})", () =>
         {
-            case ClientOpcode.Login:
-                MsgLogin((authPacket as LoginPacket)!);
-                break;
+            switch (authPacket.Opcode)
+            {
+                case ClientOpcode.Login:
+                    MsgLogin((authPacket as LoginPacket)!);
+                    break;
 
-            case ClientOpcode.Logout:
-                MsgLogout((authPacket as LogoutPacket)!);
-                break;
+                case ClientOpcode.Logout:
+                    MsgLogout((authPacket as LogoutPacket)!);
+                    break;
 
-            case ClientOpcode.AboutToPlay:
-                MsgAboutToPlay((authPacket as AboutToPlayPacket)!);
-                break;
+                case ClientOpcode.AboutToPlay:
+                    MsgAboutToPlay((authPacket as AboutToPlayPacket)!);
+                    break;
 
-            case ClientOpcode.ServerListExt:
-                MsgServerListExt((authPacket as ServerListExtPacket)!);
-                break;
-        }
+                case ClientOpcode.ServerListExt:
+                    MsgServerListExt((authPacket as ServerListExtPacket)!);
+                    break;
+            }
+        });
     }
 
     private void MsgLogin(LoginPacket packet)
@@ -43,6 +56,12 @@ public partial class AuthClient
             var account = context.Accounts.FirstOrDefault(a => a.Username == packet.UserName);
             if (account == null || !account.CheckPassword(packet.Password))
             {
+                // NEVER log the password. Client sees one merged failure; server-side the
+                // reasons stay distinguishable for brute-force triage.
+                GameLog.Warn("AuthLoginFailed", "AUTH-001",
+                    ("Reason", account == null ? "UnknownAccount" : "BadPassword"),
+                    ("Username", packet.UserName));
+
                 SendPacket(new LoginFailPacket(FailReason.UserNameOrPassword));
 
                 Close();
@@ -52,6 +71,11 @@ public partial class AuthClient
 
             if (account.Locked)
             {
+                GameLog.Warn("AuthLoginFailed", "AUTH-001",
+                    ("Reason", "Locked"),
+                    ("Username", packet.UserName),
+                    ("AccountId", account.Id));
+
                 SendPacket(new BlockedAccountPacket());
 
                 Close();
@@ -77,6 +101,11 @@ public partial class AuthClient
         }
 
         State = ClientState.LoggedIn;
+
+        GameLog.Info("AuthLoginSucceeded",
+            ("AccountId", Account!.Id),
+            ("Username", Account.Username),
+            ("SessionId", SessionId));
 
         SendPacket(new LoginOkPacket
         {
@@ -125,6 +154,10 @@ public partial class AuthClient
             Logger.WriteLog(LogType.Security, $"Account ({Account!.Username}, {Account.Id}) has sent an AboutToPlayPacket with invalid session data!");
             return;
         }
+
+        GameLog.Info("AuthRedirectRequested",
+            ("AccountId", Account!.Id),
+            ("ServerId", packet.ServerId));
 
         Server.RequestRedirection(this, packet.ServerId);
     }

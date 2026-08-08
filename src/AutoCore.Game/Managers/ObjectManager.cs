@@ -108,6 +108,18 @@ public class ObjectManager : Singleton<ObjectManager>
         return Objects.Values.Where(o => o is Character objChar && objChar.Name == name).Select(o => o as Character).FirstOrDefault();
     }
 
+    /// <summary>
+    /// Characters currently bound to a live owning connection (process-local online players).
+    /// </summary>
+    public IEnumerable<Character> GetOnlineCharacters()
+    {
+        foreach (var obj in Objects.Values)
+        {
+            if (obj is Character character && character.OwningConnection != null)
+                yield return character;
+        }
+    }
+
     public Vehicle? GetVehicle(long coid)
     {
         if (Objects.TryGetValue(coid, out var obj) && obj is Vehicle vehicle)

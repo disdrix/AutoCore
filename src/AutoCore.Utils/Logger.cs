@@ -63,6 +63,43 @@ public class Logger
             else if (!Config.LogToFile)
                 CloseFileWriter();
         }
+
+        ApplyStructuredConfig(config);
+    }
+
+    /// <summary>
+    /// Applies the structured-pipeline part of the configuration: minimum level (with the
+    /// PlaytestDiagnostics override) and the NDJSON file sink. Total: a bad path or level
+    /// string degrades, it never aborts startup.
+    /// </summary>
+    private static void ApplyStructuredConfig(LoggerConfig config)
+    {
+        try
+        {
+            var level = Logging.StructuredLogLevel.Info;
+
+            if (!string.IsNullOrWhiteSpace(config.StructuredMinimumLevel) &&
+                !Enum.TryParse(config.StructuredMinimumLevel, ignoreCase: true, out level))
+            {
+                level = Logging.StructuredLogLevel.Info;
+                WriteLog(LogType.Warning,
+                    $"Unknown StructuredMinimumLevel '{config.StructuredMinimumLevel}'; using Info.");
+            }
+
+            // One switch for playtest nights: everything down to Debug.
+            if (config.PlaytestDiagnostics && level > Logging.StructuredLogLevel.Debug)
+                level = Logging.StructuredLogLevel.Debug;
+
+            Logging.GameLog.MinimumLevel = level;
+
+            Logging.GameLog.SetSink(string.IsNullOrWhiteSpace(config.StructuredLogPath)
+                ? null
+                : new Logging.NdjsonFileSink(config.StructuredLogPath));
+        }
+        catch (Exception ex)
+        {
+            EmergencyReport("applying structured log configuration", ex);
+        }
     }
 
     /// <summary>
@@ -143,6 +180,12 @@ public class Logger
     {
         try
         {
+            // Dual-write: mirror the raw line into the structured pipeline (enriched with
+            // ambient LogContext) so legacy call sites stay session-traceable. ExportData
+            // is a raw data channel, not a log line, and is excluded.
+            if (type != LogType.ExportData)
+                Logging.GameLog.WriteLegacy(type, log);
+
             var (prefix, color) = Describe(type);
 
             var text = type == LogType.ExportData
@@ -299,5 +342,14 @@ public class Logger
         public bool IsDebugMode { get; set; } = true;
         public string LogFilePath { get; set; } = "log.txt";
         public bool LogToFile { get; set; } = true;
+
+        /// <summary>NDJSON structured-event file. Null/empty disables the structured pipeline.</summary>
+        public string StructuredLogPath { get; set; }
+
+        /// <summary>Minimum structured severity (Trace/Debug/Info/Warning/Error/Fatal). Default Info.</summary>
+        public string StructuredMinimumLevel { get; set; }
+
+        /// <summary>Playtest-night switch: forces the structured minimum level down to Debug.</summary>
+        public bool PlaytestDiagnostics { get; set; }
     }
 }

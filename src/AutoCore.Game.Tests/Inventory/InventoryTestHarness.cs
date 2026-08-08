@@ -31,6 +31,7 @@ public sealed class InventoryTestHarness
         Character = new Character();
         Character.SetCoid(characterCoid, true);
         Character.AttachTestDataForTests();
+        Character.GMLevel = 1;
 
         Vehicle = new Vehicle();
         Vehicle.SetCoid(vehicleCoid, true);

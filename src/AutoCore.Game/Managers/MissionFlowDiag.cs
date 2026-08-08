@@ -12,14 +12,21 @@ using AutoCore.Utils;
 /// </summary>
 internal static class MissionFlowDiag
 {
+    /// <summary>Test hook: receives the full message body including the [MISSION-DIAG] prefix.</summary>
+    internal static Action<string> TestSink { get; set; }
+
     public static void Log(string message)
     {
-        Logger.WriteLog(LogType.Command, "[MISSION-DIAG] " + message);
+        var line = "[MISSION-DIAG] " + message;
+        TestSink?.Invoke(line);
+        Logger.WriteLog(LogType.Command, line);
     }
 
     public static void Log(string format, params object[] args)
     {
-        Logger.WriteLog(LogType.Command, "[MISSION-DIAG] " + string.Format(format, args));
+        var line = "[MISSION-DIAG] " + string.Format(format, args);
+        TestSink?.Invoke(line);
+        Logger.WriteLog(LogType.Command, line);
     }
 
     public static string QuestSummary(Character character)

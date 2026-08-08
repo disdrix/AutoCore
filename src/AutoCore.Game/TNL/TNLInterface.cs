@@ -75,8 +75,13 @@ public class TNLInterface : NetInterface
             tConn.SetPlayerCOID(connId);
 
             MapConnections.Add(connId, tConn);
-            
+
             AutoCore.Utils.Logger.WriteLog(AutoCore.Utils.LogType.Network, $"TNLInterface: Adding connection {connId} from {conn.GetNetAddress()}");
+
+            AutoCore.Utils.Logging.GameLog.Info("ConnectionAccepted",
+                ("SessionId", tConn.SessionId),
+                ("ConnectionId", connId),
+                ("RemoteAddress", SafeAddress(conn)));
         }
 
         base.AddConnection(conn);
@@ -85,8 +90,27 @@ public class TNLInterface : NetInterface
     protected override void RemoveConnection(NetConnection conn)
     {
         if (conn is TNLConnection tConn)
+        {
             MapConnections.Remove(tConn.GetPlayerCOID());
 
+            AutoCore.Utils.Logging.GameLog.Info("ConnectionClosed",
+                ("SessionId", tConn.SessionId),
+                ("ConnectionId", tConn.GetPlayerCOID()));
+        }
+
         base.RemoveConnection(conn);
+    }
+
+    /// <summary>Net address for logging; unit-test connections may have no bound address.</summary>
+    private static string SafeAddress(NetConnection conn)
+    {
+        try
+        {
+            return conn.GetNetAddress()?.ToString();
+        }
+        catch
+        {
+            return null;
+        }
     }
 }

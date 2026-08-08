@@ -247,7 +247,7 @@ public class MissionPhaseWorldHandlerTests
             DialogSpawnCoid, originalActive: true, spawnType: sameNpc);
         PlaceDialogCreatureForCbid(map, sameNpc);
 
-        character.MapPresence.EnsureContinent(ContId);
+        character.MapPresence.EnsureContinent(ContId, map.InstanceSerial);
         character.MapPresence.Suppress(DialogSpawnCoid);
         character.MapPresence.Suppress(DialogCreatureCoid);
         Assert.IsTrue(character.MapPresence.IsSuppressed(DialogCreatureCoid));
@@ -292,7 +292,7 @@ public class MissionPhaseWorldHandlerTests
         var (character, vehicle, map) = CreatePlayerWithMap();
         SeedSpawnGraph(map);
         PlacePadMarker(map);
-        character.MapPresence.EnsureContinent(ContId);
+        character.MapPresence.EnsureContinent(ContId, map.InstanceSerial);
         character.MapPresence.Materialize(PadSpawnCoid);
 
         character.CurrentQuests.Add(MakeQuest(seq: 1));

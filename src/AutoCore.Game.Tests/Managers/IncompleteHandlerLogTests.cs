@@ -34,6 +34,7 @@ public class IncompleteHandlerLogTests
     {
         _incomplete.Clear();
         _sent.Clear();
+        IncompleteHandlerLog.ResetOnceKeysForTests();
         IncompleteHandlerLog.TestSink = msg => _incomplete.Add(msg);
         TNLConnection.TestPacketSink = (_, p) => _sent.Add(p);
         AssetManager.Instance.ClearTestMissions();
@@ -44,6 +45,7 @@ public class IncompleteHandlerLogTests
     public void TearDown()
     {
         IncompleteHandlerLog.TestSink = null;
+        IncompleteHandlerLog.ResetOnceKeysForTests();
         TNLConnection.TestPacketSink = null;
         AssetManager.Instance.ClearTestMissions();
         TriggerManager.Instance.ClearAllForTests();

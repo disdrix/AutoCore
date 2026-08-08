@@ -170,7 +170,7 @@ public static class MissionUseItemProgress
         if (!useItem.PrimaryDestroy || !useItem.PrimaryInWorld)
             return;
 
-        character.MapPresence.EnsureContinent(character.Map.ContinentId);
+        character.MapPresence.EnsureContinent(character.Map.ContinentId, character.Map.InstanceSerial);
         character.MapPresence.Suppress(targetCoid);
 
         // Personal mission-world remove (same character who used the prop).

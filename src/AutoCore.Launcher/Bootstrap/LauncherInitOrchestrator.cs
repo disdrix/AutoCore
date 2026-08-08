@@ -28,8 +28,33 @@ public static class LauncherInitOrchestrator
         LauncherInitStep.StartSector,
     ];
 
+    /// <summary>Base order plus Discord when an optional Discord host is supplied.</summary>
+    public static IReadOnlyList<LauncherInitStep> ExpectedSuccessfulOrderWithDiscord { get; } =
+    [
+        LauncherInitStep.ValidateConfig,
+        LauncherInitStep.InitializeConnectionStrings,
+        LauncherInitStep.EnsureDatabasesCreated,
+        LauncherInitStep.InitializeAssets,
+        LauncherInitStep.LoadAssets,
+        LauncherInitStep.ApplyEarlyRuntimeConfig,
+        LauncherInitStep.InitializeLootManager,
+        LauncherInitStep.InitializeMapManager,
+        LauncherInitStep.ApplyLateRuntimeConfig,
+        LauncherInitStep.SetupAuth,
+        LauncherInitStep.StartAuth,
+        LauncherInitStep.SetupDiscord,
+        LauncherInitStep.StartDiscord,
+        LauncherInitStep.SetupGlobal,
+        LauncherInitStep.StartGlobal,
+        LauncherInitStep.SetupSector,
+        LauncherInitStep.StartSector,
+    ];
+
     public static IReadOnlyList<string> ExpectedServerStartOrder { get; } =
         ["Auth", "Global", "Sector"];
+
+    public static IReadOnlyList<string> ExpectedServerStartOrderWithDiscord { get; } =
+        ["Auth", "Discord", "Global", "Sector"];
 
     public static LauncherInitResult Run(
         AuthConfig auth,
@@ -40,7 +65,8 @@ public static class LauncherInitOrchestrator
         ILauncherServerHost globalHost,
         ILauncherServerHost sectorHost,
         Func<string, bool>? pathExists = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        ILauncherServerHost? discordHost = null)
     {
         ArgumentNullException.ThrowIfNull(auth);
         ArgumentNullException.ThrowIfNull(global);
@@ -50,7 +76,7 @@ public static class LauncherInitOrchestrator
         ArgumentNullException.ThrowIfNull(globalHost);
         ArgumentNullException.ThrowIfNull(sectorHost);
 
-        var completed = new List<LauncherInitStep>(ExpectedSuccessfulOrder.Count);
+        var completed = new List<LauncherInitStep>(ExpectedSuccessfulOrderWithDiscord.Count);
 
         try
         {
@@ -117,6 +143,13 @@ public static class LauncherInitOrchestrator
             if (!StartHost(authHost, LauncherInitStep.SetupAuth, LauncherInitStep.StartAuth, completed, cancellationToken, out var authFail))
                 return authFail!;
 
+            // Optional Discord module: after Auth (needs Auth DB + player counts), before Global.
+            if (discordHost != null)
+            {
+                if (!StartHost(discordHost, LauncherInitStep.SetupDiscord, LauncherInitStep.StartDiscord, completed, cancellationToken, out var discordFail))
+                    return discordFail!;
+            }
+
             if (!StartHost(globalHost, LauncherInitStep.SetupGlobal, LauncherInitStep.StartGlobal, completed, cancellationToken, out var globalFail))
                 return globalFail!;
 
@@ -173,6 +206,8 @@ public enum LauncherInitStep
     ApplyLateRuntimeConfig,
     SetupAuth,
     StartAuth,
+    SetupDiscord,
+    StartDiscord,
     SetupGlobal,
     StartGlobal,
     SetupSector,

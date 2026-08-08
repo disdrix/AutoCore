@@ -70,6 +70,7 @@ public sealed class MissionHeavyRegressionFixture : IDisposable
 
         var character = new Character();
         character.SetCoid(charCoid, true);
+        character.GMLevel = 1; // SS-28: chat mission admin commands under test
         character.SetOwningConnection(connection);
         connection.CurrentCharacter = character;
 

@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace AutoCore.Global.Tests.Network;
 
 using AutoCore.Communicator;
+using AutoCore.Game.TNL;
 using AutoCore.Global.Network;
 using static GlobalServerTestHelpers;
 
@@ -56,7 +57,7 @@ public class GlobalServerCommunicatorTests
 
         var info = new ServerInfo
         {
-            CurrentPlayers = 99 // should be overwritten to 0
+            CurrentPlayers = 99 // should be overwritten from live connections (empty => 0)
         };
 
         InvokePrivate(_server, "OnCommunicatorServerInfoRequest", info);
@@ -66,6 +67,40 @@ public class GlobalServerCommunicatorTests
         Assert.AreEqual(0, info.CurrentPlayers);
         Assert.AreEqual(27000, info.Port);
         Assert.AreEqual(42, info.MaxPlayers);
+    }
+
+    [TestMethod]
+    public void OnCommunicatorServerInfoRequest_ReportsLiveMapConnectionCount()
+    {
+        _server = CreateServer();
+        _server.Setup(CreateSetupConfig());
+        _server.Config.GameConfig.Port = 26880;
+
+        // Simulate three live Global clients (character-select or in-world dual connection).
+        _server.Interface.MapConnections[1] = new TNLConnection();
+        _server.Interface.MapConnections[2] = new TNLConnection();
+        _server.Interface.MapConnections[3] = new TNLConnection();
+        // Null entries must not inflate the online count.
+        _server.Interface.MapConnections[99] = null!;
+
+        var info = new ServerInfo { CurrentPlayers = 0 };
+
+        InvokePrivate(_server, "OnCommunicatorServerInfoRequest", info);
+
+        Assert.AreEqual(3, info.CurrentPlayers);
+        Assert.AreEqual(26880, info.Port);
+    }
+
+    [TestMethod]
+    public void OnCommunicatorServerInfoRequest_WhenInterfaceNull_ReportsZero()
+    {
+        _server = CreateServer();
+        // No Setup — Interface remains null.
+        var info = new ServerInfo { CurrentPlayers = 7 };
+
+        InvokePrivate(_server, "OnCommunicatorServerInfoRequest", info);
+
+        Assert.AreEqual(0, info.CurrentPlayers);
     }
 
     [TestMethod]

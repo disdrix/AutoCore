@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 namespace AutoCore.Launcher.Bootstrap;
 
 using AutoCore.Auth.Config;
+using AutoCore.Discord.Config;
 using AutoCore.Global.Config;
 using AutoCore.Sector.Config;
 
@@ -17,6 +18,8 @@ public static class LauncherConfigLoader
     public const string GlobalEnvConfigFileName = "appsettings.global.env.json";
     public const string SectorConfigFileName = "appsettings.sector.json";
     public const string SectorEnvConfigFileName = "appsettings.sector.env.json";
+    public const string DiscordConfigFileName = "appsettings.discord.json";
+    public const string DiscordEnvConfigFileName = "appsettings.discord.env.json";
 
     public static AuthConfig LoadAuthConfig(string? contentRoot = null)
         => LoadConfig<AuthConfig>(AuthConfigFileName, AuthEnvConfigFileName, contentRoot);
@@ -26,6 +29,23 @@ public static class LauncherConfigLoader
 
     public static SectorConfig LoadSectorConfig(string? contentRoot = null)
         => LoadConfig<SectorConfig>(SectorConfigFileName, SectorEnvConfigFileName, contentRoot);
+
+    /// <summary>
+    /// Loads Discord config. Missing primary file yields defaults (module disabled) so existing
+    /// deployments without the optional module keep working.
+    /// </summary>
+    public static DiscordConfig LoadDiscordConfig(string? contentRoot = null)
+    {
+        var root = string.IsNullOrWhiteSpace(contentRoot)
+            ? Directory.GetCurrentDirectory()
+            : contentRoot;
+
+        var primaryPath = Path.Combine(root, DiscordConfigFileName);
+        if (!File.Exists(primaryPath))
+            return new DiscordConfig();
+
+        return LoadConfig<DiscordConfig>(DiscordConfigFileName, DiscordEnvConfigFileName, contentRoot);
+    }
 
     /// <summary>
     /// Loads and binds a config type from a required primary JSON file and an optional env overlay.

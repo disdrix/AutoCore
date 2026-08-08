@@ -19,8 +19,21 @@ public sealed class CharacterMapPresence
     /// old waypoints after server advanced (Track This seq2 deliver while client patrols).
     /// </summary>
     readonly HashSet<int> _stalePatrolResyncedMissions = new();
+    /// <summary>
+    /// AutoPatrol target COID → quest-state fingerprint last fully handled as a no-op or
+    /// already-applied hit. Client spams 0x20B3 every tick inside a pad volume; identical
+    /// state must not re-scan missions or log every frame.
+    /// </summary>
+    readonly Dictionary<long, string> _autoPatrolHandled = new();
 
     public int ContinentId { get; private set; } = -1;
+
+    /// <summary>
+    /// <see cref="SectorMap.InstanceSerial"/> this ledger is bound to. Per-player instances of
+    /// one continent mint identical live-spawn COIDs, so the ledger must reset when the
+    /// character lands on a different INSTANCE even when the continent id is unchanged.
+    /// </summary>
+    public int InstanceSerial { get; private set; } = -1;
 
     /// <summary>Map COIDs this character has deleted (client RemoveObject / no interact).</summary>
     public IReadOnlyCollection<long> SuppressedCoids => _suppressed;
@@ -32,29 +45,57 @@ public sealed class CharacterMapPresence
     public IReadOnlyCollection<long> OwnedCombatCoids => _ownedCombat;
 
     /// <summary>
-    /// Binds presence to a continent. Clears ledger when the character changes maps.
+    /// Binds presence to one map instance. Clears the ledger when the character changes maps —
+    /// including a different instance of the SAME continent (fresh tutorial copy on relog).
     /// </summary>
-    public void EnsureContinent(int continentId)
+    public void EnsureContinent(int continentId, int instanceSerial)
     {
-        if (ContinentId == continentId)
+        if (ContinentId == continentId && InstanceSerial == instanceSerial)
             return;
 
         ContinentId = continentId;
+        InstanceSerial = instanceSerial;
         _suppressed.Clear();
         _materialized.Clear();
         _ownedCombat.Clear();
         _deliverTurnInReady.Clear();
         _stalePatrolResyncedMissions.Clear();
+        _autoPatrolHandled.Clear();
     }
 
     public void Clear()
     {
         ContinentId = -1;
+        InstanceSerial = -1;
         _suppressed.Clear();
         _materialized.Clear();
         _ownedCombat.Clear();
         _deliverTurnInReady.Clear();
         _stalePatrolResyncedMissions.Clear();
+        _autoPatrolHandled.Clear();
+    }
+
+    /// <summary>
+    /// True when this AutoPatrol target was already handled for the same quest fingerprint
+    /// (mission ids, active sequences, pad progress). Skip full handler work and logging.
+    /// </summary>
+    public bool ShouldSkipRedundantAutoPatrol(long targetCoid, string questStateFingerprint)
+    {
+        if (targetCoid <= 0 || string.IsNullOrEmpty(questStateFingerprint))
+            return false;
+        return _autoPatrolHandled.TryGetValue(targetCoid, out var prior)
+            && prior == questStateFingerprint;
+    }
+
+    /// <summary>
+    /// Record that AutoPatrol for <paramref name="targetCoid"/> produced no further useful work
+    /// at <paramref name="questStateFingerprint"/> (already-counted pad, sibling ready, no-match).
+    /// </summary>
+    public void NoteAutoPatrolHandled(long targetCoid, string questStateFingerprint)
+    {
+        if (targetCoid <= 0 || string.IsNullOrEmpty(questStateFingerprint))
+            return;
+        _autoPatrolHandled[targetCoid] = questStateFingerprint;
     }
 
     /// <summary>

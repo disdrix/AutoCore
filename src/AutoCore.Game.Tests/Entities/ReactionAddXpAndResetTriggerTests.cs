@@ -146,7 +146,7 @@ public class ReactionAddXpAndResetTriggerTests
 
         Assert.IsTrue(reaction.TriggerIfPossible(vehicle));
         // Soft-assert: ResetTriggerFor is callable for listed cooids without throw.
-        TriggerManager.Instance.ResetTriggerFor(vehicle.ObjectId.Coid, triggerCoid);
+        TriggerManager.Instance.ResetTriggerFor(map, vehicle.ObjectId.Coid, triggerCoid);
     }
 
     [TestMethod]
@@ -167,7 +167,7 @@ public class ReactionAddXpAndResetTriggerTests
         reaction.SetMap(map);
 
         Assert.IsTrue(reaction.TriggerIfPossible(vehicle));
-        TriggerManager.Instance.ResetTriggerFor(vehicle.ObjectId.Coid, triggerCoid);
+        TriggerManager.Instance.ResetTriggerFor(map, vehicle.ObjectId.Coid, triggerCoid);
     }
 
     [TestMethod]

@@ -25,7 +25,11 @@ public class MissionPersistence : Singleton<MissionPersistence>
     /// <summary>Persist one op. Defaults to EF <see cref="CharContext"/> write; replace in tests.</summary>
     internal Action<long, int, QuestPersistOp> PersistQuestRow { get; set; }
 
-    internal int PendingPersistCount => _persistQueue.PendingCount;
+    /// <summary>Pending mission writes (Phase 5 health metric).</summary>
+    public int PendingPersistCount => _persistQueue.PendingCount;
+
+    /// <summary>Dead-lettered mission writes (SS-14 / Phase 5 health metric).</summary>
+    public int DeadLetteredCount => _persistQueue.DeadLetteredCount;
 
     public MissionPersistence()
     {

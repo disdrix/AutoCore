@@ -53,6 +53,11 @@ public partial class TNLConnection
         CurrentCharacter = character;
         CurrentCharacter.SetOwningConnection(this);
 
+        AutoCore.Utils.Logging.GameLog.Info("CharacterSelected",
+            ("SessionId", SessionId),
+            ("CharacterId", character.ObjectId.Coid),
+            ("AccountId", character.AccountId));
+
         // New character, that never entered the world
         if (character.LastTownId == -1)
         {

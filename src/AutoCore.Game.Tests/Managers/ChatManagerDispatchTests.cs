@@ -47,6 +47,7 @@ public class ChatManagerDispatchTests
             character.SetCoid(5001, true);
             // Seed minimal DB row so Name/Level/XP properties and attribute commands do not NRE.
             character.AttachTestDataForTests("chat-tester");
+        character.GMLevel = 1;
             character.SetOwningConnection(connection);
             connection.CurrentCharacter = character;
 
