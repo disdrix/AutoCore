@@ -70,7 +70,6 @@ public static class VehicleCreatureRam
         var map = vehicle.Map;
         var vehiclePos = vehicle.Position;
         var now = Environment.TickCount;
-        var rammerFaction = vehicle.GetIDFaction();
 
         var buffer = _spatialQueryBuffer ??= new List<ClonedObjectBase>(64);
         map.Grid.QueryRadius(vehiclePos, ContactRadius, buffer);
@@ -81,7 +80,7 @@ public static class VehicleCreatureRam
 
         foreach (var obj in buffer)
         {
-            if (!IsRamEligibleCreature(obj, rammerFaction))
+            if (!IsRamEligibleCreature(vehicle, obj))
                 continue;
 
             var distSq = obj.Position.DistSq(vehiclePos);
@@ -102,15 +101,14 @@ public static class VehicleCreatureRam
     }
 
     /// <summary>
-    /// Living, non-invincible creature whose faction is hostile to the rammer. Neutral (−100),
-    /// unset, and player-race factions are never eligible — mirrors weapon target gating.
+    /// Living creature the unified gate allows the rammer to damage (SS-36). The gate refuses
+    /// Character bodies (F3: Character : Creature slipped the old type guard and became a latent
+    /// one-hit player kill), corpses, invincible, neutral (−100), and same-effective-faction
+    /// victims; unset (−1) creatures are rammable exactly like they are shootable.
     /// </summary>
-    public static bool IsRamEligibleCreature(ClonedObjectBase obj, int rammerFaction)
+    public static bool IsRamEligibleCreature(Vehicle rammer, ClonedObjectBase obj)
     {
-        if (obj is not Creature creature || creature.IsCorpse || creature.IsInvincible)
-            return false;
-
-        return FactionHostility.IsHostile(creature.GetIDFaction(), rammerFaction);
+        return obj is Creature && CombatEligibility.CanDamage(rammer, obj, DamageContext.Ram);
     }
 
     /// <summary>

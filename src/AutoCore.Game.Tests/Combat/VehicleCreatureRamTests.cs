@@ -185,6 +185,65 @@ public class VehicleCreatureRamTests
         Assert.AreEqual(0, VehicleCreatureRam.Process(vehicle));
     }
 
+    // --- SS-36: ram routes through CombatEligibility.CanDamage ---
+
+    /// <summary>
+    /// SS-36 / F3 tripwire: Character : Creature, so the old `is not Creature` guard let an
+    /// on-foot player pass, and once its faction was pushed hostile (reaction 22 / COID
+    /// collision / mis-tagged clonebase) a drive-by became a one-hit player kill that also
+    /// removed the body from the map. On-foot players must never be ram victims.
+    /// </summary>
+    [TestMethod]
+    public void Process_CharacterOnFoot_HostileFaction_IsNeverRammed()
+    {
+        const int cbid = 9960;
+        RegisterCreature(cbid, minHp: 1, maxHp: 4);
+
+        var (vehicle, map) = CreateVehicleOnMap(speed: 20f);
+        var onFoot = new Character();
+        onFoot.SetCoid(89200, true);
+        onFoot.LoadCloneBase(cbid);
+        onFoot.InitializeHealthForTests(4);
+        onFoot.Position = vehicle.Position;
+        onFoot.Faction = HostileFaction; // worst case: pushed to a genuinely hostile faction
+        onFoot.SetMap(map);
+
+        Assert.AreEqual(0, VehicleCreatureRam.Process(vehicle),
+            "an on-foot player body must never be a ram victim");
+        Assert.IsFalse(onFoot.IsCorpse);
+        Assert.AreEqual(4, onFoot.GetCurrentHP());
+    }
+
+    /// <summary>SS-36 unification: guns can shoot −1 (unset) faction creatures; ram now agrees.</summary>
+    [TestMethod]
+    public void Process_UnsetFactionCreature_NowRammable()
+    {
+        const int cbid = 9961;
+        RegisterCreature(cbid, minHp: 1, maxHp: 4);
+
+        var (vehicle, map) = CreateVehicleOnMap(speed: 20f);
+        var creature = CreateCreatureOnMap(map, coid: 89201, cbid: cbid, maxHp: 4, position: vehicle.Position, faction: -1);
+
+        Assert.IsTrue(VehicleCreatureRam.Process(vehicle) >= 1,
+            "unset-faction creatures are shootable, so they must be rammable too");
+        Assert.IsTrue(creature.IsCorpse);
+    }
+
+    /// <summary>SS-36 retail policy: cross-race hostility — a Mutant-faction creature is a valid victim.</summary>
+    [TestMethod]
+    public void Process_PlayerRaceFactionCreature_Rammable()
+    {
+        const int cbid = 9962;
+        RegisterCreature(cbid, minHp: 1, maxHp: 4);
+
+        var (vehicle, map) = CreateVehicleOnMap(speed: 20f);
+        var creature = CreateCreatureOnMap(map, coid: 89202, cbid: cbid, maxHp: 4, position: vehicle.Position, faction: 1);
+
+        Assert.IsTrue(VehicleCreatureRam.Process(vehicle) >= 1,
+            "retail effective-faction inequality: race 1 vs race 0 is hostile");
+        Assert.IsTrue(creature.IsCorpse);
+    }
+
     private static void RegisterCreature(int cbid, short minHp, short maxHp)
     {
         AssetManagerTestHelper.RegisterCloneBase(cbid, CloneBaseObjectType.Creature);
