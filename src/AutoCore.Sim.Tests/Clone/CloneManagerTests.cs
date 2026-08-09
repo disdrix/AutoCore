@@ -144,23 +144,42 @@ public class CloneManagerTests
     }
 
     [TestMethod]
-    public void Tick_MovesCloneTowardOwnerFollowPoint()
+    public void Tick_StationaryOwner_CloneOrbitsWithinAnnulus()
     {
         var map = CreateFieldMap(8207);
         var character = DrivingCharacter(map);
-        character.CurrentVehicle.Position = new AutoCore.Game.Structures.Vector3(100f, 0f, 100f);
+        var player = new AutoCore.Game.Structures.Vector3(100f, 0f, 100f);
+        character.CurrentVehicle.Position = player;
         var manager = new CloneManager();
         manager.Toggle(character);
         var clone = map.NpcAiEntities.OfType<Vehicle>().Single();
-        var initialDistance = clone.Position.Dist(character.CurrentVehicle.Position);
 
-        for (var i = 0; i < 300; i++)
+        var angleCovered = 0f;
+        var prevAngle = float.NaN;
+        for (var i = 0; i < 900; i++) // 45 s: enter Orbit and circle
+        {
             manager.Tick(nowMs: i * 50, dt: 0.05f);
+            if (i < 400)
+                continue;
 
-        // Identity rotation faces +Z: follow point is 6m behind the player.
-        var goal = new AutoCore.Game.Structures.Vector3(100f, 0f, 94f);
-        Assert.IsTrue(clone.Position.Dist(goal) < 2f,
-            $"clone should settle at the follow point {goal}; started {initialDistance}m from player, now at {clone.Position}");
+            var dx = clone.Position.X - player.X;
+            var dz = clone.Position.Z - player.Z;
+            var r = MathF.Sqrt(dx * dx + dz * dz);
+            Assert.IsTrue(r is > 2f and < 20f, $"clone left the orbit annulus at step {i}: r={r}");
+
+            var angle = MathF.Atan2(dx, dz);
+            if (!float.IsNaN(prevAngle))
+            {
+                var d = angle - prevAngle;
+                if (d > MathF.PI) d -= 2f * MathF.PI;
+                if (d < -MathF.PI) d += 2f * MathF.PI;
+                angleCovered += MathF.Abs(d);
+            }
+            prevAngle = angle;
+        }
+
+        Assert.IsTrue(angleCovered > 2f * MathF.PI,
+            $"clone must orbit the stationary player (covered {angleCovered} rad)");
     }
 
     [TestMethod]

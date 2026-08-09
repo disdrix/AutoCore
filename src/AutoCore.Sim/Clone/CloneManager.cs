@@ -37,6 +37,22 @@ public sealed class CloneManager
         return "Clone spawned.";
     }
 
+    internal static CloneDriveBrain BuildBrainForHandle(Vehicle clone)
+    {
+        var parameters = clone.CloneBaseObject is AutoCore.Game.CloneBases.CloneBaseVehicle cb
+            ? Physics.SimVehicleParams.FromCloneBase(cb)
+            : Physics.SimVehicleParams.CreateForTests(
+                massKg: 1500f, steeringMaxAngleRad: 0.6f, steeringFullSpeedLimit: 15f, topSpeed: 30f,
+                muBase: 1f, suspensionLength: 0.35f, suspensionStrength: 60f,
+                suspensionDampCompression: 6f, suspensionDampExtension: 7f,
+                wheelRadius: 0.45f, wheelBase: 3f, dragHalfRhoCdA: 0.6f);
+
+        var brain = new CloneDriveBrain(parameters, new CloneAiTuning());
+        var forward = TerrainContactPlane.ForwardFromQuaternion(clone.Rotation);
+        brain.Reset(clone.Position, MathF.Atan2(forward.X, forward.Z));
+        return brain;
+    }
+
     /// <summary>Despawns clones whose owner is gone or changed maps. Called every sector tick.</summary>
     public void Tick(long nowMs, float dt)
     {
@@ -61,9 +77,44 @@ public sealed class CloneManager
     {
         var heightfield = handle.Clone.Map?.MapData?.Heightfield;
         TerrainContactPlane.HeightSample sample = heightfield == null
-            ? null
+            ? FlatAtCurrentHeight(handle.Clone)
             : heightfield.TrySample;
-        handle.Motion.Step(handle.Clone, handle.Owner.CurrentVehicle, sample, dt);
+
+        var owner = handle.Owner.CurrentVehicle;
+        var ownerForward = TerrainContactPlane.ForwardFromQuaternion(owner.Rotation);
+        var ownerYaw = MathF.Atan2(ownerForward.X, ownerForward.Z);
+
+        var brain = handle.Brain;
+        brain.Step(owner.Position, owner.Velocity, ownerYaw, sample, dt);
+
+        var car = brain.Car;
+        if (brain.TeleportedThisStep)
+        {
+            // Discontinuous jump: SetPosition clears any stale physics bookkeeping, and the
+            // ghost PositionMask still needs dirtying for the snap to reach clients.
+            handle.Clone.SetPosition(car.Position);
+            handle.Clone.Rotation = car.Rotation;
+            handle.Clone.Ghost?.SetMaskBits(AutoCore.Game.TNL.Ghost.GhostObject.PositionMask);
+            return;
+        }
+
+        var inputs = brain.LastInputs;
+        handle.Clone.ApplyServerMove(
+            car.Position,
+            car.Rotation,
+            car.Velocity,
+            dt,
+            driveThrottle: inputs.Throttle,
+            driveSteering: inputs.Steering,
+            sharpTurn: inputs.Handbrake ? (byte)1 : (byte)0,
+            angularVelocity: new AutoCore.Game.Structures.Vector3(0f, car.YawRate, 0f));
+    }
+
+    /// <summary>Maps without a heightfield (test maps, towns) drive on a flat plane at spawn height.</summary>
+    private static TerrainContactPlane.HeightSample FlatAtCurrentHeight(Vehicle clone)
+    {
+        var y = clone.Position.Y;
+        return (float x, float z, out float worldY) => { worldY = y; return true; };
     }
 }
 
@@ -74,11 +125,12 @@ public sealed class CloneHandle
     {
         Owner = owner;
         Clone = clone;
+        Brain = CloneManager.BuildBrainForHandle(clone);
     }
 
     public Character Owner { get; }
     public Vehicle Clone { get; }
 
-    /// <summary>Per-clone mover state (Phase 2 kinematic; physics replaces it in Phase 3).</summary>
-    public KinematicFollower Motion { get; } = new();
+    /// <summary>Physics-driven follow/orbit AI for this clone.</summary>
+    public CloneDriveBrain Brain { get; }
 }
