@@ -61,6 +61,11 @@ public static class ServerConfig
     /// <summary>Server-side map-prop ramming (<c>VehicleMapPropRam</c>) — defaults OFF.</summary>
     public const bool DefaultEnableRamming = false;
 
+    /// <summary>AutoCore.Sim drives NPC vehicle movement (path patrol) by default.</summary>
+    public const bool DefaultSimNpcVehiclesEnabled = true;
+    /// <summary>Per-vehicle Sim debug logs (CloneDiag / CloneAI telemetry). Default off.</summary>
+    public const bool DefaultSimDebugLogs = false;
+
     /// <summary>Verbose inventory grab/drop/MM packet logs (raw hex + op results). Default off.</summary>
     public const bool DefaultInventoryDebugPackets = false;
 
@@ -128,6 +133,19 @@ public static class ServerConfig
     /// </summary>
     public static bool EnableRamming { get; set; } = DefaultEnableRamming;
 
+    /// <summary>
+    /// When true (default), AutoCore.Sim's physics engine (RaycastCar + avoidance) drives all
+    /// NPC VEHICLE movement — vehicles only, never creatures/bipeds/animals — replacing the
+    /// legacy path movers. Set <c>sim.npcVehicles: false</c> to fall back to the legacy tiers.
+    /// </summary>
+    public static bool SimNpcVehiclesEnabled { get; set; } = DefaultSimNpcVehiclesEnabled;
+
+    /// <summary>
+    /// When true, Sim vehicles emit per-vehicle debug telemetry (CloneDiag height lines and
+    /// CloneAI[coid] path/stuck logs). Default <b>false</b> — the logs are development-only.
+    /// </summary>
+    public static bool SimDebugLogs { get; set; } = DefaultSimDebugLogs;
+
     /// When true, sector inventory handlers log grab/drop/MM packet details (including raw hex)
     /// and operation result messages. Default <b>false</b> — production stays quiet once moves work.
     /// </summary>
@@ -170,6 +188,8 @@ public static class ServerConfig
         CompositeWheelCollisionEnabled = DefaultCompositeWheelCollisionEnabled;
         ChassisPointImpulsesEnabled = DefaultChassisPointImpulsesEnabled;
         EnableRamming = DefaultEnableRamming;
+        SimNpcVehiclesEnabled = DefaultSimNpcVehiclesEnabled;
+        SimDebugLogs = DefaultSimDebugLogs;
         InventoryDebugPackets = DefaultInventoryDebugPackets;
         LogDamageToPlayers = DefaultLogDamageToPlayers;
         LogDamageToNpcs = DefaultLogDamageToNpcs;
@@ -220,6 +240,7 @@ public static class ServerConfig
             if (ApplyFromYaml(yaml, out var error))
                 Logger.WriteLog(LogType.Initialize,
                     $"ServerConfig: loaded {file} — tier={ControllerTier} enabled={NpcVehiclePhysicsEnabled} substepHz={SubstepHz} enableRamming={EnableRamming} " +
+                    $"simNpcVehicles={SimNpcVehiclesEnabled} simDebugLogs={SimDebugLogs} " +
                     $"logDamageToPlayers={LogDamageToPlayers} logDamageToNpcs={LogDamageToNpcs} logHitChanceRolls={LogHitChanceRolls} logNpcToNpc={LogNpcToNpc}");
             else
                 Logger.WriteLog(LogType.Error, $"ServerConfig: failed to load {file}: {error}");
@@ -300,6 +321,15 @@ public static class ServerConfig
                 ChassisPointImpulsesEnabled = p.ChassisPointImpulsesEnabled.Value;
         }
 
+        var sim = root?.Sim;
+        if (sim != null)
+        {
+            if (sim.NpcVehicles.HasValue)
+                SimNpcVehiclesEnabled = sim.NpcVehicles.Value;
+            if (sim.DebugLogs.HasValue)
+                SimDebugLogs = sim.DebugLogs.Value;
+        }
+
         var inv = root?.Inventory;
         if (inv?.DebugPackets.HasValue == true)
             InventoryDebugPackets = inv.DebugPackets.Value;
@@ -350,6 +380,7 @@ public static class ServerConfig
     {
         public bool? EnableRamming { get; set; }
         public NpcVehiclePhysicsDto NpcVehiclePhysics { get; set; }
+        public SimDto Sim { get; set; }
         public InventoryDto Inventory { get; set; }
         public CombatDto Combat { get; set; }
     }
@@ -365,6 +396,12 @@ public static class ServerConfig
         public bool? SuspensionForceClampEnabled { get; set; }
         public bool? CompositeWheelCollisionEnabled { get; set; }
         public bool? ChassisPointImpulsesEnabled { get; set; }
+    }
+
+    private sealed class SimDto
+    {
+        public bool? NpcVehicles { get; set; }
+        public bool? DebugLogs { get; set; }
     }
 
     private sealed class InventoryDto

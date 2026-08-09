@@ -173,6 +173,9 @@ public sealed class CloneManager
     }
 
     internal static CloneDriveBrain BuildBrainForHandle(Vehicle clone)
+        => BuildBrainForHandle(clone, new CloneAiTuning());
+
+    internal static CloneDriveBrain BuildBrainForHandle(Vehicle clone, CloneAiTuning tuning)
     {
         var wheelSet = clone.WheelSet?.CloneBaseObject as AutoCore.Game.CloneBases.CloneBaseWheelSet;
         var parameters = clone.CloneBaseObject is AutoCore.Game.CloneBases.CloneBaseVehicle cb
@@ -183,10 +186,16 @@ public sealed class CloneManager
                 suspensionDampCompression: 6f, suspensionDampExtension: 7f,
                 wheelRadius: 0.45f, wheelBase: 3f, dragHalfRhoCdA: 0.6f);
 
-        var brain = new CloneDriveBrain(parameters, new CloneAiTuning());
-        var coid = clone.ObjectId.Coid;
-        brain.DebugLog = message =>
-            Logger.WriteLog(LogType.Debug, $"CloneAI[{coid}]: {message}");
+        var brain = new CloneDriveBrain(parameters, tuning);
+        // Per-vehicle telemetry is development-only noise at fleet/NPC scale — gated by
+        // serverConfig sim.debugLogs (default off).
+        if (AutoCore.Game.Diagnostics.ServerConfig.SimDebugLogs)
+        {
+            var coid = clone.ObjectId.Coid;
+            brain.DebugLog = message =>
+                Logger.WriteLog(LogType.Debug, $"CloneAI[{coid}]: {message}");
+        }
+
         var forward = TerrainContactPlane.ForwardFromQuaternion(clone.Rotation);
         brain.Reset(clone.Position, MathF.Atan2(forward.X, forward.Z));
         return brain;
@@ -351,16 +360,19 @@ public sealed class CloneManager
         var rideHeight = AutoCore.Game.Npc.VehicleGroundMetricsCache.GetRideHeight(handle.Clone.CBID);
         var heightOffset = rideHeight + HeightTrim;
 
-        handle.DiagCountdown -= dt;
-        if (handle.DiagCountdown <= 0f)
+        if (AutoCore.Game.Diagnostics.ServerConfig.SimDebugLogs)
         {
-            handle.DiagCountdown = 2f;
-            var terrainAtClone = 0f;
-            sample(car.Position.X, car.Position.Z, out terrainAtClone);
-            Logger.WriteLog(LogType.Debug,
-                $"CloneDiag: ownerY={owner.Position.Y:F2} cloneSimY={car.Position.Y:F2} " +
-                $"terrainAtClone={terrainAtClone:F2} rideHeight={rideHeight:F2} " +
-                $"trim={HeightTrim:F2} mode={handle.Brain.Mode} speed={PlanarSpeed(car):F1}");
+            handle.DiagCountdown -= dt;
+            if (handle.DiagCountdown <= 0f)
+            {
+                handle.DiagCountdown = 2f;
+                var terrainAtClone = 0f;
+                sample(car.Position.X, car.Position.Z, out terrainAtClone);
+                Logger.WriteLog(LogType.Debug,
+                    $"CloneDiag: ownerY={owner.Position.Y:F2} cloneSimY={car.Position.Y:F2} " +
+                    $"terrainAtClone={terrainAtClone:F2} rideHeight={rideHeight:F2} " +
+                    $"trim={HeightTrim:F2} mode={handle.Brain.Mode} speed={PlanarSpeed(car):F1}");
+            }
         }
         // NOTE: heightOffset already includes HeightTrim (double-add fixed 2026-08-09).
         var publishPosition = new AutoCore.Game.Structures.Vector3(

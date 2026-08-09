@@ -85,6 +85,12 @@ public static class NpcTicker
             if (!map.TryGetMapPath(GetPathCoid(entity), out var path) || path.Points.Count == 0)
                 return;
 
+            // AutoCore.Sim vehicle mover (serverConfig sim.npcVehicles, default on): a claimed
+            // vehicle is driven by SimHost.Tick with real physics — the legacy movers below
+            // must not touch it. Creatures always fall through to the foot movers.
+            if (entity is Vehicle simVehicle && NpcVehicleSimControl.TrySimDrive?.Invoke(simVehicle) == true)
+                return;
+
             // Captured before WaitUntilMs is overwritten below: true exactly when this tick took
             // NpcPathFollower.Step's hold-in-place branch (nowMs still short of the wait deadline).
             var wasHolding = nowMs < npcAi.WaitUntilMs;

@@ -14,9 +14,38 @@ public sealed class SimHost
 {
     public static SimHost Instance { get; } = new();
 
-    private readonly CloneManager _cloneManager = new();
+    private readonly Collision.MapCollisionWorlds _collisionWorlds = new();
+    private readonly CloneManager _cloneManager;
+    private readonly Npc.NpcVehicleSimManager _npcVehicles;
+
+    public SimHost()
+    {
+        // One hull-world cache shared by clones and NPC vehicles — a map's static collision
+        // world is built once no matter who asks first.
+        _cloneManager = new CloneManager(_collisionWorlds);
+        _npcVehicles = new Npc.NpcVehicleSimManager(_collisionWorlds);
+    }
 
     internal CloneManager CloneManager => _cloneManager;
+
+    internal Npc.NpcVehicleSimManager NpcVehicles => _npcVehicles;
+
+    /// <summary>
+    /// NpcTicker hook: adopt (and keep owning) a pathed NPC vehicle. Boundary catch — a bad
+    /// vehicle must fall back to the legacy mover, not abort the NPC tick.
+    /// </summary>
+    public bool TryAdoptNpcVehicle(AutoCore.Game.Entities.Vehicle vehicle)
+    {
+        try
+        {
+            return _npcVehicles.TryAdopt(vehicle);
+        }
+        catch (Exception ex)
+        {
+            Logger.WriteException(LogType.Error, "SimHost.TryAdoptNpcVehicle", ex);
+            return false;
+        }
+    }
 
     /// <summary>
     /// Boundary catch (repo exception-safety rules): a spawn failure on live data must degrade
@@ -58,7 +87,11 @@ public sealed class SimHost
         }
     }
 
-    public void Tick(long nowMs, float dt) => _cloneManager.Tick(nowMs, dt);
+    public void Tick(long nowMs, float dt)
+    {
+        _cloneManager.Tick(nowMs, dt);
+        _npcVehicles.Tick(nowMs, dt);
+    }
 
     /// <summary>
     /// /clonetrim: sets or reports the global publish-height trim (metres). Live tuning knob
@@ -159,5 +192,6 @@ public sealed class SimHost
         CloneCommandControl.TryTeleportClone = Instance.TeleportClone;
         CloneCommandControl.TryStartPath = Instance.StartClonePath;
         CloneCommandControl.TrySetPathSpeed = Instance.SetPathSpeed;
+        AutoCore.Game.Npc.NpcVehicleSimControl.TrySimDrive = Instance.TryAdoptNpcVehicle;
     }
 }
