@@ -182,6 +182,49 @@ public class CloneManagerTests
             $"clone must orbit the stationary player (covered {angleCovered} rad)");
     }
 
+    [TestMethod]
+    public void Tick_AttachesLazilyBuiltHullWorldToTheBrain()
+    {
+        var map = CreateFieldMap(8210);
+        map.MapData.Templates.Add(555, new AutoCore.Game.EntityTemplates.GraphicsObjectTemplate(
+            AutoCore.Game.Entities.GraphicsObjectType.GraphicsPhysics)
+        {
+            CBID = 777,
+            COID = 555,
+            Location = new AutoCore.Game.Structures.Vector4(120f, 0f, 120f, 0f),
+            Rotation = new AutoCore.Game.Structures.Quaternion(0f, 0f, 0f, 1f),
+            Scale = 1f,
+            OriginalIsActive = true,
+        });
+
+        var boxBytes = File.ReadAllBytes(
+            Path.Combine(AppContext.BaseDirectory, "Fixtures", "hulls", "box.cache"));
+        var worlds = new AutoCore.Sim.Collision.MapCollisionWorlds
+        {
+            PhysicsNameByCbid = cbid => cbid == 777 ? "box" : null,
+            HullEntryNames = () => new[] { "box.cache" },
+            HullBytesByName = _ => boxBytes,
+        };
+        var manager = new CloneManager(worlds);
+        var character = DrivingCharacter(map);
+        manager.Toggle(character);
+        var clone = map.NpcAiEntities.OfType<Vehicle>().Single();
+
+        // Background build: tick until the world flips in (bounded wait).
+        AutoCore.Sim.Ai.CloneDriveBrain brain = null;
+        for (var i = 0; i < 200; i++)
+        {
+            manager.Tick(nowMs: i * 50, dt: 0.05f);
+            brain = manager.BrainForTests(character);
+            if (brain?.Obstacles != null)
+                break;
+            Thread.Sleep(10);
+        }
+
+        Assert.IsNotNull(brain?.Obstacles, "hull world must attach after the background build");
+        Assert.AreEqual(1, brain.Obstacles.InstanceCount);
+    }
+
     /// <summary>
     /// Height is fully data-driven (user decision 2026-08-09, no owner calibration): published
     /// Y = sim ground pose + per-chassis ride height from VehicleGroundMetricsCache (wheel

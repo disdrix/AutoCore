@@ -1,5 +1,6 @@
 using AutoCore.Game.Npc;
 using AutoCore.Game.Structures;
+using AutoCore.Sim.Collision;
 using AutoCore.Sim.Physics;
 
 namespace AutoCore.Sim.Ai;
@@ -19,6 +20,7 @@ public sealed class CloneDriveBrain
     private float _recoverRemaining;
     private float _recoverSteer;
     private float _orbitDirection = 1f; // +1 = clockwise when viewed from above (persistent)
+    private float _avoidSign; // committed detour direction while feelers report obstacles
 
     public CloneDriveBrain(SimVehicleParams parameters, CloneAiTuning tuning)
     {
@@ -30,6 +32,9 @@ public sealed class CloneDriveBrain
     public RaycastCar Car => _car;
 
     public CloneAiMode Mode => _stateMachine.Mode;
+
+    /// <summary>Static hull world for feeler avoidance + hard blocking; null = terrain only.</summary>
+    public StaticCollisionWorld Obstacles { get; set; }
 
     /// <summary>Set when the last Step teleported the car (entity must publish via SetPosition).</summary>
     public bool TeleportedThisStep { get; private set; }
@@ -78,6 +83,8 @@ public sealed class CloneDriveBrain
                 ? OrbitInputs(playerPosition, playerSpeed)
                 : FollowInputs(playerPosition, playerVelocity, separation);
 
+            inputs = ApplyObstacleAvoidance(inputs);
+
             if (_stuckDetector.Update(_car.Position, inputs.Throttle, dt))
             {
                 _recoverRemaining = _tuning.RecoverDuration;
@@ -87,7 +94,85 @@ public sealed class CloneDriveBrain
         }
 
         LastInputs = inputs;
+
+        var prePosition = _car.Position;
         _car.Advance(dt, inputs, ground);
+
+        // Hard block: whatever the feelers missed, the body may not enter a hull. Revert the
+        // planar move and kill speed — the stuck detector then drives the reverse-out.
+        if (Obstacles != null && Obstacles.SphereOverlap(_car.Position, HardBlockRadius))
+            _car.BlockAt(prePosition);
+    }
+
+    private const float HardBlockRadius = 0.9f;
+
+    /// <summary>
+    /// Three forward feelers (center, ±25°). Side hits bias the steering away; a close center
+    /// hit brakes proportionally. Classic feeler avoidance — good enough to route around props
+    /// and buildings; the hard block above guarantees no penetration.
+    /// </summary>
+    private DriveInputs ApplyObstacleAvoidance(DriveInputs inputs)
+    {
+        var world = Obstacles;
+        if (world == null)
+            return inputs;
+
+        var speed = MathF.Sqrt(_car.Velocity.X * _car.Velocity.X + _car.Velocity.Z * _car.Velocity.Z);
+        var feelerLength = speed * 1.2f + 5f;
+        var origin = new Vector3(_car.Position.X, _car.Position.Y + 0.6f, _car.Position.Z);
+
+        var steer = inputs.Steering;
+        var throttle = inputs.Throttle;
+        const float feelerAngle = 25f * MathF.PI / 180f;
+
+        var centerHit = Feel(world, origin, _car.Yaw, feelerLength, out var centerDist);
+        var leftHit = Feel(world, origin, _car.Yaw - feelerAngle, feelerLength, out var leftDist);
+        var rightHit = Feel(world, origin, _car.Yaw + feelerAngle, feelerLength, out var rightDist);
+
+        if (leftHit || rightHit || centerHit)
+        {
+            // Commit to one detour side and KEEP it until the path clears — re-choosing every
+            // tick flip-flopped between sides and stalled the clone nose-in against walls.
+            if (_avoidSign == 0f)
+            {
+                if (leftHit && rightHit)
+                    _avoidSign = leftDist < rightDist ? 1f : -1f;
+                else if (leftHit)
+                    _avoidSign = 1f;
+                else if (rightHit)
+                    _avoidSign = -1f;
+                else
+                    _avoidSign = steer >= 0f ? 1f : -1f;
+            }
+
+            var urgency = 1f - MathF.Min(centerHit ? centerDist : MathF.Min(leftDist, rightDist), feelerLength) / feelerLength;
+            steer = Math.Clamp(steer + _avoidSign * (0.7f + 0.9f * urgency), -1f, 1f);
+
+            if (centerHit)
+            {
+                // Slow for the turn but never stall: pure braking parked the clone facing the
+                // wall forever. Keep rolling so the committed side-steer carries it around.
+                var brakingDistance = speed * speed / (2f * _car.Params.MuMax * SimVehicleParams.Gravity) + 2.5f;
+                if (centerDist < brakingDistance && speed > 6f)
+                    throttle = -0.4f;
+                else if (throttle > 0f)
+                    throttle = MathF.Max(throttle, 0.5f);
+                else if (throttle <= 0f)
+                    throttle = 0.5f;
+            }
+        }
+        else
+        {
+            _avoidSign = 0f;
+        }
+
+        return new DriveInputs(throttle, steer, inputs.Handbrake);
+    }
+
+    private static bool Feel(StaticCollisionWorld world, Vector3 origin, float yaw, float length, out float distance)
+    {
+        var direction = new Vector3(MathF.Sin(yaw), 0f, MathF.Cos(yaw));
+        return world.Raycast(origin, direction, length, out distance, out _);
     }
 
     private DriveInputs FollowInputs(Vector3 playerPosition, Vector3 playerVelocity, float separation)

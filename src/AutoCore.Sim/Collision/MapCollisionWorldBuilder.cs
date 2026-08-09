@@ -1,0 +1,99 @@
+using AutoCore.Game.EntityTemplates;
+using AutoCore.Game.Structures;
+using AutoCore.Utils;
+
+namespace AutoCore.Sim.Collision;
+
+/// <summary>
+/// Builds a map's StaticCollisionWorld from fam object placements:
+/// placement CBID → clonebase SimpleObjectSpecific.PhysicsName → "{PhysicsName}.cache" in
+/// physics.glm (case-insensitive — archive casing differs from clonebase casing; 100% match
+/// rate on non-empty names, docs/reconstruction/physics/hull-format-findings.md). The base
+/// hull is the whole-object hull; -pN/_partNN decomposition pieces are not needed for server
+/// collision. Dependencies are injected as delegates so tests run without WAD/GLM data.
+/// </summary>
+public sealed class MapCollisionWorldBuilder
+{
+    private readonly Func<int, string> _physicsNameByCbid;
+    private readonly Dictionary<string, string> _cacheEntryIndex;
+    private readonly Func<string, byte[]> _hullBytesByName;
+    private readonly Dictionary<string, ConvexHull> _hullCache = new(StringComparer.OrdinalIgnoreCase);
+
+    public MapCollisionWorldBuilder(
+        Func<int, string> physicsNameByCbid,
+        IEnumerable<string> hullEntryNames,
+        Func<string, byte[]> hullBytesByName)
+    {
+        _physicsNameByCbid = physicsNameByCbid ?? throw new ArgumentNullException(nameof(physicsNameByCbid));
+        _hullBytesByName = hullBytesByName ?? throw new ArgumentNullException(nameof(hullBytesByName));
+
+        // Case-insensitive name → exact archive entry name.
+        _cacheEntryIndex = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var name in hullEntryNames ?? Enumerable.Empty<string>())
+        {
+            if (name.EndsWith(".cache", StringComparison.OrdinalIgnoreCase))
+                _cacheEntryIndex.TryAdd(name, name);
+        }
+    }
+
+    public StaticCollisionWorld Build(IEnumerable<ObjectTemplate> placements)
+    {
+        var world = new StaticCollisionWorld();
+        var resolved = 0;
+        var skippedNoHull = 0;
+
+        foreach (var template in placements ?? Enumerable.Empty<ObjectTemplate>())
+        {
+            if (template is not GraphicsObjectTemplate graphics || !template.OriginalIsActive || template.CBID <= 0)
+                continue;
+
+            var hull = ResolveHull(template.CBID);
+            if (hull == null)
+            {
+                skippedNoHull++;
+                continue;
+            }
+
+            world.Add(
+                hull,
+                new Vector3(graphics.Location.X, graphics.Location.Y, graphics.Location.Z),
+                graphics.Rotation,
+                graphics.Scale);
+            resolved++;
+        }
+
+        world.Build();
+        Logger.WriteLog(LogType.Debug,
+            $"MapCollisionWorldBuilder: {resolved} hull instances, {skippedNoHull} placements without hulls");
+        return world;
+    }
+
+    private ConvexHull ResolveHull(int cbid)
+    {
+        var physicsName = _physicsNameByCbid(cbid);
+        if (string.IsNullOrWhiteSpace(physicsName))
+            return null;
+
+        if (_hullCache.TryGetValue(physicsName, out var cached))
+            return cached;
+
+        ConvexHull hull = null;
+        if (_cacheEntryIndex.TryGetValue(physicsName + ".cache", out var entryName))
+        {
+            try
+            {
+                var bytes = _hullBytesByName(entryName);
+                if (bytes != null)
+                    hull = CacheHullParser.Parse(bytes);
+            }
+            catch (Exception ex) when (ex is InvalidDataException or EndOfStreamException)
+            {
+                Logger.WriteLog(LogType.Error,
+                    $"MapCollisionWorldBuilder: malformed hull '{entryName}' — object gets no collision: {ex.Message}");
+            }
+        }
+
+        _hullCache[physicsName] = hull; // negative results cached too
+        return hull;
+    }
+}

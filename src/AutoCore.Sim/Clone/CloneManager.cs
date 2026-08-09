@@ -14,6 +14,12 @@ namespace AutoCore.Sim.Clone;
 public sealed class CloneManager
 {
     private readonly ConcurrentDictionary<long, CloneHandle> _clones = new();
+    private readonly Collision.MapCollisionWorlds _collisionWorlds;
+
+    public CloneManager(Collision.MapCollisionWorlds collisionWorlds = null)
+    {
+        _collisionWorlds = collisionWorlds ?? new Collision.MapCollisionWorlds();
+    }
 
     /// <summary>
     /// Global publish-height trim (metres), live-tuned via /clonetrim to dial out the residual
@@ -22,6 +28,9 @@ public sealed class CloneManager
     public static float HeightTrim { get; set; }
 
     public int ActiveCloneCount => _clones.Count;
+
+    internal Ai.CloneDriveBrain BrainForTests(Character owner)
+        => _clones.TryGetValue(owner.ObjectId.Coid, out var handle) ? handle.Brain : null;
 
     public string Toggle(Character character)
     {
@@ -72,6 +81,9 @@ public sealed class CloneManager
             var ownerMap = handle.Owner.Map;
             if (ownerMap != null && ownerMap == handle.Clone.Map)
             {
+                // Hull world attaches whenever the lazy background build completes; clones run
+                // terrain-only until then (and forever if the build failed).
+                handle.Brain.Obstacles ??= _collisionWorlds.GetOrRequest(ownerMap);
                 MoveClone(handle, dt);
                 continue;
             }

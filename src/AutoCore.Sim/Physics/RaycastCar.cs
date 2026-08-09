@@ -72,6 +72,17 @@ public sealed class RaycastCar
 
     internal void SetVelocityForTests(Vector3 velocity) => Velocity = velocity;
 
+    /// <summary>
+    /// Hard collision stop: restore a pre-step pose and drop planar momentum (small elastic
+    /// remainder so the body visibly reacts). Used by the obstacle hard-block.
+    /// </summary>
+    internal void BlockAt(Vector3 position)
+    {
+        Position = position;
+        Velocity = new Vector3(-Velocity.X * 0.1f, Velocity.Y, -Velocity.Z * 0.1f);
+        YawRate = 0f;
+    }
+
     public void Advance(float frameDt, DriveInputs inputs, TerrainContactPlane.HeightSample ground)
     {
         if (!float.IsFinite(frameDt) || frameDt <= 0f)
