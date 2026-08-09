@@ -65,12 +65,20 @@ public class GlobalServerSetupTests
     [TestMethod]
     public void Setup_PropagatesPublicAddress_ToSectorRedirect()
     {
-        _server = CreateServer();
-        var config = CreateSetupConfig(gamePort: 0, publicAddress: "192.168.50.62");
+        var saved = TNLConnection.SectorRedirectAddress;
+        try
+        {
+            _server = CreateServer();
+            var config = CreateSetupConfig(gamePort: 0, publicAddress: "10.4.5.6");
 
-        _server.Setup(config);
+            _server.Setup(config);
 
-        Assert.AreEqual(IPAddress.Parse("192.168.50.62"), TNLConnection.SectorRedirectAddress);
+            Assert.AreEqual(System.Net.IPAddress.Parse("10.4.5.6"), TNLConnection.SectorRedirectAddress);
+        }
+        finally
+        {
+            TNLConnection.SectorRedirectAddress = saved;
+        }
     }
 
     [TestMethod]

@@ -62,6 +62,10 @@ public partial class GlobalServer : BaseServer, ILoopable
         // only works when client and server share a machine.
         TNLConnection.SectorRedirectAddress = PublicAddress;
 
+        // The sector redirect must advertise a client-reachable address, not loopback.
+        // The single sector server runs alongside Global, so it shares this address.
+        TNLConnection.SectorRedirectAddress = PublicAddress;
+
         Logger.WriteLog(LogType.Initialize, "The Global server has been setup!");
     }
 
