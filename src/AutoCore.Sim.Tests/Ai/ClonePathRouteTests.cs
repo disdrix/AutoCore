@@ -239,6 +239,52 @@ public class ClonePathRouteTests
             $"recovery must start within ~1 s of sustained blocking (block step {firstBlock.Step}, recovery step {firstRecovery.Step})");
     }
 
+    /// <summary>
+    /// Live 2026-08-09 11:59 (brick-store corner, third time): direct-to-waypoint pursuit
+    /// strings a chord across the path polyline, clipping buildings inside corners the
+    /// authored lane goes around. Lane-following pursuit must keep the clone on the polyline.
+    /// </summary>
+    [TestMethod]
+    public void BuildingInsideACorner_LaneFollowingDoesNotCutThroughIt()
+    {
+        var box = AutoCore.Sim.Collision.CacheHullParser.Parse(File.ReadAllBytes(
+            Path.Combine(AppContext.BaseDirectory, "Fixtures", "hulls", "box.cache")));
+        var world = new AutoCore.Sim.Collision.StaticCollisionWorld();
+        // Building just inside the right-angle corner apex: the chord from the approach leg to
+        // the far waypoint clips it; the authored lane (the polyline) clears it.
+        // Tight to the live geometry (block 0.1 s after waypoint advance): the store face
+        // sits ~1.5 m off the outgoing lane, and the chord from the advance circle clips it.
+        world.Add(box, new Vector3(8f, 0f, 46f), new Quaternion(0f, 0f, 0f, 1f), scale: 5f, "corner-store");
+        world.Build();
+
+        var messages = new List<string>();
+        var brain = new CloneDriveBrain(Params(), new CloneAiTuning())
+        {
+            Obstacles = world,
+            DebugLog = messages.Add,
+        };
+        brain.Reset(new Vector3(0f, 0f, 0f), yaw: 0f);
+        brain.SetPathRoute(new[]
+        {
+            new Vector3(0f, 0f, 20f),
+            new Vector3(0f, 0f, 50f),
+            new Vector3(40f, 0f, 50f),
+        }, loop: false);
+
+        var reachedEnd = false;
+        for (var i = 0; i < 700 && !reachedEnd; i++)
+        {
+            brain.Step(new Vector3(500f, 0f, 500f), default, 0f, Flat, dt: 0.05f);
+            var dx = brain.Car.Position.X - 40f;
+            var dz = brain.Car.Position.Z - 50f;
+            reachedEnd = MathF.Sqrt(dx * dx + dz * dz) < 8f;
+        }
+
+        Assert.IsTrue(reachedEnd, $"must round the corner to the last waypoint; ended at {brain.Car.Position}");
+        Assert.IsFalse(messages.Any(m => m.Contains("STUCK")),
+            $"lane following must clear the corner without getting stuck:\n{string.Join("\n", messages.Where(m => m.Contains("BLOCK") || m.Contains("STUCK")))}");
+    }
+
     [TestMethod]
     public void SetPathRoute_ClearsHold()
     {

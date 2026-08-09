@@ -406,7 +406,31 @@ public sealed class CloneDriveBrain
             target = _pathWaypoints[_pathIndex];
         }
 
-        var steer = PurePursuitSteer(target.X, target.Z);
+        // Lane-following pursuit (live 2026-08-09 11:59, brick-store corner): aiming straight
+        // at the waypoint strings a chord across the polyline, clipping buildings inside
+        // corners that the AUTHORED lane clears. Aim at a lookahead point ON the segment
+        // (previous waypoint -> current), clamped at the waypoint, so the clone hugs the lane
+        // and, after any recovery shove, returns to the lane before continuing along it.
+        var aimX = target.X;
+        var aimZ = target.Z;
+        var prevIndex = _pathIndex - _pathDirection;
+        if (prevIndex >= 0 && prevIndex < _pathWaypoints.Count)
+        {
+            var from = _pathWaypoints[prevIndex];
+            var segX = target.X - from.X;
+            var segZ = target.Z - from.Z;
+            var segLenSq = segX * segX + segZ * segZ;
+            if (segLenSq > 1f)
+            {
+                var t = ((_car.Position.X - from.X) * segX + (_car.Position.Z - from.Z) * segZ) / segLenSq;
+                var lookaheadT = t + LaneLookaheadMeters / MathF.Sqrt(segLenSq);
+                lookaheadT = Math.Clamp(lookaheadT, 0f, 1f);
+                aimX = from.X + segX * lookaheadT;
+                aimZ = from.Z + segZ * lookaheadT;
+            }
+        }
+
+        var steer = PurePursuitSteer(aimX, aimZ);
 
         // Corner anticipation (live trace 2026-08-09 11:30: 30 m/s straight past a turn into
         // a wall): shrink the speed target by the upcoming turn angle as the waypoint nears,
@@ -427,6 +451,8 @@ public sealed class CloneDriveBrain
         var throttle = SpeedControl(targetSpeed);
         return new DriveInputs(throttle, steer, Handbrake: false);
     }
+
+    private const float LaneLookaheadMeters = 9f;
 
     /// <summary>0 = straight through the current waypoint, 1 = full U-turn to the next one.</summary>
     private float UpcomingTurnSharpness(Vector3 target)
