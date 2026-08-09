@@ -93,6 +93,9 @@ public sealed class CloneDriveBrain
 
     public bool HasPathRoute => _pathWaypoints != null;
 
+    /// <summary>True when the route wraps last→first (legacy ReverseDirection=false semantics).</summary>
+    public bool PathLoops => _pathLoops;
+
     public int PathWaypointIndex => _pathIndex;
 
     /// <summary>

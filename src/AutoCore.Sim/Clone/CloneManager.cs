@@ -109,10 +109,9 @@ public sealed class CloneManager
 
         var waypoints = nearest.Points.Select(p => p.Position).ToArray();
         var accepts = nearest.Points.Select(p => p.AcceptDistance).ToArray();
-        // Closed path (first ≈ last) → loop; otherwise ping-pong the A→B line.
-        var dxEnds = waypoints[0].X - waypoints[^1].X;
-        var dzEnds = waypoints[0].Z - waypoints[^1].Z;
-        var loops = MathF.Sqrt(dxEnds * dxEnds + dzEnds * dzEnds) < 15f;
+        // Authored semantics (matches legacy NpcPathFollower.Advance): ReverseDirection=false
+        // wraps last→first (loop); ReverseDirection=true ping-pongs.
+        var loops = !nearest.ReverseDirection;
 
         foreach (var h in fleet)
             h.Brain.SetPathRoute(waypoints, loops, accepts);

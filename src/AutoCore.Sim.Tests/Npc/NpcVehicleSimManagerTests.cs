@@ -134,6 +134,34 @@ public class NpcVehicleSimManagerTests
         Assert.IsFalse(manager.TryAdopt(vehicle));
     }
 
+    /// <summary>
+    /// Legacy NpcPathFollower.Advance semantics: ReverseDirection=false paths ALWAYS wrap
+    /// (after the last waypoint the NPC heads back to waypoint 0), regardless of endpoint
+    /// distance; only ReverseDirection=true ping-pongs. Live 2026-08-09: guessing loop from
+    /// endpoint proximity made open paths ping-pong, so patrol direction looked random.
+    /// </summary>
+    [TestMethod]
+    public void PathLoopSemantics_FollowTheAuthoredReverseDirectionFlag()
+    {
+        var map = CreateFieldMap(8510);
+        var wrap = SeedPath(map, PathCoid, waitTimeMs: 0,
+            new Vector3(100f, 0f, 100f), new Vector3(300f, 0f, 100f)); // open ends, no flag
+        var pingPong = SeedPath(map, PathCoid + 1, waitTimeMs: 0,
+            new Vector3(100f, 0f, 300f), new Vector3(300f, 0f, 300f));
+        pingPong.ReverseDirection = true;
+
+        var wrapVehicle = PlacePathNpcVehicle(map, new Vector3(100f, 0f, 100f), PathCoid);
+        var pingPongVehicle = PlacePathNpcVehicle(map, new Vector3(100f, 0f, 300f), PathCoid + 1);
+        var manager = new NpcVehicleSimManager();
+        manager.TryAdopt(wrapVehicle);
+        manager.TryAdopt(pingPongVehicle);
+
+        Assert.IsTrue(manager.BrainForTests(wrapVehicle).PathLoops,
+            "ReverseDirection=false must wrap (loop) like legacy Advance, even with open ends");
+        Assert.IsFalse(manager.BrainForTests(pingPongVehicle).PathLoops,
+            "ReverseDirection=true is the authored ping-pong flag");
+    }
+
     [TestMethod]
     public void WaypointWait_HoldsThenResumes()
     {

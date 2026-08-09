@@ -60,12 +60,11 @@ public sealed class NpcVehicleSimManager
 
         var waypoints = path.Points.Select(p => p.Position).ToArray();
         var accepts = path.Points.Select(p => p.AcceptDistance).ToArray();
-        // Closed path (first ≈ last) → loop; otherwise ping-pong — same authoring heuristic
-        // as CloneManager.StartPath.
-        var dx = waypoints[0].X - waypoints[^1].X;
-        var dz = waypoints[0].Z - waypoints[^1].Z;
-        var loops = MathF.Sqrt(dx * dx + dz * dz) < 15f;
-        handle.Brain.SetPathRoute(waypoints, loops, accepts);
+        // Legacy NpcPathFollower.Advance semantics: ReverseDirection=false ALWAYS wraps
+        // last→first (loop), no matter how far apart the ends are; ReverseDirection=true
+        // ping-pongs. Guessing from endpoint proximity made patrol direction look random
+        // (vehicles on the return leg ran "backwards" next to outbound ones, live 2026-08-09).
+        handle.Brain.SetPathRoute(waypoints, loop: !path.ReverseDirection, accepts);
         handle.LastVertexIndex = handle.Brain.PathWaypointIndex;
 
         _handles[vehicle.ObjectId.Coid] = handle;
