@@ -109,12 +109,16 @@ public sealed class RaycastCar
         var newVelY = Velocity.Y - SimVehicleParams.Gravity * dt;
         if (Grounded)
         {
+            // Bidirectional within the contact window: compressed below rest pushes up, extended
+            // above rest pulls DOWN (terrain adhesion). Without the down-pull the body surfed a
+            // RestCompression-sized gap on every descent (live 2026-08-09, mean 0.5 m on a 12%
+            // grade). Down-pull is capped at 2 g so cresting a jump still goes ballistic.
             var compression = _params.RestCompression - heightAboveGround;
-            var x = MathF.Max(compression, 0f);
             var closing = -Velocity.Y; // positive when compressing
             var damp = closing >= 0f ? _params.SuspensionDampCompression : _params.SuspensionDampExtension;
-            var suspensionAccel = _params.SuspensionStrength * (x / _params.SuspensionLength)
+            var suspensionAccel = _params.SuspensionStrength * (compression / _params.SuspensionLength)
                                   - damp * closing * -1f; // damping opposes motion: −damp·(dY/dt)
+            suspensionAccel = MathF.Max(suspensionAccel, -2f * SimVehicleParams.Gravity);
             newVelY += suspensionAccel * dt;
 
             // Anti-sink (0.4-suspension.md): position-only correction, never below terrain.
@@ -204,9 +208,7 @@ public sealed class RaycastCar
         var newCos = MathF.Cos(Yaw);
         Velocity = new Vector3(
             newFwd * newSin + newLat * newCos,
-            Grounded && newVelY < 0f && heightAboveGround < _params.RestCompression
-                ? MathF.Max(newVelY, 0f)
-                : newVelY,
+            newVelY, // spring + damping own the vertical; a velY>=0 clamp here caused descent surfing
             newFwd * newCos - newLat * newSin);
 
         Position = new Vector3(

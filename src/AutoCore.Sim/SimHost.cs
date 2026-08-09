@@ -38,9 +38,30 @@ public sealed class SimHost
 
     public void Tick(long nowMs, float dt) => _cloneManager.Tick(nowMs, dt);
 
-    /// <summary>Routes /clone through AutoCore.Game's hook seam to this host.</summary>
+    /// <summary>
+    /// /clonetrim: sets or reports the global publish-height trim (metres). Live tuning knob
+    /// for the residual per-map body height (2026-08-09 feedback: "ever so slightly floaty").
+    /// </summary>
+    public string TrimClone(Character character, string arg)
+    {
+        if (string.IsNullOrWhiteSpace(arg))
+            return $"Clone height trim is {CloneManager.HeightTrim:+0.00;-0.00;0.00} m. Usage: /clonetrim <metres> (e.g. /clonetrim -0.35)";
+
+        if (!float.TryParse(arg, System.Globalization.NumberStyles.Float,
+                System.Globalization.CultureInfo.InvariantCulture, out var trim)
+            || !float.IsFinite(trim) || MathF.Abs(trim) > 5f)
+        {
+            return "Usage: /clonetrim <metres between -5 and 5>  (e.g. /clonetrim -0.35)";
+        }
+
+        CloneManager.HeightTrim = trim;
+        return $"Clone height trim set to {trim:+0.00;-0.00;0.00} m.";
+    }
+
+    /// <summary>Routes /clone and /clonetrim through AutoCore.Game's hook seam to this host.</summary>
     public static void InstallCommandHook()
     {
         CloneCommandControl.TryToggleClone = Instance.ToggleClone;
+        CloneCommandControl.TryTrimClone = Instance.TrimClone;
     }
 }

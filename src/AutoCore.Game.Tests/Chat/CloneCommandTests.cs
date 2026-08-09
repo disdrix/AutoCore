@@ -53,5 +53,23 @@ public class CloneCommandTests
     {
         Assert.IsTrue(ChatAdminGate.IsMutatingCommand("/clone"));
         Assert.IsTrue(ChatAdminGate.IsMutatingCommand("/unclone"));
+        Assert.IsTrue(ChatAdminGate.IsMutatingCommand("/clonetrim"));
+    }
+
+    [TestMethod]
+    public void CloneTrim_RoutesArgumentToHook()
+    {
+        string seen = null;
+        CloneCommandControl.TryTrimClone = (_, arg) => { seen = arg; return "trim set"; };
+
+        var result = ChatCommandService.Instance.Execute(null, "/clonetrim -0.35");
+
+        Assert.IsTrue(result.Handled);
+        Assert.AreEqual("trim set", result.Message);
+        Assert.AreEqual("-0.35", seen);
+
+        CloneCommandControl.TryTrimClone = null;
+        var unavailable = ChatCommandService.Instance.Execute(null, "/clonetrim 0.1");
+        StringAssert.Contains(unavailable.Message.ToLowerInvariant(), "unavailable");
     }
 }

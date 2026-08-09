@@ -31,4 +31,25 @@ public class SimHostTests
     {
         SimHost.Instance.Tick(nowMs: 123, dt: 0.05f);
     }
+
+    [TestMethod]
+    public void TrimClone_ParsesSetsAndReports()
+    {
+        try
+        {
+            var set = SimHost.Instance.TrimClone(null, "-0.35");
+            StringAssert.Contains(set, "-0.35");
+            Assert.AreEqual(-0.35f, AutoCore.Sim.Clone.CloneManager.HeightTrim, 0.001f);
+
+            var query = SimHost.Instance.TrimClone(null, null);
+            StringAssert.Contains(query, "-0.35");
+
+            var bad = SimHost.Instance.TrimClone(null, "abc");
+            StringAssert.Contains(bad.ToLowerInvariant(), "usage");
+        }
+        finally
+        {
+            AutoCore.Sim.Clone.CloneManager.HeightTrim = 0f;
+        }
+    }
 }

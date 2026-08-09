@@ -88,6 +88,70 @@ public class RaycastCarTests
             $"full-lock yaw rate at 10 m/s is {yawRate} rad/s; must be near the kinematic 2.28");
     }
 
+    /// <summary>
+    /// Live 2026-08-09 (map 1 diag): the sim rode up to 0.6 m above local terrain across dips —
+    /// the anti-bounce clamp blocked descent, so the car stepped up with terrain but only sank
+    /// back at gravity's pace. Grounded suspension must track terrain DOWN too.
+    /// </summary>
+    [TestMethod]
+    public void DrivingAcrossADip_TracksTerrainDownQuickly()
+    {
+        TerrainContactPlane.HeightSample dip = (float x, float z, out float y) =>
+        {
+            y = z is > 10f and < 40f ? -0.5f : 0f; // half-metre dip
+            return true;
+        };
+        var car = CarAt(0f, 0f, 0f);
+        car.SetVelocityForTests(new Vector3(0f, 0f, 8f));
+
+        // Drive into the dip; by mid-dip (z≈25, ~2s later) the body must have settled into it.
+        var worstGap = 0f;
+        for (var i = 0; i < 60; i++)
+        {
+            car.Advance(0.05f, new DriveInputs(0.4f, 0f, false), dip);
+            if (car.Position.Z is > 20f and < 38f)
+            {
+                dip(car.Position.X, car.Position.Z, out var groundY);
+                worstGap = MathF.Max(worstGap, car.Position.Y - groundY);
+            }
+        }
+
+        Assert.IsTrue(worstGap < 0.2f,
+            $"body must settle into the dip within ~1 car length; rode {worstGap} m high");
+    }
+
+    [TestMethod]
+    public void DrivingDownAContinuousSlope_StaysSeatedOnTheGround()
+    {
+        // Real-data RestCompression is ~0.2 m; a velY>=0 clamp inside that band makes the car
+        // surf that gap all the way down any hill (map 1 diag: 0.6 m high across undulations).
+        TerrainContactPlane.HeightSample slope = (float x, float z, out float y) =>
+        {
+            y = -0.12f * z; // 12% downgrade
+            return true;
+        };
+        var car = CarAt(0f, 0f, 0f);
+        car.SetVelocityForTests(new Vector3(0f, 0f, 8f));
+
+        var gapSum = 0f;
+        var samples = 0;
+        for (var i = 0; i < 100; i++) // 5 s of descent
+        {
+            car.Advance(0.05f, new DriveInputs(0.4f, 0f, false), slope);
+            if (i < 20)
+                continue; // entry transient
+            slope(car.Position.X, car.Position.Z, out var groundY);
+            gapSum += MathF.Abs(car.Position.Y - groundY);
+            samples++;
+        }
+
+        var meanGap = gapSum / samples;
+        // Pre-fix this was 0.50 m (surfing). ~0.09 m of damped tracking lag remains, which the
+        // rendered wheels/suspension fully cover — the bound guards the surfing regression.
+        Assert.IsTrue(meanGap < 0.12f,
+            $"descending body must stay seated on terrain; mean gap {meanGap} m");
+    }
+
     private static float NormalizeAngle(float a)
     {
         while (a > MathF.PI) a -= 2f * MathF.PI;

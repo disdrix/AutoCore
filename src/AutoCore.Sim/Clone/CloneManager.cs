@@ -15,6 +15,12 @@ public sealed class CloneManager
 {
     private readonly ConcurrentDictionary<long, CloneHandle> _clones = new();
 
+    /// <summary>
+    /// Global publish-height trim (metres), live-tuned via /clonetrim to dial out the residual
+    /// per-map body height that formulas and calibration leave behind.
+    /// </summary>
+    public static float HeightTrim { get; set; }
+
     public int ActiveCloneCount => _clones.Count;
 
     public string Toggle(Character character)
@@ -106,10 +112,10 @@ public sealed class CloneManager
             Logger.WriteLog(LogType.Debug,
                 $"CloneDiag: ownerY={owner.Position.Y:F2} cloneSimY={car.Position.Y:F2} " +
                 $"terrainAtClone={terrainAtClone:F2} calibOffset={heightOffset:F2} " +
-                $"mode={handle.Brain.Mode} speed={PlanarSpeed(car):F1}");
+                $"trim={HeightTrim:F2} mode={handle.Brain.Mode} speed={PlanarSpeed(car):F1}");
         }
         var publishPosition = new AutoCore.Game.Structures.Vector3(
-            car.Position.X, car.Position.Y + heightOffset, car.Position.Z);
+            car.Position.X, car.Position.Y + heightOffset + HeightTrim, car.Position.Z);
 
         if (brain.TeleportedThisStep)
         {

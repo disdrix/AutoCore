@@ -69,6 +69,10 @@ public sealed class ChatCommandService
             case "/unclone":
                 return ToggleClone(character);
 
+            case "/clonetrim":
+            case "/cloneTrim":
+                return TrimClone(character, parts.Length > 1 ? parts[1] : null);
+
             case "/showMissions":
             case "/showmissions":
                 return ShowMissions(character);
@@ -246,6 +250,16 @@ public sealed class ChatCommandService
             return new ChatCommandExecutionResult(true, "Clone simulation is unavailable on this server.");
 
         return new ChatCommandExecutionResult(true, toggle(character));
+    }
+
+    /// <summary>/clonetrim &lt;metres&gt; — live clone height trim; see CloneCommandControl.</summary>
+    private static ChatCommandExecutionResult TrimClone(Character character, string arg)
+    {
+        var trim = CloneCommandControl.TryTrimClone;
+        if (trim == null)
+            return new ChatCommandExecutionResult(true, "Clone simulation is unavailable on this server.");
+
+        return new ChatCommandExecutionResult(true, trim(character, arg));
     }
 
     private static ChatCommandExecutionResult Skills(Character character, string[] parts)

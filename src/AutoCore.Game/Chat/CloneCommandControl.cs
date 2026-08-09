@@ -14,4 +14,10 @@ public static class CloneCommandControl
     /// result message. Null when no Sim host is wired (command reports unavailable).
     /// </summary>
     public static Func<Character, string> TryToggleClone { get; set; }
+
+    /// <summary>
+    /// /clonetrim: live height-trim tuning (arg = metres or null to query). Same wiring rules
+    /// as <see cref="TryToggleClone"/>.
+    /// </summary>
+    public static Func<Character, string, string> TryTrimClone { get; set; }
 }
