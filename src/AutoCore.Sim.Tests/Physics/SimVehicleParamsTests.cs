@@ -59,6 +59,23 @@ public class SimVehicleParamsTests
     }
 
     [TestMethod]
+    public void FromCloneBase_TireFrictionComesFromWheelset()
+    {
+        // clonebase.wad probe 2026-08-09: WheelSetSpecific.Friction shorts ARE the mu values
+        // (ed_whl_car = [3,2,3,4,3,2]) — using 1.0 gave a third of retail grip live.
+        var ws = (CloneBaseWheelSet)System.Runtime.CompilerServices.RuntimeHelpers
+            .GetUninitializedObject(typeof(CloneBaseWheelSet));
+        ws.WheelSetSpecific = new WheelSetSpecific { Friction = new short[] { 3, 2, 3, 4, 3, 2 } };
+
+        var p = SimVehicleParams.FromCloneBase(CloneBase(new VehicleSpecific(), 900f), ws);
+
+        Assert.AreEqual((3 + 2 + 3 + 4 + 3 + 2) / 6f, p.MuBase, 0.01f);
+
+        var noWheelset = SimVehicleParams.FromCloneBase(CloneBase(new VehicleSpecific(), 900f));
+        Assert.AreEqual(3f, noWheelset.MuBase, 0.01f, "fallback must match typical retail mu, not 1.0");
+    }
+
+    [TestMethod]
     public void FromCloneBase_WheelBaseFromHardPointSpan()
     {
         var vs = new VehicleSpecific

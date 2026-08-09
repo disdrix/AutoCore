@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using AutoCore.Game.Entities;
 using AutoCore.Game.Npc;
 using AutoCore.Sim.Ai;
+using AutoCore.Utils;
 
 namespace AutoCore.Sim.Clone;
 
@@ -39,8 +40,9 @@ public sealed class CloneManager
 
     internal static CloneDriveBrain BuildBrainForHandle(Vehicle clone)
     {
+        var wheelSet = clone.WheelSet?.CloneBaseObject as AutoCore.Game.CloneBases.CloneBaseWheelSet;
         var parameters = clone.CloneBaseObject is AutoCore.Game.CloneBases.CloneBaseVehicle cb
-            ? Physics.SimVehicleParams.FromCloneBase(cb)
+            ? Physics.SimVehicleParams.FromCloneBase(cb, wheelSet)
             : Physics.SimVehicleParams.CreateForTests(
                 massKg: 1500f, steeringMaxAngleRad: 0.6f, steeringFullSpeedLimit: 15f, topSpeed: 30f,
                 muBase: 1f, suspensionLength: 0.35f, suspensionStrength: 60f,
@@ -84,15 +86,36 @@ public sealed class CloneManager
         var ownerForward = TerrainContactPlane.ForwardFromQuaternion(owner.Rotation);
         var ownerYaw = MathF.Atan2(ownerForward.X, ownerForward.Z);
 
+        // Height convention is measured from the owner: whatever (Y − heightfield) delta the
+        // player's grounded vehicle runs at is what the client renders as "on the ground".
+        if (heightfield != null && heightfield.TrySample(owner.Position.X, owner.Position.Z, out var terrainAtOwner))
+            handle.HeightCalibration.Observe(owner.Position.Y, terrainAtOwner, dt);
+
         var brain = handle.Brain;
         brain.Step(owner.Position, owner.Velocity, ownerYaw, sample, dt);
 
         var car = brain.Car;
+        var heightOffset = heightfield != null ? handle.HeightCalibration.Offset : 0f;
+
+        handle.DiagCountdown -= dt;
+        if (handle.DiagCountdown <= 0f)
+        {
+            handle.DiagCountdown = 2f;
+            var terrainAtClone = 0f;
+            heightfield?.TrySample(car.Position.X, car.Position.Z, out terrainAtClone);
+            Logger.WriteLog(LogType.Debug,
+                $"CloneDiag: ownerY={owner.Position.Y:F2} cloneSimY={car.Position.Y:F2} " +
+                $"terrainAtClone={terrainAtClone:F2} calibOffset={heightOffset:F2} " +
+                $"mode={handle.Brain.Mode} speed={PlanarSpeed(car):F1}");
+        }
+        var publishPosition = new AutoCore.Game.Structures.Vector3(
+            car.Position.X, car.Position.Y + heightOffset, car.Position.Z);
+
         if (brain.TeleportedThisStep)
         {
             // Discontinuous jump: SetPosition clears any stale physics bookkeeping, and the
             // ghost PositionMask still needs dirtying for the snap to reach clients.
-            handle.Clone.SetPosition(car.Position);
+            handle.Clone.SetPosition(publishPosition);
             handle.Clone.Rotation = car.Rotation;
             handle.Clone.Ghost?.SetMaskBits(AutoCore.Game.TNL.Ghost.GhostObject.PositionMask);
             return;
@@ -104,7 +127,7 @@ public sealed class CloneManager
         // both axes flip here — publishing them raw animated the wheels backwards live.
         var inputs = brain.LastInputs;
         handle.Clone.ApplyServerMove(
-            car.Position,
+            publishPosition,
             car.Rotation,
             car.Velocity,
             dt,
@@ -113,6 +136,9 @@ public sealed class CloneManager
             sharpTurn: inputs.Handbrake ? (byte)1 : (byte)0,
             angularVelocity: new AutoCore.Game.Structures.Vector3(0f, car.YawRate, 0f));
     }
+
+    private static float PlanarSpeed(AutoCore.Sim.Physics.RaycastCar car)
+        => MathF.Sqrt(car.Velocity.X * car.Velocity.X + car.Velocity.Z * car.Velocity.Z);
 
     /// <summary>Maps without a heightfield (test maps, towns) drive on a flat plane at spawn height.</summary>
     private static TerrainContactPlane.HeightSample FlatAtCurrentHeight(Vehicle clone)
@@ -137,4 +163,10 @@ public sealed class CloneHandle
 
     /// <summary>Physics-driven follow/orbit AI for this clone.</summary>
     public CloneDriveBrain Brain { get; }
+
+    /// <summary>Learns the owner's wire-Y-vs-heightfield delta (client ground convention).</summary>
+    public GroundOffsetCalibrator HeightCalibration { get; } = new();
+
+    /// <summary>Seconds until the next CloneDiag log line.</summary>
+    public float DiagCountdown { get; set; }
 }

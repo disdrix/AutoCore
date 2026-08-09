@@ -51,7 +51,7 @@ public sealed class SimVehicleParams
     /// <summary>Radians-per-second-per-rpm: π/30 (verified/fn_005fd390_speedGovernor.md).</summary>
     private const float RpmToRadPerSec = 0.104719758f;
 
-    public static SimVehicleParams FromCloneBase(CloneBaseVehicle cloneBase)
+    public static SimVehicleParams FromCloneBase(CloneBaseVehicle cloneBase, CloneBaseWheelSet wheelSet = null)
     {
         var vs = cloneBase.VehicleSpecific;
         var mass = cloneBase.SimpleObjectSpecific.Mass;
@@ -65,7 +65,7 @@ public sealed class SimVehicleParams
             SteeringMaxAngleRad = vs.SteeringMaxAngle > 0f ? vs.SteeringMaxAngle : 0.6f,
             SteeringFullSpeedLimit = vs.SteeringFullSpeedLimit > 0f ? vs.SteeringFullSpeedLimit : 15f,
             TopSpeed = ComputeTopSpeed(vs, wheelRadius),
-            MuBase = 1.0f,
+            MuBase = ComputeMuBase(wheelSet),
             RearMuScale = vs.RearWheelFrictionScalar > 0f ? vs.RearWheelFrictionScalar : 1f,
             SuspensionLength = PositiveOr(vs.SuspensionLength.Front, 0.35f),
             SuspensionStrength = PositiveOr(vs.SuspensionStrength.Front, 60f),
@@ -128,6 +128,30 @@ public sealed class SimVehicleParams
             topSpeed = MathF.Min(topSpeed, vs.AbsoluteTopSpeed);
 
         return MathF.Max(topSpeed, 1f);
+    }
+
+    /// <summary>
+    /// Tire mu from the wheelset clonebase: WheelSetSpecific.Friction shorts ARE the mu values
+    /// (clonebase.wad probe 2026-08-09: ed_whl_car=[3,2,3,4,3,2], bikes/tanks 3-5). Retail grip
+    /// is arcade-high; 1.0 cornered at a third of the client's rate live.
+    /// </summary>
+    private static float ComputeMuBase(CloneBaseWheelSet wheelSet)
+    {
+        var friction = wheelSet?.WheelSetSpecific.Friction;
+        if (friction == null || friction.Length == 0)
+            return 3f;
+
+        var sum = 0f;
+        var count = 0;
+        foreach (var f in friction)
+        {
+            if (f <= 0)
+                continue;
+            sum += f;
+            count++;
+        }
+
+        return count > 0 ? sum / count : 3f;
     }
 
     private static float ComputeDrag(AutoCore.Game.CloneBases.Specifics.VehicleSpecific vs)
