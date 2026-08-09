@@ -41,7 +41,61 @@ public sealed class CloneManager
             return "No clone active — use /clone first.";
 
         handle.Brain.Hold = hold;
+        if (!hold)
+            handle.Brain.ClearPathRoute(); // /clonefollow = resume following, from hold OR path
         return hold ? "Clone holding position." : "Clone resuming follow.";
+    }
+
+    /// <summary>
+    /// /clonestartpath: navigate the map path nearest to the clone, waypoint by waypoint,
+    /// using the sim (physics + avoidance — no pose snapping). Closed paths loop; open A→B
+    /// paths ping-pong, matching typical fam path authoring.
+    /// </summary>
+    public string StartPath(Character character)
+    {
+        if (character == null)
+            return "No character loaded.";
+        if (!_clones.TryGetValue(character.ObjectId.Coid, out var handle))
+            return "No clone active — use /clone first.";
+
+        var templates = handle.Clone.Map?.MapData?.Templates;
+        if (templates == null)
+            return "No map data available.";
+
+        AutoCore.Game.EntityTemplates.MapPathTemplate nearest = null;
+        var nearestDist = float.MaxValue;
+        var clonePos = handle.Clone.Position;
+        foreach (var template in templates.Values)
+        {
+            if (template is not AutoCore.Game.EntityTemplates.MapPathTemplate path || path.Points.Count < 2)
+                continue;
+
+            foreach (var point in path.Points)
+            {
+                var dx = point.Position.X - clonePos.X;
+                var dz = point.Position.Z - clonePos.Z;
+                var d = MathF.Sqrt(dx * dx + dz * dz);
+                if (d < nearestDist)
+                {
+                    nearestDist = d;
+                    nearest = path;
+                }
+            }
+        }
+
+        if (nearest == null)
+            return "No map paths on this map.";
+
+        var waypoints = nearest.Points.Select(p => p.Position).ToArray();
+        // Closed path (first ≈ last) → loop; otherwise ping-pong the A→B line.
+        var dxEnds = waypoints[0].X - waypoints[^1].X;
+        var dzEnds = waypoints[0].Z - waypoints[^1].Z;
+        var loops = MathF.Sqrt(dxEnds * dxEnds + dzEnds * dzEnds) < 15f;
+
+        handle.Brain.SetPathRoute(waypoints, loops);
+        var label = string.IsNullOrWhiteSpace(nearest.PathName) ? $"#{nearest.COID}" : nearest.PathName;
+        return $"Clone following path '{label}' ({waypoints.Length} waypoints, " +
+               $"{(loops ? "loop" : "ping-pong")}, {nearestDist:0} m away).";
     }
 
     /// <summary>/cloneteleport: manual jump behind the caller (replaces the old auto-leash).</summary>

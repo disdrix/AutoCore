@@ -48,6 +48,54 @@ public sealed class CloneDriveBrain
     /// <summary>/cloneteleport: jump behind the player on the next step.</summary>
     public void RequestCatchUp() => _catchUpRequested = true;
 
+    // --- /clonestartpath: waypoint route (map path) instead of follow/orbit ---
+    private IReadOnlyList<Vector3> _pathWaypoints;
+    private bool _pathLoops;
+    private int _pathIndex;
+    private int _pathDirection = 1; // +1 forward, −1 for the ping-pong return leg
+
+    public bool HasPathRoute => _pathWaypoints != null;
+
+    public int PathWaypointIndex => _pathIndex;
+
+    /// <summary>
+    /// Navigate the given waypoints with the sim (physics + avoidance, no snapping): loop
+    /// routes wrap; open A→B routes ping-pong. Starts at the nearest waypoint. Clears a hold.
+    /// </summary>
+    public void SetPathRoute(IReadOnlyList<Vector3> waypoints, bool loop)
+    {
+        if (waypoints == null || waypoints.Count < 2)
+            return;
+
+        _pathWaypoints = waypoints;
+        _pathLoops = loop;
+        _pathDirection = 1;
+        Hold = false;
+
+        var best = 0;
+        var bestDist = float.MaxValue;
+        for (var i = 0; i < waypoints.Count; i++)
+        {
+            var d = DistXZ(waypoints[i], _car.Position);
+            if (d < bestDist)
+            {
+                bestDist = d;
+                best = i;
+            }
+        }
+
+        _pathIndex = best;
+    }
+
+    public void ClearPathRoute() => _pathWaypoints = null;
+
+    private static float DistXZ(Vector3 a, Vector3 b)
+    {
+        var dx = a.X - b.X;
+        var dz = a.Z - b.Z;
+        return MathF.Sqrt(dx * dx + dz * dz);
+    }
+
     /// <summary>Set when the last Step teleported the car (entity must publish via SetPosition).</summary>
     public bool TeleportedThisStep { get; private set; }
 
@@ -122,9 +170,11 @@ public sealed class CloneDriveBrain
         }
         else
         {
-            inputs = _stateMachine.Mode == CloneAiMode.Orbit
-                ? OrbitInputs(playerPosition, playerSpeed)
-                : FollowInputs(playerPosition, playerVelocity, separation);
+            inputs = _pathWaypoints != null
+                ? PathInputs()
+                : _stateMachine.Mode == CloneAiMode.Orbit
+                    ? OrbitInputs(playerPosition, playerSpeed)
+                    : FollowInputs(playerPosition, playerVelocity, separation);
 
             inputs = ApplyObstacleAvoidance(inputs);
 
@@ -263,6 +313,33 @@ public sealed class CloneDriveBrain
         }
 
         return true;
+    }
+
+    /// <summary>Waypoint pursuit: aim at the current point, advance inside the accept radius.</summary>
+    private DriveInputs PathInputs()
+    {
+        var waypoints = _pathWaypoints;
+        var target = waypoints[_pathIndex];
+        if (DistXZ(target, _car.Position) < _tuning.PathAcceptDistance)
+        {
+            var next = _pathIndex + _pathDirection;
+            if (_pathLoops)
+            {
+                next = (next + waypoints.Count) % waypoints.Count;
+            }
+            else if (next < 0 || next >= waypoints.Count)
+            {
+                _pathDirection = -_pathDirection; // A→B line: ping-pong at the ends
+                next = _pathIndex + _pathDirection;
+            }
+
+            _pathIndex = next;
+            target = waypoints[_pathIndex];
+        }
+
+        var steer = PurePursuitSteer(target.X, target.Z);
+        var throttle = SpeedControl(_tuning.PathSpeed);
+        return new DriveInputs(throttle, steer, Handbrake: false);
     }
 
     private DriveInputs FollowInputs(Vector3 playerPosition, Vector3 playerVelocity, float separation)

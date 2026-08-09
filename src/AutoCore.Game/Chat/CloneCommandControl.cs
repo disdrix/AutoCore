@@ -29,4 +29,7 @@ public static class CloneCommandControl
 
     /// <summary>/cloneteleport: jump the caller's clone to them (manual; no auto-leash).</summary>
     public static Func<Character, string> TryTeleportClone { get; set; }
+
+    /// <summary>/clonestartpath: navigate the nearest map path; /clonefollow resumes.</summary>
+    public static Func<Character, string> TryStartPath { get; set; }
 }

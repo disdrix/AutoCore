@@ -183,6 +183,51 @@ public class CloneManagerTests
     }
 
     [TestMethod]
+    public void StartPath_PicksTheNearestMapPath_AndFollowResumes()
+    {
+        var map = CreateFieldMap(8211);
+        var far = new AutoCore.Game.EntityTemplates.MapPathTemplate { COID = 901, PathName = "far" };
+        far.Points.Add(new AutoCore.Game.EntityTemplates.MapPathTemplate.MapPathPoint
+        { Position = new AutoCore.Game.Structures.Vector3(500f, 0f, 500f) });
+        far.Points.Add(new AutoCore.Game.EntityTemplates.MapPathTemplate.MapPathPoint
+        { Position = new AutoCore.Game.Structures.Vector3(600f, 0f, 500f) });
+        var near = new AutoCore.Game.EntityTemplates.MapPathTemplate { COID = 902, PathName = "near" };
+        near.Points.Add(new AutoCore.Game.EntityTemplates.MapPathTemplate.MapPathPoint
+        { Position = new AutoCore.Game.Structures.Vector3(120f, 0f, 100f) });
+        near.Points.Add(new AutoCore.Game.EntityTemplates.MapPathTemplate.MapPathPoint
+        { Position = new AutoCore.Game.Structures.Vector3(160f, 0f, 100f) });
+        map.MapData.Templates.Add(far.COID, far);
+        map.MapData.Templates.Add(near.COID, near);
+
+        var character = DrivingCharacter(map);
+        character.CurrentVehicle.Position = new AutoCore.Game.Structures.Vector3(100f, 0f, 100f);
+        var manager = new CloneManager();
+        manager.Toggle(character);
+
+        var message = manager.StartPath(character);
+        StringAssert.Contains(message, "near", "must pick the closest path to the clone");
+        Assert.IsTrue(manager.BrainForTests(character).HasPathRoute);
+
+        var resume = manager.SetHold(character, hold: false);
+        Assert.IsFalse(manager.BrainForTests(character).HasPathRoute,
+            "/clonefollow must clear the path route and resume following");
+        StringAssert.Contains(resume.ToLowerInvariant(), "follow");
+    }
+
+    [TestMethod]
+    public void StartPath_NoPathsOnMap_ReportsFriendlyMessage()
+    {
+        var map = CreateFieldMap(8212);
+        var character = DrivingCharacter(map);
+        var manager = new CloneManager();
+        manager.Toggle(character);
+
+        var message = manager.StartPath(character);
+
+        StringAssert.Contains(message.ToLowerInvariant(), "no map paths");
+    }
+
+    [TestMethod]
     public void Tick_AttachesLazilyBuiltHullWorldToTheBrain()
     {
         var map = CreateFieldMap(8210);

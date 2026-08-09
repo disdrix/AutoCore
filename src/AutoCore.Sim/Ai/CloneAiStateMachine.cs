@@ -51,6 +51,12 @@ public sealed class CloneAiTuning
     /// 120 m tripped constantly at cruise speed — keep this generous.
     /// </summary>
     public float CatchUpDistance { get; init; } = 250f;
+
+    /// <summary>/clonestartpath cruise speed (m/s) — brisk NPC patrol pace.</summary>
+    public float PathSpeed { get; init; } = 14f;
+
+    /// <summary>Waypoint arrival radius (m) for path routes.</summary>
+    public float PathAcceptDistance { get; init; } = 6f;
 }
 
 /// <summary>

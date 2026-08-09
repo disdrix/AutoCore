@@ -90,6 +90,10 @@ public sealed class ChatCommandService
             case "/clonetp":
                 return CloneTeleport(character);
 
+            case "/clonestartpath":
+            case "/cloneStartPath":
+                return CloneStartPath(character);
+
             case "/showMissions":
             case "/showmissions":
                 return ShowMissions(character);
@@ -277,6 +281,16 @@ public sealed class ChatCommandService
             return new ChatCommandExecutionResult(true, "Clone simulation is unavailable on this server.");
 
         return new ChatCommandExecutionResult(true, trim(character, arg));
+    }
+
+    /// <summary>/clonestartpath — clone navigates the nearest map path.</summary>
+    private static ChatCommandExecutionResult CloneStartPath(Character character)
+    {
+        var startPath = CloneCommandControl.TryStartPath;
+        if (startPath == null)
+            return new ChatCommandExecutionResult(true, "Clone simulation is unavailable on this server.");
+
+        return new ChatCommandExecutionResult(true, startPath(character));
     }
 
     /// <summary>/cloneteleport — jump the caller's clone to them.</summary>

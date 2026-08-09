@@ -96,6 +96,9 @@ public sealed class SimHost
     /// <summary>/cloneteleport.</summary>
     public string TeleportClone(Character character) => _cloneManager.Teleport(character);
 
+    /// <summary>/clonestartpath.</summary>
+    public string StartClonePath(Character character) => _cloneManager.StartPath(character);
+
     /// <summary>Routes the /clone* commands through AutoCore.Game's hook seam to this host.</summary>
     public static void InstallCommandHook()
     {
@@ -104,5 +107,6 @@ public sealed class SimHost
         CloneCommandControl.TrySetFollowDistance = Instance.SetFollowDistance;
         CloneCommandControl.TrySetHold = Instance.SetCloneHold;
         CloneCommandControl.TryTeleportClone = Instance.TeleportClone;
+        CloneCommandControl.TryStartPath = Instance.StartClonePath;
     }
 }

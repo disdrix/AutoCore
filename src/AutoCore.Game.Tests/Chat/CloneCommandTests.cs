@@ -14,6 +14,7 @@ public class CloneCommandTests
         CloneCommandControl.TrySetFollowDistance = null;
         CloneCommandControl.TrySetHold = null;
         CloneCommandControl.TryTeleportClone = null;
+        CloneCommandControl.TryStartPath = null;
     }
 
     [TestMethod]
@@ -63,6 +64,18 @@ public class CloneCommandTests
         Assert.IsTrue(ChatAdminGate.IsMutatingCommand("/clonefollow"));
         Assert.IsTrue(ChatAdminGate.IsMutatingCommand("/cloneteleport"));
         Assert.IsTrue(ChatAdminGate.IsMutatingCommand("/clonetp"));
+        Assert.IsTrue(ChatAdminGate.IsMutatingCommand("/clonestartpath"));
+    }
+
+    [TestMethod]
+    public void CloneStartPath_RoutesToHook()
+    {
+        CloneCommandControl.TryStartPath = _ => "pathing";
+
+        var result = ChatCommandService.Instance.Execute(null, "/clonestartpath");
+
+        Assert.AreEqual("pathing", result.Message);
+        CloneCommandControl.TryStartPath = null;
     }
 
     [TestMethod]
