@@ -161,7 +161,7 @@ public sealed class CloneDriveBrain
         var behindZ = playerPosition.Z - MathF.Cos(playerYaw) * _tuning.OrbitRadius;
         var y = playerPosition.Y;
         if (ground != null && ground(behindX, behindZ, out var groundY))
-            y = groundY + _car.Params.RideHeight;
+            y = groundY; // wire convention: vehicle Y sits at terrain height
 
         _car.SetPose(new Vector3(behindX, y, behindZ), playerYaw);
         _stateMachine.ForceMode(CloneAiMode.Follow);

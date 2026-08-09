@@ -98,14 +98,18 @@ public sealed class CloneManager
             return;
         }
 
+        // Retail wire sign convention (VehicleDriveController.ComputeAxes: baseDir = −1 when
+        // driving forward; brake-spec pedal = max(0, axis)): NEGATIVE throttle drives forward
+        // and steer is baseDir·lateral. The sim brain uses positive-forward/positive-right, so
+        // both axes flip here — publishing them raw animated the wheels backwards live.
         var inputs = brain.LastInputs;
         handle.Clone.ApplyServerMove(
             car.Position,
             car.Rotation,
             car.Velocity,
             dt,
-            driveThrottle: inputs.Throttle,
-            driveSteering: inputs.Steering,
+            driveThrottle: -inputs.Throttle,
+            driveSteering: -inputs.Steering,
             sharpTurn: inputs.Handbrake ? (byte)1 : (byte)0,
             angularVelocity: new AutoCore.Game.Structures.Vector3(0f, car.YawRate, 0f));
     }

@@ -37,8 +37,11 @@ public sealed class CloneAiTuning
 
     public float RecoverDuration { get; init; } = 1.5f;
 
-    /// <summary>Separation beyond which the clone teleports behind the player.</summary>
-    public float CatchUpDistance { get; init; } = 120f;
+    /// <summary>
+    /// Separation beyond which the clone teleports behind the player. Live feedback 2026-08-08:
+    /// 120 m tripped constantly at cruise speed — keep this generous.
+    /// </summary>
+    public float CatchUpDistance { get; init; } = 250f;
 }
 
 /// <summary>

@@ -53,17 +53,46 @@ public class RaycastCarTests
     // --- Suspension (0.4-suspension.md: F = (strength·compression/length − damp·closing) · mass) ---
 
     [TestMethod]
-    public void AtRest_SettlesAtStaticCompression()
+    public void AtRest_SettlesAtTerrainHeight()
     {
-        var car = CarAt(0f, 2f, 0f); // dropped from above ride height
+        var car = CarAt(0f, 2f, 0f); // dropped from above
+
         Run(car, seconds: 6f, new DriveInputs(0f, 0f, false));
 
-        // Static equilibrium: strength·(x/L) = g  =>  x = g·L/strength.
-        var expectedCompression = 9.81f * 0.35f / 60f;
-        var expectedY = 0.45f + 0.35f - expectedCompression; // radius + free length − compression
-        Assert.AreEqual(expectedY, car.Position.Y, 0.06f,
-            $"rest height {car.Position.Y} should sit at static compression (expected {expectedY})");
+        // Wire convention (NpcTicker.SnapToTerrain, live float report 2026-08-08): vehicle
+        // Position.Y sits AT the terrain height; the client renders wheels/suspension itself.
+        Assert.AreEqual(0f, car.Position.Y, 0.08f,
+            $"rest height {car.Position.Y} must sit at terrain level, not float above it");
         Assert.IsTrue(MathF.Abs(car.Velocity.Y) < 0.05f, "vertical oscillation must decay");
+    }
+
+    [TestMethod]
+    public void ModerateSpeed_FullSteer_TurnsTightly()
+    {
+        // Live report 2026-08-08: clone turned far wider than the player. At 10 m/s (below
+        // FSL=15, low-speed grip boost ~2x) the kinematic bicycle limit v·tan(0.6)/3 ≈ 2.28
+        // rad/s should dominate — require most of it.
+        var car = CarAt(0f, 0.5f, 0f);
+        car.SetVelocityForTests(new Vector3(0f, 0f, 10f));
+
+        var yawStart = float.NaN;
+        for (var i = 0; i < 60; i++)
+        {
+            var throttle = Speed(car) < 10f ? 0.6f : 0f;
+            car.Advance(0.05f, new DriveInputs(throttle, 1f, false), Flat);
+            if (i == 39) yawStart = car.Yaw;
+        }
+        var yawRate = MathF.Abs(NormalizeAngle(car.Yaw - yawStart)) / 1.0f;
+
+        Assert.IsTrue(yawRate > 1.6f,
+            $"full-lock yaw rate at 10 m/s is {yawRate} rad/s; must be near the kinematic 2.28");
+    }
+
+    private static float NormalizeAngle(float a)
+    {
+        while (a > MathF.PI) a -= 2f * MathF.PI;
+        while (a < -MathF.PI) a += 2f * MathF.PI;
+        return a;
     }
 
     // --- Drive / top speed (verified/fn_005fd390_speedGovernor.md) ---

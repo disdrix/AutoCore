@@ -93,17 +93,19 @@ public sealed class RaycastCar
         var planarSpeed = MathF.Sqrt(fwdSpeed * fwdSpeed + latSpeed * latSpeed);
 
         // --- ground contact (wheel ray down from chassis) ---
+        // Wire convention: Position.Y rests AT terrain height (client renders suspension), so
+        // the spring equilibrium sits at groundY: compression there equals RestCompression and
+        // strength·(x/L) exactly balances gravity.
         var groundY = 0f;
         var hasGround = ground != null && ground(Position.X, Position.Z, out groundY);
-        var rideHeight = _params.RideHeight;
-        var compression = hasGround ? rideHeight - (Position.Y - groundY) : 0f;
-        Grounded = hasGround && compression > -0.05f;
+        var heightAboveGround = hasGround ? Position.Y - groundY : float.MaxValue;
+        const float GroundContactMargin = 0.6f; // suspension travel window before airborne
+        Grounded = hasGround && heightAboveGround < GroundContactMargin;
 
         var newVelY = Velocity.Y - SimVehicleParams.Gravity * dt;
         if (Grounded)
         {
-            // Suspension heave: strength·(x/L) acts as acceleration (force is ×mass per spec, so
-            // mass cancels); damp by vertical closing speed.
+            var compression = _params.RestCompression - heightAboveGround;
             var x = MathF.Max(compression, 0f);
             var closing = -Velocity.Y; // positive when compressing
             var damp = closing >= 0f ? _params.SuspensionDampCompression : _params.SuspensionDampExtension;
@@ -111,10 +113,9 @@ public sealed class RaycastCar
                                   - damp * closing * -1f; // damping opposes motion: −damp·(dY/dt)
             newVelY += suspensionAccel * dt;
 
-            // Anti-sink (0.4-suspension.md): position-only correction when below the wheel.
-            var minY = groundY + _params.WheelRadius * 0.5f;
-            if (Position.Y + newVelY * dt < minY)
-                Position = new Vector3(Position.X, minY, Position.Z);
+            // Anti-sink (0.4-suspension.md): position-only correction, never below terrain.
+            if (Position.Y + newVelY * dt < groundY - 0.1f)
+                Position = new Vector3(Position.X, groundY - 0.1f, Position.Z);
         }
 
         // --- steering (steering-spec.md) ---
@@ -142,13 +143,15 @@ public sealed class RaycastCar
             var boost = planarSpeed < LowSpeedBoostThreshold
                 ? MathF.Min((LowSpeedBoostThreshold - planarSpeed) * LowSpeedBoostSlope + 1f, MaxLowSpeedBoost)
                 : 1f;
-            var muBudget = _params.MuMax * SimVehicleParams.Gravity;
+            // Retail's low-speed boost multiplies wheel μ, so it raises the lateral grip
+            // budget too — without it the clone cornered far wider than the player.
+            var muBudget = _params.MuMax * SimVehicleParams.Gravity * boost;
             var rearGrip = inputs.Handbrake ? 0.5f : 1f;
 
             // Longitudinal demand: drive toward the governor, brake against motion.
             var throttle = Math.Clamp(inputs.Throttle, -1f, 1f);
             if (throttle > 0f && fwdSpeed < _params.TopSpeed)
-                accelFwd = throttle * _params.MuBase * SimVehicleParams.Gravity * boost;
+                accelFwd = throttle * _params.MuBase * SimVehicleParams.Gravity * MathF.Min(boost, 2f);
             else if (throttle < 0f)
             {
                 if (fwdSpeed > 0.3f)
@@ -197,7 +200,9 @@ public sealed class RaycastCar
         var newCos = MathF.Cos(Yaw);
         Velocity = new Vector3(
             newFwd * newSin + newLat * newCos,
-            Grounded && newVelY < 0f && compression > 0.02f ? MathF.Max(newVelY, 0f) : newVelY,
+            Grounded && newVelY < 0f && heightAboveGround < _params.RestCompression
+                ? MathF.Max(newVelY, 0f)
+                : newVelY,
             newFwd * newCos - newLat * newSin);
 
         Position = new Vector3(

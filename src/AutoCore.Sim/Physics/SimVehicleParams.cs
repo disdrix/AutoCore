@@ -39,8 +39,12 @@ public sealed class SimVehicleParams
     /// <summary>Precombined 0.5·ρ·Cd·A for drag along forward axis (0.6-aerodynamics.md).</summary>
     public float DragHalfRhoCdA { get; private init; }
 
-    /// <summary>Ride height at zero suspension compression: wheel radius + free suspension length.</summary>
-    public float RideHeight => WheelRadius + SuspensionLength;
+    /// <summary>
+    /// Static suspension compression g·L/strength. The wire convention puts vehicle Position.Y
+    /// AT terrain height (NpcTicker.SnapToTerrain; client renders wheels/suspension), so the
+    /// spring equilibrium is tuned to rest exactly at ground level.
+    /// </summary>
+    public float RestCompression => Gravity * SuspensionLength / SuspensionStrength;
 
     public const float Gravity = 9.81f;
 

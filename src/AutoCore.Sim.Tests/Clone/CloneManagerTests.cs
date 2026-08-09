@@ -182,6 +182,38 @@ public class CloneManagerTests
             $"clone must orbit the stationary player (covered {angleCovered} rad)");
     }
 
+    /// <summary>
+    /// Live report 2026-08-08: wheels animated the wrong way. The retail wire convention
+    /// (VehicleDriveController.ComputeAxes, brake-spec.md pedal derivation) is NEGATIVE
+    /// throttle = drive forward and steer = baseDir·lateral, so the sim's positive-forward /
+    /// positive-right inputs must be negated at the publish boundary.
+    /// </summary>
+    [TestMethod]
+    public void Tick_PublishesRetailSignConventionOnTheWire()
+    {
+        var map = CreateFieldMap(8208);
+        var character = DrivingCharacter(map);
+        character.CurrentVehicle.Position = new AutoCore.Game.Structures.Vector3(100f, 0f, 100f);
+        // Player cruising forward so the clone chases at meaningful throttle. ApplyServerMove is
+        // the sanctioned velocity write path.
+        character.CurrentVehicle.ApplyServerMove(
+            character.CurrentVehicle.Position, character.CurrentVehicle.Rotation,
+            new AutoCore.Game.Structures.Vector3(0f, 0f, 10f), 0.05f, null, null, null, null);
+        var manager = new CloneManager();
+        manager.Toggle(character);
+        var clone = map.NpcAiEntities.OfType<Vehicle>().Single();
+
+        for (var i = 0; i < 60; i++)
+        {
+            character.CurrentVehicle.Position = new AutoCore.Game.Structures.Vector3(
+                100f, 0f, 100f + i * 0.5f);
+            manager.Tick(nowMs: i * 50, dt: 0.05f);
+        }
+
+        Assert.IsTrue(clone.Acceleration < -0.1f,
+            $"forward drive must publish NEGATIVE Acceleration (retail wire), was {clone.Acceleration}");
+    }
+
     [TestMethod]
     public void Toggle_TwoPlayers_HaveIndependentClones()
     {
