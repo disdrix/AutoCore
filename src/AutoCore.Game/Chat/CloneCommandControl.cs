@@ -26,4 +26,7 @@ public static class CloneCommandControl
 
     /// <summary>/clonestop (true) / /clonefollow (false): park or resume the caller's clone.</summary>
     public static Func<Character, bool, string> TrySetHold { get; set; }
+
+    /// <summary>/cloneteleport: jump the caller's clone to them (manual; no auto-leash).</summary>
+    public static Func<Character, string> TryTeleportClone { get; set; }
 }

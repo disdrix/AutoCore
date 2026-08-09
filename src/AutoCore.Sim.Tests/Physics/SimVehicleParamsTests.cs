@@ -76,6 +76,22 @@ public class SimVehicleParamsTests
     }
 
     [TestMethod]
+    public void FromCloneBase_ExtraGravityFromAeroData()
+    {
+        var vs = new VehicleSpecific
+        {
+            AerodynamicsExtraGravity = new Vector3(0f, -12f, 0f),
+        };
+
+        var p = SimVehicleParams.FromCloneBase(CloneBase(vs, 900f));
+
+        Assert.AreEqual(9.81f + 12f, p.TotalGravity, 0.01f);
+
+        var none = SimVehicleParams.FromCloneBase(CloneBase(new VehicleSpecific(), 900f));
+        Assert.AreEqual(9.81f, none.TotalGravity, 0.01f, "no data → base gravity only");
+    }
+
+    [TestMethod]
     public void FromCloneBase_WheelBaseFromHardPointSpan()
     {
         var vs = new VehicleSpecific

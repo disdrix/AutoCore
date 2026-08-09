@@ -85,6 +85,11 @@ public sealed class ChatCommandService
             case "/cloneFollow":
                 return CloneHold(character, hold: false);
 
+            case "/cloneteleport":
+            case "/cloneTeleport":
+            case "/clonetp":
+                return CloneTeleport(character);
+
             case "/showMissions":
             case "/showmissions":
                 return ShowMissions(character);
@@ -272,6 +277,16 @@ public sealed class ChatCommandService
             return new ChatCommandExecutionResult(true, "Clone simulation is unavailable on this server.");
 
         return new ChatCommandExecutionResult(true, trim(character, arg));
+    }
+
+    /// <summary>/cloneteleport — jump the caller's clone to them.</summary>
+    private static ChatCommandExecutionResult CloneTeleport(Character character)
+    {
+        var teleport = CloneCommandControl.TryTeleportClone;
+        if (teleport == null)
+            return new ChatCommandExecutionResult(true, "Clone simulation is unavailable on this server.");
+
+        return new ChatCommandExecutionResult(true, teleport(character));
     }
 
     /// <summary>/clonestop and /clonefollow — park / resume the caller's clone.</summary>

@@ -44,6 +44,19 @@ public sealed class CloneManager
         return hold ? "Clone holding position." : "Clone resuming follow.";
     }
 
+    /// <summary>/cloneteleport: manual jump behind the caller (replaces the old auto-leash).</summary>
+    public string Teleport(Character character)
+    {
+        if (character == null)
+            return "No character loaded.";
+        if (!_clones.TryGetValue(character.ObjectId.Coid, out var handle))
+            return "No clone active — use /clone first.";
+
+        handle.Brain.Hold = false;
+        handle.Brain.RequestCatchUp();
+        return "Clone teleporting to you.";
+    }
+
     public string Toggle(Character character)
     {
         if (character == null)

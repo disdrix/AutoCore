@@ -152,6 +152,31 @@ public class RaycastCarTests
             $"descending body must stay seated on terrain; mean gap {meanGap} m");
     }
 
+    /// <summary>
+    /// Live 2026-08-09: the clone fell noticeably slower than the player. Retail applies
+    /// per-chassis AerodynamicsExtraGravity on top of world gravity (0.6-aerodynamics.md:
+    /// F = mass · ExtraGravity, world-space) — the sim must too.
+    /// </summary>
+    [TestMethod]
+    public void ExtraGravity_AcceleratesFallBeyondBaseGravity()
+    {
+        var heavyFall = SimVehicleParams.CreateForTests(
+            massKg: 1500f, steeringMaxAngleRad: 0.6f, steeringFullSpeedLimit: 15f, topSpeed: 30f,
+            muBase: 1.0f, suspensionLength: 0.35f, suspensionStrength: 60f,
+            suspensionDampCompression: 6f, suspensionDampExtension: 7f,
+            wheelRadius: 0.45f, wheelBase: 3.0f, dragHalfRhoCdA: 0.6f,
+            extraGravityY: -10f);
+        var car = new RaycastCar(heavyFall);
+        car.SetPose(new Vector3(0f, 50f, 0f), 0f); // airborne
+
+        var vyBefore = car.Velocity.Y;
+        for (var i = 0; i < 10; i++) // 0.5 s of free fall
+            car.Advance(0.05f, new DriveInputs(0f, 0f, false), Flat);
+
+        // Total fall accel = 9.81 + 10 = 19.81 m/s².
+        Assert.AreEqual(-19.81f * 0.5f, car.Velocity.Y - vyBefore, 1.0f);
+    }
+
     private static float NormalizeAngle(float a)
     {
         while (a > MathF.PI) a -= 2f * MathF.PI;

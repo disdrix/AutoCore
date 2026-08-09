@@ -84,6 +84,7 @@ public static class ChatAdminGate
         "/clonefollowdist", "/cloneFollowDist",
         "/clonestop", "/cloneStop",
         "/clonefollow", "/cloneFollow",
+        "/cloneteleport", "/cloneTeleport", "/clonetp",
 
         // Moderation
         "/kick",

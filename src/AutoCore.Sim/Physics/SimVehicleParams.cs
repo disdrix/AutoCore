@@ -40,11 +40,21 @@ public sealed class SimVehicleParams
     public float DragHalfRhoCdA { get; private init; }
 
     /// <summary>
+    /// Downward AerodynamicsExtraGravity.Y from chassis data (≤ 0). Retail applies it as a
+    /// world-space acceleration on top of gravity (0.6-aerodynamics.md) — without it the clone
+    /// fell visibly slower than the player (live 2026-08-09).
+    /// </summary>
+    public float ExtraGravityY { get; private init; }
+
+    /// <summary>Effective downward acceleration: base gravity + chassis extra gravity.</summary>
+    public float TotalGravity => Gravity - MathF.Min(ExtraGravityY, 0f);
+
+    /// <summary>
     /// Static suspension compression g·L/strength. The wire convention puts vehicle Position.Y
     /// AT terrain height (NpcTicker.SnapToTerrain; client renders wheels/suspension), so the
     /// spring equilibrium is tuned to rest exactly at ground level.
     /// </summary>
-    public float RestCompression => Gravity * SuspensionLength / SuspensionStrength;
+    public float RestCompression => TotalGravity * SuspensionLength / SuspensionStrength;
 
     public const float Gravity = 9.81f;
 
@@ -74,6 +84,7 @@ public sealed class SimVehicleParams
             WheelRadius = wheelRadius,
             WheelBase = wheelBase,
             DragHalfRhoCdA = ComputeDrag(vs),
+            ExtraGravityY = vs.AerodynamicsExtraGravity.Y,
         };
     }
 
@@ -91,9 +102,11 @@ public sealed class SimVehicleParams
         float wheelRadius,
         float wheelBase,
         float dragHalfRhoCdA,
-        float rearMuScale = 1f)
+        float rearMuScale = 1f,
+        float extraGravityY = 0f)
         => new()
         {
+            ExtraGravityY = extraGravityY,
             MassKg = massKg,
             SteeringMaxAngleRad = steeringMaxAngleRad,
             SteeringFullSpeedLimit = steeringFullSpeedLimit,

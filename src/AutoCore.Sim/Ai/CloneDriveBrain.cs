@@ -42,6 +42,11 @@ public sealed class CloneDriveBrain
     /// </summary>
     public bool Hold { get; set; }
 
+    private bool _catchUpRequested;
+
+    /// <summary>/cloneteleport: jump behind the player on the next step.</summary>
+    public void RequestCatchUp() => _catchUpRequested = true;
+
     /// <summary>Set when the last Step teleported the car (entity must publish via SetPosition).</summary>
     public bool TeleportedThisStep { get; private set; }
 
@@ -67,13 +72,34 @@ public sealed class CloneDriveBrain
         // Hull tops are drivable ground (bridges/decks/ramps); see CompositeGround.
         ground = CompositeGround.Wrap(ground, Obstacles, _car.Position.Y);
 
+        // Teleport only on explicit request (/cloneteleport) — the automatic distance leash
+        // was removed on user request 2026-08-09.
+        if (_catchUpRequested)
+        {
+            _catchUpRequested = false;
+            CatchUpTeleport(playerPosition, playerYaw, ground);
+            return;
+        }
+
         if (Hold)
         {
-            var holdSpeed = MathF.Sqrt(
-                _car.Velocity.X * _car.Velocity.X + _car.Velocity.Z * _car.Velocity.Z);
-            var holdInputs = holdSpeed > 0.4f
-                ? new DriveInputs(-0.8f, 0f, false)
-                : new DriveInputs(0f, 0f, false);
+            // Brake against the SIGNED forward speed: a plain negative throttle becomes
+            // reverse drive once speed crosses zero, which live sent the "stopped" clone
+            // backing up forever. Inside the deadband, park with direct damping.
+            var sin = MathF.Sin(_car.Yaw);
+            var cos = MathF.Cos(_car.Yaw);
+            var fwdSpeed = _car.Velocity.X * sin + _car.Velocity.Z * cos;
+            DriveInputs holdInputs;
+            if (fwdSpeed > 0.5f)
+                holdInputs = new DriveInputs(-0.8f, 0f, false);
+            else if (fwdSpeed < -0.5f)
+                holdInputs = new DriveInputs(0.8f, 0f, false);
+            else
+            {
+                holdInputs = new DriveInputs(0f, 0f, false);
+                _car.ApplyParkingDamping(dt);
+            }
+
             LastInputs = holdInputs;
             _car.Advance(dt, holdInputs, ground);
             return;
@@ -82,11 +108,6 @@ public sealed class CloneDriveBrain
         var toPlayerX = playerPosition.X - _car.Position.X;
         var toPlayerZ = playerPosition.Z - _car.Position.Z;
         var separation = MathF.Sqrt(toPlayerX * toPlayerX + toPlayerZ * toPlayerZ);
-        if (separation > _tuning.CatchUpDistance)
-        {
-            CatchUpTeleport(playerPosition, playerYaw, ground);
-            return;
-        }
 
         var playerSpeed = MathF.Sqrt(
             playerVelocity.X * playerVelocity.X + playerVelocity.Z * playerVelocity.Z);

@@ -196,7 +196,7 @@ public class CloneDriveBrainClosedLoopTests
     }
 
     [TestMethod]
-    public void Hold_StopsAndStaysPut_EvenBeyondCatchUpRange()
+    public void Hold_BrakesToAStandstill_NeverReversesAway()
     {
         var brain = new CloneDriveBrain(Params(), new CloneAiTuning());
         brain.Reset(new Vector3(0f, 0.5f, 0f), yaw: 0f);
@@ -204,38 +204,46 @@ public class CloneDriveBrainClosedLoopTests
         brain.Hold = true;
 
         var player = new Vector3(0f, 0f, 30f);
-        for (var i = 0; i < 200; i++) // 10 s; player ends up 1 km away
-        {
-            player = new Vector3(player.X, player.Y, player.Z + 5f);
-            brain.Step(player, new Vector3(0f, 0f, 20f), 0f, Flat, dt: 0.05f);
-        }
+        for (var i = 0; i < 100; i++) // 5 s to stop
+            brain.Step(player, default, 0f, Flat, dt: 0.05f);
+
+        // Live 2026-08-09: the hold brake input became reverse throttle at 0 and the clone
+        // backed up forever. It must come to a genuine standstill.
+        var restPosition = brain.Car.Position;
+        for (var i = 0; i < 100; i++) // 5 more seconds parked
+            brain.Step(player, default, 0f, Flat, dt: 0.05f);
 
         var speed = MathF.Sqrt(
             brain.Car.Velocity.X * brain.Car.Velocity.X + brain.Car.Velocity.Z * brain.Car.Velocity.Z);
-        Assert.IsTrue(speed < 0.5f, $"held clone must brake to a stop, speed={speed}");
-        Assert.IsTrue(brain.Car.Position.Z < 40f, $"held clone must stay put, z={brain.Car.Position.Z}");
-        Assert.IsFalse(brain.TeleportedThisStep, "hold must suppress catch-up teleports");
-
-        brain.Hold = false;
-        for (var i = 0; i < 40; i++)
-            brain.Step(player, default, 0f, Flat, dt: 0.05f);
-        Assert.IsTrue(brain.TeleportedThisStep || brain.Car.Position.Z > 45f,
-            "releasing hold must resume following (teleport at this range)");
+        Assert.IsTrue(speed < 0.3f, $"held clone must be stopped, speed={speed}");
+        Assert.IsTrue(restPosition.Dist(brain.Car.Position) < 0.5f,
+            $"held clone crept {restPosition.Dist(brain.Car.Position)} m while parked");
+        Assert.IsTrue(brain.Car.Position.Z is > 0f and < 25f,
+            $"clone must not have reversed away, z={brain.Car.Position.Z}");
     }
 
     [TestMethod]
-    public void HugeSeparation_TriggersCatchUpTeleport()
+    public void HugeSeparation_NoAutoTeleport_ManualRequestWorks()
     {
         var brain = new CloneDriveBrain(Params(), new CloneAiTuning());
-        var player = new Vector3(1000f, 0f, 1000f);
-        brain.Reset(new Vector3(0f, 0.8f, 0f), yaw: 0f);
+        brain.Reset(new Vector3(0f, 0.5f, 0f), yaw: 0f);
+        var player = new Vector3(1000f, 0f, 1000f); // far beyond the old 250 m leash
 
-        brain.Step(player, default, 0f, Flat, dt: 0.05f);
+        for (var i = 0; i < 40; i++)
+            brain.Step(player, default, 0f, Flat, dt: 0.05f);
 
         var dx = brain.Car.Position.X - player.X;
         var dz = brain.Car.Position.Z - player.Z;
-        Assert.IsTrue(MathF.Sqrt(dx * dx + dz * dz) < 30f,
-            "beyond CatchUpDistance the brain must teleport the clone near the player");
-        Assert.IsTrue(brain.TeleportedThisStep, "teleport must be flagged so the entity uses SetPosition");
+        Assert.IsTrue(MathF.Sqrt(dx * dx + dz * dz) > 500f,
+            "distance alone must no longer teleport the clone (user request 2026-08-09)");
+
+        brain.RequestCatchUp();
+        brain.Step(player, default, 0f, Flat, dt: 0.05f);
+
+        dx = brain.Car.Position.X - player.X;
+        dz = brain.Car.Position.Z - player.Z;
+        Assert.IsTrue(MathF.Sqrt(dx * dx + dz * dz) < 30f, "manual /cloneteleport must jump to the player");
+        Assert.IsTrue(brain.TeleportedThisStep);
     }
+
 }

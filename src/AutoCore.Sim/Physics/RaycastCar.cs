@@ -83,6 +83,18 @@ public sealed class RaycastCar
         YawRate = 0f;
     }
 
+    /// <summary>
+    /// Parking brake for the held state: bleeds planar momentum to a true standstill. Plain
+    /// zero-throttle only coasts (drag ∝ v²), and a brake input becomes reverse throttle at
+    /// 0 — which live sent a "stopped" clone backing up forever.
+    /// </summary>
+    internal void ApplyParkingDamping(float dt)
+    {
+        var decay = MathF.Max(0f, 1f - 4f * dt);
+        Velocity = new Vector3(Velocity.X * decay, Velocity.Y, Velocity.Z * decay);
+        YawRate *= decay;
+    }
+
     public void Advance(float frameDt, DriveInputs inputs, TerrainContactPlane.HeightSample ground)
     {
         if (!float.IsFinite(frameDt) || frameDt <= 0f)
@@ -117,7 +129,7 @@ public sealed class RaycastCar
         const float GroundContactMargin = 0.6f; // suspension travel window before airborne
         Grounded = hasGround && heightAboveGround < GroundContactMargin;
 
-        var newVelY = Velocity.Y - SimVehicleParams.Gravity * dt;
+        var newVelY = Velocity.Y - _params.TotalGravity * dt;
         if (Grounded)
         {
             // Bidirectional within the contact window: compressed below rest pushes up, extended
@@ -134,7 +146,12 @@ public sealed class RaycastCar
             var damp = closing >= 0f ? _params.SuspensionDampCompression : _params.SuspensionDampExtension;
             var suspensionAccel = _params.SuspensionStrength * (compression / _params.SuspensionLength)
                                   - damp * closing * -1f; // damping opposes motion: −damp·(dY/dt)
-            suspensionAccel = MathF.Max(suspensionAccel, -2f * SimVehicleParams.Gravity);
+            // Both directions capped: the down-pull cap keeps jump exits ballistic; the UP cap
+            // (new, live 2026-08-09 "slidey/snappy on decks") stops hull-seam height steps from
+            // spiking the spring — the body eases over seams in a few substeps instead of
+            // snapping.
+            suspensionAccel = Math.Clamp(
+                suspensionAccel, -2f * _params.TotalGravity, 3f * _params.TotalGravity);
             newVelY += suspensionAccel * dt;
 
             // Anti-sink (0.4-suspension.md): position-only correction, never below terrain.
@@ -169,19 +186,19 @@ public sealed class RaycastCar
                 : 1f;
             // Retail's low-speed boost multiplies wheel μ, so it raises the lateral grip
             // budget too — without it the clone cornered far wider than the player.
-            var muBudget = _params.MuMax * SimVehicleParams.Gravity * boost;
+            var muBudget = _params.MuMax * _params.TotalGravity * boost;
             var rearGrip = inputs.Handbrake ? 0.5f : 1f;
 
             // Longitudinal demand: drive toward the governor, brake against motion.
             var throttle = Math.Clamp(inputs.Throttle, -1f, 1f);
             if (throttle > 0f && fwdSpeed < _params.TopSpeed)
-                accelFwd = throttle * _params.MuBase * SimVehicleParams.Gravity * MathF.Min(boost, 2f);
+                accelFwd = throttle * _params.MuBase * _params.TotalGravity * MathF.Min(boost, 2f);
             else if (throttle < 0f)
             {
                 if (fwdSpeed > 0.3f)
-                    accelFwd = throttle * _params.MuMax * SimVehicleParams.Gravity * boost; // brake
+                    accelFwd = throttle * _params.MuMax * _params.TotalGravity * boost; // brake
                 else
-                    accelFwd = throttle * _params.MuBase * SimVehicleParams.Gravity; // reverse
+                    accelFwd = throttle * _params.MuBase * _params.TotalGravity; // reverse
             }
 
             // Yaw follows the kinematic bicycle toward v·tan(δ)/L, limited by lateral grip.
