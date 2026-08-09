@@ -64,6 +64,9 @@ public sealed class CloneDriveBrain
     {
         TeleportedThisStep = false;
 
+        // Hull tops are drivable ground (bridges/decks/ramps); see CompositeGround.
+        ground = CompositeGround.Wrap(ground, Obstacles, _car.Position.Y);
+
         if (Hold)
         {
             var holdSpeed = MathF.Sqrt(
@@ -116,13 +119,22 @@ public sealed class CloneDriveBrain
         var prePosition = _car.Position;
         _car.Advance(dt, inputs, ground);
 
-        // Hard block: whatever the feelers missed, the body may not enter a hull. Revert the
+        // Hard block: whatever the feelers missed, the body may not enter a hull. The probe
+        // sphere sits ABOVE step-up height so decks the car stands on / ledges it can climb
+        // (CompositeGround handles those) never trigger — only genuine walls do. Revert the
         // planar move and kill speed — the stuck detector then drives the reverse-out.
-        if (Obstacles != null && Obstacles.SphereOverlap(_car.Position, HardBlockRadius))
-            _car.BlockAt(prePosition);
+        if (Obstacles != null)
+        {
+            var probe = new Vector3(
+                _car.Position.X,
+                _car.Position.Y + CompositeGround.StepUpHeight + HardBlockRadius,
+                _car.Position.Z);
+            if (Obstacles.SphereOverlap(probe, HardBlockRadius))
+                _car.BlockAt(prePosition);
+        }
     }
 
-    private const float HardBlockRadius = 0.9f;
+    private const float HardBlockRadius = 0.85f;
 
     /// <summary>
     /// Three forward feelers (center, ±25°). Side hits bias the steering away; a close center
@@ -143,9 +155,9 @@ public sealed class CloneDriveBrain
         var throttle = inputs.Throttle;
         const float feelerAngle = 25f * MathF.PI / 180f;
 
-        var centerHit = Feel(world, origin, _car.Yaw, feelerLength, out var centerDist);
-        var leftHit = Feel(world, origin, _car.Yaw - feelerAngle, feelerLength, out var leftDist);
-        var rightHit = Feel(world, origin, _car.Yaw + feelerAngle, feelerLength, out var rightDist);
+        var centerHit = Feel(world, origin, _car.Position.Y, _car.Yaw, feelerLength, out var centerDist);
+        var leftHit = Feel(world, origin, _car.Position.Y, _car.Yaw - feelerAngle, feelerLength, out var leftDist);
+        var rightHit = Feel(world, origin, _car.Position.Y, _car.Yaw + feelerAngle, feelerLength, out var rightDist);
 
         if (leftHit || rightHit || centerHit)
         {
@@ -187,10 +199,33 @@ public sealed class CloneDriveBrain
         return new DriveInputs(throttle, steer, inputs.Handbrake);
     }
 
-    private static bool Feel(StaticCollisionWorld world, Vector3 origin, float yaw, float length, out float distance)
+    private static bool Feel(StaticCollisionWorld world, Vector3 origin, float carY, float yaw, float length, out float distance)
     {
         var direction = new Vector3(MathF.Sin(yaw), 0f, MathF.Cos(yaw));
-        return world.Raycast(origin, direction, length, out distance, out _);
+        if (!world.Raycast(origin, direction, length, out distance, out var normal))
+            return false;
+
+        // Walkable-facing surfaces (ramps, bridge-deck slopes) are drivable ground, not
+        // obstacles — steering away from them kept the clone off every bridge approach.
+        if (normal.Y > 0.6f)
+            return false;
+
+        // Wall-facing hit, but climbable? A ledge whose top just past the hit sits within
+        // step-up height (low bridge decks, kerbs) is ground CompositeGround will lift us
+        // onto — only report obstacles the car genuinely cannot mount.
+        var probeX = origin.X + direction.X * (distance + 0.6f);
+        var probeZ = origin.Z + direction.Z * (distance + 0.6f);
+        var probeTop = carY + CompositeGround.StepUpHeight;
+        if (world.Raycast(new Vector3(probeX, probeTop, probeZ), new Vector3(0f, -1f, 0f),
+                CompositeGround.StepUpHeight + 2f, out var downDist, out var downNormal)
+            && downNormal.Y > 0.3f)
+        {
+            var ledgeTop = probeTop - downDist;
+            if (ledgeTop - carY <= CompositeGround.StepUpHeight)
+                return false; // climbable — not an obstacle
+        }
+
+        return true;
     }
 
     private DriveInputs FollowInputs(Vector3 playerPosition, Vector3 playerVelocity, float separation)
