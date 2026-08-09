@@ -1,0 +1,6 @@
+*.user
+*.suo
+/TNL.NET/bin
+/TNL.NET/obj
+
+/.vs
