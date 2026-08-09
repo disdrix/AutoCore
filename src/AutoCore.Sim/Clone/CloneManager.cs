@@ -153,9 +153,19 @@ public sealed class CloneManager
         return brain;
     }
 
-    /// <summary>Despawns clones whose owner is gone or changed maps. Called every sector tick.</summary>
+    /// <summary>Think phase runs in parallel above this fleet size (publish stays serial).</summary>
+    public const int ParallelThinkThreshold = 8;
+
+    private readonly List<CloneHandle> _aliveScratch = new();
+
+    /// <summary>
+    /// Per sector tick: lifecycle checks (serial), think phase — brain + physics against
+    /// read-only world state — parallel at fleet scale, then a serial publish phase that
+    /// mutates shared game state (pose, ghosts, ram damage). See DeferredWork.cs scale-out.
+    /// </summary>
     public void Tick(long nowMs, float dt)
     {
+        _aliveScratch.Clear();
         foreach (var (ownerCoid, handle) in _clones)
         {
             // Alive only while owner and clone share a live map. Both-null is NOT alive: the
@@ -165,42 +175,70 @@ public sealed class CloneManager
             if (ownerMap != null && ownerMap == handle.Clone.Map)
             {
                 // Hull world attaches whenever the lazy background build completes; clones run
-                // terrain-only until then (and forever if the build failed).
+                // terrain-only until then (and forever if the build failed). Kept serial: it
+                // touches the lazy-build table and may kick a SafeTask.
                 handle.Brain.Obstacles ??= _collisionWorlds.GetOrRequest(ownerMap);
-                MoveClone(handle, dt);
+                _aliveScratch.Add(handle);
                 continue;
             }
 
             if (_clones.TryRemove(ownerCoid, out var removed))
                 CloneSpawner.Despawn(removed.Clone);
         }
-    }
 
-    private static void MoveClone(CloneHandle handle, float dt)
-    {
-        var heightfield = handle.Clone.Map?.MapData?.Heightfield;
-        TerrainContactPlane.HeightSample sample;
-        if (heightfield != null)
+        if (_aliveScratch.Count >= ParallelThinkThreshold)
         {
-            sample = heightfield.TrySample;
+            var dtLocal = dt;
+            Parallel.For(0, _aliveScratch.Count, i => ThinkClone(_aliveScratch[i], dtLocal));
         }
         else
         {
-            // No heightfield (test maps): flat plane pinned once in SIM space. Never derive it
-            // from the published entity Y — that includes the ride-height offset and feeds back
-            // as ever-rising ground.
-            handle.FlatFallbackY ??= handle.Brain.Car.Position.Y;
-            var flatY = handle.FlatFallbackY.Value;
-            sample = (float x, float z, out float y) => { y = flatY; return true; };
+            foreach (var handle in _aliveScratch)
+                ThinkClone(handle, dt);
+        }
+
+        foreach (var handle in _aliveScratch)
+            PublishClone(handle, dt);
+    }
+
+    /// <summary>Parallel-safe: touches only the handle's brain/car and read-only world state.</summary>
+    private static void ThinkClone(CloneHandle handle, float dt)
+    {
+        // Ground delegate cached per handle (a fresh method-group/closure per tick was
+        // measurable GC load at fleet scale).
+        var sample = handle.GroundSample;
+        if (sample == null)
+        {
+            var heightfield = handle.Clone.Map?.MapData?.Heightfield;
+            if (heightfield != null)
+            {
+                sample = heightfield.TrySample;
+            }
+            else
+            {
+                // No heightfield (test maps): flat plane pinned once in SIM space. Never derive
+                // it from the published entity Y — that includes the ride-height offset and
+                // feeds back as ever-rising ground.
+                var flatY = handle.Brain.Car.Position.Y;
+                sample = (float x, float z, out float y) => { y = flatY; return true; };
+            }
+
+            handle.GroundSample = sample;
         }
 
         var owner = handle.Owner.CurrentVehicle;
         var ownerForward = TerrainContactPlane.ForwardFromQuaternion(owner.Rotation);
         var ownerYaw = MathF.Atan2(ownerForward.X, ownerForward.Z);
 
-        var brain = handle.Brain;
-        brain.Step(owner.Position, owner.Velocity, ownerYaw, sample, dt);
+        handle.Brain.Step(owner.Position, owner.Velocity, ownerYaw, sample, dt);
+    }
 
+    /// <summary>Serial: mutates shared game state (entity pose, ghost masks, ram damage).</summary>
+    private static void PublishClone(CloneHandle handle, float dt)
+    {
+        var owner = handle.Owner.CurrentVehicle;
+        var brain = handle.Brain;
+        var sample = handle.GroundSample;
         var car = brain.Car;
 
         // Fully data-driven height (user decision 2026-08-09 — no owner calibration): the sim
@@ -227,14 +265,15 @@ public sealed class CloneManager
         {
             handle.DiagCountdown = 2f;
             var terrainAtClone = 0f;
-            heightfield?.TrySample(car.Position.X, car.Position.Z, out terrainAtClone);
+            sample(car.Position.X, car.Position.Z, out terrainAtClone);
             Logger.WriteLog(LogType.Debug,
                 $"CloneDiag: ownerY={owner.Position.Y:F2} cloneSimY={car.Position.Y:F2} " +
                 $"terrainAtClone={terrainAtClone:F2} rideHeight={rideHeight:F2} " +
                 $"trim={HeightTrim:F2} mode={handle.Brain.Mode} speed={PlanarSpeed(car):F1}");
         }
+        // NOTE: heightOffset already includes HeightTrim (double-add fixed 2026-08-09).
         var publishPosition = new AutoCore.Game.Structures.Vector3(
-            car.Position.X, car.Position.Y + heightOffset + HeightTrim, car.Position.Z);
+            car.Position.X, car.Position.Y + heightOffset, car.Position.Z);
 
         if (brain.TeleportedThisStep)
         {
@@ -291,8 +330,8 @@ public sealed class CloneHandle
     /// <summary>Physics-driven follow/orbit AI for this clone.</summary>
     public CloneDriveBrain Brain { get; }
 
-    /// <summary>Sim-space plane height for maps without a heightfield; pinned on first tick.</summary>
-    public float? FlatFallbackY { get; set; }
+    /// <summary>Cached terrain sampler (heightfield delegate or pinned flat plane).</summary>
+    public TerrainContactPlane.HeightSample GroundSample { get; set; }
 
     /// <summary>Seconds until the next CloneDiag log line.</summary>
     public float DiagCountdown { get; set; }

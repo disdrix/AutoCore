@@ -31,11 +31,6 @@ public class SimPerfBenchmarkTests
     private static readonly int[] FleetSizes = { 1, 10, 100, 250, 500, 1000 };
 
     [TestMethod]
-    [Ignore("Manual perf benchmark against the real client install (~3 min). Baseline captured " +
-            "2026-08-09 (24-core box, single-threaded): per-vehicle 8-79 us/tick depending on map " +
-            "hull density; 1000 vehicles = 17% (scrapvalley) / 84% (militiabase) / 147% (malachite) " +
-            "of the 50 ms budget; allocations 5-15 KB per vehicle-tick (closure garbage — the " +
-            "first optimization target). Remove [Ignore] to re-measure.")]
     public void Benchmark_FleetTickCost_OnRealMaps()
     {
         if (!Directory.Exists(InstallPath))
@@ -143,9 +138,18 @@ public class SimPerfBenchmarkTests
                 var msPerTick = sw.Elapsed.TotalMilliseconds / measured;
                 var usPerVehicleTick = msPerTick * 1000.0 / fleet;
                 var bytesPerVehicleTick = (allocAfter - allocBefore) / (double)(measured * (long)fleet);
+
+                // Parallel think phase (mirrors CloneManager.Tick above ParallelThinkThreshold).
+                var swPar = Stopwatch.StartNew();
+                for (var t = 0; t < measured; t++)
+                    Parallel.For(0, fleet, i => brains[i].Step(player, default, 0f, ground, 0.05f));
+                swPar.Stop();
+                var msPerTickPar = swPar.Elapsed.TotalMilliseconds / measured;
+
                 Console.WriteLine(
                     $"fleet={fleet,5}  tick={msPerTick,8:F3} ms  perVehicle={usPerVehicleTick,7:F1} us  " +
-                    $"alloc={bytesPerVehicleTick,7:F0} B/veh-tick  budgetUse={msPerTick / 50.0 * 100.0,5:F1}%");
+                    $"alloc={bytesPerVehicleTick,7:F0} B/veh-tick  budgetUse={msPerTick / 50.0 * 100.0,5:F1}%  " +
+                    $"parTick={msPerTickPar,7:F3} ms ({msPerTick / Math.Max(msPerTickPar, 0.0001),4:F1}x)");
             }
         }
     }

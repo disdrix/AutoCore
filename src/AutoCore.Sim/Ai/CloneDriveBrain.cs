@@ -16,6 +16,7 @@ public sealed class CloneDriveBrain
     private readonly CloneAiTuning _tuning;
     private readonly CloneAiStateMachine _stateMachine;
     private readonly StuckDetector _stuckDetector = new();
+    private readonly CompositeGround.Sampler _groundSampler = new();
     private readonly RaycastCar _car;
     private float _recoverRemaining;
     private float _recoverSteer;
@@ -246,8 +247,13 @@ public sealed class CloneDriveBrain
     {
         TeleportedThisStep = false;
 
-        // Hull tops are drivable ground (bridges/decks/ramps); see CompositeGround.
-        ground = CompositeGround.Wrap(ground, Obstacles, _car.Position.Y);
+        // Hull tops are drivable ground (bridges/decks/ramps); see CompositeGround. The
+        // sampler instance is reused across steps (no per-step closure allocation).
+        if (Obstacles != null)
+        {
+            _groundSampler.Update(ground, Obstacles, _car.Position.Y);
+            ground = _groundSampler.Delegate;
+        }
 
         // Teleport only on explicit request (/cloneteleport) — the automatic distance leash
         // was removed on user request 2026-08-09.

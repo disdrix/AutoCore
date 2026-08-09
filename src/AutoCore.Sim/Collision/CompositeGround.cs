@@ -29,8 +29,41 @@ public static class CompositeGround
         if (hulls == null)
             return terrain;
 
-        return (float x, float z, out float y) =>
+        var sampler = new Sampler();
+        sampler.Update(terrain, hulls, referenceY);
+        return sampler.Delegate;
+    }
+
+    /// <summary>
+    /// Reusable composite sampler: one instance per brain, fields updated per step. The old
+    /// per-step closure was a measurable share of the 5-15 KB/vehicle-tick GC load.
+    /// </summary>
+    public sealed class Sampler
+    {
+        private TerrainContactPlane.HeightSample _terrain;
+        private StaticCollisionWorld _hulls;
+        private float _referenceY;
+
+        public Sampler()
         {
+            Delegate = Sample;
+        }
+
+        public TerrainContactPlane.HeightSample Delegate { get; }
+
+        public void Update(TerrainContactPlane.HeightSample terrain, StaticCollisionWorld hulls, float referenceY)
+        {
+            _terrain = terrain;
+            _hulls = hulls;
+            _referenceY = referenceY;
+        }
+
+        private bool Sample(float x, float z, out float y)
+        {
+            var terrain = _terrain;
+            var hulls = _hulls;
+            var referenceY = _referenceY;
+
             var hasTerrain = terrain(x, z, out var terrainY);
             if (!hasTerrain)
                 terrainY = float.MinValue;
@@ -52,6 +85,6 @@ public static class CompositeGround
 
             y = hasTerrain ? terrainY : 0f;
             return hasTerrain;
-        };
+        }
     }
 }

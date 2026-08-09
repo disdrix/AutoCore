@@ -63,6 +63,33 @@ public sealed class StaticCollisionWorld
         out float distance, out Vector3 normal)
         => Raycast(origin, direction, maxDistance, out distance, out normal, out _);
 
+    // Per-thread visited-stamp dedup: queries run in the sector tick AND (scale-out) from a
+    // parallel think phase, so scratch is [ThreadStatic]. Baseline profiling showed the old
+    // per-call HashSet + iterator allocated 5-15 KB per vehicle-tick — the dominant GC load.
+    [ThreadStatic] private static int[] _visitStamps;
+    [ThreadStatic] private static int _visitGeneration;
+
+    private static int[] PrepareStamps(int instanceCount, out int generation)
+    {
+        var stamps = _visitStamps;
+        if (stamps == null || stamps.Length < instanceCount)
+        {
+            stamps = new int[Math.Max(instanceCount, 256)];
+            _visitStamps = stamps;
+            _visitGeneration = 0;
+        }
+
+        generation = ++_visitGeneration;
+        if (generation == int.MaxValue)
+        {
+            Array.Clear(stamps);
+            _visitGeneration = 1;
+            generation = 1;
+        }
+
+        return stamps;
+    }
+
     public bool Raycast(Vector3 origin, Vector3 direction, float maxDistance,
         out float distance, out Vector3 normal, out string hitLabel)
     {
@@ -72,18 +99,39 @@ public sealed class StaticCollisionWorld
         if (!_built || _instances.Count == 0 || maxDistance <= 0f)
             return false;
 
+        var stamps = PrepareStamps(_instances.Count, out var generation);
+        var endX = origin.X + direction.X * maxDistance;
+        var endZ = origin.Z + direction.Z * maxDistance;
+        var c0 = (int)MathF.Floor(MathF.Min(origin.X, endX) / CellSize);
+        var c1 = (int)MathF.Floor(MathF.Max(origin.X, endX) / CellSize);
+        var r0 = (int)MathF.Floor(MathF.Min(origin.Z, endZ) / CellSize);
+        var r1 = (int)MathF.Floor(MathF.Max(origin.Z, endZ) / CellSize);
+
         var found = false;
-        foreach (var index in CandidatesAlongRay(origin, direction, maxDistance))
+        for (var c = c0; c <= c1; c++)
         {
-            var inst = _instances[index];
-            if (!inst.Raycast(origin, direction, maxDistance, out var d, out var n))
-                continue;
-            if (d < distance)
+            for (var r = r0; r <= r1; r++)
             {
-                distance = d;
-                normal = n;
-                hitLabel = inst.Label;
-                found = true;
+                if (!_grid.TryGetValue((c, r), out var list))
+                    continue;
+                for (var k = 0; k < list.Count; k++)
+                {
+                    var index = list[k];
+                    if (stamps[index] == generation)
+                        continue;
+                    stamps[index] = generation;
+
+                    var inst = _instances[index];
+                    if (!inst.Raycast(origin, direction, maxDistance, out var d, out var n))
+                        continue;
+                    if (d < distance)
+                    {
+                        distance = d;
+                        normal = n;
+                        hitLabel = inst.Label;
+                        found = true;
+                    }
+                }
             }
         }
 
@@ -99,20 +147,24 @@ public sealed class StaticCollisionWorld
         if (!_built)
             return false;
 
+        var stamps = PrepareStamps(_instances.Count, out var generation);
         var c0 = (int)MathF.Floor((center.X - radius) / CellSize);
         var c1 = (int)MathF.Floor((center.X + radius) / CellSize);
         var r0 = (int)MathF.Floor((center.Z - radius) / CellSize);
         var r1 = (int)MathF.Floor((center.Z + radius) / CellSize);
-        var seen = new HashSet<int>();
         for (var c = c0; c <= c1; c++)
         {
             for (var r = r0; r <= r1; r++)
             {
                 if (!_grid.TryGetValue((c, r), out var list))
                     continue;
-                foreach (var index in list)
+                for (var k = 0; k < list.Count; k++)
                 {
-                    if (seen.Add(index) && _instances[index].SphereOverlap(center, radius))
+                    var index = list[k];
+                    if (stamps[index] == generation)
+                        continue;
+                    stamps[index] = generation;
+                    if (_instances[index].SphereOverlap(center, radius))
                     {
                         hitLabel = _instances[index].Label;
                         return true;
@@ -122,32 +174,6 @@ public sealed class StaticCollisionWorld
         }
 
         return false;
-    }
-
-    /// <summary>Distinct instance indices in every grid cell the ray's AABB touches.</summary>
-    private IEnumerable<int> CandidatesAlongRay(Vector3 origin, Vector3 direction, float maxDistance)
-    {
-        var endX = origin.X + direction.X * maxDistance;
-        var endZ = origin.Z + direction.Z * maxDistance;
-        var c0 = (int)MathF.Floor(MathF.Min(origin.X, endX) / CellSize);
-        var c1 = (int)MathF.Floor(MathF.Max(origin.X, endX) / CellSize);
-        var r0 = (int)MathF.Floor(MathF.Min(origin.Z, endZ) / CellSize);
-        var r1 = (int)MathF.Floor(MathF.Max(origin.Z, endZ) / CellSize);
-
-        var seen = new HashSet<int>();
-        for (var c = c0; c <= c1; c++)
-        {
-            for (var r = r0; r <= r1; r++)
-            {
-                if (!_grid.TryGetValue((c, r), out var list))
-                    continue;
-                foreach (var index in list)
-                {
-                    if (seen.Add(index))
-                        yield return index;
-                }
-            }
-        }
     }
 
     private readonly struct Instance
