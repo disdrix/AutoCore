@@ -127,6 +127,28 @@ public class CloneSpawnerTests
         Assert.IsTrue(clone.Position.Dist(new Vector3(0, 0, 0)) > 100f);
     }
 
+    /// <summary>
+    /// Live repro 2026-08-08: a player ornament materializes as a bare SimpleObject, which has
+    /// no parameterless ctor — Activator.CreateInstance(GetType()) threw MissingMethodException
+    /// and killed the whole /clone command.
+    /// </summary>
+    [TestMethod]
+    public void Spawn_BareSimpleObjectEquipment_DoesNotThrowAndIsCopied()
+    {
+        var map = CreateFieldMap(8305);
+        var character = DrivingCharacter(map);
+        AssetManagerTestHelper.RegisterCloneBase(FrontWeaponCbid, CloneBaseObjectType.Item);
+
+        var ornament = new SimpleObject(AutoCore.Game.Entities.GraphicsObjectType.Graphics);
+        Equip(character.CurrentVehicle, map, VehicleEquipmentSlot.Ornament, ornament, FrontWeaponCbid);
+
+        var clone = CloneSpawner.Spawn(character);
+
+        var copied = clone.GetEquippedItem(VehicleEquipmentSlot.Ornament);
+        Assert.IsNotNull(copied, "ornament must be copied, not crash the spawn");
+        Assert.AreEqual(FrontWeaponCbid, copied.CBID);
+    }
+
     [TestMethod]
     public void Spawn_DriverCreature_IsAttachedAsOwner()
     {

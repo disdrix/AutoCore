@@ -110,7 +110,7 @@ internal static class CloneSpawner
             if (slot == VehicleEquipmentSlot.WheelSet || item == null || item.CBID <= 0)
                 continue;
 
-            var copy = (SimpleObject)Activator.CreateInstance(item.GetType())!;
+            var copy = CreateCopyInstance(slot, item);
             AssignMapNpcIdentity(map, copy);
             copy.LoadCloneBase(item.CBID);
             copy.SetupCBFields();
@@ -122,6 +122,22 @@ internal static class CloneSpawner
             }
         }
     }
+
+    /// <summary>
+    /// Fresh instance for an equipment copy, keyed by slot. Ornament/race-item slots hold bare
+    /// SimpleObjects, which have no parameterless ctor — Activator.CreateInstance(GetType())
+    /// crashed live on an equipped ornament (MissingMethodException), so construct explicitly.
+    /// </summary>
+    private static SimpleObject CreateCopyInstance(VehicleEquipmentSlot slot, SimpleObject source)
+        => slot switch
+        {
+            VehicleEquipmentSlot.Armor => new Armor(),
+            VehicleEquipmentSlot.PowerPlant => new PowerPlant(),
+            VehicleEquipmentSlot.WheelSet => new WheelSet(),
+            VehicleEquipmentSlot.WeaponMelee or VehicleEquipmentSlot.WeaponFront
+                or VehicleEquipmentSlot.WeaponTurret or VehicleEquipmentSlot.WeaponRear => new Weapon(),
+            _ => new SimpleObject(source.ObjectType),
+        };
 
     /// <summary>
     /// Driver creature for the client HBAIDriver contract (level/faction chain); the clone is

@@ -1,6 +1,7 @@
 using AutoCore.Game.Chat;
 using AutoCore.Game.Entities;
 using AutoCore.Sim.Clone;
+using AutoCore.Utils;
 
 namespace AutoCore.Sim;
 
@@ -17,7 +18,23 @@ public sealed class SimHost
 
     internal CloneManager CloneManager => _cloneManager;
 
-    public string ToggleClone(Character character) => _cloneManager.Toggle(character);
+    /// <summary>
+    /// Boundary catch (repo exception-safety rules): a spawn failure on live data must degrade
+    /// to a chat message, not abort the inbound packet handler (seen live 2026-08-08 with an
+    /// unconstructible equipped ornament).
+    /// </summary>
+    public string ToggleClone(Character character)
+    {
+        try
+        {
+            return _cloneManager.Toggle(character);
+        }
+        catch (Exception ex)
+        {
+            Logger.WriteException(LogType.Error, "SimHost.ToggleClone", ex);
+            return "Clone failed — see server log.";
+        }
+    }
 
     public void Tick(long nowMs, float dt) => _cloneManager.Tick(nowMs, dt);
 
