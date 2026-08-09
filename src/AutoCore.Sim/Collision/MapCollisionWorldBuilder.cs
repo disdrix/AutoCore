@@ -59,13 +59,15 @@ public sealed class MapCollisionWorldBuilder
                 continue;
             }
 
+            var label = $"{_physicsNameByCbid(template.CBID)}#{template.COID}";
             foreach (var hull in hulls)
             {
                 world.Add(
                     hull,
                     new Vector3(graphics.Location.X, graphics.Location.Y, graphics.Location.Z),
                     graphics.Rotation,
-                    graphics.Scale);
+                    graphics.Scale,
+                    label);
             }
 
             resolved++;

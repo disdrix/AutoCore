@@ -19,6 +19,10 @@ public sealed class StaticCollisionWorld
     public int InstanceCount => _instances.Count;
 
     public void Add(ConvexHull hull, Vector3 position, Quaternion rotation, float scale)
+        => Add(hull, position, rotation, scale, label: null);
+
+    /// <summary>Label identifies the source object in diagnostics (e.g. "physicsName#coid").</summary>
+    public void Add(ConvexHull hull, Vector3 position, Quaternion rotation, float scale, string label)
     {
         ArgumentNullException.ThrowIfNull(hull);
         if (_built)
@@ -26,7 +30,7 @@ public sealed class StaticCollisionWorld
         if (scale <= 0f || !float.IsFinite(scale))
             scale = 1f;
 
-        _instances.Add(new Instance(hull, position, rotation, scale));
+        _instances.Add(new Instance(hull, position, rotation, scale, label));
     }
 
     /// <summary>Freeze and index. Idempotent.</summary>
@@ -57,9 +61,14 @@ public sealed class StaticCollisionWorld
 
     public bool Raycast(Vector3 origin, Vector3 direction, float maxDistance,
         out float distance, out Vector3 normal)
+        => Raycast(origin, direction, maxDistance, out distance, out normal, out _);
+
+    public bool Raycast(Vector3 origin, Vector3 direction, float maxDistance,
+        out float distance, out Vector3 normal, out string hitLabel)
     {
         distance = float.MaxValue;
         normal = default;
+        hitLabel = null;
         if (!_built || _instances.Count == 0 || maxDistance <= 0f)
             return false;
 
@@ -73,6 +82,7 @@ public sealed class StaticCollisionWorld
             {
                 distance = d;
                 normal = n;
+                hitLabel = inst.Label;
                 found = true;
             }
         }
@@ -81,7 +91,11 @@ public sealed class StaticCollisionWorld
     }
 
     public bool SphereOverlap(Vector3 center, float radius)
+        => SphereOverlap(center, radius, out _);
+
+    public bool SphereOverlap(Vector3 center, float radius, out string hitLabel)
     {
+        hitLabel = null;
         if (!_built)
             return false;
 
@@ -99,7 +113,10 @@ public sealed class StaticCollisionWorld
                 foreach (var index in list)
                 {
                     if (seen.Add(index) && _instances[index].SphereOverlap(center, radius))
+                    {
+                        hitLabel = _instances[index].Label;
                         return true;
+                    }
                 }
             }
         }
@@ -138,14 +155,17 @@ public sealed class StaticCollisionWorld
         private readonly ConvexHull _hull;
         private readonly Vector3 _position;
         private readonly float _scale;
+
+        public string Label { get; }
         // Rotation as quaternion components for vector rotate (q v q^-1).
         private readonly float _qx, _qy, _qz, _qw;
 
-        public Instance(ConvexHull hull, Vector3 position, Quaternion rotation, float scale)
+        public Instance(ConvexHull hull, Vector3 position, Quaternion rotation, float scale, string label)
         {
             _hull = hull;
             _position = position;
             _scale = scale;
+            Label = label;
             var len = MathF.Sqrt(
                 rotation.X * rotation.X + rotation.Y * rotation.Y +
                 rotation.Z * rotation.Z + rotation.W * rotation.W);

@@ -82,6 +82,21 @@ public class StaticCollisionWorldTests
     }
 
     [TestMethod]
+    public void Queries_ReportTheHitInstanceLabel()
+    {
+        var world = new StaticCollisionWorld();
+        world.Add(Box(), new Vector3(0f, 0f, 30f), Yaw(0f), 1f, "obj_gen_wall#4711");
+        world.Build();
+
+        Assert.IsTrue(world.Raycast(new Vector3(0f, 0.5f, 0f), new Vector3(0f, 0f, 1f), 50f,
+            out _, out _, out var rayLabel));
+        Assert.AreEqual("obj_gen_wall#4711", rayLabel);
+
+        Assert.IsTrue(world.SphereOverlap(new Vector3(0f, 0.5f, 29.8f), 0.5f, out var sphereLabel));
+        Assert.AreEqual("obj_gen_wall#4711", sphereLabel);
+    }
+
+    [TestMethod]
     public void SphereOverlap_DetectsNearbyInstanceOnly()
     {
         var world = new StaticCollisionWorld();

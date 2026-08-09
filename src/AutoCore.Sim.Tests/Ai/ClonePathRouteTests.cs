@@ -165,6 +165,80 @@ public class ClonePathRouteTests
             "waypoint-advance events must be emitted");
     }
 
+    /// <summary>
+    /// Live trace 2026-08-09 11:30: 30 m/s straight into a corner waypoint, past the turn,
+    /// into a wall. The path speed target must shrink for the turn.
+    /// </summary>
+    [TestMethod]
+    public void SharpCornerAhead_SlowsDownBeforeTheWaypoint()
+    {
+        CloneAiTuning.PathSpeedOverride = 30f;
+        try
+        {
+            var brain = new CloneDriveBrain(Params(), new CloneAiTuning());
+            brain.Reset(new Vector3(0f, 0f, 0f), yaw: 0f);
+            // Right-angle corner at (0,80): approach north, then head east.
+            brain.SetPathRoute(new[]
+            {
+                new Vector3(0f, 0f, 80f),
+                new Vector3(80f, 0f, 80f),
+            }, loop: false);
+
+            var speedNearCorner = float.MaxValue;
+            for (var i = 0; i < 300; i++)
+            {
+                brain.Step(new Vector3(500f, 0f, 500f), default, 0f, Flat, dt: 0.05f);
+                var dz = 80f - brain.Car.Position.Z;
+                if (brain.PathWaypointIndex == 0 && dz is > 0f and < 12f)
+                {
+                    var s = MathF.Sqrt(brain.Car.Velocity.X * brain.Car.Velocity.X
+                        + brain.Car.Velocity.Z * brain.Car.Velocity.Z);
+                    speedNearCorner = MathF.Min(speedNearCorner, s);
+                }
+            }
+
+            Assert.IsTrue(speedNearCorner < 18f,
+                $"must brake for a right-angle corner; was still doing {speedNearCorner} m/s within 12 m");
+        }
+        finally
+        {
+            CloneAiTuning.PathSpeedOverride = null;
+        }
+    }
+
+    /// <summary>
+    /// Live trace: after a hard block the clone sat at full throttle against the wall for
+    /// 2+ s until the generic stuck timer fired. Sustained blocking must trigger recovery
+    /// within about half a second.
+    /// </summary>
+    [TestMethod]
+    public void SustainedHardBlock_TriggersRecoveryFast()
+    {
+        var box = AutoCore.Sim.Collision.CacheHullParser.Parse(File.ReadAllBytes(
+            Path.Combine(AppContext.BaseDirectory, "Fixtures", "hulls", "box.cache")));
+        var world = new AutoCore.Sim.Collision.StaticCollisionWorld();
+        world.Add(box, new Vector3(0f, 0f, 14f), new Quaternion(0f, 0f, 0f, 1f), scale: 10f);
+        world.Build();
+
+        var messages = new List<(int Step, string Message)>();
+        var step = 0;
+        var brain = new CloneDriveBrain(Params(), new CloneAiTuning());
+        brain.DebugLog = m => messages.Add((step, m));
+        brain.Obstacles = world;
+        brain.Reset(new Vector3(0f, 0f, 0f), yaw: 0f);
+        brain.SetPathRoute(new[] { new Vector3(0f, 0f, 40f), new Vector3(0f, 0f, 80f) }, loop: false);
+
+        for (step = 0; step < 200; step++)
+            brain.Step(new Vector3(500f, 0f, 500f), default, 0f, Flat, dt: 0.05f);
+
+        var firstBlock = messages.FirstOrDefault(m => m.Message.Contains("BLOCK"));
+        var firstRecovery = messages.FirstOrDefault(m => m.Message.Contains("STUCK") || m.Message.Contains("BLOCKED"));
+        Assert.IsNotNull(firstBlock.Message, "the wall must hard-block");
+        Assert.IsNotNull(firstRecovery.Message, "recovery must trigger");
+        Assert.IsTrue(firstRecovery.Step - firstBlock.Step <= 20,
+            $"recovery must start within ~1 s of sustained blocking (block step {firstBlock.Step}, recovery step {firstRecovery.Step})");
+    }
+
     [TestMethod]
     public void SetPathRoute_ClearsHold()
     {

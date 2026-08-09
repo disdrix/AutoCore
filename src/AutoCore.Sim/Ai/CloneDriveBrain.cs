@@ -177,7 +177,7 @@ public sealed class CloneDriveBrain
         if (_recoverRemaining > 0f)
         {
             _recoverRemaining -= dt;
-            inputs = new DriveInputs(-0.8f, _recoverSteer, false);
+            inputs = new DriveInputs(_recoverForward ? 0.8f : -0.8f, _recoverSteer, false);
             if (_recoverRemaining <= 0f)
                 Debug($"recover end #{_consecutiveRecoveries} at ({_car.Position.X:F0},{_car.Position.Z:F0})");
         }
@@ -197,25 +197,7 @@ public sealed class CloneDriveBrain
 
             if (_stuckDetector.Update(_car.Position, inputs.Throttle, dt))
             {
-                _consecutiveRecoveries++;
-                _sinceLastRecovery = 0f;
-                // Escalate: alternate the reverse-turn side each attempt (the same arc into
-                // the same obstacle ping-ponged forever), reverse a little longer each time.
-                _recoverRemaining = _tuning.RecoverDuration * (1f + 0.5f * (_consecutiveRecoveries - 1));
-                var baseSign = -MathF.Sign(inputs.Steering is 0f ? 1f : inputs.Steering);
-                _recoverSteer = _consecutiveRecoveries % 2 == 1 ? baseSign : -baseSign;
-                Debug($"STUCK #{_consecutiveRecoveries} at ({_car.Position.X:F0},{_car.Position.Z:F0}) " +
-                      $"speed={PlanarSpeed():F1} -> reverse {_recoverRemaining:F1}s steer={_recoverSteer:+0;-0}");
-
-                // Path mode: an unreachable waypoint (buried in a hull, walled off) would
-                // recover forever — skip it after repeated failures and keep the route alive.
-                if (_pathWaypoints != null && _consecutiveRecoveries >= 3)
-                {
-                    Debug($"waypoint {_pathIndex} unreachable after {_consecutiveRecoveries} recoveries — SKIPPING");
-                    AdvanceWaypoint();
-                    _consecutiveRecoveries = 0;
-                }
-
+                StartRecovery(inputs.Steering);
                 inputs = new DriveInputs(-0.8f, _recoverSteer, false);
             }
         }
@@ -237,21 +219,61 @@ public sealed class CloneDriveBrain
                 _car.Position.X,
                 _car.Position.Y + CompositeGround.StepUpHeight + HardBlockRadius,
                 _car.Position.Z);
-            if (Obstacles.SphereOverlap(probe, HardBlockRadius))
+            if (Obstacles.SphereOverlap(probe, HardBlockRadius, out var blockLabel))
             {
                 if (!_wasHardBlocked)
-                    Debug($"hard BLOCK at ({_car.Position.X:F0},{_car.Position.Z:F0})");
+                    Debug($"hard BLOCK at ({_car.Position.X:F0},{_car.Position.Z:F0}) on '{blockLabel ?? "?"}'");
                 _wasHardBlocked = true;
+                _blockedTime += dt;
                 _car.BlockAt(prePosition);
+
+                if (_recoverRemaining > 0f && !_recoverForward)
+                {
+                    // Blocked while REVERSING (live trace 11:30:31: backed into a second
+                    // obstacle and kept pushing) — flip the recovery to forward-turn.
+                    _recoverForward = true;
+                    Debug("recover blocked while reversing — FLIP to forward-turn");
+                }
+                else if (_recoverRemaining <= 0f && _blockedTime > 0.6f)
+                {
+                    // Pinned against a wall at full throttle: don't wait the ~2 s stuck
+                    // window (live trace 11:30:24-26), recover now.
+                    Debug($"BLOCKED {_blockedTime:F1}s on '{blockLabel ?? "?"}' — recovering immediately");
+                    StartRecovery(LastInputs.Steering);
+                    _blockedTime = 0f;
+                }
             }
             else
             {
                 _wasHardBlocked = false;
+                _blockedTime = MathF.Max(0f, _blockedTime - dt * 2f);
             }
         }
     }
 
     private bool _wasHardBlocked;
+    private float _blockedTime;
+    private bool _recoverForward;
+
+    /// <summary>Shared recovery entry: escalation, side alternation, path-waypoint skip.</summary>
+    private void StartRecovery(float steerHint)
+    {
+        _consecutiveRecoveries++;
+        _sinceLastRecovery = 0f;
+        _recoverRemaining = _tuning.RecoverDuration * (1f + 0.5f * (_consecutiveRecoveries - 1));
+        _recoverForward = false;
+        var baseSign = -MathF.Sign(steerHint is 0f ? 1f : steerHint);
+        _recoverSteer = _consecutiveRecoveries % 2 == 1 ? baseSign : -baseSign;
+        Debug($"STUCK #{_consecutiveRecoveries} at ({_car.Position.X:F0},{_car.Position.Z:F0}) " +
+              $"speed={PlanarSpeed():F1} -> reverse {_recoverRemaining:F1}s steer={_recoverSteer:+0;-0}");
+
+        if (_pathWaypoints != null && _consecutiveRecoveries >= 3)
+        {
+            Debug($"waypoint {_pathIndex} unreachable after {_consecutiveRecoveries} recoveries — SKIPPING");
+            AdvanceWaypoint();
+            _consecutiveRecoveries = 0;
+        }
+    }
 
     private const float HardBlockRadius = 0.85f;
 
@@ -373,8 +395,57 @@ public sealed class CloneDriveBrain
         }
 
         var steer = PurePursuitSteer(target.X, target.Z);
-        var throttle = SpeedControl(_tuning.EffectivePathSpeed);
+
+        // Corner anticipation (live trace 2026-08-09 11:30: 30 m/s straight past a turn into
+        // a wall): shrink the speed target by the upcoming turn angle as the waypoint nears,
+        // and by the current heading error.
+        var targetSpeed = _tuning.EffectivePathSpeed;
+        var distToTarget = DistXZ(target, _car.Position);
+        var turnSharpness = UpcomingTurnSharpness(target);
+        if (turnSharpness > 0.05f)
+        {
+            var cornerSpeed = MathF.Max(6f, _tuning.EffectivePathSpeed * (1f - turnSharpness));
+            targetSpeed = MathF.Min(targetSpeed, cornerSpeed + distToTarget * 0.35f);
+        }
+
+        var headingError = MathF.Abs(HeadingErrorTo(target.X, target.Z));
+        if (headingError > 0.4f)
+            targetSpeed = MathF.Min(targetSpeed, MathF.Max(6f, _tuning.EffectivePathSpeed * (1.2f - headingError)));
+
+        var throttle = SpeedControl(targetSpeed);
         return new DriveInputs(throttle, steer, Handbrake: false);
+    }
+
+    /// <summary>0 = straight through the current waypoint, 1 = full U-turn to the next one.</summary>
+    private float UpcomingTurnSharpness(Vector3 target)
+    {
+        var waypoints = _pathWaypoints;
+        var nextIndex = _pathIndex + _pathDirection;
+        if (_pathLoops)
+            nextIndex = (nextIndex + waypoints.Count) % waypoints.Count;
+        else if (nextIndex < 0 || nextIndex >= waypoints.Count)
+            return 1f; // route end: full ping-pong turnaround ahead
+
+        var next = waypoints[nextIndex];
+        var inX = target.X - _car.Position.X;
+        var inZ = target.Z - _car.Position.Z;
+        var outX = next.X - target.X;
+        var outZ = next.Z - target.Z;
+        var inLen = MathF.Sqrt(inX * inX + inZ * inZ);
+        var outLen = MathF.Sqrt(outX * outX + outZ * outZ);
+        if (inLen < 0.5f || outLen < 0.5f)
+            return 0f;
+
+        var cos = (inX * outX + inZ * outZ) / (inLen * outLen);
+        return MathF.Acos(Math.Clamp(cos, -1f, 1f)) / MathF.PI;
+    }
+
+    private float HeadingErrorTo(float x, float z)
+    {
+        var error = MathF.Atan2(x - _car.Position.X, z - _car.Position.Z) - _car.Yaw;
+        if (error > MathF.PI) error -= 2f * MathF.PI;
+        if (error < -MathF.PI) error += 2f * MathF.PI;
+        return error;
     }
 
     private void AdvanceWaypoint()
