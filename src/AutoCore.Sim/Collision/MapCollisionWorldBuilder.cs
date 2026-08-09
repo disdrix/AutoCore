@@ -44,7 +44,12 @@ public sealed class MapCollisionWorldBuilder
 
         foreach (var template in placements ?? Enumerable.Empty<ObjectTemplate>())
         {
-            if (template is not GraphicsObjectTemplate graphics || !template.OriginalIsActive || template.CBID <= 0)
+            // NOTE: no IsActive filter. Real-map probe (2026-08-09): essentially all static
+            // geometry — bridges, buildings, fences, invis_physics_* barrier walls — is
+            // fam-authored IsActive=false (the flag is mission/server logic state, not
+            // existence; the client renders statics regardless). Filtering on it produced an
+            // EMPTY collision world on highway maps.
+            if (template is not GraphicsObjectTemplate graphics || template.CBID <= 0)
                 continue;
 
             var hull = ResolveHull(template.CBID);

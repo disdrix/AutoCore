@@ -40,10 +40,14 @@ public class MapCollisionWorldBuilderTests
             Placement(100, 50f, 50f),
             Placement(100, 80f, 50f),
             Placement(999, 110f, 50f),            // no PhysicsName → no hull
-            Placement(100, 140f, 50f, active: false), // fam-inactive → skipped
+            // Fam-authored IsActive=false MUST still collide: real map probe (2026-08-09,
+            // scrapvalley/malachite/militiabase) shows essentially ALL static geometry —
+            // bridges, buildings, fences, invisible barrier walls — is authored inactive;
+            // the flag is server logic state, not existence.
+            Placement(100, 140f, 50f, active: false),
         });
 
-        Assert.AreEqual(2, world.InstanceCount);
+        Assert.AreEqual(3, world.InstanceCount);
         Assert.IsTrue(world.Raycast(new Vector3(50f, 0.5f, 40f), new Vector3(0f, 0f, 1f), 20f, out var d, out _));
         Assert.AreEqual(9.5f, d, 0.01f);
         Assert.IsFalse(world.Raycast(new Vector3(110f, 0.5f, 40f), new Vector3(0f, 0f, 1f), 20f, out _, out _),
