@@ -25,8 +25,17 @@ public sealed class CloneAiTuning
 
     public float OrbitSpeed { get; init; } = 8f;
 
-    /// <summary>Follow offset behind the player (m).</summary>
-    public float FollowDistance { get; init; } = 6f;
+    /// <summary>
+    /// Follow offset behind the player (m). Default tripled 6 → 18 on user request 2026-08-09
+    /// (6 m was too close to line the clone up on obstacles for collision testing).
+    /// </summary>
+    public float FollowDistance { get; init; } = 18f;
+
+    /// <summary>Live /clonefollowdist override (metres); null = per-instance FollowDistance.</summary>
+    public static float? FollowDistanceOverride { get; set; }
+
+    /// <summary>The follow distance currently in effect for this tuning instance.</summary>
+    public float EffectiveFollowDistance => FollowDistanceOverride ?? FollowDistance;
 
     /// <summary>Aim lead on the player's velocity (s).</summary>
     public float LookaheadSeconds { get; init; } = 0.6f;

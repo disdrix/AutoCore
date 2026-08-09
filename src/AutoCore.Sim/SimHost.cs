@@ -58,10 +58,43 @@ public sealed class SimHost
         return $"Clone height trim set to {trim:+0.00;-0.00;0.00} m.";
     }
 
-    /// <summary>Routes /clone and /clonetrim through AutoCore.Game's hook seam to this host.</summary>
+    /// <summary>
+    /// /clonefollowdist: sets the live follow-distance override (metres; "default" resets to
+    /// the tuning default). Added so obstacle-collision testing can trail far enough back to
+    /// line the clone up on things (user request 2026-08-09).
+    /// </summary>
+    public string SetFollowDistance(Character character, string arg)
+    {
+        if (string.IsNullOrWhiteSpace(arg))
+        {
+            var current = Ai.CloneAiTuning.FollowDistanceOverride;
+            return current.HasValue
+                ? $"Clone follow distance override is {current.Value:0.#} m. Usage: /clonefollowdist <metres|default>"
+                : $"Clone follow distance is the default ({new Ai.CloneAiTuning().FollowDistance:0.#} m). Usage: /clonefollowdist <metres|default>";
+        }
+
+        if (arg.Equals("default", StringComparison.OrdinalIgnoreCase))
+        {
+            Ai.CloneAiTuning.FollowDistanceOverride = null;
+            return $"Clone follow distance reset to default ({new Ai.CloneAiTuning().FollowDistance:0.#} m).";
+        }
+
+        if (!float.TryParse(arg, System.Globalization.NumberStyles.Float,
+                System.Globalization.CultureInfo.InvariantCulture, out var metres)
+            || metres is < 2f or > 200f)
+        {
+            return "Usage: /clonefollowdist <metres between 2 and 200, or 'default'>";
+        }
+
+        Ai.CloneAiTuning.FollowDistanceOverride = metres;
+        return $"Clone follow distance set to {metres:0.#} m.";
+    }
+
+    /// <summary>Routes the /clone* commands through AutoCore.Game's hook seam to this host.</summary>
     public static void InstallCommandHook()
     {
         CloneCommandControl.TryToggleClone = Instance.ToggleClone;
         CloneCommandControl.TryTrimClone = Instance.TrimClone;
+        CloneCommandControl.TrySetFollowDistance = Instance.SetFollowDistance;
     }
 }

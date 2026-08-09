@@ -81,6 +81,7 @@ public static class ChatAdminGate
         "/sectorTick", "/sectortick", "/sector.tick",
         "/clone", "/unclone",
         "/clonetrim", "/cloneTrim",
+        "/clonefollowdist", "/cloneFollowDist",
 
         // Moderation
         "/kick",

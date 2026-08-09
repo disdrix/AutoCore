@@ -10,6 +10,8 @@ public class CloneCommandTests
     public void Cleanup()
     {
         CloneCommandControl.TryToggleClone = null;
+        CloneCommandControl.TryTrimClone = null;
+        CloneCommandControl.TrySetFollowDistance = null;
     }
 
     [TestMethod]
@@ -54,6 +56,21 @@ public class CloneCommandTests
         Assert.IsTrue(ChatAdminGate.IsMutatingCommand("/clone"));
         Assert.IsTrue(ChatAdminGate.IsMutatingCommand("/unclone"));
         Assert.IsTrue(ChatAdminGate.IsMutatingCommand("/clonetrim"));
+        Assert.IsTrue(ChatAdminGate.IsMutatingCommand("/clonefollowdist"));
+    }
+
+    [TestMethod]
+    public void CloneFollowDist_RoutesArgumentToHook()
+    {
+        string seen = null;
+        CloneCommandControl.TrySetFollowDistance = (_, arg) => { seen = arg; return "dist set"; };
+
+        var result = ChatCommandService.Instance.Execute(null, "/clonefollowdist 40");
+
+        Assert.IsTrue(result.Handled);
+        Assert.AreEqual("dist set", result.Message);
+        Assert.AreEqual("40", seen);
+        CloneCommandControl.TrySetFollowDistance = null;
     }
 
     [TestMethod]

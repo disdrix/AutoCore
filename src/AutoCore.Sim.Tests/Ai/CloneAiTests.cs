@@ -138,6 +138,40 @@ public class CloneDriveBrainClosedLoopTests
     }
 
     [TestMethod]
+    public void FollowDistance_DefaultsTripledForCombatTesting()
+    {
+        // User request 2026-08-09: 6 m was far too close to line the clone up on obstacles.
+        Assert.AreEqual(18f, new CloneAiTuning().FollowDistance);
+    }
+
+    [TestMethod]
+    public void FollowDistanceOverride_ChangesTrailingGapLive()
+    {
+        CloneAiTuning.FollowDistanceOverride = 35f;
+        try
+        {
+            var brain = new CloneDriveBrain(Params(), new CloneAiTuning());
+            var playerPos = new Vector3(0f, 0f, 0f);
+            var playerVel = new Vector3(0f, 0f, 12f);
+            brain.Reset(new Vector3(0f, 0.5f, -30f), yaw: 0f);
+
+            for (var i = 0; i < 600; i++)
+            {
+                playerPos = new Vector3(0f, 0f, playerPos.Z + playerVel.Z * 0.05f);
+                brain.Step(playerPos, playerVel, 0f, Flat, dt: 0.05f);
+            }
+
+            var gap = playerPos.Z - brain.Car.Position.Z;
+            Assert.IsTrue(gap is > 22f and < 50f,
+                $"override 35 m should hold a wide trailing gap, was {gap}");
+        }
+        finally
+        {
+            CloneAiTuning.FollowDistanceOverride = null;
+        }
+    }
+
+    [TestMethod]
     public void MovingPlayer_CloneFollowsBehind()
     {
         var brain = new CloneDriveBrain(Params(), new CloneAiTuning());

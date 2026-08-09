@@ -182,8 +182,8 @@ public sealed class CloneDriveBrain
         float behindX = 0f, behindZ = 0f;
         if (speed > 0.5f)
         {
-            behindX = -playerVelocity.X / speed * _tuning.FollowDistance;
-            behindZ = -playerVelocity.Z / speed * _tuning.FollowDistance;
+            behindX = -playerVelocity.X / speed * _tuning.EffectiveFollowDistance;
+            behindZ = -playerVelocity.Z / speed * _tuning.EffectiveFollowDistance;
         }
         var aimX = playerPosition.X + playerVelocity.X * _tuning.LookaheadSeconds + behindX;
         var aimZ = playerPosition.Z + playerVelocity.Z * _tuning.LookaheadSeconds + behindZ;
@@ -191,7 +191,7 @@ public sealed class CloneDriveBrain
         var steer = PurePursuitSteer(aimX, aimZ);
 
         // Speed matching: player speed plus a distance-error term, capped at the governor.
-        var distanceError = separation - _tuning.FollowDistance;
+        var distanceError = separation - _tuning.EffectiveFollowDistance;
         var targetSpeed = Math.Clamp(speed + distanceError * 0.8f, 0f, _car.Params.TopSpeed);
         var throttle = SpeedControl(targetSpeed);
         return new DriveInputs(throttle, steer, Handbrake: false);

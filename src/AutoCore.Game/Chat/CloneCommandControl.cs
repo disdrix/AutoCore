@@ -20,4 +20,7 @@ public static class CloneCommandControl
     /// as <see cref="TryToggleClone"/>.
     /// </summary>
     public static Func<Character, string, string> TryTrimClone { get; set; }
+
+    /// <summary>/clonefollowdist: live follow-distance tuning (metres, or "default" to reset).</summary>
+    public static Func<Character, string, string> TrySetFollowDistance { get; set; }
 }

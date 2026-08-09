@@ -33,6 +33,28 @@ public class SimHostTests
     }
 
     [TestMethod]
+    public void SetFollowDistance_ParsesSetsAndReports()
+    {
+        try
+        {
+            var set = SimHost.Instance.SetFollowDistance(null, "40");
+            StringAssert.Contains(set, "40");
+            Assert.AreEqual(40f, AutoCore.Sim.Ai.CloneAiTuning.FollowDistanceOverride);
+
+            var reset = SimHost.Instance.SetFollowDistance(null, "default");
+            Assert.IsNull(AutoCore.Sim.Ai.CloneAiTuning.FollowDistanceOverride);
+            StringAssert.Contains(reset.ToLowerInvariant(), "default");
+
+            var bad = SimHost.Instance.SetFollowDistance(null, "abc");
+            StringAssert.Contains(bad.ToLowerInvariant(), "usage");
+        }
+        finally
+        {
+            AutoCore.Sim.Ai.CloneAiTuning.FollowDistanceOverride = null;
+        }
+    }
+
+    [TestMethod]
     public void TrimClone_ParsesSetsAndReports()
     {
         try
