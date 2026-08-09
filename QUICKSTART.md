@@ -11,24 +11,25 @@ Get AutoCore running in 5 minutes!
 
 ## Quick Setup Steps
 
-### 1. Create Databases (30 seconds)
+### 1. Import starter databases (30 seconds)
+
+Imports world static data plus empty auth/char schemas (no accounts):
 
 ```powershell
-cd scripts
-.\init-databases.ps1 -MySQLUser root -MySQLPassword YOUR_PASSWORD
+.\scripts\import-starter-db.ps1 -MySQLPassword YOUR_PASSWORD
 ```
 
-If MySQL is not in PATH, specify the path:
+If MySQL is not in PATH:
 ```powershell
-.\init-databases.ps1 -MySQLUser root -MySQLPath "C:\Program Files\MariaDB 12.1\bin\mysql.exe"
+.\scripts\import-starter-db.ps1 -MySQLPassword YOUR_PASSWORD -MySQLPath "C:\Program Files\MariaDB 12.1\bin\mysql.exe"
 ```
 
 Or manually:
-```sql
-CREATE DATABASE autocore_auth;
-CREATE DATABASE autocore_char;
-CREATE DATABASE autocore_world;
+```powershell
+mysql -u root -p < sql\autocore_starter.sql
 ```
+
+Empty DBs only (no world data): `.\scripts\init-databases.ps1 -MySQLUser root -MySQLPassword YOUR_PASSWORD`
 
 ### 2. Update Configuration Files (2 minutes)
 
@@ -85,14 +86,12 @@ cd src\AutoCore.Launcher\bin\Debug\net8.0
 - Check if another instance is running
 - Change ports in appsettings files
 
-## Default Account
+## First account
 
-A default admin account is automatically created when the database is first initialized:
+The starter dump has **no accounts**. After starting the server, either:
 
-- **Username:** `admin`
-- **Password:** `admin123`
-
-You can use these credentials to log in immediately after starting the server.
+- Set `DefaultAdminPassword` in `appsettings.auth.json` before the first Auth boot (creates `admin`), or
+- Run `auth.create <email> <username> <password>` on the Auth console.
 
 ## Capturing Inventory Toss Packets (Dev)
 

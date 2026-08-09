@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AutoCore.Global.Tests.Network;
@@ -10,6 +11,13 @@ using static GlobalServerTestHelpers;
 public class GlobalServerSetupTests
 {
     private GlobalServer? _server;
+    private IPAddress? _savedSectorRedirect;
+
+    [TestInitialize]
+    public void SaveSectorRedirect()
+    {
+        _savedSectorRedirect = TNLConnection.SectorRedirectAddress;
+    }
 
     [TestCleanup]
     public void Cleanup()
@@ -17,6 +25,8 @@ public class GlobalServerSetupTests
         if (_server != null)
             SafeShutdown(_server);
         _server = null;
+
+        TNLConnection.SectorRedirectAddress = _savedSectorRedirect ?? IPAddress.Loopback;
     }
 
     [TestMethod]
@@ -50,6 +60,17 @@ public class GlobalServerSetupTests
         Assert.IsNotNull(_server.Interface);
         Assert.IsTrue(_server.Interface.AllowVersionMismatch);
         Assert.AreEqual(149, _server.Interface.ExpectedVersion);
+    }
+
+    [TestMethod]
+    public void Setup_PropagatesPublicAddress_ToSectorRedirect()
+    {
+        _server = CreateServer();
+        var config = CreateSetupConfig(gamePort: 0, publicAddress: "192.168.50.62");
+
+        _server.Setup(config);
+
+        Assert.AreEqual(IPAddress.Parse("192.168.50.62"), TNLConnection.SectorRedirectAddress);
     }
 
     [TestMethod]

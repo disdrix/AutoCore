@@ -58,6 +58,9 @@ public partial class GlobalServer : BaseServer, ILoopable
 
         Logger.WriteLog(LogType.Initialize, "Initializing the network...");
         PublicAddress = IPAddress.Parse(Config.GameConfig.PublicAddress);
+        // Advertise this host to clients on Play (TransferToSector). Loopback default
+        // only works when client and server share a machine.
+        TNLConnection.SectorRedirectAddress = PublicAddress;
 
         Logger.WriteLog(LogType.Initialize, "The Global server has been setup!");
     }

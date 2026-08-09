@@ -23,11 +23,36 @@ This guide will help you set up and run the AutoCore game server.
 
 ### 1. Database Setup
 
-Create three MySQL databases. You have two options:
+You need three MySQL databases: `autocore_auth`, `autocore_char`, and `autocore_world`.
 
-#### Option A: Use the PowerShell Script (Recommended)
+#### Option A: Import the starter dump (Recommended for new operators)
 
-Run the provided initialization script:
+The repo ships a shareable dump under [`sql/`](sql/) with **world static data** and **empty** auth/char schemas (no accounts, no characters). Import it:
+
+```powershell
+.\scripts\import-starter-db.ps1 -MySQLPassword YOUR_PASSWORD
+```
+
+If MySQL is not in PATH:
+```powershell
+.\scripts\import-starter-db.ps1 -MySQLPassword YOUR_PASSWORD -MySQLPath "C:\Program Files\MariaDB 12.1\bin\mysql.exe"
+```
+
+Or manually:
+```powershell
+mysql -u root -p < sql\autocore_starter.sql
+```
+
+This creates the three databases, loads world tables (`config_new_character`, continents, XP curves, factions, …), and leaves account/character tables empty. After the server starts, create your own admin (see [First account](#first-account) below).
+
+To refresh the dump from a live world DB (maintainers):
+```powershell
+.\scripts\export-starter-db.ps1 -Force
+```
+
+#### Option B: Empty databases only
+
+Run the initialization script (tables are created on first server boot; **world static rows are not** — prefer Option A unless you have another world data source):
 
 ```powershell
 cd scripts
@@ -44,9 +69,7 @@ If MySQL is not in your PATH, specify the path:
 .\init-databases.ps1 -MySQLUser root -MySQLPath "C:\Program Files\MariaDB 12.1\bin\mysql.exe"
 ```
 
-The script will automatically check common installation locations if MySQL is not in PATH.
-
-#### Option B: Manual SQL Creation
+#### Option C: Manual SQL Creation
 
 Connect to MySQL and run:
 
@@ -56,7 +79,7 @@ CREATE DATABASE autocore_char CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE DATABASE autocore_world CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-**Note:** The databases must exist before running the server. Tables will be created automatically by Entity Framework Core when the server first accesses each database context.
+**Note:** Empty databases get tables from Entity Framework Core on first access, but a working game needs the world data from the starter dump (Option A).
 
 ### 2. Configure Database Connection Strings
 
@@ -201,21 +224,17 @@ Log files are created in the same directory as the executables:
 
 Check these files for detailed error messages if something goes wrong.
 
-## Default Account
+## First account
 
-When the database is first initialized, a default admin account is automatically created:
+The starter SQL dump ships **with no accounts**. Create an admin one of two ways:
 
-- **Username:** `admin`
-- **Email:** `admin@autocore.local`
-- **Password:** `admin123`
-- **Level:** 255 (Admin)
+1. **Bootstrap on first empty auth DB** — set `DefaultAdminPassword` in `appsettings.auth.json` before the first Auth start. That creates username `admin` / email `admin@autocore.local` at level 255 using your password. Leave it empty (default) to skip seeding.
+2. **Console** — after Auth is running:
+   ```
+   auth.create <email> <username> <password>
+   ```
 
-**Important:** Change this password after your first login for security purposes.
-
-You can also create additional accounts using the Auth server console command:
-```
-auth.create <email> <username> <password>
-```
+There is no built-in default password.
 
 ## Optional: Discord bot
 
@@ -245,8 +264,8 @@ Once all servers are running:
 1. Verify all three servers started successfully
 2. Check log files for any warnings or errors
 3. Configure your Auto Assault client to connect to the server (see `CLIENT_SETUP.md`)
-4. Test client connection to the server using the default account credentials
-5. Create additional accounts through the Auth server console if needed
+4. Create an admin account if you have not already (see [First account](#first-account))
+5. Test client connection with that account
 
 ## Client Configuration
 

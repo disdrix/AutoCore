@@ -12,6 +12,24 @@ using AutoCore.Utils;
 
 public partial class TNLConnection
 {
+    /// <summary>
+    /// Address advertised to clients in the Global→Sector hand-off packet.
+    /// Defaults to loopback for single-machine setups; GlobalServer.Setup overwrites
+    /// this with <c>GameConfig.PublicAddress</c> so LAN/remote clients reach the host.
+    /// </summary>
+    public static IPAddress SectorRedirectAddress { get; set; } = IPAddress.Loopback;
+
+    /// <summary>
+    /// Builds the sector transfer packet from <see cref="SectorRedirectAddress"/>.
+    /// Extracted so unit tests can pin the advertised IP/port without a live DB.
+    /// </summary>
+    internal static TransferToSectorPacket BuildSectorTransfer() => new()
+    {
+        IPAddress = SectorRedirectAddress,
+        Port = 27001,
+        Flags = 0
+    };
+
     private void HandleNewsPacket(BinaryReader reader)
     {
         var packet = new NewsPacket();
@@ -94,14 +112,8 @@ public partial class TNLConnection
         }
 
         // TODO: select sector server based on registered sector servers
-        // default to localhost, for now
-
-        SendGamePacket(new TransferToSectorPacket()
-        {
-            IPAddress = IPAddress.Loopback,
-            Port = 27001,
-            Flags = 0
-        });
+        // Today the sector host shares Global's public address (same process / same machine).
+        SendGamePacket(BuildSectorTransfer());
     }
 
     public void HandleDisconnectPacket(BinaryReader reader)

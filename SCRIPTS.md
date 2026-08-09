@@ -30,6 +30,8 @@ Game-data tools default to `C:\Program Files (x86)\NetDevil\Auto Assault`; overr
 | Script | What it does |
 |--------|----------------|
 | [`init-databases.ps1`](scripts/init-databases.ps1) | Creates the MySQL databases required by AutoCore (auth/world/character, etc.) using local MySQL credentials. |
+| [`export-starter-db.ps1`](scripts/export-starter-db.ps1) | Dumps live MySQL into shareable starter SQL under `sql/` (`autocore_world` with static data; auth/char schema only — no accounts or player rows). Re-run after world-data changes; use `-Force` to overwrite. |
+| [`import-starter-db.ps1`](scripts/import-starter-db.ps1) | Imports `sql/autocore_starter.sql` into local MySQL so other operators get world data without any accounts. Create an admin after first boot via `DefaultAdminPassword` or `auth.create`. |
 | [`recreate-char-db.ps1`](scripts/recreate-char-db.ps1) | Drops and recreates the character database so schema can be reset cleanly during development. |
 | [`wipeplayers.ps1`](scripts/wipeplayers.ps1) | Truncates all character/player tables in `autocore_char` (chars, vehicles, inventory, missions, skills, clans, …) while keeping `account` rows and leaving `autocore_auth` untouched. Use `-Force` for non-interactive runs; also available as the Grok workflow `wipeplayers`. |
 | [`setup-client.ps1`](scripts/setup-client.ps1) | Adds or removes a Windows hosts-file entry so the retail Auto Assault client points at a local auth server (run as Administrator). |

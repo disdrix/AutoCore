@@ -19,10 +19,12 @@ AutoCore is a complete server implementation for the Auto Assault MMO game, cons
 - **Global Server** - Manages character data and global game state
 - **Sector Server** - Handles in-game sector/map operations
 
-## Default Account
+## Databases & first account
 
-When first initialized, a default admin account is created:
-- **Username:** `admin`
-- **Password:** `admin123`
+Import the shareable starter dump (world data, no accounts):
 
-See [SETUP.md](SETUP.md) for more information.
+```powershell
+.\scripts\import-starter-db.ps1 -MySQLPassword YOUR_PASSWORD
+```
+
+Then create an admin via `DefaultAdminPassword` in `appsettings.auth.json`, or `auth.create` on the Auth console. See [SETUP.md](SETUP.md).
