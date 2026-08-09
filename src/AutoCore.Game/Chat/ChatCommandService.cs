@@ -67,7 +67,7 @@ public sealed class ChatCommandService
 
             case "/clone":
             case "/unclone":
-                return ToggleClone(character);
+                return ToggleClone(character, parts.Length > 1 ? parts[1] : null);
 
             case "/clonetrim":
             case "/cloneTrim":
@@ -268,13 +268,13 @@ public sealed class ChatCommandService
     /// Toggle a simulated clone of the character's vehicle. The actual behavior lives in
     /// AutoCore.Sim; the Sector host wires <see cref="CloneCommandControl.TryToggleClone"/>.
     /// </summary>
-    private static ChatCommandExecutionResult ToggleClone(Character character)
+    private static ChatCommandExecutionResult ToggleClone(Character character, string countArg)
     {
         var toggle = CloneCommandControl.TryToggleClone;
         if (toggle == null)
             return new ChatCommandExecutionResult(true, "Clone simulation is unavailable on this server.");
 
-        return new ChatCommandExecutionResult(true, toggle(character));
+        return new ChatCommandExecutionResult(true, toggle(character, countArg));
     }
 
     /// <summary>/clonetrim &lt;metres&gt; — live clone height trim; see CloneCommandControl.</summary>

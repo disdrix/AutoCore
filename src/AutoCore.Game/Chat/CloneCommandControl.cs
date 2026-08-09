@@ -10,10 +10,10 @@ using AutoCore.Game.Entities;
 public static class CloneCommandControl
 {
     /// <summary>
-    /// Toggles a clone vehicle for the given character and returns the user-facing
-    /// result message. Null when no Sim host is wired (command reports unavailable).
+    /// Toggles clone vehicles for the given character (arg = optional fleet count, "/clone 10")
+    /// and returns the user-facing result message. Null when no Sim host is wired.
     /// </summary>
-    public static Func<Character, string> TryToggleClone { get; set; }
+    public static Func<Character, string, string> TryToggleClone { get; set; }
 
     /// <summary>
     /// /clonetrim: live height-trim tuning (arg = metres or null to query). Same wiring rules

@@ -41,6 +41,27 @@ public sealed class CloneDriveBrain
     /// <summary>Static hull world for feeler avoidance + hard blocking; null = terrain only.</summary>
     public StaticCollisionWorld Obstacles { get; set; }
 
+    /// <summary>Another vehicle to steer around (position/velocity snapshot for this tick).</summary>
+    public struct DynamicObstacle
+    {
+        public Vector3 Position;
+        public Vector3 Velocity;
+    }
+
+    private DynamicObstacle[] _dynObstacles;
+    private int _dynObstacleCount;
+
+    /// <summary>
+    /// Per-tick snapshot of nearby vehicles (buffer owned by the caller, reused). The brain
+    /// dodges them when possible — but never at the cost of steering into a static hull
+    /// (static room is probed before committing a dodge side; both sides blocked = brake).
+    /// </summary>
+    public void SetDynamicObstacles(DynamicObstacle[] buffer, int count)
+    {
+        _dynObstacles = buffer;
+        _dynObstacleCount = buffer == null ? 0 : Math.Min(count, buffer.Length);
+    }
+
     /// <summary>
     /// /clonestop: brake to a halt and stay put — no follow, no orbit, and no catch-up
     /// teleport no matter how far the owner drives. /clonefollow clears it.
@@ -411,6 +432,8 @@ public sealed class CloneDriveBrain
     /// </summary>
     private DriveInputs ApplyObstacleAvoidance(DriveInputs inputs)
     {
+        inputs = ApplyDynamicAvoidance(inputs);
+
         var world = Obstacles;
         if (world == null)
             return inputs;
@@ -488,6 +511,105 @@ public sealed class CloneDriveBrain
         }
 
         return new DriveInputs(throttle, steer, inputs.Handbrake);
+    }
+
+    /// <summary>
+    /// Vehicle-vs-vehicle avoidance. Runs BEFORE the static stage so static corrections are
+    /// applied on top (static wins); additionally the dodge side itself is probed against the
+    /// static world first — a dodge that would hit a wall flips side, and if both sides are
+    /// walled the clone only brakes (user requirement: avoid vehicles when possible, never at
+    /// the cost of hitting a static object).
+    /// </summary>
+    private DriveInputs ApplyDynamicAvoidance(DriveInputs inputs)
+    {
+        if (_dynObstacleCount == 0)
+            return inputs;
+
+        var sin = MathF.Sin(_car.Yaw);
+        var cos = MathF.Cos(_car.Yaw);
+        var worstUrgency = 0f;
+        var worstLateral = 0f;
+        var worstDistance = float.MaxValue;
+        var worstClosing = false;
+
+        for (var i = 0; i < _dynObstacleCount; i++)
+        {
+            var relX = _dynObstacles[i].Position.X - _car.Position.X;
+            var relZ = _dynObstacles[i].Position.Z - _car.Position.Z;
+            var distNow = MathF.Sqrt(relX * relX + relZ * relZ);
+            if (distNow > 35f || distNow < 0.01f)
+                continue;
+
+            // Ignore traffic clearly behind us.
+            var forwardDot = relX * sin + relZ * cos;
+            if (forwardDot < -3f)
+                continue;
+
+            // Closest approach within a 2.5 s horizon (constant-velocity prediction).
+            var relVx = _dynObstacles[i].Velocity.X - _car.Velocity.X;
+            var relVz = _dynObstacles[i].Velocity.Z - _car.Velocity.Z;
+            var vv = relVx * relVx + relVz * relVz;
+            var t = vv > 0.01f ? Math.Clamp(-(relX * relVx + relZ * relVz) / vv, 0f, 2.5f) : 0f;
+            var cxX = relX + relVx * t;
+            var cxZ = relZ + relVz * t;
+            var closest = MathF.Sqrt(cxX * cxX + cxZ * cxZ);
+            const float ClearRadius = 4.0f;
+            if (closest >= ClearRadius)
+                continue;
+
+            var urgency = (ClearRadius - closest) / ClearRadius * (1f - t / 3.5f);
+            if (urgency <= worstUrgency)
+                continue;
+
+            worstUrgency = urgency;
+            worstDistance = distNow;
+            worstClosing = (relX * relVx + relZ * relVz) < -0.1f || vv <= 0.01f;
+            // Lateral offset of the predicted closest point: dodge away from that side.
+            worstLateral = cxX * cos - cxZ * sin;
+        }
+
+        if (worstUrgency <= 0f)
+            return inputs;
+
+        // Dodge away from where the threat will be; near-zero lateral (dead ahead) defaults right.
+        var dodgeSign = worstLateral > 0.2f ? -1f : worstLateral < -0.2f ? 1f : 1f;
+
+        // Static priority: never dodge into a wall. Probe the dodge side; flip if blocked;
+        // both blocked -> no steering dodge at all, brake only.
+        var canDodge = true;
+        if (Obstacles != null)
+        {
+            const float ProbeAngle = 0.45f; // rad off the nose toward the dodge side
+            const float ProbeLength = 9f;
+            if (StaticSideBlocked(dodgeSign * ProbeAngle, ProbeLength))
+            {
+                if (StaticSideBlocked(-dodgeSign * ProbeAngle, ProbeLength))
+                    canDodge = false;
+                else
+                    dodgeSign = -dodgeSign;
+            }
+        }
+
+        var steer = inputs.Steering;
+        var throttle = inputs.Throttle;
+        if (canDodge)
+            steer = Math.Clamp(steer + dodgeSign * (0.3f + 0.6f * worstUrgency), -1f, 1f);
+
+        // Brake for imminent conflicts (always; harder when a steering dodge is unavailable).
+        var speed = MathF.Sqrt(_car.Velocity.X * _car.Velocity.X + _car.Velocity.Z * _car.Velocity.Z);
+        if (worstClosing && worstDistance < (canDodge ? 8f : 14f) && speed > 4f)
+            throttle = MathF.Min(throttle, canDodge ? -0.3f : -0.7f);
+
+        return new DriveInputs(throttle, steer, inputs.Handbrake);
+    }
+
+    private bool StaticSideBlocked(float yawOffset, float length)
+    {
+        var yaw = _car.Yaw + yawOffset;
+        var origin = new Vector3(_car.Position.X, _car.Position.Y + 0.6f, _car.Position.Z);
+        var direction = new Vector3(MathF.Sin(yaw), 0f, MathF.Cos(yaw));
+        return Obstacles.Raycast(origin, direction, length, out _, out var normal)
+               && normal.Y <= 0.6f; // walkable slopes are not walls
     }
 
     private static bool Feel(StaticCollisionWorld world, Vector3 origin, float carY, float yaw, float length, out float distance)

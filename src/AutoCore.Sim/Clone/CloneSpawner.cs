@@ -16,7 +16,10 @@ internal static class CloneSpawner
 {
     private const float SpawnAheadMeters = 8f;
 
-    public static Vehicle Spawn(Character owner)
+    public static Vehicle Spawn(Character owner) => Spawn(owner, fleetIndex: 0);
+
+    /// <summary>Fleet spawns fan out in a 5-wide grid ahead of the player so /clone N does not stack.</summary>
+    public static Vehicle Spawn(Character owner, int fleetIndex)
     {
         var map = owner.Map;
         var source = owner.CurrentVehicle;
@@ -28,10 +31,15 @@ internal static class CloneSpawner
 
         clone.Layer = source.Layer;
         var forward = TerrainContactPlane.ForwardFromQuaternion(source.Rotation);
+        // Right vector in the ground plane for lateral fleet spread.
+        var rightX = forward.Z;
+        var rightZ = -forward.X;
+        var aheadMeters = SpawnAheadMeters + (fleetIndex / 5) * 6f;
+        var sideMeters = ((fleetIndex % 5) - 2) * 5f;
         var spawnPosition = new AutoCore.Game.Structures.Vector3(
-            source.Position.X + forward.X * SpawnAheadMeters,
-            source.Position.Y + forward.Y * SpawnAheadMeters,
-            source.Position.Z + forward.Z * SpawnAheadMeters);
+            source.Position.X + forward.X * aheadMeters + rightX * sideMeters,
+            source.Position.Y + forward.Y * aheadMeters,
+            source.Position.Z + forward.Z * aheadMeters + rightZ * sideMeters);
         clone.Position = NpcTicker.SnapToTerrain(map, spawnPosition);
         clone.Rotation = source.Rotation;
 

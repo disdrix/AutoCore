@@ -129,6 +129,55 @@ public class CloneManagerTests
     }
 
     [TestMethod]
+    public void Toggle_WithCount_SpawnsAFleet_AndDespawnsAllTogether()
+    {
+        var map = CreateFieldMap(8214);
+        var character = DrivingCharacter(map);
+        var manager = new CloneManager();
+
+        var message = manager.Toggle(character, count: 10);
+
+        Assert.AreEqual(10, manager.ActiveCloneCount, $"got: {message}");
+        var clones = map.NpcAiEntities.OfType<Vehicle>().ToList();
+        Assert.AreEqual(10, clones.Count);
+        // Spawns must be spread out, not stacked on one point.
+        var distinct = clones.Select(c => (MathF.Round(c.Position.X, 1), MathF.Round(c.Position.Z, 1)))
+            .Distinct().Count();
+        Assert.AreEqual(10, distinct, "fleet spawns must not stack");
+
+        manager.Toggle(character);
+        Assert.AreEqual(0, manager.ActiveCloneCount, "second /clone despawns the whole fleet");
+        Assert.AreEqual(0, map.NpcAiEntities.OfType<Vehicle>().Count());
+    }
+
+    [TestMethod]
+    public void FleetCommands_ApplyToEveryClone()
+    {
+        var map = CreateFieldMap(8215);
+        var near = new AutoCore.Game.EntityTemplates.MapPathTemplate { COID = 903, PathName = "p" };
+        near.Points.Add(new AutoCore.Game.EntityTemplates.MapPathTemplate.MapPathPoint
+        { Position = new AutoCore.Game.Structures.Vector3(120f, 0f, 100f) });
+        near.Points.Add(new AutoCore.Game.EntityTemplates.MapPathTemplate.MapPathPoint
+        { Position = new AutoCore.Game.Structures.Vector3(160f, 0f, 100f) });
+        map.MapData.Templates.Add(near.COID, near);
+
+        var character = DrivingCharacter(map);
+        character.CurrentVehicle.Position = new AutoCore.Game.Structures.Vector3(100f, 0f, 100f);
+        var manager = new CloneManager();
+        manager.Toggle(character, count: 3);
+
+        manager.SetHold(character, hold: true);
+        Assert.IsTrue(manager.BrainsForTests(character).All(b => b.Hold), "/clonestop applies to all");
+
+        manager.StartPath(character);
+        Assert.IsTrue(manager.BrainsForTests(character).All(b => b.HasPathRoute), "/clonestartpath applies to all");
+
+        manager.SetHold(character, hold: false);
+        Assert.IsTrue(manager.BrainsForTests(character).All(b => !b.Hold && !b.HasPathRoute),
+            "/clonefollow resumes all");
+    }
+
+    [TestMethod]
     public void Tick_OwnerLeftMap_DespawnsClone()
     {
         var map = CreateFieldMap(8205);
@@ -165,7 +214,7 @@ public class CloneManagerTests
             var dx = clone.Position.X - player.X;
             var dz = clone.Position.Z - player.Z;
             var r = MathF.Sqrt(dx * dx + dz * dz);
-            Assert.IsTrue(r is > 2f and < 20f, $"clone left the orbit annulus at step {i}: r={r}");
+            Assert.IsTrue(r is > 8f and < 45f, $"clone left the orbit annulus at step {i}: r={r}");
 
             var angle = MathF.Atan2(dx, dz);
             if (!float.IsNaN(prevAngle))
@@ -206,10 +255,10 @@ public class CloneManagerTests
 
         var message = manager.StartPath(character);
         StringAssert.Contains(message, "near", "must pick the closest path to the clone");
-        Assert.IsTrue(manager.BrainForTests(character).HasPathRoute);
+        Assert.IsTrue(manager.BrainsForTests(character).Single().HasPathRoute);
 
         var resume = manager.SetHold(character, hold: false);
-        Assert.IsFalse(manager.BrainForTests(character).HasPathRoute,
+        Assert.IsFalse(manager.BrainsForTests(character).Single().HasPathRoute,
             "/clonefollow must clear the path route and resume following");
         StringAssert.Contains(resume.ToLowerInvariant(), "follow");
     }
@@ -242,7 +291,7 @@ public class CloneManagerTests
             prop.SetCoid(770_001, false);
             prop.LoadCloneBase(propCbid);
             prop.InitializeHealthForTests(3);
-            prop.Position = new AutoCore.Game.Structures.Vector3(100f, 0f, 92f);
+            prop.Position = new AutoCore.Game.Structures.Vector3(100f, 0f, 100f - new AutoCore.Sim.Ai.CloneAiTuning().OrbitRadius);
             prop.SetMap(map);
 
             var startHp = prop.GetCurrentHP();
@@ -307,7 +356,7 @@ public class CloneManagerTests
         for (var i = 0; i < 200; i++)
         {
             manager.Tick(nowMs: i * 50, dt: 0.05f);
-            brain = manager.BrainForTests(character);
+            brain = manager.BrainsForTests(character).SingleOrDefault();
             if (brain?.Obstacles != null)
                 break;
             Thread.Sleep(10);

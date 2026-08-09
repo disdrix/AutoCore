@@ -21,7 +21,8 @@ public sealed class CloneAiTuning
 
     public float OrbitEnterHold { get; init; } = 1.5f;
 
-    public float OrbitRadius { get; init; } = 8f;
+    /// <summary>Tripled from 8 on user request 2026-08-09 ("too close to my character").</summary>
+    public float OrbitRadius { get; init; } = 24f;
 
     public float OrbitSpeed { get; init; } = 8f;
 

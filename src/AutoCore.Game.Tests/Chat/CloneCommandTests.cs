@@ -32,7 +32,7 @@ public class CloneCommandTests
     [TestMethod]
     public void Clone_HookInstalled_ReturnsHookMessage()
     {
-        CloneCommandControl.TryToggleClone = _ => "Clone spawned.";
+        CloneCommandControl.TryToggleClone = (_, _) => "Clone spawned.";
 
         var result = ChatCommandService.Instance.Execute(null, "/clone");
 
@@ -44,7 +44,7 @@ public class CloneCommandTests
     public void Unclone_RoutesToSameToggleHook()
     {
         var calls = 0;
-        CloneCommandControl.TryToggleClone = _ => { calls++; return "toggled"; };
+        CloneCommandControl.TryToggleClone = (_, _) => { calls++; return "toggled"; };
 
         var clone = ChatCommandService.Instance.Execute(null, "/clone");
         var unclone = ChatCommandService.Instance.Execute(null, "/unclone");

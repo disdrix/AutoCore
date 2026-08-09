@@ -23,11 +23,18 @@ public sealed class SimHost
     /// to a chat message, not abort the inbound packet handler (seen live 2026-08-08 with an
     /// unconstructible equipped ornament).
     /// </summary>
-    public string ToggleClone(Character character)
+    public string ToggleClone(Character character, string countArg)
     {
         try
         {
-            return _cloneManager.Toggle(character);
+            var count = 1;
+            if (!string.IsNullOrWhiteSpace(countArg)
+                && (!int.TryParse(countArg, out count) || count < 1 || count > Clone.CloneManager.MaxFleetSize))
+            {
+                return $"Usage: /clone [1-{Clone.CloneManager.MaxFleetSize}]";
+            }
+
+            return _cloneManager.Toggle(character, count);
         }
         catch (Exception ex)
         {

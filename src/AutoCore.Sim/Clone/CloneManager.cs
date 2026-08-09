@@ -13,8 +13,11 @@ namespace AutoCore.Sim.Clone;
 /// </summary>
 public sealed class CloneManager
 {
-    private readonly ConcurrentDictionary<long, CloneHandle> _clones = new();
+    private readonly ConcurrentDictionary<long, List<CloneHandle>> _clones = new();
     private readonly Collision.MapCollisionWorlds _collisionWorlds;
+
+    /// <summary>/clone N cap — sanity bound, well inside the measured perf envelope.</summary>
+    public const int MaxFleetSize = 100;
 
     public CloneManager(Collision.MapCollisionWorlds collisionWorlds = null)
     {
@@ -27,23 +30,40 @@ public sealed class CloneManager
     /// </summary>
     public static float HeightTrim { get; set; }
 
-    public int ActiveCloneCount => _clones.Count;
+    public int ActiveCloneCount
+    {
+        get
+        {
+            var total = 0;
+            foreach (var list in _clones.Values)
+                total += list.Count;
+            return total;
+        }
+    }
 
-    internal Ai.CloneDriveBrain BrainForTests(Character owner)
-        => _clones.TryGetValue(owner.ObjectId.Coid, out var handle) ? handle.Brain : null;
+    internal IEnumerable<Ai.CloneDriveBrain> BrainsForTests(Character owner)
+        => _clones.TryGetValue(owner.ObjectId.Coid, out var list)
+            ? list.Select(h => h.Brain)
+            : Enumerable.Empty<Ai.CloneDriveBrain>();
 
     /// <summary>/clonestop / /clonefollow: park the caller's clone in place or resume the AI.</summary>
     public string SetHold(Character character, bool hold)
     {
         if (character == null)
             return "No character loaded.";
-        if (!_clones.TryGetValue(character.ObjectId.Coid, out var handle))
+        if (!_clones.TryGetValue(character.ObjectId.Coid, out var fleet) || fleet.Count == 0)
             return "No clone active — use /clone first.";
 
-        handle.Brain.Hold = hold;
-        if (!hold)
-            handle.Brain.ClearPathRoute(); // /clonefollow = resume following, from hold OR path
-        return hold ? "Clone holding position." : "Clone resuming follow.";
+        foreach (var handle in fleet)
+        {
+            handle.Brain.Hold = hold;
+            if (!hold)
+                handle.Brain.ClearPathRoute(); // /clonefollow = resume following, from hold OR path
+        }
+
+        return hold
+            ? $"{fleet.Count} clone(s) holding position."
+            : $"{fleet.Count} clone(s) resuming follow.";
     }
 
     /// <summary>
@@ -55,9 +75,10 @@ public sealed class CloneManager
     {
         if (character == null)
             return "No character loaded.";
-        if (!_clones.TryGetValue(character.ObjectId.Coid, out var handle))
+        if (!_clones.TryGetValue(character.ObjectId.Coid, out var fleet) || fleet.Count == 0)
             return "No clone active — use /clone first.";
 
+        var handle = fleet[0];
         var templates = handle.Clone.Map?.MapData?.Templates;
         if (templates == null)
             return "No map data available.";
@@ -93,9 +114,10 @@ public sealed class CloneManager
         var dzEnds = waypoints[0].Z - waypoints[^1].Z;
         var loops = MathF.Sqrt(dxEnds * dxEnds + dzEnds * dzEnds) < 15f;
 
-        handle.Brain.SetPathRoute(waypoints, loops, accepts);
+        foreach (var h in fleet)
+            h.Brain.SetPathRoute(waypoints, loops, accepts);
         var label = string.IsNullOrWhiteSpace(nearest.PathName) ? $"#{nearest.COID}" : nearest.PathName;
-        return $"Clone following path '{label}' ({waypoints.Length} waypoints, " +
+        return $"{fleet.Count} clone(s) following path '{label}' ({waypoints.Length} waypoints, " +
                $"{(loops ? "loop" : "ping-pong")}, {nearestDist:0} m away).";
     }
 
@@ -104,23 +126,28 @@ public sealed class CloneManager
     {
         if (character == null)
             return "No character loaded.";
-        if (!_clones.TryGetValue(character.ObjectId.Coid, out var handle))
+        if (!_clones.TryGetValue(character.ObjectId.Coid, out var fleet) || fleet.Count == 0)
             return "No clone active — use /clone first.";
 
-        handle.Brain.Hold = false;
-        handle.Brain.RequestCatchUp();
-        return "Clone teleporting to you.";
+        foreach (var handle in fleet)
+        {
+            handle.Brain.Hold = false;
+            handle.Brain.RequestCatchUp();
+        }
+
+        return $"{fleet.Count} clone(s) teleporting to you.";
     }
 
-    public string Toggle(Character character)
+    public string Toggle(Character character, int count = 1)
     {
         if (character == null)
             return "No character loaded.";
 
         if (_clones.TryRemove(character.ObjectId.Coid, out var existing))
         {
-            CloneSpawner.Despawn(existing.Clone);
-            return "Clone despawned.";
+            foreach (var handle in existing)
+                CloneSpawner.Despawn(handle.Clone);
+            return $"Despawned {existing.Count} clone(s).";
         }
 
         var map = character.Map;
@@ -128,9 +155,13 @@ public sealed class CloneManager
         if (map == null || vehicle == null || map.MapData?.ContinentObject?.IsTown != false)
             return "You need to be driving to use /clone.";
 
-        var clone = CloneSpawner.Spawn(character);
-        _clones[character.ObjectId.Coid] = new CloneHandle(character, clone);
-        return "Clone spawned.";
+        count = Math.Clamp(count, 1, MaxFleetSize);
+        var fleet = new List<CloneHandle>(count);
+        for (var i = 0; i < count; i++)
+            fleet.Add(new CloneHandle(character, CloneSpawner.Spawn(character, i)));
+
+        _clones[character.ObjectId.Coid] = fleet;
+        return $"Spawned {count} clone(s).";
     }
 
     internal static CloneDriveBrain BuildBrainForHandle(Vehicle clone)
@@ -166,24 +197,38 @@ public sealed class CloneManager
     public void Tick(long nowMs, float dt)
     {
         _aliveScratch.Clear();
-        foreach (var (ownerCoid, handle) in _clones)
+        foreach (var (ownerCoid, fleet) in _clones)
         {
-            // Alive only while owner and clone share a live map. Both-null is NOT alive: the
-            // map's last-player-left reset (SectorMap.ResetLocalWorldToAuthored) tears down the
-            // clone entity, and the handle must not linger as a zombie.
-            var ownerMap = handle.Owner.Map;
-            if (ownerMap != null && ownerMap == handle.Clone.Map)
+            var anyDead = false;
+            foreach (var handle in fleet)
             {
-                // Hull world attaches whenever the lazy background build completes; clones run
-                // terrain-only until then (and forever if the build failed). Kept serial: it
-                // touches the lazy-build table and may kick a SafeTask.
-                handle.Brain.Obstacles ??= _collisionWorlds.GetOrRequest(ownerMap);
-                _aliveScratch.Add(handle);
-                continue;
+                // Alive only while owner and clone share a live map. Both-null is NOT alive:
+                // the map's last-player-left reset (SectorMap.ResetLocalWorldToAuthored) tears
+                // down the clone entity, and the handle must not linger as a zombie.
+                var ownerMap = handle.Owner.Map;
+                if (ownerMap != null && ownerMap == handle.Clone.Map)
+                {
+                    // Hull world attaches whenever the lazy background build completes; clones
+                    // run terrain-only until then (and forever if the build failed). Kept
+                    // serial: it touches the lazy-build table and may kick a SafeTask.
+                    handle.Brain.Obstacles ??= _collisionWorlds.GetOrRequest(ownerMap);
+                    _aliveScratch.Add(handle);
+                }
+                else
+                {
+                    anyDead = true;
+                }
             }
 
-            if (_clones.TryRemove(ownerCoid, out var removed))
-                CloneSpawner.Despawn(removed.Clone);
+            if (anyDead && _clones.TryRemove(ownerCoid, out var removed))
+            {
+                // One dead clone means the owner left / map reset — retire the whole fleet.
+                foreach (var handle in removed)
+                {
+                    CloneSpawner.Despawn(handle.Clone);
+                    _aliveScratch.Remove(handle);
+                }
+            }
         }
 
         if (_aliveScratch.Count >= ParallelThinkThreshold)
@@ -230,7 +275,45 @@ public sealed class CloneManager
         var ownerForward = TerrainContactPlane.ForwardFromQuaternion(owner.Rotation);
         var ownerYaw = MathF.Atan2(ownerForward.X, ownerForward.Z);
 
+        CollectDynamicObstacles(handle);
         handle.Brain.Step(owner.Position, owner.Velocity, ownerYaw, sample, dt);
+    }
+
+    /// <summary>
+    /// Nearby vehicles (players, NPCs, other clones) snapshotted into the handle's reusable
+    /// buffer for vehicle-vs-vehicle avoidance. Grid reads are safe from the parallel think
+    /// phase: the grid only mutates in the serial rebucket stage of the sector loop.
+    /// </summary>
+    private static void CollectDynamicObstacles(CloneHandle handle)
+    {
+        var map = handle.Clone.Map;
+        if (map?.Grid == null)
+        {
+            handle.Brain.SetDynamicObstacles(null, 0);
+            return;
+        }
+
+        var scratch = handle.QueryScratch;
+        scratch.Clear();
+        map.Grid.QueryRadius(handle.Clone.Position, 35f, scratch);
+
+        var buffer = handle.DynamicBuffer;
+        var count = 0;
+        foreach (var obj in scratch)
+        {
+            if (count >= buffer.Length)
+                break;
+            if (obj is not Vehicle vehicle || ReferenceEquals(vehicle, handle.Clone) || vehicle.IsCorpse)
+                continue;
+
+            buffer[count++] = new Ai.CloneDriveBrain.DynamicObstacle
+            {
+                Position = vehicle.Position,
+                Velocity = vehicle.Velocity,
+            };
+        }
+
+        handle.Brain.SetDynamicObstacles(buffer, count);
     }
 
     /// <summary>Serial: mutates shared game state (entity pose, ghost masks, ram damage).</summary>
@@ -332,6 +415,13 @@ public sealed class CloneHandle
 
     /// <summary>Cached terrain sampler (heightfield delegate or pinned flat plane).</summary>
     public TerrainContactPlane.HeightSample GroundSample { get; set; }
+
+    /// <summary>Reusable spatial-query scratch for dynamic-obstacle collection.</summary>
+    public List<AutoCore.Game.Entities.ClonedObjectBase> QueryScratch { get; } = new(32);
+
+    /// <summary>Reusable dynamic-obstacle snapshot buffer.</summary>
+    public Ai.CloneDriveBrain.DynamicObstacle[] DynamicBuffer { get; } =
+        new Ai.CloneDriveBrain.DynamicObstacle[16];
 
     /// <summary>Seconds until the next CloneDiag log line.</summary>
     public float DiagCountdown { get; set; }
