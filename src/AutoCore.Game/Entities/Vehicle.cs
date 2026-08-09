@@ -2153,7 +2153,7 @@ public class Vehicle : SimpleObject
                 var splash = WeaponFireTargetAcquisition.AcquireExplosion(
                     primaryPos.Value,
                     weaponSpec.ExplosionRadius,
-                    Faction,
+                    shooterFaction, // SS-36/RC2: owner-chain faction, never chassis Faction (−1 for players)
                     ObjectId.Coid,
                     ownerCoid,
                     candidates,
@@ -2296,7 +2296,7 @@ public class Vehicle : SimpleObject
         return target != null;
     }
 
-    private void ApplyWeaponHit(
+    internal void ApplyWeaponHit(
         ClonedObjectBase target,
         CloneBases.Specifics.WeaponSpecific weaponSpec,
         int attackerLevel,
@@ -2316,6 +2316,14 @@ public class Vehicle : SimpleObject
 
         // Never weapon-kill a player Character body (see IsWeaponCombatantTarget).
         if (target is Character)
+            return;
+
+        // SS-36: entity-level recheck of the unified hostility gate. Acquisition already
+        // filtered candidates, but this computes the effective faction from the live entities,
+        // so a wrong faction at a call site (the RC2 chassis-faction splash bug) cannot land.
+        if (!Combat.CombatEligibility.CanDamage(
+                this, target,
+                isSprayTarget ? Combat.DamageContext.Splash : Combat.DamageContext.WeaponFire))
             return;
 
         // Inanimate / non-creature always hit (client AutoHit); creatures/vehicles roll.
