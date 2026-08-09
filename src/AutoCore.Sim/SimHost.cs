@@ -99,6 +99,34 @@ public sealed class SimHost
     /// <summary>/clonestartpath.</summary>
     public string StartClonePath(Character character) => _cloneManager.StartPath(character);
 
+    /// <summary>/clonepathspeed: sets or resets the live path cruise speed (m/s).</summary>
+    public string SetPathSpeed(Character character, string arg)
+    {
+        if (string.IsNullOrWhiteSpace(arg))
+        {
+            var current = Ai.CloneAiTuning.PathSpeedOverride;
+            return current.HasValue
+                ? $"Clone path speed override is {current.Value:0.#} m/s. Usage: /clonepathspeed <m/s|default>"
+                : $"Clone path speed is the default ({new Ai.CloneAiTuning().PathSpeed:0.#} m/s). Usage: /clonepathspeed <m/s|default>";
+        }
+
+        if (arg.Equals("default", StringComparison.OrdinalIgnoreCase))
+        {
+            Ai.CloneAiTuning.PathSpeedOverride = null;
+            return $"Clone path speed reset to default ({new Ai.CloneAiTuning().PathSpeed:0.#} m/s).";
+        }
+
+        if (!float.TryParse(arg, System.Globalization.NumberStyles.Float,
+                System.Globalization.CultureInfo.InvariantCulture, out var speed)
+            || speed is < 2f or > 60f)
+        {
+            return "Usage: /clonepathspeed <m/s between 2 and 60, or 'default'>";
+        }
+
+        Ai.CloneAiTuning.PathSpeedOverride = speed;
+        return $"Clone path speed set to {speed:0.#} m/s.";
+    }
+
     /// <summary>Routes the /clone* commands through AutoCore.Game's hook seam to this host.</summary>
     public static void InstallCommandHook()
     {
@@ -108,5 +136,6 @@ public sealed class SimHost
         CloneCommandControl.TrySetHold = Instance.SetCloneHold;
         CloneCommandControl.TryTeleportClone = Instance.TeleportClone;
         CloneCommandControl.TryStartPath = Instance.StartClonePath;
+        CloneCommandControl.TrySetPathSpeed = Instance.SetPathSpeed;
     }
 }

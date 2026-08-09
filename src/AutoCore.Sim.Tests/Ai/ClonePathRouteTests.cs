@@ -91,6 +91,81 @@ public class ClonePathRouteTests
     }
 
     [TestMethod]
+    public void PathSpeedOverride_ChangesCruiseSpeed()
+    {
+        CloneAiTuning.PathSpeedOverride = 6f;
+        try
+        {
+            var brain = new CloneDriveBrain(Params(), new CloneAiTuning());
+            brain.Reset(new Vector3(0f, 0f, 0f), yaw: 0f);
+            brain.SetPathRoute(new[] { new Vector3(0f, 0f, 200f), new Vector3(0f, 0f, 400f) }, loop: false);
+
+            for (var i = 0; i < 200; i++)
+                brain.Step(new Vector3(500f, 0f, 500f), default, 0f, Flat, dt: 0.05f);
+
+            var speed = MathF.Sqrt(
+                brain.Car.Velocity.X * brain.Car.Velocity.X + brain.Car.Velocity.Z * brain.Car.Velocity.Z);
+            Assert.AreEqual(6f, speed, 2f, "/clonepathspeed override must govern path cruise speed");
+        }
+        finally
+        {
+            CloneAiTuning.PathSpeedOverride = null;
+        }
+    }
+
+    /// <summary>
+    /// Live 2026-08-09: "sometimes it just stops at a waypoint" — recovery ping-ponged
+    /// against an obstacle near the waypoint forever. After repeated failed recoveries the
+    /// route must SKIP the unreachable waypoint and continue.
+    /// </summary>
+    [TestMethod]
+    public void UnreachableWaypoint_IsSkippedAfterRepeatedRecoveries()
+    {
+        var box = AutoCore.Sim.Collision.CacheHullParser.Parse(File.ReadAllBytes(
+            Path.Combine(AppContext.BaseDirectory, "Fixtures", "hulls", "box.cache")));
+        var world = new AutoCore.Sim.Collision.StaticCollisionWorld();
+        world.Add(box, new Vector3(0f, 0f, 30f), new Quaternion(0f, 0f, 0f, 1f), scale: 12f); // waypoint buried inside
+        world.Build();
+
+        var brain = new CloneDriveBrain(Params(), new CloneAiTuning()) { Obstacles = world };
+        brain.Reset(new Vector3(0f, 0f, 0f), yaw: 0f);
+        brain.SetPathRoute(new[]
+        {
+            new Vector3(0f, 0f, 30f),   // inside the hull — unreachable
+            new Vector3(40f, 0f, 60f),  // reachable
+        }, loop: false);
+
+        var reachedSecond = false;
+        for (var i = 0; i < 1200 && !reachedSecond; i++) // 60 s budget
+        {
+            brain.Step(new Vector3(500f, 0f, 500f), default, 0f, Flat, dt: 0.05f);
+            var dx = brain.Car.Position.X - 40f;
+            var dz = brain.Car.Position.Z - 60f;
+            reachedSecond = MathF.Sqrt(dx * dx + dz * dz) < 8f;
+        }
+
+        Assert.IsTrue(reachedSecond,
+            $"clone must skip the buried waypoint and reach the next one; ended at {brain.Car.Position}");
+    }
+
+    [TestMethod]
+    public void PathMode_EmitsTelemetryAndEvents()
+    {
+        var messages = new List<string>();
+        var brain = new CloneDriveBrain(Params(), new CloneAiTuning()) { DebugLog = messages.Add };
+        brain.Reset(new Vector3(0f, 0f, 0f), yaw: 0f);
+        brain.SetPathRoute(new[] { new Vector3(0f, 0f, 25f), new Vector3(0f, 0f, 60f) }, loop: false);
+
+        for (var i = 0; i < 300; i++)
+            brain.Step(new Vector3(500f, 0f, 500f), default, 0f, Flat, dt: 0.05f);
+
+        Assert.IsTrue(messages.Any(m => m.Contains("waypoint", StringComparison.OrdinalIgnoreCase)),
+            "periodic path telemetry must be emitted");
+        Assert.IsTrue(messages.Any(m => m.Contains("advance", StringComparison.OrdinalIgnoreCase)),
+            "waypoint-advance events must be emitted");
+    }
+
+    [TestMethod]
     public void SetPathRoute_ClearsHold()
     {
         var brain = new CloneDriveBrain(Params(), new CloneAiTuning()) { Hold = true };

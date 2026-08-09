@@ -15,6 +15,7 @@ public class CloneCommandTests
         CloneCommandControl.TrySetHold = null;
         CloneCommandControl.TryTeleportClone = null;
         CloneCommandControl.TryStartPath = null;
+        CloneCommandControl.TrySetPathSpeed = null;
     }
 
     [TestMethod]
@@ -65,6 +66,20 @@ public class CloneCommandTests
         Assert.IsTrue(ChatAdminGate.IsMutatingCommand("/cloneteleport"));
         Assert.IsTrue(ChatAdminGate.IsMutatingCommand("/clonetp"));
         Assert.IsTrue(ChatAdminGate.IsMutatingCommand("/clonestartpath"));
+        Assert.IsTrue(ChatAdminGate.IsMutatingCommand("/clonepathspeed"));
+    }
+
+    [TestMethod]
+    public void ClonePathSpeed_RoutesArgumentToHook()
+    {
+        string seen = null;
+        CloneCommandControl.TrySetPathSpeed = (_, arg) => { seen = arg; return "speed set"; };
+
+        var result = ChatCommandService.Instance.Execute(null, "/clonepathspeed 20");
+
+        Assert.AreEqual("speed set", result.Message);
+        Assert.AreEqual("20", seen);
+        CloneCommandControl.TrySetPathSpeed = null;
     }
 
     [TestMethod]

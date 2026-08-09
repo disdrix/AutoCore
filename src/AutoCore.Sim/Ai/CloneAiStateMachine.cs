@@ -55,6 +55,12 @@ public sealed class CloneAiTuning
     /// <summary>/clonestartpath cruise speed (m/s) — brisk NPC patrol pace.</summary>
     public float PathSpeed { get; init; } = 14f;
 
+    /// <summary>Live /clonepathspeed override (m/s); null = per-instance PathSpeed.</summary>
+    public static float? PathSpeedOverride { get; set; }
+
+    /// <summary>The path cruise speed currently in effect.</summary>
+    public float EffectivePathSpeed => PathSpeedOverride ?? PathSpeed;
+
     /// <summary>Waypoint arrival radius (m) for path routes.</summary>
     public float PathAcceptDistance { get; init; } = 6f;
 }

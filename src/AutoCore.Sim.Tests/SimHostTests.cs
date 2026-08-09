@@ -67,6 +67,28 @@ public class SimHostTests
     }
 
     [TestMethod]
+    public void SetPathSpeed_ParsesSetsAndResets()
+    {
+        try
+        {
+            var set = SimHost.Instance.SetPathSpeed(null, "22");
+            StringAssert.Contains(set, "22");
+            Assert.AreEqual(22f, AutoCore.Sim.Ai.CloneAiTuning.PathSpeedOverride);
+
+            var reset = SimHost.Instance.SetPathSpeed(null, "default");
+            Assert.IsNull(AutoCore.Sim.Ai.CloneAiTuning.PathSpeedOverride);
+            StringAssert.Contains(reset.ToLowerInvariant(), "default");
+
+            var bad = SimHost.Instance.SetPathSpeed(null, "999");
+            StringAssert.Contains(bad.ToLowerInvariant(), "usage");
+        }
+        finally
+        {
+            AutoCore.Sim.Ai.CloneAiTuning.PathSpeedOverride = null;
+        }
+    }
+
+    [TestMethod]
     public void TrimClone_ParsesSetsAndReports()
     {
         try

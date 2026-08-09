@@ -144,6 +144,9 @@ public sealed class CloneManager
                 wheelRadius: 0.45f, wheelBase: 3f, dragHalfRhoCdA: 0.6f);
 
         var brain = new CloneDriveBrain(parameters, new CloneAiTuning());
+        var coid = clone.ObjectId.Coid;
+        brain.DebugLog = message =>
+            Logger.WriteLog(LogType.Debug, $"CloneAI[{coid}]: {message}");
         var forward = TerrainContactPlane.ForwardFromQuaternion(clone.Rotation);
         brain.Reset(clone.Position, MathF.Atan2(forward.X, forward.Z));
         return brain;

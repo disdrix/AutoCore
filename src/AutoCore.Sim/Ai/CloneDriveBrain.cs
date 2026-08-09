@@ -19,6 +19,9 @@ public sealed class CloneDriveBrain
     private readonly RaycastCar _car;
     private float _recoverRemaining;
     private float _recoverSteer;
+    private int _consecutiveRecoveries;
+    private float _sinceLastRecovery;
+    private float _debugAccumulator;
     private float _orbitDirection = 1f; // +1 = clockwise when viewed from above (persistent)
     private float _avoidSign; // committed detour direction while feelers report obstacles
     private float _avoidClearTime; // seconds since the feelers last reported anything
@@ -102,6 +105,14 @@ public sealed class CloneDriveBrain
     /// <summary>Inputs applied on the last step, for the wire (throttle/steer animation).</summary>
     public DriveInputs LastInputs { get; private set; }
 
+    /// <summary>
+    /// Diagnostics sink (server log when wired by CloneManager): ~1 Hz status while pathing
+    /// plus events — waypoint advances/skips, ping-pong flips, stuck/recovery, hard blocks.
+    /// </summary>
+    public Action<string> DebugLog { get; set; }
+
+    private void Debug(string message) => DebugLog?.Invoke(message);
+
     public void Reset(Vector3 position, float yaw)
     {
         _car.SetPose(position, yaw);
@@ -167,9 +178,15 @@ public sealed class CloneDriveBrain
         {
             _recoverRemaining -= dt;
             inputs = new DriveInputs(-0.8f, _recoverSteer, false);
+            if (_recoverRemaining <= 0f)
+                Debug($"recover end #{_consecutiveRecoveries} at ({_car.Position.X:F0},{_car.Position.Z:F0})");
         }
         else
         {
+            _sinceLastRecovery += dt;
+            if (_sinceLastRecovery > 4f)
+                _consecutiveRecoveries = 0; // clean driving spell — reset escalation
+
             inputs = _pathWaypoints != null
                 ? PathInputs()
                 : _stateMachine.Mode == CloneAiMode.Orbit
@@ -180,11 +197,30 @@ public sealed class CloneDriveBrain
 
             if (_stuckDetector.Update(_car.Position, inputs.Throttle, dt))
             {
-                _recoverRemaining = _tuning.RecoverDuration;
-                _recoverSteer = -MathF.Sign(inputs.Steering is 0f ? 1f : inputs.Steering);
+                _consecutiveRecoveries++;
+                _sinceLastRecovery = 0f;
+                // Escalate: alternate the reverse-turn side each attempt (the same arc into
+                // the same obstacle ping-ponged forever), reverse a little longer each time.
+                _recoverRemaining = _tuning.RecoverDuration * (1f + 0.5f * (_consecutiveRecoveries - 1));
+                var baseSign = -MathF.Sign(inputs.Steering is 0f ? 1f : inputs.Steering);
+                _recoverSteer = _consecutiveRecoveries % 2 == 1 ? baseSign : -baseSign;
+                Debug($"STUCK #{_consecutiveRecoveries} at ({_car.Position.X:F0},{_car.Position.Z:F0}) " +
+                      $"speed={PlanarSpeed():F1} -> reverse {_recoverRemaining:F1}s steer={_recoverSteer:+0;-0}");
+
+                // Path mode: an unreachable waypoint (buried in a hull, walled off) would
+                // recover forever — skip it after repeated failures and keep the route alive.
+                if (_pathWaypoints != null && _consecutiveRecoveries >= 3)
+                {
+                    Debug($"waypoint {_pathIndex} unreachable after {_consecutiveRecoveries} recoveries — SKIPPING");
+                    AdvanceWaypoint();
+                    _consecutiveRecoveries = 0;
+                }
+
                 inputs = new DriveInputs(-0.8f, _recoverSteer, false);
             }
         }
+
+        EmitPathTelemetry(dt);
 
         LastInputs = inputs;
 
@@ -202,9 +238,20 @@ public sealed class CloneDriveBrain
                 _car.Position.Y + CompositeGround.StepUpHeight + HardBlockRadius,
                 _car.Position.Z);
             if (Obstacles.SphereOverlap(probe, HardBlockRadius))
+            {
+                if (!_wasHardBlocked)
+                    Debug($"hard BLOCK at ({_car.Position.X:F0},{_car.Position.Z:F0})");
+                _wasHardBlocked = true;
                 _car.BlockAt(prePosition);
+            }
+            else
+            {
+                _wasHardBlocked = false;
+            }
         }
     }
+
+    private bool _wasHardBlocked;
 
     private const float HardBlockRadius = 0.85f;
 
@@ -318,29 +365,57 @@ public sealed class CloneDriveBrain
     /// <summary>Waypoint pursuit: aim at the current point, advance inside the accept radius.</summary>
     private DriveInputs PathInputs()
     {
-        var waypoints = _pathWaypoints;
-        var target = waypoints[_pathIndex];
+        var target = _pathWaypoints[_pathIndex];
         if (DistXZ(target, _car.Position) < _tuning.PathAcceptDistance)
         {
-            var next = _pathIndex + _pathDirection;
-            if (_pathLoops)
-            {
-                next = (next + waypoints.Count) % waypoints.Count;
-            }
-            else if (next < 0 || next >= waypoints.Count)
-            {
-                _pathDirection = -_pathDirection; // A→B line: ping-pong at the ends
-                next = _pathIndex + _pathDirection;
-            }
-
-            _pathIndex = next;
-            target = waypoints[_pathIndex];
+            AdvanceWaypoint();
+            target = _pathWaypoints[_pathIndex];
         }
 
         var steer = PurePursuitSteer(target.X, target.Z);
-        var throttle = SpeedControl(_tuning.PathSpeed);
+        var throttle = SpeedControl(_tuning.EffectivePathSpeed);
         return new DriveInputs(throttle, steer, Handbrake: false);
     }
+
+    private void AdvanceWaypoint()
+    {
+        var waypoints = _pathWaypoints;
+        var next = _pathIndex + _pathDirection;
+        if (_pathLoops)
+        {
+            next = (next + waypoints.Count) % waypoints.Count;
+        }
+        else if (next < 0 || next >= waypoints.Count)
+        {
+            _pathDirection = -_pathDirection; // A→B line: ping-pong at the ends
+            next = _pathIndex + _pathDirection;
+            Debug($"path end reached — ping-pong, now heading {(_pathDirection > 0 ? "forward" : "back")}");
+        }
+
+        Debug($"waypoint advance {_pathIndex} -> {next} ({waypoints.Count} total)");
+        _pathIndex = next;
+    }
+
+    /// <summary>~1 Hz status while a path route is active.</summary>
+    private void EmitPathTelemetry(float dt)
+    {
+        if (DebugLog == null || _pathWaypoints == null)
+            return;
+
+        _debugAccumulator += dt;
+        if (_debugAccumulator < 1f)
+            return;
+        _debugAccumulator = 0f;
+
+        var target = _pathWaypoints[_pathIndex];
+        var state = _recoverRemaining > 0f ? "RECOVERING" : Hold ? "HOLD" : "pathing";
+        Debug($"path: waypoint {_pathIndex + 1}/{_pathWaypoints.Count} dist={DistXZ(target, _car.Position):F0}m " +
+              $"{state} speed={PlanarSpeed():F1} thr={LastInputs.Throttle:F2} steer={LastInputs.Steering:F2} " +
+              $"pos=({_car.Position.X:F0},{_car.Position.Y:F0},{_car.Position.Z:F0})");
+    }
+
+    private float PlanarSpeed() =>
+        MathF.Sqrt(_car.Velocity.X * _car.Velocity.X + _car.Velocity.Z * _car.Velocity.Z);
 
     private DriveInputs FollowInputs(Vector3 playerPosition, Vector3 playerVelocity, float separation)
     {

@@ -32,4 +32,7 @@ public static class CloneCommandControl
 
     /// <summary>/clonestartpath: navigate the nearest map path; /clonefollow resumes.</summary>
     public static Func<Character, string> TryStartPath { get; set; }
+
+    /// <summary>/clonepathspeed: live path cruise speed (m/s, or "default").</summary>
+    public static Func<Character, string, string> TrySetPathSpeed { get; set; }
 }

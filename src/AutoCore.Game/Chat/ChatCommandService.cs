@@ -94,6 +94,10 @@ public sealed class ChatCommandService
             case "/cloneStartPath":
                 return CloneStartPath(character);
 
+            case "/clonepathspeed":
+            case "/clonePathSpeed":
+                return ClonePathSpeed(character, parts.Length > 1 ? parts[1] : null);
+
             case "/showMissions":
             case "/showmissions":
                 return ShowMissions(character);
@@ -281,6 +285,16 @@ public sealed class ChatCommandService
             return new ChatCommandExecutionResult(true, "Clone simulation is unavailable on this server.");
 
         return new ChatCommandExecutionResult(true, trim(character, arg));
+    }
+
+    /// <summary>/clonepathspeed &lt;m/s|default&gt; — live path cruise speed.</summary>
+    private static ChatCommandExecutionResult ClonePathSpeed(Character character, string arg)
+    {
+        var setter = CloneCommandControl.TrySetPathSpeed;
+        if (setter == null)
+            return new ChatCommandExecutionResult(true, "Clone simulation is unavailable on this server.");
+
+        return new ChatCommandExecutionResult(true, setter(character, arg));
     }
 
     /// <summary>/clonestartpath — clone navigates the nearest map path.</summary>
