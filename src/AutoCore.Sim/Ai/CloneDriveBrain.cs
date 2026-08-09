@@ -225,6 +225,10 @@ public sealed class CloneDriveBrain
                     Debug($"hard BLOCK at ({_car.Position.X:F0},{_car.Position.Z:F0}) on '{blockLabel ?? "?"}'");
                 _wasHardBlocked = true;
                 _blockedTime += dt;
+                // A block is not "clean driving": without this the recovery escalation counter
+                // reset between ~6 s block-wander-block loops and STUCK #1 repeated forever,
+                // so the unreachable-waypoint skip never fired.
+                _sinceLastRecovery = 0f;
                 _car.BlockAt(prePosition);
 
                 if (_recoverRemaining > 0f && !_recoverForward)
@@ -300,9 +304,17 @@ public sealed class CloneDriveBrain
         var throttle = inputs.Throttle;
         const float feelerAngle = 15f * MathF.PI / 180f;
 
-        var centerHit = Feel(world, origin, _car.Position.Y, _car.Yaw, feelerLength, out var centerDist);
-        var leftHit = Feel(world, origin, _car.Position.Y, _car.Yaw - feelerAngle, sideLength, out var leftDist);
-        var rightHit = Feel(world, origin, _car.Position.Y, _car.Yaw + feelerAngle, sideLength, out var rightDist);
+        // Scan where the car is GOING, not just where the nose points: aligning the fan with
+        // the velocity heading catches walls on the inside of a turn arc (live 2026-08-09
+        // 11:47: repeated corner-cut into the same brick store the nose-only fan never saw).
+        // Velocity is used rather than the steer command — steer-based rotation fed back into
+        // avoidance bias and oscillated in tight detours.
+        var scanYaw = speed > 3f
+            ? MathF.Atan2(_car.Velocity.X, _car.Velocity.Z)
+            : _car.Yaw;
+        var centerHit = Feel(world, origin, _car.Position.Y, scanYaw, feelerLength, out var centerDist);
+        var leftHit = Feel(world, origin, _car.Position.Y, scanYaw - feelerAngle, sideLength, out var leftDist);
+        var rightHit = Feel(world, origin, _car.Position.Y, scanYaw + feelerAngle, sideLength, out var rightDist);
 
         if (leftHit || rightHit || centerHit)
         {
