@@ -87,12 +87,13 @@ public sealed class CloneManager
             return "No map paths on this map.";
 
         var waypoints = nearest.Points.Select(p => p.Position).ToArray();
+        var accepts = nearest.Points.Select(p => p.AcceptDistance).ToArray();
         // Closed path (first ≈ last) → loop; otherwise ping-pong the A→B line.
         var dxEnds = waypoints[0].X - waypoints[^1].X;
         var dzEnds = waypoints[0].Z - waypoints[^1].Z;
         var loops = MathF.Sqrt(dxEnds * dxEnds + dzEnds * dzEnds) < 15f;
 
-        handle.Brain.SetPathRoute(waypoints, loops);
+        handle.Brain.SetPathRoute(waypoints, loops, accepts);
         var label = string.IsNullOrWhiteSpace(nearest.PathName) ? $"#{nearest.COID}" : nearest.PathName;
         return $"Clone following path '{label}' ({waypoints.Length} waypoints, " +
                $"{(loops ? "loop" : "ping-pong")}, {nearestDist:0} m away).";

@@ -207,6 +207,54 @@ public class ClonePathRouteTests
     }
 
     /// <summary>
+    /// Live 2026-08-09 12:06: speed 27 with positive throttle TWO legs before a 90° corner —
+    /// single-vertex anticipation cannot brake across dense waypoints (10–20 m legs, ~19 m
+    /// braking distance). The speed cap must scan the braking horizon across multiple legs.
+    /// </summary>
+    [TestMethod]
+    public void DenseWaypoints_BrakesAcrossMultipleLegsBeforeACorner()
+    {
+        CloneAiTuning.PathSpeedOverride = 30f;
+        try
+        {
+            var brain = new CloneDriveBrain(Params(), new CloneAiTuning());
+            brain.Reset(new Vector3(0f, 0f, -40f), yaw: 0f);
+            // Straight run with dense waypoints, then a 90° turn at (0,90) — live-like spacing.
+            brain.SetPathRoute(new[]
+            {
+                new Vector3(0f, 0f, 0f),
+                new Vector3(0f, 0f, 15f),
+                new Vector3(0f, 0f, 30f),
+                new Vector3(0f, 0f, 45f),
+                new Vector3(0f, 0f, 60f),
+                new Vector3(0f, 0f, 75f),
+                new Vector3(0f, 0f, 90f),
+                new Vector3(60f, 0f, 90f),
+            }, loop: false);
+
+            var speedAtCorner = float.MaxValue;
+            for (var i = 0; i < 400; i++)
+            {
+                brain.Step(new Vector3(500f, 0f, 500f), default, 0f, Flat, dt: 0.05f);
+                var dz = 90f - brain.Car.Position.Z;
+                if (dz is > 0f and < 10f && MathF.Abs(brain.Car.Position.X) < 6f)
+                {
+                    var s = MathF.Sqrt(brain.Car.Velocity.X * brain.Car.Velocity.X
+                        + brain.Car.Velocity.Z * brain.Car.Velocity.Z);
+                    speedAtCorner = MathF.Min(speedAtCorner, s);
+                }
+            }
+
+            Assert.IsTrue(speedAtCorner < 12f,
+                $"must arrive at the 90° corner slow despite dense waypoints; was {speedAtCorner} m/s");
+        }
+        finally
+        {
+            CloneAiTuning.PathSpeedOverride = null;
+        }
+    }
+
+    /// <summary>
     /// Live trace: after a hard block the clone sat at full throttle against the wall for
     /// 2+ s until the generic stuck timer fired. Sustained blocking must trigger recovery
     /// within about half a second.
@@ -283,6 +331,38 @@ public class ClonePathRouteTests
         Assert.IsTrue(reachedEnd, $"must round the corner to the last waypoint; ended at {brain.Car.Position}");
         Assert.IsFalse(messages.Any(m => m.Contains("STUCK")),
             $"lane following must clear the corner without getting stuck:\n{string.Join("\n", messages.Where(m => m.Contains("BLOCK") || m.Contains("STUCK")))}");
+    }
+
+    /// <summary>
+    /// ROOT CAUSE of the brick-store stuck (probe of arkbaytutorial 'realgunny2' path):
+    /// waypoint 56 sits ~1 m from the store wall, but its AUTHORED AcceptDistance is 15 m —
+    /// retail NPCs tick it off from afar and never approach the wall. Our fixed 6 m accept
+    /// forced the clone to drive into the building. Authored accepts must be honored.
+    /// </summary>
+    [TestMethod]
+    public void AuthoredAcceptDistance_AdvancesWaypointFromAfar()
+    {
+        var brain = new CloneDriveBrain(Params(), new CloneAiTuning());
+        brain.Reset(new Vector3(0f, 0f, 0f), yaw: 0f);
+        brain.SetPathRoute(
+            new[] { new Vector3(0f, 0f, 60f), new Vector3(50f, 0f, 60f) },
+            loop: false,
+            acceptDistances: new[] { 15f, 15f });
+
+        var advancedAtDistance = -1f;
+        for (var i = 0; i < 300 && advancedAtDistance < 0f; i++)
+        {
+            brain.Step(new Vector3(500f, 0f, 500f), default, 0f, Flat, dt: 0.05f);
+            if (brain.PathWaypointIndex == 1)
+            {
+                var dx = brain.Car.Position.X - 0f;
+                var dz = brain.Car.Position.Z - 60f;
+                advancedAtDistance = MathF.Sqrt(dx * dx + dz * dz);
+            }
+        }
+
+        Assert.IsTrue(advancedAtDistance is > 10f and < 18f,
+            $"waypoint with authored accept 15 must advance ~15 m out, advanced at {advancedAtDistance}");
     }
 
     [TestMethod]

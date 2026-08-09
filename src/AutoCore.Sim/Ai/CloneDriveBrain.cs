@@ -53,6 +53,7 @@ public sealed class CloneDriveBrain
 
     // --- /clonestartpath: waypoint route (map path) instead of follow/orbit ---
     private IReadOnlyList<Vector3> _pathWaypoints;
+    private IReadOnlyList<float> _pathAccepts; // authored per-waypoint AcceptDistance (fam)
     private bool _pathLoops;
     private int _pathIndex;
     private int _pathDirection = 1; // +1 forward, −1 for the ping-pong return leg
@@ -65,12 +66,16 @@ public sealed class CloneDriveBrain
     /// Navigate the given waypoints with the sim (physics + avoidance, no snapping): loop
     /// routes wrap; open A→B routes ping-pong. Starts at the nearest waypoint. Clears a hold.
     /// </summary>
-    public void SetPathRoute(IReadOnlyList<Vector3> waypoints, bool loop)
+    public void SetPathRoute(IReadOnlyList<Vector3> waypoints, bool loop,
+        IReadOnlyList<float> acceptDistances = null)
     {
         if (waypoints == null || waypoints.Count < 2)
             return;
 
         _pathWaypoints = waypoints;
+        _pathAccepts = acceptDistances != null && acceptDistances.Count == waypoints.Count
+            ? acceptDistances
+            : null;
         _pathLoops = loop;
         _pathDirection = 1;
         Hold = false;
@@ -400,7 +405,12 @@ public sealed class CloneDriveBrain
     private DriveInputs PathInputs()
     {
         var target = _pathWaypoints[_pathIndex];
-        if (DistXZ(target, _car.Position) < _tuning.PathAcceptDistance)
+        // Authored AcceptDistance wins (root cause of the brick-store stuck: a waypoint 1 m
+        // from a wall authored with accept 15 — retail NPCs never approach it closer).
+        var accept = _pathAccepts != null && _pathAccepts[_pathIndex] > 0f
+            ? Math.Clamp(_pathAccepts[_pathIndex], 3f, 30f)
+            : _tuning.PathAcceptDistance;
+        if (DistXZ(target, _car.Position) < accept)
         {
             AdvanceWaypoint();
             target = _pathWaypoints[_pathIndex];
