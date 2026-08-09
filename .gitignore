@@ -320,3 +320,9 @@ tmp-map/
 tools/
 scripts/
 AutoCore.DevTool/
+# Local game client installation (copyrighted assets - never track)
+autoassaultclient/
+
+# Local starter-dump import scratch
+tmp/
+
