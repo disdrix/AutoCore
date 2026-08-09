@@ -249,6 +249,26 @@ public static class VehicleMapPropRam
         return IsCollidable(cb);
     }
 
+    /// <summary>
+    /// Clonebase-only soft-destructible check (no live entity needed) — used by AutoCore.Sim
+    /// to keep drive-through props out of the clone's hard collision world. Mirrors
+    /// <see cref="IsSoftDestructible"/>'s clonebase branch.
+    /// </summary>
+    public static bool IsSoftDestructibleCloneBase(CloneBases.CloneBaseObject cb)
+    {
+        if (cb == null)
+            return false;
+
+        if (cb.SimpleObjectSpecific.MinHitPoints >= SoftMinHitPointsExclusive)
+            return false;
+
+        var type = (CloneBaseObjectType)cb.CloneBaseSpecific.Type;
+        return type == CloneBaseObjectType.ObjectGraphicsPhysics
+               || type == CloneBaseObjectType.Creature
+               || type == CloneBaseObjectType.Object
+               || type == CloneBaseObjectType.QuestObject;
+    }
+
     public static bool IsSoftDestructible(GraphicsObject prop)
     {
         var cb = prop?.CloneBaseObject;

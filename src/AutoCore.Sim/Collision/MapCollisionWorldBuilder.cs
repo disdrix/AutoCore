@@ -17,15 +17,18 @@ public sealed class MapCollisionWorldBuilder
     private readonly Func<int, string> _physicsNameByCbid;
     private readonly Dictionary<string, string> _cacheEntryIndex;
     private readonly Func<string, byte[]> _hullBytesByName;
+    private readonly Func<int, bool> _isSoftDestructibleByCbid;
     private readonly Dictionary<string, ConvexHull[]> _hullCache = new(StringComparer.OrdinalIgnoreCase);
 
     public MapCollisionWorldBuilder(
         Func<int, string> physicsNameByCbid,
         IEnumerable<string> hullEntryNames,
-        Func<string, byte[]> hullBytesByName)
+        Func<string, byte[]> hullBytesByName,
+        Func<int, bool> isSoftDestructibleByCbid = null)
     {
         _physicsNameByCbid = physicsNameByCbid ?? throw new ArgumentNullException(nameof(physicsNameByCbid));
         _hullBytesByName = hullBytesByName ?? throw new ArgumentNullException(nameof(hullBytesByName));
+        _isSoftDestructibleByCbid = isSoftDestructibleByCbid;
 
         // Case-insensitive name → exact archive entry name.
         _cacheEntryIndex = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -50,6 +53,12 @@ public sealed class MapCollisionWorldBuilder
             // existence; the client renders statics regardless). Filtering on it produced an
             // EMPTY collision world on highway maps.
             if (template is not GraphicsObjectTemplate graphics || template.CBID <= 0)
+                continue;
+
+            // Soft destructibles (street lights, crates, fences the client drives through and
+            // rams to bits) must NOT hard-collide — the clone destroys them via
+            // VehicleMapPropRam instead (live 2026-08-09 11:38: blocked on a street light).
+            if (_isSoftDestructibleByCbid != null && _isSoftDestructibleByCbid(template.CBID))
                 continue;
 
             var hulls = ResolveHulls(template.CBID);

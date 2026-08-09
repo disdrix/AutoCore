@@ -82,6 +82,26 @@ public class MapCollisionWorldBuilderTests
             "one instance per -pN decomposition piece; base hull and _part destruction pieces excluded");
     }
 
+    /// <summary>
+    /// Live 2026-08-09 11:38: the clone hard-blocked on a street light — a soft destructible
+    /// that retail vehicles drive straight through (ramming destroys it). Soft-destructible
+    /// placements must not enter the hard collision world.
+    /// </summary>
+    [TestMethod]
+    public void Build_ExcludesSoftDestructibleProps()
+    {
+        var hullSource = new Dictionary<string, byte[]> { ["pole.cache"] = BoxCache(), ["wall.cache"] = BoxCache() };
+        var builder = new MapCollisionWorldBuilder(
+            physicsNameByCbid: cbid => cbid == 1 ? "pole" : "wall",
+            hullEntryNames: hullSource.Keys,
+            hullBytesByName: name => hullSource.TryGetValue(name, out var b) ? b : null,
+            isSoftDestructibleByCbid: cbid => cbid == 1);
+
+        var world = builder.Build(new[] { Placement(1, 0f, 0f), Placement(2, 30f, 0f) });
+
+        Assert.AreEqual(1, world.InstanceCount, "the destructible pole must be drive-through");
+    }
+
     [TestMethod]
     public void Build_BadHullBytes_SkipSilentlyAndKeepOthers()
     {

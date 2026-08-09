@@ -249,6 +249,12 @@ public sealed class CloneManager
         // driving forward; brake-spec pedal = max(0, axis)): NEGATIVE throttle drives forward
         // and steer is baseDir·lateral. The sim brain uses positive-forward/positive-right, so
         // both axes flip here — publishing them raw animated the wheels backwards live.
+        // Ram-through destructibles: same pipeline as player vehicles (damage, loot,
+        // destruction replication). Soft props are excluded from the hard collision world,
+        // so the clone drives through them and this smashes them (live 2026-08-09 11:38:
+        // it hard-blocked on a street light instead).
+        var prePublishPosition = handle.Clone.Position;
+
         var inputs = brain.LastInputs;
         handle.Clone.ApplyServerMove(
             publishPosition,
@@ -259,6 +265,8 @@ public sealed class CloneManager
             driveSteering: -inputs.Steering,
             sharpTurn: inputs.Handbrake ? (byte)1 : (byte)0,
             angularVelocity: new AutoCore.Game.Structures.Vector3(0f, car.YawRate, 0f));
+
+        AutoCore.Game.Combat.VehicleMapPropRam.Process(handle.Clone, prePublishPosition, dt);
     }
 
     private static float PlanarSpeed(AutoCore.Sim.Physics.RaycastCar car)

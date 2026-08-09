@@ -214,6 +214,53 @@ public class CloneManagerTests
         StringAssert.Contains(resume.ToLowerInvariant(), "follow");
     }
 
+    /// <summary>
+    /// Live 2026-08-09 11:38: the clone must RAM soft destructibles like a player vehicle —
+    /// damage + destruction replicate through the normal pipeline (VehicleMapPropRam).
+    /// </summary>
+    [TestMethod]
+    public void Tick_CloneRamsSoftDestructiblePropsInItsWay()
+    {
+        var previous = AutoCore.Game.Diagnostics.ServerConfig.EnableRamming;
+        AutoCore.Game.Diagnostics.ServerConfig.EnableRamming = true;
+        AutoCore.Game.Combat.VehicleMapPropRam.ResetCooldownsForTests();
+        try
+        {
+            const int propCbid = 810_050;
+            AssetManagerTestHelper.RegisterCloneBase(propCbid, CloneBaseObjectType.ObjectGraphicsPhysics);
+
+            var map = CreateFieldMap(8213);
+            var character = DrivingCharacter(map);
+            character.CurrentVehicle.Position = new AutoCore.Game.Structures.Vector3(100f, 0f, 100f);
+            var manager = new CloneManager();
+            manager.Toggle(character);
+            var clone = map.NpcAiEntities.OfType<Vehicle>().Single();
+
+            // Drop a fragile prop right on the clone's orbit circle.
+            var prop = new AutoCore.Game.Entities.GraphicsObject(
+                AutoCore.Game.Entities.GraphicsObjectType.GraphicsPhysics);
+            prop.SetCoid(770_001, false);
+            prop.LoadCloneBase(propCbid);
+            prop.InitializeHealthForTests(3);
+            prop.Position = new AutoCore.Game.Structures.Vector3(100f, 0f, 92f);
+            prop.SetMap(map);
+
+            var startHp = prop.GetCurrentHP();
+            for (var i = 0; i < 900 && prop.GetCurrentHP() >= startHp; i++)
+            {
+                map.Grid.RebucketSweep();
+                manager.Tick(nowMs: i * 50, dt: 0.05f);
+            }
+
+            Assert.IsTrue(prop.GetCurrentHP() < startHp,
+                "the clone must ram-damage soft props it passes through");
+        }
+        finally
+        {
+            AutoCore.Game.Diagnostics.ServerConfig.EnableRamming = previous;
+        }
+    }
+
     [TestMethod]
     public void StartPath_NoPathsOnMap_ReportsFriendlyMessage()
     {

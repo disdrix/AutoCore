@@ -36,6 +36,10 @@ public sealed class MapCollisionWorlds
         return stream?.ToArray();
     };
 
+    internal Func<int, bool> IsSoftDestructibleByCbid { get; set; } = cbid =>
+        AutoCore.Game.Combat.VehicleMapPropRam.IsSoftDestructibleCloneBase(
+            AssetManager.Instance.GetCloneBase(cbid) as AutoCore.Game.CloneBases.CloneBaseObject);
+
     /// <summary>Returns the built world for this map, or null while building/unavailable.</summary>
     public StaticCollisionWorld GetOrRequest(SectorMap map)
     {
@@ -55,7 +59,7 @@ public sealed class MapCollisionWorlds
                 try
                 {
                     var builder = new MapCollisionWorldBuilder(
-                        PhysicsNameByCbid, HullEntryNames(), HullBytesByName);
+                        PhysicsNameByCbid, HullEntryNames(), HullBytesByName, IsSoftDestructibleByCbid);
                     slot.World = builder.Build(placements);
                     Logger.WriteLog(LogType.Debug,
                         $"MapCollisionWorlds: '{mapName}' ready with {slot.World.InstanceCount} hull instances");
