@@ -65,6 +65,10 @@ public sealed class ChatCommandService
             case "/sector.tick":
                 return SectorTick(parts);
 
+            case "/clone":
+            case "/unclone":
+                return ToggleClone(character);
+
             case "/showMissions":
             case "/showmissions":
                 return ShowMissions(character);
@@ -229,6 +233,19 @@ public sealed class ChatCommandService
             return new ChatCommandExecutionResult(true, message);
 
         return new ChatCommandExecutionResult(true, message);
+    }
+
+    /// <summary>
+    /// Toggle a simulated clone of the character's vehicle. The actual behavior lives in
+    /// AutoCore.Sim; the Sector host wires <see cref="CloneCommandControl.TryToggleClone"/>.
+    /// </summary>
+    private static ChatCommandExecutionResult ToggleClone(Character character)
+    {
+        var toggle = CloneCommandControl.TryToggleClone;
+        if (toggle == null)
+            return new ChatCommandExecutionResult(true, "Clone simulation is unavailable on this server.");
+
+        return new ChatCommandExecutionResult(true, toggle(character));
     }
 
     private static ChatCommandExecutionResult Skills(Character character, string[] parts)
