@@ -32,12 +32,12 @@ public class SimPerfBenchmarkTests
 
     [TestMethod]
     [Ignore("Manual perf benchmark against the real client install (~4 min); loads the real WAD " +
-            "into the AssetManager singleton, which contaminates fake-clonebase tests in the same " +
-            "run. After the 2026-08-09 optimization pass (zero-alloc collision queries, cached " +
-            "samplers, parallel think): allocations 5-15 KB -> ~0 B/veh-tick; serial per-vehicle " +
-            "8.5/40/70 -> 4.3/17/32 us; 1000-vehicle serial tick 8.5/17.4/31.9 ms (max 64% of " +
-            "budget, was 147%); PARALLEL 1000-vehicle tick 0.72/1.76/3.09 ms = 1.4-6.2% of budget " +
-            "(6-10x on 24 cores). Remove [Ignore] to re-measure.")]
+            "into the AssetManager singleton, contaminating fake-clonebase tests in the same run. " +
+            "History (per-vehicle us, scrapvalley/militiabase/malachite): baseline 8.5/40/70 -> " +
+            "round 1 (zero-alloc queries, cached samplers) 4.3/17/32 -> round 2 (AABB pre-rejects, " +
+            "per-tick TryAlign) 3.0/4.5/7.9. 1000-vehicle tick: serial max 7.9 ms (16% budget), " +
+            "PARALLEL max 0.82 ms (1.6% budget, 24 cores). Allocations ~0 B/veh-tick. " +
+            "Remove [Ignore] to re-measure.")]
     public void Benchmark_FleetTickCost_OnRealMaps()
     {
         if (!Directory.Exists(InstallPath))

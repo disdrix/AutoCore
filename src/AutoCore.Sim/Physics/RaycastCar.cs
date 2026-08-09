@@ -101,10 +101,24 @@ public sealed class RaycastCar
             return;
 
         _dtAccumulator = MathF.Min(_dtAccumulator + frameDt, MaxSubstepsPerAdvance * SubstepDt);
+        var stepped = false;
         while (_dtAccumulator >= SubstepDt)
         {
             _dtAccumulator -= SubstepDt;
             Substep(inputs, ground);
+            stepped = true;
+        }
+
+        // Presentation rotation once per Advance (not per substep): TryAlign's 5-point
+        // footprint sampling was ~half the per-vehicle collision cost, and 20 Hz is already
+        // the wire rate — per-substep alignment bought nothing visible.
+        if (stepped)
+        {
+            if (Grounded && ground != null
+                && TerrainContactPlane.TryAlign(Position, Yaw, ground, out _, out var aligned))
+                Rotation = aligned;
+            else
+                Rotation = TerrainContactPlane.FromYawPitchRoll(Yaw, 0f, 0f);
         }
     }
 
@@ -249,11 +263,6 @@ public sealed class RaycastCar
             Position.Y + Velocity.Y * dt,
             Position.Z + Velocity.Z * dt);
 
-        // --- presentation rotation: terrain-aligned when grounded, yaw-only airborne ---
-        if (Grounded && ground != null
-            && TerrainContactPlane.TryAlign(Position, Yaw, ground, out _, out var aligned))
-            Rotation = aligned;
-        else
-            Rotation = TerrainContactPlane.FromYawPitchRoll(Yaw, 0f, 0f);
+        // Presentation rotation is updated once per Advance (see caller).
     }
 }

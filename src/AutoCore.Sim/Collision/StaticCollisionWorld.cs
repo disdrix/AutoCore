@@ -33,6 +33,10 @@ public sealed class StaticCollisionWorld
         _instances.Add(new Instance(hull, position, rotation, scale, label));
     }
 
+    // World AABB per instance (SoA) for cheap ray/sphere pre-rejects before the full
+    // oriented-hull test — dense cells previously paid an inverse-rotate per candidate.
+    private float[] _aabbMinX, _aabbMinY, _aabbMinZ, _aabbMaxX, _aabbMaxY, _aabbMaxZ;
+
     /// <summary>Freeze and index. Idempotent.</summary>
     public void Build()
     {
@@ -40,9 +44,19 @@ public sealed class StaticCollisionWorld
             return;
         _built = true;
 
+        _aabbMinX = new float[_instances.Count];
+        _aabbMinY = new float[_instances.Count];
+        _aabbMinZ = new float[_instances.Count];
+        _aabbMaxX = new float[_instances.Count];
+        _aabbMaxY = new float[_instances.Count];
+        _aabbMaxZ = new float[_instances.Count];
+
         for (var i = 0; i < _instances.Count; i++)
         {
             var (min, max) = _instances[i].WorldBounds();
+            _aabbMinX[i] = min.X; _aabbMinY[i] = min.Y; _aabbMinZ[i] = min.Z;
+            _aabbMaxX[i] = max.X; _aabbMaxY[i] = max.Y; _aabbMaxZ[i] = max.Z;
+
             var c0 = (int)MathF.Floor(min.X / CellSize);
             var c1 = (int)MathF.Floor(max.X / CellSize);
             var r0 = (int)MathF.Floor(min.Z / CellSize);
@@ -121,6 +135,9 @@ public sealed class StaticCollisionWorld
                         continue;
                     stamps[index] = generation;
 
+                    if (!RayIntersectsAabb(index, origin, direction, MathF.Min(maxDistance, distance)))
+                        continue;
+
                     var inst = _instances[index];
                     if (!inst.Raycast(origin, direction, maxDistance, out var d, out var n))
                         continue;
@@ -164,6 +181,13 @@ public sealed class StaticCollisionWorld
                     if (stamps[index] == generation)
                         continue;
                     stamps[index] = generation;
+                    if (center.X < _aabbMinX[index] - radius || center.X > _aabbMaxX[index] + radius
+                        || center.Y < _aabbMinY[index] - radius || center.Y > _aabbMaxY[index] + radius
+                        || center.Z < _aabbMinZ[index] - radius || center.Z > _aabbMaxZ[index] + radius)
+                    {
+                        continue;
+                    }
+
                     if (_instances[index].SphereOverlap(center, radius))
                     {
                         hitLabel = _instances[index].Label;
@@ -174,6 +198,69 @@ public sealed class StaticCollisionWorld
         }
 
         return false;
+    }
+
+    /// <summary>Standard slab test against the instance's world AABB (cheap pre-reject).</summary>
+    private bool RayIntersectsAabb(int index, Vector3 origin, Vector3 direction, float maxDistance)
+    {
+        var tMin = 0f;
+        var tMax = maxDistance;
+
+        // X slab
+        if (MathF.Abs(direction.X) < 1e-9f)
+        {
+            if (origin.X < _aabbMinX[index] || origin.X > _aabbMaxX[index])
+                return false;
+        }
+        else
+        {
+            var inv = 1f / direction.X;
+            var t1 = (_aabbMinX[index] - origin.X) * inv;
+            var t2 = (_aabbMaxX[index] - origin.X) * inv;
+            if (t1 > t2) (t1, t2) = (t2, t1);
+            tMin = MathF.Max(tMin, t1);
+            tMax = MathF.Min(tMax, t2);
+            if (tMin > tMax)
+                return false;
+        }
+
+        // Y slab
+        if (MathF.Abs(direction.Y) < 1e-9f)
+        {
+            if (origin.Y < _aabbMinY[index] || origin.Y > _aabbMaxY[index])
+                return false;
+        }
+        else
+        {
+            var inv = 1f / direction.Y;
+            var t1 = (_aabbMinY[index] - origin.Y) * inv;
+            var t2 = (_aabbMaxY[index] - origin.Y) * inv;
+            if (t1 > t2) (t1, t2) = (t2, t1);
+            tMin = MathF.Max(tMin, t1);
+            tMax = MathF.Min(tMax, t2);
+            if (tMin > tMax)
+                return false;
+        }
+
+        // Z slab
+        if (MathF.Abs(direction.Z) < 1e-9f)
+        {
+            if (origin.Z < _aabbMinZ[index] || origin.Z > _aabbMaxZ[index])
+                return false;
+        }
+        else
+        {
+            var inv = 1f / direction.Z;
+            var t1 = (_aabbMinZ[index] - origin.Z) * inv;
+            var t2 = (_aabbMaxZ[index] - origin.Z) * inv;
+            if (t1 > t2) (t1, t2) = (t2, t1);
+            tMin = MathF.Max(tMin, t1);
+            tMax = MathF.Min(tMax, t2);
+            if (tMin > tMax)
+                return false;
+        }
+
+        return true;
     }
 
     private readonly struct Instance
