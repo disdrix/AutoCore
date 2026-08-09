@@ -5,7 +5,7 @@ namespace AutoCore.Game.Map;
 /// Encoding matches retail <c>CVOGTerrain::LoadMapImage</c> (and the level-viewer sampler):
 /// <list type="bullet">
 ///   <item>Uncompressed BGRA; height16 = (A &lt;&lt; 8) | B</item>
-///   <item>world Y = height16 * <see cref="DefaultHeightScale"/> / 256</item>
+///   <item>world Y = height16 * <see cref="DefaultHeightScale"/> / 0xFF00 (A/255 × max height)</item>
 ///   <item>world X = col * gridSize, world Z = row * gridSize (row 0 = Z 0, no vertical flip)</item>
 /// </list>
 /// Source file: <c>{MapFileName}.tga</c> from the game GLM pack, dimensions must match fam
@@ -13,14 +13,23 @@ namespace AutoCore.Game.Map;
 /// </summary>
 public sealed class MapTerrainHeightfield
 {
-    /// <summary>Retail / level-viewer default: world Y units per 256 of the 16-bit height.</summary>
-    public const float DefaultHeightScale = 4.0f;
+    /// <summary>
+    /// World height at full-scale height16 (A=255, B=0 → 0xFF00): 1000 world units. The old
+    /// level-viewer-derived decode (4.0 per 256 of h16) ran exactly 255/250 ≈ 2% high — live
+    /// player-Y calibration on 2026-08-09 matched worldY = h16·1000/65280 to 1–2 cm on two
+    /// independent maps (h16 8126 → 124.48 vs observed 124.49; 8641 → 132.37 vs 132.35).
+    /// Semantics: A channel /255 × MaxWorldHeight, B channel = sub-precision /256.
+    /// </summary>
+    public const float DefaultHeightScale = 1000.0f;
+
+    /// <summary>height16 value at full scale: 0xFF00 (A=255, B=0).</summary>
+    private const float FullScaleHeight16 = 65280f;
 
     private readonly ushort[] _heights;
     private readonly int _width;
     private readonly int _height;
     private readonly float _gridSize;
-    private readonly float _heightScaleOver256;
+    private readonly float _worldYPerHeight16;
 
     private MapTerrainHeightfield(ushort[] heights, int width, int height, float gridSize, float heightScale)
     {
@@ -28,7 +37,7 @@ public sealed class MapTerrainHeightfield
         _width = width;
         _height = height;
         _gridSize = gridSize;
-        _heightScaleOver256 = heightScale / 256f;
+        _worldYPerHeight16 = heightScale / FullScaleHeight16;
     }
 
     public int Width => _width;
@@ -159,6 +168,6 @@ public sealed class MapTerrainHeightfield
         else if (row >= _height) row = _height - 1;
         if (col < 0) col = 0;
         else if (col >= _width) col = _width - 1;
-        return _heights[row * _width + col] * _heightScaleOver256;
+        return _heights[row * _width + col] * _worldYPerHeight16;
     }
 }

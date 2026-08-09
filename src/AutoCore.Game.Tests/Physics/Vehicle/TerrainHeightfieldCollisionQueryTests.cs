@@ -164,14 +164,14 @@ public class TerrainHeightfieldCollisionQueryTests
     [TestMethod]
     public void CastRay_MapTerrainHeightfield_WrapsBilinearSample()
     {
-        // 2x2 flat height16=256 → world Y = 256 * 4/256 = 4
+        // 2x2 flat height16=256 → world Y = 256·1000/65280 ≈ 3.9216
         using var tga = MapTerrainHeightfieldTests.BuildHeightTga(2, 2, new ushort[] { 256, 256, 256, 256 });
         Assert.IsTrue(MapTerrainHeightfield.TryLoad(tga, 2, 2, 10f, out var field, out var err), err);
 
         var q = new TerrainHeightfieldCollisionQuery(field);
         Assert.IsTrue(q.CastRay(5f, 6f, 5f, 0f, -1f, 0f, 5f, out var hit));
-        Assert.AreEqual(4f, hit.PointY, 1e-3f);
-        Assert.AreEqual((6f - 4f) / 5f, hit.Fraction, 1e-3f);
+        Assert.AreEqual(256f * (1000f / 65280f), hit.PointY, 1e-3f);
+        Assert.AreEqual((6f - 256f * (1000f / 65280f)) / 5f, hit.Fraction, 1e-3f);
         Assert.IsTrue(hit.IsTerrain);
         Assert.IsTrue(hit.NormalY > 0.99f);
     }
