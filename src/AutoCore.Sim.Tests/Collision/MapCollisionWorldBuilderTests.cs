@@ -102,6 +102,32 @@ public class MapCollisionWorldBuilderTests
         Assert.AreEqual(1, world.InstanceCount, "the destructible pole must be drive-through");
     }
 
+    /// <summary>
+    /// The archive uses BOTH decomposition namings: "-pN" (overpass span) and "_pNN"
+    /// (brick-2story-store01_p01..12 — found live 2026-08-09: the -pN-only scan fell back to
+    /// the solid convex BASE hull, whose envelope bulges across the alley the real walls
+    /// clear, which was the wall the clone kept hitting).
+    /// </summary>
+    [TestMethod]
+    public void Build_LoadsUnderscoreZeroPaddedPieces()
+    {
+        var hullSource = new Dictionary<string, byte[]>
+        {
+            ["store.cache"] = BoxCache(),
+            ["store_p01.cache"] = BoxCache(),
+            ["store_p02.cache"] = BoxCache(),
+            ["store_part01.cache"] = BoxCache(), // destruction chunk — must NOT load
+        };
+        var builder = new MapCollisionWorldBuilder(
+            cbid => "store",
+            hullSource.Keys,
+            name => hullSource.TryGetValue(name, out var b) ? b : null);
+
+        var world = builder.Build(new[] { Placement(1, 0f, 0f) });
+
+        Assert.AreEqual(2, world.InstanceCount, "one per _pNN piece; base and _part excluded");
+    }
+
     [TestMethod]
     public void Build_BadHullBytes_SkipSilentlyAndKeepOthers()
     {

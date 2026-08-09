@@ -51,12 +51,17 @@ public sealed class CloneDriveBrain
     /// <summary>/cloneteleport: jump behind the player on the next step.</summary>
     public void RequestCatchUp() => _catchUpRequested = true;
 
-    // --- /clonestartpath: waypoint route (map path) instead of follow/orbit ---
+    // --- /clonestartpath: continuous arc-length route following (map path) ---
+    // Retail semantics: the reference position moves ALONG the polyline; the vehicle chases
+    // that moving reference. Point-to-point waypoint chasing chorded across geometry the
+    // authored lane clears (brick-store alley, 2026-08-09) — vertices are never aim targets.
     private IReadOnlyList<Vector3> _pathWaypoints;
-    private IReadOnlyList<float> _pathAccepts; // authored per-waypoint AcceptDistance (fam)
+    private float[] _pathVertexArc; // cumulative arc length at each vertex (ascending index)
+    private float _pathTotal;
+    private float _pathRef; // car's current projected arc position
     private bool _pathLoops;
     private int _pathIndex;
-    private int _pathDirection = 1; // +1 forward, −1 for the ping-pong return leg
+    private int _pathDirection = 1; // +1 ascending indices, −1 for the ping-pong return leg
 
     public bool HasPathRoute => _pathWaypoints != null;
 
@@ -64,7 +69,9 @@ public sealed class CloneDriveBrain
 
     /// <summary>
     /// Navigate the given waypoints with the sim (physics + avoidance, no snapping): loop
-    /// routes wrap; open A→B routes ping-pong. Starts at the nearest waypoint. Clears a hold.
+    /// routes wrap; open A→B routes ping-pong. Starts at the nearest point ON the polyline.
+    /// Clears a hold. Authored accept distances are accepted for API stability but arc
+    /// following supersedes them (vertices are not arrival targets).
     /// </summary>
     public void SetPathRoute(IReadOnlyList<Vector3> waypoints, bool loop,
         IReadOnlyList<float> acceptDistances = null)
@@ -73,29 +80,134 @@ public sealed class CloneDriveBrain
             return;
 
         _pathWaypoints = waypoints;
-        _pathAccepts = acceptDistances != null && acceptDistances.Count == waypoints.Count
-            ? acceptDistances
-            : null;
         _pathLoops = loop;
         _pathDirection = 1;
         Hold = false;
 
-        var best = 0;
-        var bestDist = float.MaxValue;
-        for (var i = 0; i < waypoints.Count; i++)
+        var segments = loop ? waypoints.Count : waypoints.Count - 1;
+        _pathVertexArc = new float[waypoints.Count + (loop ? 1 : 0)];
+        var arc = 0f;
+        for (var i = 0; i < segments; i++)
         {
-            var d = DistXZ(waypoints[i], _car.Position);
-            if (d < bestDist)
-            {
-                bestDist = d;
-                best = i;
-            }
+            _pathVertexArc[i] = arc;
+            arc += DistXZ(waypoints[i], waypoints[(i + 1) % waypoints.Count]);
         }
 
-        _pathIndex = best;
+        _pathVertexArc[segments] = arc;
+        _pathTotal = arc;
+        _pathRef = ProjectOntoPath(_car.Position, nearArc: null);
+        _pathIndex = VertexAhead(_pathRef);
     }
 
     public void ClearPathRoute() => _pathWaypoints = null;
+
+    /// <summary>
+    /// Nearest arc position on the polyline. When <paramref name="nearArc"/> is given, only
+    /// segments within ~40 m of it (wrap-aware on loops) are considered, so folded paths
+    /// (out-and-back alleys) do not snap the reference to a parallel lane.
+    /// </summary>
+    private float ProjectOntoPath(Vector3 position, float? nearArc)
+    {
+        var waypoints = _pathWaypoints;
+        var segments = _pathLoops ? waypoints.Count : waypoints.Count - 1;
+        var bestArc = 0f;
+        var bestDistSq = float.MaxValue;
+        var found = false;
+
+        for (var pass = 0; pass < 2 && !found; pass++)
+        {
+            for (var i = 0; i < segments; i++)
+            {
+                if (pass == 0 && nearArc.HasValue
+                    && ArcDistance(_pathVertexArc[i], nearArc.Value) > 40f
+                    && ArcDistance(_pathVertexArc[i + 1], nearArc.Value) > 40f)
+                {
+                    continue;
+                }
+
+                var a = waypoints[i];
+                var b = waypoints[(i + 1) % waypoints.Count];
+                var segX = b.X - a.X;
+                var segZ = b.Z - a.Z;
+                var lenSq = segX * segX + segZ * segZ;
+                if (lenSq < 0.01f)
+                    continue;
+
+                var t = Math.Clamp(
+                    ((position.X - a.X) * segX + (position.Z - a.Z) * segZ) / lenSq, 0f, 1f);
+                var px = a.X + segX * t;
+                var pz = a.Z + segZ * t;
+                var dSq = (position.X - px) * (position.X - px) + (position.Z - pz) * (position.Z - pz);
+                if (dSq < bestDistSq)
+                {
+                    bestDistSq = dSq;
+                    bestArc = _pathVertexArc[i] + MathF.Sqrt(lenSq) * t;
+                    found = true;
+                }
+            }
+
+            if (pass == 0 && !nearArc.HasValue)
+                break; // global pass already ran
+        }
+
+        return bestArc;
+    }
+
+    private float ArcDistance(float a, float b)
+    {
+        var d = MathF.Abs(a - b);
+        return _pathLoops ? MathF.Min(d, _pathTotal - d) : d;
+    }
+
+    private Vector3 PointAtArc(float arc)
+    {
+        var waypoints = _pathWaypoints;
+        var segments = _pathLoops ? waypoints.Count : waypoints.Count - 1;
+        if (_pathLoops)
+            arc = ((arc % _pathTotal) + _pathTotal) % _pathTotal;
+        else
+            arc = Math.Clamp(arc, 0f, _pathTotal);
+
+        for (var i = 0; i < segments; i++)
+        {
+            var end = _pathVertexArc[i + 1];
+            if (arc <= end || i == segments - 1)
+            {
+                var a = waypoints[i];
+                var b = waypoints[(i + 1) % waypoints.Count];
+                var len = end - _pathVertexArc[i];
+                var t = len > 0.01f ? (arc - _pathVertexArc[i]) / len : 0f;
+                return new Vector3(a.X + (b.X - a.X) * t, a.Y, a.Z + (b.Z - a.Z) * t);
+            }
+        }
+
+        return waypoints[^1];
+    }
+
+    /// <summary>Index of the vertex the reference is travelling toward.</summary>
+    private int VertexAhead(float arc)
+    {
+        var waypoints = _pathWaypoints;
+        var segments = _pathLoops ? waypoints.Count : waypoints.Count - 1;
+        if (_pathDirection > 0)
+        {
+            for (var i = 0; i < segments; i++)
+            {
+                if (arc < _pathVertexArc[i + 1] - 0.01f)
+                    return (i + 1) % waypoints.Count;
+            }
+
+            return _pathLoops ? 0 : waypoints.Count - 1;
+        }
+
+        for (var i = segments; i >= 1; i--)
+        {
+            if (arc > _pathVertexArc[i - 1] + 0.01f)
+                return i - 1;
+        }
+
+        return 0;
+    }
 
     private static float DistXZ(Vector3 a, Vector3 b)
     {
@@ -278,8 +390,8 @@ public sealed class CloneDriveBrain
 
         if (_pathWaypoints != null && _consecutiveRecoveries >= 3)
         {
-            Debug($"waypoint {_pathIndex} unreachable after {_consecutiveRecoveries} recoveries — SKIPPING");
-            AdvanceWaypoint();
+            Debug($"stretch toward vertex {_pathIndex} unreachable after {_consecutiveRecoveries} recoveries — SKIPPING past it");
+            SkipPastNextVertex();
             _consecutiveRecoveries = 0;
         }
     }
@@ -401,60 +513,66 @@ public sealed class CloneDriveBrain
         return true;
     }
 
-    /// <summary>Waypoint pursuit: aim at the current point, advance inside the accept radius.</summary>
+    /// <summary>Arc-length pursuit: chase a reference moving along the polyline.</summary>
     private DriveInputs PathInputs()
     {
-        var target = _pathWaypoints[_pathIndex];
-        // Authored AcceptDistance wins (root cause of the brick-store stuck: a waypoint 1 m
-        // from a wall authored with accept 15 — retail NPCs never approach it closer).
-        var accept = _pathAccepts != null && _pathAccepts[_pathIndex] > 0f
-            ? Math.Clamp(_pathAccepts[_pathIndex], 3f, 30f)
-            : _tuning.PathAcceptDistance;
-        if (DistXZ(target, _car.Position) < accept)
-        {
-            AdvanceWaypoint();
-            target = _pathWaypoints[_pathIndex];
-        }
+        // Re-project near the previous reference (window keeps folded lanes from stealing it).
+        _pathRef = ProjectOntoPath(_car.Position, _pathRef);
 
-        // Lane-following pursuit (live 2026-08-09 11:59, brick-store corner): aiming straight
-        // at the waypoint strings a chord across the polyline, clipping buildings inside
-        // corners that the AUTHORED lane clears. Aim at a lookahead point ON the segment
-        // (previous waypoint -> current), clamped at the waypoint, so the clone hugs the lane
-        // and, after any recovery shove, returns to the lane before continuing along it.
-        var aimX = target.X;
-        var aimZ = target.Z;
-        var prevIndex = _pathIndex - _pathDirection;
-        if (prevIndex >= 0 && prevIndex < _pathWaypoints.Count)
+        // Ping-pong: flip direction when the CAR reaches an end of an open route.
+        if (!_pathLoops)
         {
-            var from = _pathWaypoints[prevIndex];
-            var segX = target.X - from.X;
-            var segZ = target.Z - from.Z;
-            var segLenSq = segX * segX + segZ * segZ;
-            if (segLenSq > 1f)
+            if (_pathDirection > 0 && _pathTotal - _pathRef < 2f)
             {
-                var t = ((_car.Position.X - from.X) * segX + (_car.Position.Z - from.Z) * segZ) / segLenSq;
-                var lookaheadT = t + LaneLookaheadMeters / MathF.Sqrt(segLenSq);
-                lookaheadT = Math.Clamp(lookaheadT, 0f, 1f);
-                aimX = from.X + segX * lookaheadT;
-                aimZ = from.Z + segZ * lookaheadT;
+                _pathDirection = -1;
+                Debug("path end reached — ping-pong, now heading back");
+            }
+            else if (_pathDirection < 0 && _pathRef < 2f)
+            {
+                _pathDirection = 1;
+                Debug("path start reached — ping-pong, now heading forward");
             }
         }
 
-        var steer = PurePursuitSteer(aimX, aimZ);
+        var aimArc = _pathRef + _pathDirection * LaneLookaheadMeters;
+        var aim = PointAtArc(aimArc);
 
-        // Corner anticipation (live trace 2026-08-09 11:30: 30 m/s straight past a turn into
-        // a wall): shrink the speed target by the upcoming turn angle as the waypoint nears,
-        // and by the current heading error.
-        var targetSpeed = _tuning.EffectivePathSpeed;
-        var distToTarget = DistXZ(target, _car.Position);
-        var turnSharpness = UpcomingTurnSharpness(target);
-        if (turnSharpness > 0.05f)
+        var newIndex = VertexAhead(_pathRef);
+        if (newIndex != _pathIndex)
         {
-            var cornerSpeed = MathF.Max(6f, _tuning.EffectivePathSpeed * (1f - turnSharpness));
-            targetSpeed = MathF.Min(targetSpeed, cornerSpeed + distToTarget * 0.35f);
+            Debug($"waypoint advance {_pathIndex} -> {newIndex} ({_pathWaypoints.Count} total)");
+            _pathIndex = newIndex;
         }
 
-        var headingError = MathF.Abs(HeadingErrorTo(target.X, target.Z));
+        var steer = PurePursuitSteer(aim.X, aim.Z);
+
+        // Braking envelope across the horizon: every vertex within reach must be arrivable at
+        // its corner speed (single-vertex anticipation could not brake across dense waypoints,
+        // live 2026-08-09 12:06).
+        var targetSpeed = _tuning.EffectivePathSpeed;
+        const float BrakeDecel = 7f;
+        var probeArc = _pathRef;
+        for (var n = 0; n < 6; n++)
+        {
+            var vertex = NextVertexArc(probeArc);
+            if (!vertex.HasValue)
+                break;
+            var distTo = ArcDistanceAlongDirection(_pathRef, vertex.Value);
+            if (distTo > 45f)
+                break;
+
+            var sharp = VertexSharpness(vertex.Value);
+            if (sharp > 0.05f)
+            {
+                var cornerSpeed = MathF.Max(6f, _tuning.EffectivePathSpeed * (1f - sharp));
+                var allowed = MathF.Sqrt(cornerSpeed * cornerSpeed + 2f * BrakeDecel * MathF.Max(distTo, 0f));
+                targetSpeed = MathF.Min(targetSpeed, allowed);
+            }
+
+            probeArc = vertex.Value + _pathDirection * 0.1f;
+        }
+
+        var headingError = MathF.Abs(HeadingErrorTo(aim.X, aim.Z));
         if (headingError > 0.4f)
             targetSpeed = MathF.Min(targetSpeed, MathF.Max(6f, _tuning.EffectivePathSpeed * (1.2f - headingError)));
 
@@ -464,24 +582,53 @@ public sealed class CloneDriveBrain
 
     private const float LaneLookaheadMeters = 9f;
 
-    /// <summary>0 = straight through the current waypoint, 1 = full U-turn to the next one.</summary>
-    private float UpcomingTurnSharpness(Vector3 target)
+    /// <summary>Arc of the next vertex strictly ahead of <paramref name="arc"/>, if any.</summary>
+    private float? NextVertexArc(float arc)
     {
-        var waypoints = _pathWaypoints;
-        var nextIndex = _pathIndex + _pathDirection;
-        if (_pathLoops)
-            nextIndex = (nextIndex + waypoints.Count) % waypoints.Count;
-        else if (nextIndex < 0 || nextIndex >= waypoints.Count)
-            return 1f; // route end: full ping-pong turnaround ahead
+        var segments = _pathLoops ? _pathWaypoints.Count : _pathWaypoints.Count - 1;
+        if (_pathDirection > 0)
+        {
+            for (var i = 1; i <= segments; i++)
+            {
+                if (_pathVertexArc[i] > arc + 0.2f)
+                    return _pathVertexArc[i];
+            }
 
-        var next = waypoints[nextIndex];
-        var inX = target.X - _car.Position.X;
-        var inZ = target.Z - _car.Position.Z;
-        var outX = next.X - target.X;
-        var outZ = next.Z - target.Z;
+            return _pathLoops ? _pathVertexArc[1] + _pathTotal : null;
+        }
+
+        for (var i = segments - 1; i >= 0; i--)
+        {
+            if (_pathVertexArc[i] < arc - 0.2f)
+                return _pathVertexArc[i];
+        }
+
+        return _pathLoops ? _pathVertexArc[segments - 1] - _pathTotal : null;
+    }
+
+    private float ArcDistanceAlongDirection(float from, float to)
+        => MathF.Abs(to - from);
+
+    /// <summary>0 = straight through the vertex at this arc, 1 = full U-turn.</summary>
+    private float VertexSharpness(float vertexArc)
+    {
+        // Route ends of an open path are full turnarounds.
+        var wrapped = _pathLoops
+            ? ((vertexArc % _pathTotal) + _pathTotal) % _pathTotal
+            : vertexArc;
+        if (!_pathLoops && (wrapped <= 0.2f || wrapped >= _pathTotal - 0.2f))
+            return 1f;
+
+        var before = PointAtArc(wrapped - 2f);
+        var at = PointAtArc(wrapped);
+        var after = PointAtArc(wrapped + 2f);
+        var inX = at.X - before.X;
+        var inZ = at.Z - before.Z;
+        var outX = after.X - at.X;
+        var outZ = after.Z - at.Z;
         var inLen = MathF.Sqrt(inX * inX + inZ * inZ);
         var outLen = MathF.Sqrt(outX * outX + outZ * outZ);
-        if (inLen < 0.5f || outLen < 0.5f)
+        if (inLen < 0.2f || outLen < 0.2f)
             return 0f;
 
         var cos = (inX * outX + inZ * outZ) / (inLen * outLen);
@@ -496,23 +643,19 @@ public sealed class CloneDriveBrain
         return error;
     }
 
-    private void AdvanceWaypoint()
+    /// <summary>Recovery escalation gave up on this stretch: jump the reference past the next
+    /// vertex so the route continues beyond the unreachable pinch.</summary>
+    private void SkipPastNextVertex()
     {
-        var waypoints = _pathWaypoints;
-        var next = _pathIndex + _pathDirection;
-        if (_pathLoops)
+        var vertex = NextVertexArc(_pathRef);
+        if (vertex.HasValue)
         {
-            next = (next + waypoints.Count) % waypoints.Count;
+            _pathRef = vertex.Value + _pathDirection * 3f;
+            if (_pathLoops)
+                _pathRef = ((_pathRef % _pathTotal) + _pathTotal) % _pathTotal;
+            else
+                _pathRef = Math.Clamp(_pathRef, 0f, _pathTotal);
         }
-        else if (next < 0 || next >= waypoints.Count)
-        {
-            _pathDirection = -_pathDirection; // A→B line: ping-pong at the ends
-            next = _pathIndex + _pathDirection;
-            Debug($"path end reached — ping-pong, now heading {(_pathDirection > 0 ? "forward" : "back")}");
-        }
-
-        Debug($"waypoint advance {_pathIndex} -> {next} ({waypoints.Count} total)");
-        _pathIndex = next;
     }
 
     /// <summary>~1 Hz status while a path route is active.</summary>
@@ -526,7 +669,7 @@ public sealed class CloneDriveBrain
             return;
         _debugAccumulator = 0f;
 
-        var target = _pathWaypoints[_pathIndex];
+        var target = _pathWaypoints[Math.Clamp(_pathIndex, 0, _pathWaypoints.Count - 1)];
         var state = _recoverRemaining > 0f ? "RECOVERING" : Hold ? "HOLD" : "pathing";
         Debug($"path: waypoint {_pathIndex + 1}/{_pathWaypoints.Count} dist={DistXZ(target, _car.Position):F0}m " +
               $"{state} speed={PlanarSpeed():F1} thr={LastInputs.Throttle:F2} steer={LastInputs.Steering:F2} " +

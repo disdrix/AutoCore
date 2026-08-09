@@ -13,6 +13,9 @@ public class ClonePathRouteTests
     private static readonly TerrainContactPlane.HeightSample Flat =
         (float x, float z, out float y) => { y = 0f; return true; };
 
+    private static readonly TerrainContactPlane.HeightSample Flat88 =
+        (float x, float z, out float y) => { y = 88.1f; return true; };
+
     private static SimVehicleParams Params() => SimVehicleParams.CreateForTests(
         massKg: 1500f, steeringMaxAngleRad: 0.6f, steeringFullSpeedLimit: 15f, topSpeed: 30f,
         muBase: 3.0f, suspensionLength: 0.35f, suspensionStrength: 60f,
@@ -334,35 +337,74 @@ public class ClonePathRouteTests
     }
 
     /// <summary>
-    /// ROOT CAUSE of the brick-store stuck (probe of arkbaytutorial 'realgunny2' path):
-    /// waypoint 56 sits ~1 m from the store wall, but its AUTHORED AcceptDistance is 15 m —
-    /// retail NPCs tick it off from afar and never approach the wall. Our fixed 6 m accept
-    /// forced the clone to drive into the building. Authored accepts must be honored.
+    /// Exact-geometry regression for the brick-store stuck (arkbaytutorial, path 'realgunny2',
+    /// store coid 15097): waypoints hug the building (~1 m off its faces) with accept 15, so
+    /// any point-to-point aiming — at waypoints OR at the start of an unreached lane segment —
+    /// chords across the store's SE corner. Only a continuous arc-length reference that moves
+    /// ALONG the polyline sweeps the alley the way it was authored.
     /// </summary>
     [TestMethod]
-    public void AuthoredAcceptDistance_AdvancesWaypointFromAfar()
+    public void RealGunnyAlley_SweepsTheStoreCornerWithoutSticking()
     {
-        var brain = new CloneDriveBrain(Params(), new CloneAiTuning());
-        brain.Reset(new Vector3(0f, 0f, 0f), yaw: 0f);
-        brain.SetPathRoute(
-            new[] { new Vector3(0f, 0f, 60f), new Vector3(50f, 0f, 60f) },
-            loop: false,
-            acceptDistances: new[] { 15f, 15f });
-
-        var advancedAtDistance = -1f;
-        for (var i = 0; i < 300 && advancedAtDistance < 0f; i++)
+        var world = new AutoCore.Sim.Collision.StaticCollisionWorld();
+        // The REAL store hulls (physics.glm decomposition pieces _p01.._p12) at the fam-probed
+        // placement — exact live collision geometry.
+        var storeRot = new Quaternion(-0.0112f, 0.6905f, -0.0107f, 0.7232f);
+        var storePos = new Vector3(1178.85f, 88.12f, 2117.76f);
+        foreach (var piece in Directory.GetFiles(
+                     Path.Combine(AppContext.BaseDirectory, "Fixtures", "hulls", "store"), "*.cache"))
         {
-            brain.Step(new Vector3(500f, 0f, 500f), default, 0f, Flat, dt: 0.05f);
-            if (brain.PathWaypointIndex == 1)
-            {
-                var dx = brain.Car.Position.X - 0f;
-                var dz = brain.Car.Position.Z - 60f;
-                advancedAtDistance = MathF.Sqrt(dx * dx + dz * dz);
-            }
+            world.Add(AutoCore.Sim.Collision.CacheHullParser.Parse(File.ReadAllBytes(piece)),
+                storePos, storeRot, 1f, "brick-store");
         }
 
-        Assert.IsTrue(advancedAtDistance is > 10f and < 18f,
-            $"waypoint with authored accept 15 must advance ~15 m out, advanced at {advancedAtDistance}");
+        world.Build();
+
+        var messages = new List<string>();
+        var brain = new CloneDriveBrain(Params(), new CloneAiTuning())
+        {
+            Obstacles = world,
+            DebugLog = messages.Add,
+        };
+        brain.Reset(new Vector3(1140f, 88.1f, 2098f), yaw: MathF.PI / 2f); // heading +X like the live lap
+        AutoCore.Sim.Ai.CloneAiTuning.PathSpeedOverride = 20f;
+        try
+        {
+            // The probed 'realgunny2' waypoints around the store, in traversal order.
+            brain.SetPathRoute(new[]
+            {
+                new Vector3(1131.1f, 88.1f, 2098.5f),
+                new Vector3(1163.0f, 88.1f, 2103.6f),
+                new Vector3(1177.1f, 88.1f, 2111.0f),
+                new Vector3(1184.8f, 88.1f, 2117.5f),
+                new Vector3(1186.7f, 88.1f, 2128.8f),
+                new Vector3(1178.6f, 88.2f, 2142.7f),
+            }, loop: false, acceptDistances: new[] { 15f, 15f, 15f, 15f, 15f, 15f });
+
+            var reachedEnd = false;
+            for (var i = 0; i < 600 && !reachedEnd; i++)
+            {
+                brain.Step(new Vector3(5000f, 0f, 5000f), default, 0f, Flat88, dt: 0.05f);
+                var dx = brain.Car.Position.X - 1178.6f;
+                var dz = brain.Car.Position.Z - 2142.7f;
+                reachedEnd = MathF.Sqrt(dx * dx + dz * dz) < 10f;
+            }
+
+            // The authored polyline genuinely clips the store's real south wall (piece p09
+            // spans the wp57→wp56 segment at car height) — retail likely threads it with
+            // per-NPC lane offsets. The achievable spec: brush, recover, CONTINUE the route —
+            // never wedge indefinitely.
+            Assert.IsTrue(reachedEnd,
+                $"must get past the store to the far waypoint; ended at {brain.Car.Position}\n" +
+                string.Join("\n", messages.Where(m => m.Contains("BLOCK") || m.Contains("STUCK")).Take(12)));
+            var recoveries = messages.Count(m => m.Contains("STUCK"));
+            Assert.IsTrue(recoveries <= 4,
+                $"{recoveries} recoveries at the store — must escape within a few attempts");
+        }
+        finally
+        {
+            AutoCore.Sim.Ai.CloneAiTuning.PathSpeedOverride = null;
+        }
     }
 
     [TestMethod]

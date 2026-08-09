@@ -104,10 +104,14 @@ public sealed class MapCollisionWorldBuilder
         if (_hullCache.TryGetValue(physicsName, out var cached))
             return cached;
 
+        // Two authored piece namings exist: "-pN" (husks, overpass) and "_pNN" (buildings,
+        // e.g. brick-2story-store01_p01..12). "_partNN" destruction chunks are never loaded.
         var pieces = new List<ConvexHull>();
         for (var n = 1; ; n++)
         {
-            if (!_cacheEntryIndex.TryGetValue($"{physicsName}-p{n}.cache", out var pieceEntry))
+            var found = _cacheEntryIndex.TryGetValue($"{physicsName}-p{n}.cache", out var pieceEntry)
+                || _cacheEntryIndex.TryGetValue($"{physicsName}_p{n:D2}.cache", out pieceEntry);
+            if (!found)
             {
                 // Retail decompositions may start at -p2 (observed: sportscar husk -p2..-p11).
                 if (n == 1)
