@@ -144,6 +144,26 @@ public class CloneManagerTests
     }
 
     [TestMethod]
+    public void Tick_MovesCloneTowardOwnerFollowPoint()
+    {
+        var map = CreateFieldMap(8207);
+        var character = DrivingCharacter(map);
+        character.CurrentVehicle.Position = new AutoCore.Game.Structures.Vector3(100f, 0f, 100f);
+        var manager = new CloneManager();
+        manager.Toggle(character);
+        var clone = map.NpcAiEntities.OfType<Vehicle>().Single();
+        var initialDistance = clone.Position.Dist(character.CurrentVehicle.Position);
+
+        for (var i = 0; i < 300; i++)
+            manager.Tick(nowMs: i * 50, dt: 0.05f);
+
+        // Identity rotation faces +Z: follow point is 6m behind the player.
+        var goal = new AutoCore.Game.Structures.Vector3(100f, 0f, 94f);
+        Assert.IsTrue(clone.Position.Dist(goal) < 2f,
+            $"clone should settle at the follow point {goal}; started {initialDistance}m from player, now at {clone.Position}");
+    }
+
+    [TestMethod]
     public void Toggle_TwoPlayers_HaveIndependentClones()
     {
         var map = CreateFieldMap(8206);

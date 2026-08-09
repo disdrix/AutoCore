@@ -1,5 +1,7 @@
 using System.Collections.Concurrent;
 using AutoCore.Game.Entities;
+using AutoCore.Game.Npc;
+using AutoCore.Sim.Ai;
 
 namespace AutoCore.Sim.Clone;
 
@@ -45,11 +47,23 @@ public sealed class CloneManager
             // clone entity, and the handle must not linger as a zombie.
             var ownerMap = handle.Owner.Map;
             if (ownerMap != null && ownerMap == handle.Clone.Map)
+            {
+                MoveClone(handle, dt);
                 continue;
+            }
 
             if (_clones.TryRemove(ownerCoid, out var removed))
                 CloneSpawner.Despawn(removed.Clone);
         }
+    }
+
+    private static void MoveClone(CloneHandle handle, float dt)
+    {
+        var heightfield = handle.Clone.Map?.MapData?.Heightfield;
+        TerrainContactPlane.HeightSample sample = heightfield == null
+            ? null
+            : heightfield.TrySample;
+        handle.Motion.Step(handle.Clone, handle.Owner.CurrentVehicle, sample, dt);
     }
 }
 
@@ -64,4 +78,7 @@ public sealed class CloneHandle
 
     public Character Owner { get; }
     public Vehicle Clone { get; }
+
+    /// <summary>Per-clone mover state (Phase 2 kinematic; physics replaces it in Phase 3).</summary>
+    public KinematicFollower Motion { get; } = new();
 }
