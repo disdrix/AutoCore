@@ -41,6 +41,17 @@ public class CloneCommandTests
     }
 
     [TestMethod]
+    public void Clone_PassesCountAndSpacingArgumentsToHook()
+    {
+        string seen = "unset";
+        CloneCommandControl.TryToggleClone = (_, arg) => { seen = arg; return "ok"; };
+
+        ChatCommandService.Instance.Execute(null, "/clone 10 5");
+
+        Assert.AreEqual("10 5", seen, "/clone must forward every argument to the Sim hook");
+    }
+
+    [TestMethod]
     public void Unclone_RoutesToSameToggleHook()
     {
         var calls = 0;

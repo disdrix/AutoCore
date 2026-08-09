@@ -23,18 +23,33 @@ public sealed class SimHost
     /// to a chat message, not abort the inbound packet handler (seen live 2026-08-08 with an
     /// unconstructible equipped ornament).
     /// </summary>
-    public string ToggleClone(Character character, string countArg)
+    public string ToggleClone(Character character, string args)
     {
         try
         {
             var count = 1;
-            if (!string.IsNullOrWhiteSpace(countArg)
-                && (!int.TryParse(countArg, out count) || count < 1 || count > Clone.CloneManager.MaxFleetSize))
+            float? spacing = null;
+            if (!string.IsNullOrWhiteSpace(args))
             {
-                return $"Usage: /clone [1-{Clone.CloneManager.MaxFleetSize}]";
+                var usage = $"Usage: /clone [count 1-{Clone.CloneManager.MaxFleetSize}] [spacing 1-50 m]";
+                var argv = args.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (!int.TryParse(argv[0], out count) || count < 1 || count > Clone.CloneManager.MaxFleetSize)
+                    return usage;
+
+                if (argv.Length > 1)
+                {
+                    if (!float.TryParse(argv[1], System.Globalization.NumberStyles.Float,
+                            System.Globalization.CultureInfo.InvariantCulture, out var metres)
+                        || metres is < 1f or > 50f)
+                    {
+                        return usage;
+                    }
+
+                    spacing = metres;
+                }
             }
 
-            return _cloneManager.Toggle(character, count);
+            return _cloneManager.Toggle(character, count, spacing);
         }
         catch (Exception ex)
         {

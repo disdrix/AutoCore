@@ -55,6 +55,45 @@ public class DynamicAvoidanceTests
         Assert.IsTrue(brain.Car.Position.Z > 55f, "and still make progress down the route");
     }
 
+    /// <summary>/clone N &lt;spacing&gt; widens the vehicle-vs-vehicle standoff radius.</summary>
+    [TestMethod]
+    public void WiderStandoffRadius_KeepsMoreDistanceFromParkedVehicle()
+    {
+        float RunWithStandoff(float standoff)
+        {
+            var brain = new CloneDriveBrain(Params(), new CloneAiTuning())
+            {
+                DynamicStandoffRadius = standoff,
+            };
+            brain.Reset(new Vector3(0f, 0f, 0f), yaw: 0f);
+            brain.SetPathRoute(new[] { new Vector3(0f, 0f, 60f), new Vector3(0f, 0f, 120f) }, loop: false);
+
+            var parked = new Vector3(0f, 0f, 35f);
+            var minDistance = float.MaxValue;
+            for (var i = 0; i < 300; i++)
+            {
+                SingleObstacleBuffer[0] = new CloneDriveBrain.DynamicObstacle
+                {
+                    Position = parked,
+                    Velocity = default,
+                };
+                brain.SetDynamicObstacles(SingleObstacleBuffer, 1);
+                brain.Step(new Vector3(500f, 0f, 500f), default, 0f, Flat, dt: 0.05f);
+
+                var dx = brain.Car.Position.X - parked.X;
+                var dz = brain.Car.Position.Z - parked.Z;
+                minDistance = MathF.Min(minDistance, MathF.Sqrt(dx * dx + dz * dz));
+            }
+
+            return minDistance;
+        }
+
+        var tight = RunWithStandoff(4f);
+        var wide = RunWithStandoff(9f);
+        Assert.IsTrue(wide > tight + 0.5f,
+            $"a 9 m standoff must clear a parked vehicle wider than a 4 m one (got {tight:F2} vs {wide:F2})");
+    }
+
     [TestMethod]
     public void DodgeBlockedByWall_BrakesInsteadOfSwervingIntoIt()
     {

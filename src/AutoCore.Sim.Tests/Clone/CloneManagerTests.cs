@@ -150,6 +150,43 @@ public class CloneManagerTests
         Assert.AreEqual(0, map.NpcAiEntities.OfType<Vehicle>().Count());
     }
 
+    /// <summary>/clone 10 5 — second arg is the fleet's mutual standoff spacing in metres.</summary>
+    [TestMethod]
+    public void Toggle_WithSpacing_SetsFleetStandoffAndSpreadsSpawnsThatFar()
+    {
+        var map = CreateFieldMap(8218);
+        var character = DrivingCharacter(map);
+        var manager = new CloneManager();
+
+        manager.Toggle(character, count: 6, spacingMeters: 9f);
+
+        foreach (var brain in manager.BrainsForTests(character))
+            Assert.AreEqual(9f, brain.DynamicStandoffRadius, 0.001f, "spacing must reach every brain");
+
+        var clones = map.NpcAiEntities.OfType<Vehicle>().ToList();
+        for (var i = 0; i < clones.Count; i++)
+        for (var j = i + 1; j < clones.Count; j++)
+        {
+            var dx = clones[i].Position.X - clones[j].Position.X;
+            var dz = clones[i].Position.Z - clones[j].Position.Z;
+            Assert.IsTrue(MathF.Sqrt(dx * dx + dz * dz) >= 8.9f,
+                "fleet must SPAWN at least the requested spacing apart");
+        }
+    }
+
+    [TestMethod]
+    public void Toggle_WithoutSpacing_KeepsDefaultStandoff()
+    {
+        var map = CreateFieldMap(8219);
+        var character = DrivingCharacter(map);
+        var manager = new CloneManager();
+
+        manager.Toggle(character, count: 2);
+
+        foreach (var brain in manager.BrainsForTests(character))
+            Assert.AreEqual(4f, brain.DynamicStandoffRadius, 0.001f);
+    }
+
     [TestMethod]
     public void FleetCommands_ApplyToEveryClone()
     {

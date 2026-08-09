@@ -67,7 +67,7 @@ public sealed class ChatCommandService
 
             case "/clone":
             case "/unclone":
-                return ToggleClone(character, parts.Length > 1 ? parts[1] : null);
+                return ToggleClone(character, parts.Length > 1 ? string.Join(' ', parts.Skip(1)) : null);
 
             case "/clonetrim":
             case "/cloneTrim":

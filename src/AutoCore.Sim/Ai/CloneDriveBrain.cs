@@ -48,6 +48,12 @@ public sealed class CloneDriveBrain
         public Vector3 Velocity;
     }
 
+    /// <summary>
+    /// Minimum distance to keep from other vehicles (m). Default 4; /clone N &lt;spacing&gt;
+    /// widens it per fleet so grouped clones hold formation gaps.
+    /// </summary>
+    public float DynamicStandoffRadius { get; set; } = 4.0f;
+
     private DynamicObstacle[] _dynObstacles;
     private int _dynObstacleCount;
 
@@ -553,11 +559,11 @@ public sealed class CloneDriveBrain
             var cxX = relX + relVx * t;
             var cxZ = relZ + relVz * t;
             var closest = MathF.Sqrt(cxX * cxX + cxZ * cxZ);
-            const float ClearRadius = 4.0f;
-            if (closest >= ClearRadius)
+            var clearRadius = DynamicStandoffRadius;
+            if (closest >= clearRadius)
                 continue;
 
-            var urgency = (ClearRadius - closest) / ClearRadius * (1f - t / 3.5f);
+            var urgency = (clearRadius - closest) / clearRadius * (1f - t / 3.5f);
             if (urgency <= worstUrgency)
                 continue;
 

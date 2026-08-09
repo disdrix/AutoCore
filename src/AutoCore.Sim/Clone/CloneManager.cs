@@ -138,7 +138,7 @@ public sealed class CloneManager
         return $"{fleet.Count} clone(s) teleporting to you.";
     }
 
-    public string Toggle(Character character, int count = 1)
+    public string Toggle(Character character, int count = 1, float? spacingMeters = null)
     {
         if (character == null)
             return "No character loaded.";
@@ -156,12 +156,20 @@ public sealed class CloneManager
             return "You need to be driving to use /clone.";
 
         count = Math.Clamp(count, 1, MaxFleetSize);
+        var spacing = spacingMeters.HasValue ? Math.Clamp(spacingMeters.Value, 1f, 50f) : (float?)null;
         var fleet = new List<CloneHandle>(count);
         for (var i = 0; i < count; i++)
-            fleet.Add(new CloneHandle(character, CloneSpawner.Spawn(character, i)));
+        {
+            var handle = new CloneHandle(character, CloneSpawner.Spawn(character, i, spacing ?? 5f));
+            if (spacing.HasValue)
+                handle.Brain.DynamicStandoffRadius = spacing.Value;
+            fleet.Add(handle);
+        }
 
         _clones[character.ObjectId.Coid] = fleet;
-        return $"Spawned {count} clone(s).";
+        return spacing.HasValue
+            ? $"Spawned {count} clone(s) with {spacing.Value:0.#} m spacing."
+            : $"Spawned {count} clone(s).";
     }
 
     internal static CloneDriveBrain BuildBrainForHandle(Vehicle clone)
