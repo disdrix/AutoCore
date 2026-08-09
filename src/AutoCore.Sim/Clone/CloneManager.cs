@@ -84,24 +84,48 @@ public sealed class CloneManager
     private static void MoveClone(CloneHandle handle, float dt)
     {
         var heightfield = handle.Clone.Map?.MapData?.Heightfield;
-        TerrainContactPlane.HeightSample sample = heightfield == null
-            ? FlatAtCurrentHeight(handle.Clone)
-            : heightfield.TrySample;
+        TerrainContactPlane.HeightSample sample;
+        if (heightfield != null)
+        {
+            sample = heightfield.TrySample;
+        }
+        else
+        {
+            // No heightfield (test maps): flat plane pinned once in SIM space. Never derive it
+            // from the published entity Y — that includes the ride-height offset and feeds back
+            // as ever-rising ground.
+            handle.FlatFallbackY ??= handle.Brain.Car.Position.Y;
+            var flatY = handle.FlatFallbackY.Value;
+            sample = (float x, float z, out float y) => { y = flatY; return true; };
+        }
 
         var owner = handle.Owner.CurrentVehicle;
         var ownerForward = TerrainContactPlane.ForwardFromQuaternion(owner.Rotation);
         var ownerYaw = MathF.Atan2(ownerForward.X, ownerForward.Z);
 
-        // Height convention is measured from the owner: whatever (Y − heightfield) delta the
-        // player's grounded vehicle runs at is what the client renders as "on the ground".
-        if (heightfield != null && heightfield.TrySample(owner.Position.X, owner.Position.Z, out var terrainAtOwner))
-            handle.HeightCalibration.Observe(owner.Position.Y, terrainAtOwner, dt);
-
         var brain = handle.Brain;
         brain.Step(owner.Position, owner.Velocity, ownerYaw, sample, dt);
 
         var car = brain.Car;
-        var heightOffset = heightfield != null ? handle.HeightCalibration.Offset : 0f;
+
+        // Fully data-driven height (user decision 2026-08-09 — no owner calibration): the sim
+        // grounds the chassis AT the heightfield, and publish adds the per-chassis ride height
+        // (mean wheel radius − mean hardpoint Y, clonebase.wad via VehicleGroundMetricsCache)
+        // plus the live /clonetrim knob.
+        //
+        // TODO(deferred by user until after the remaining phases — centimeter-perfect height
+        // without any reference vehicle): the residual per-map wobble (±0.2–0.5 m, observed
+        // live 2026-08-09 as owner deltas +0.46/+0.44/−0.19) comes from sampling geometry, not
+        // scale: the server samples the height16 grid BILINEARLY, while the client renders a
+        // TRIANGULATED terrain mesh from the same grid — between grid points the two surfaces
+        // disagree by up to tens of centimeters depending on which diagonal the client splits
+        // each quad on and the local slope. Fix plan: RE CVOGTerrain's mesh build (which
+        // diagonal per cell — fixed, alternating, or data-driven), then replace
+        // MapTerrainHeightfield.TrySample's bilinear blend with the matching two-triangle
+        // barycentric interpolation. That makes server ground == client ground everywhere and
+        // benefits every NPC, not just clones.
+        var rideHeight = AutoCore.Game.Npc.VehicleGroundMetricsCache.GetRideHeight(handle.Clone.CBID);
+        var heightOffset = rideHeight + HeightTrim;
 
         handle.DiagCountdown -= dt;
         if (handle.DiagCountdown <= 0f)
@@ -111,7 +135,7 @@ public sealed class CloneManager
             heightfield?.TrySample(car.Position.X, car.Position.Z, out terrainAtClone);
             Logger.WriteLog(LogType.Debug,
                 $"CloneDiag: ownerY={owner.Position.Y:F2} cloneSimY={car.Position.Y:F2} " +
-                $"terrainAtClone={terrainAtClone:F2} calibOffset={heightOffset:F2} " +
+                $"terrainAtClone={terrainAtClone:F2} rideHeight={rideHeight:F2} " +
                 $"trim={HeightTrim:F2} mode={handle.Brain.Mode} speed={PlanarSpeed(car):F1}");
         }
         var publishPosition = new AutoCore.Game.Structures.Vector3(
@@ -146,12 +170,6 @@ public sealed class CloneManager
     private static float PlanarSpeed(AutoCore.Sim.Physics.RaycastCar car)
         => MathF.Sqrt(car.Velocity.X * car.Velocity.X + car.Velocity.Z * car.Velocity.Z);
 
-    /// <summary>Maps without a heightfield (test maps, towns) drive on a flat plane at spawn height.</summary>
-    private static TerrainContactPlane.HeightSample FlatAtCurrentHeight(Vehicle clone)
-    {
-        var y = clone.Position.Y;
-        return (float x, float z, out float worldY) => { worldY = y; return true; };
-    }
 }
 
 /// <summary>Live pairing of a player and their simulated clone vehicle.</summary>
@@ -170,8 +188,8 @@ public sealed class CloneHandle
     /// <summary>Physics-driven follow/orbit AI for this clone.</summary>
     public CloneDriveBrain Brain { get; }
 
-    /// <summary>Learns the owner's wire-Y-vs-heightfield delta (client ground convention).</summary>
-    public GroundOffsetCalibrator HeightCalibration { get; } = new();
+    /// <summary>Sim-space plane height for maps without a heightfield; pinned on first tick.</summary>
+    public float? FlatFallbackY { get; set; }
 
     /// <summary>Seconds until the next CloneDiag log line.</summary>
     public float DiagCountdown { get; set; }

@@ -183,6 +183,64 @@ public class CloneManagerTests
     }
 
     /// <summary>
+    /// Height is fully data-driven (user decision 2026-08-09, no owner calibration): published
+    /// Y = sim ground pose + per-chassis ride height from VehicleGroundMetricsCache (wheel
+    /// radius − hardpoint Y, from clonebase.wad) + /clonetrim.
+    /// </summary>
+    [TestMethod]
+    public void Tick_PublishesDataDrivenRideHeightFromGroundMetrics()
+    {
+        var metricsSource = new Dictionary<int, AutoCore.Game.CloneBases.CloneBase>();
+        var cv = (AutoCore.Game.CloneBases.CloneBaseVehicle)System.Runtime.CompilerServices.RuntimeHelpers
+            .GetUninitializedObject(typeof(AutoCore.Game.CloneBases.CloneBaseVehicle));
+        cv.CloneBaseSpecific = new AutoCore.Game.CloneBases.Specifics.CloneBaseSpecific
+        {
+            Type = (int)CloneBaseObjectType.Vehicle,
+            CloneBaseId = ChassisCbid,
+        };
+        cv.SimpleObjectSpecific = new AutoCore.Game.CloneBases.Specifics.SimpleObjectSpecific { Mass = 900f };
+        cv.VehicleSpecific = new AutoCore.Game.CloneBases.Specifics.VehicleSpecific
+        {
+            WheelRadius = new[] { 0.5f, 0.5f, 0.5f, 0.5f, 0f, 0f },
+            WheelHardPoints = new[]
+            {
+                new AutoCore.Game.Structures.Vector3(-0.9f, 0.2f, 1.5f),
+                new AutoCore.Game.Structures.Vector3(0.9f, 0.2f, 1.5f),
+                new AutoCore.Game.Structures.Vector3(-0.9f, 0.2f, -1.5f),
+                new AutoCore.Game.Structures.Vector3(0.9f, 0.2f, -1.5f),
+                new AutoCore.Game.Structures.Vector3(0f, 0f, 0f),
+                new AutoCore.Game.Structures.Vector3(0f, 0f, 0f),
+            },
+        };
+        metricsSource[ChassisCbid] = cv;
+        AutoCore.Game.Npc.VehicleGroundMetricsCache.BuildFromCloneBases(metricsSource);
+        try
+        {
+            var expectedRide = AutoCore.Game.Npc.VehicleGroundMetricsCache.GetRideHeight(ChassisCbid);
+            Assert.AreEqual(0.3f, expectedRide, 0.01f, "test setup: radius 0.5 − hardpointY 0.2");
+
+            var map = CreateFieldMap(8209);
+            var character = DrivingCharacter(map);
+            character.CurrentVehicle.Position = new AutoCore.Game.Structures.Vector3(100f, 50f, 100f);
+            var manager = new CloneManager();
+            manager.Toggle(character);
+            var clone = map.NpcAiEntities.OfType<Vehicle>().Single();
+
+            for (var i = 0; i < 100; i++)
+                manager.Tick(nowMs: i * 50, dt: 0.05f);
+
+            // No heightfield on test maps: the sim drives a flat plane at spawn height (50),
+            // so the published Y must be plane + data-driven ride height.
+            Assert.AreEqual(50f + expectedRide, clone.Position.Y, 0.15f,
+                $"published Y {clone.Position.Y} must include the chassis ride height {expectedRide}");
+        }
+        finally
+        {
+            AutoCore.Game.Npc.VehicleGroundMetricsCache.Clear();
+        }
+    }
+
+    /// <summary>
     /// Live report 2026-08-08: wheels animated the wrong way. The retail wire convention
     /// (VehicleDriveController.ComputeAxes, brake-spec.md pedal derivation) is NEGATIVE
     /// throttle = drive forward and steer = baseDir·lateral, so the sim's positive-forward /
