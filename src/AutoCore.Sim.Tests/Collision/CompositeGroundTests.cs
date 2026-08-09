@@ -64,11 +64,11 @@ public class CompositeGroundTests
     [TestMethod]
     public void LowLedgeWithinStepUp_BecomesGround()
     {
-        var world = BridgeDeck(top: 1.0f);
+        var world = BridgeDeck(top: 0.5f);
         var sample = CompositeGround.Wrap(FlatZero, world, referenceY: 0f);
 
         Assert.IsTrue(sample(0f, 40f, out var y));
-        Assert.AreEqual(1.0f, y, 0.01f, "a ledge within step-up height is drivable ground");
+        Assert.AreEqual(0.5f, y, 0.01f, "a ledge within step-up height is drivable ground");
     }
 
     [TestMethod]

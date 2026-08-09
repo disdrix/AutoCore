@@ -27,10 +27,10 @@ public class BridgeDrivingTests
     [TestMethod]
     public void Follow_CrossesALowBridgeDeck_OnTop()
     {
-        // Ramped crossing modeled as ledges within step-up: 0.9 m deck from z=25..55 with a
+        // Ramped crossing modeled as ledges within step-up: 0.5 m deck from z=25..55 with a
         // wide footprint so the follow line goes straight across.
         var world = new StaticCollisionWorld();
-        world.Add(CompositeGroundTests.Slab(10f, 0.3f, 0.9f, 25f, 55f),
+        world.Add(CompositeGroundTests.Slab(10f, 0.15f, 0.5f, 25f, 55f),
             new Vector3(0f, 0f, 0f), new Quaternion(0f, 0f, 0f, 1f), 1f);
         world.Build();
 
@@ -45,7 +45,7 @@ public class BridgeDrivingTests
             var pos = brain.Car.Position;
             if (pos.Z is > 30f and < 50f && MathF.Abs(pos.X) < 9f)
             {
-                Assert.IsTrue(pos.Y > 0.55f,
+                Assert.IsTrue(pos.Y > 0.3f,
                     $"crossing the deck the body must ride ON it, was y={pos.Y} at z={pos.Z}");
                 wasOnDeck = true;
             }

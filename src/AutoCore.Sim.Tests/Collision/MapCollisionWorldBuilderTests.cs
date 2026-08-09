@@ -54,6 +54,34 @@ public class MapCollisionWorldBuilderTests
             "placement without a physics hull must not collide");
     }
 
+    /// <summary>
+    /// Live 2026-08-09: the clone veered into bridge walls. A single convex base hull of a
+    /// U-shaped bridge is a SOLID BOX to wall-top height — the deck reads at parapet level and
+    /// the walls have no faces. The -pN entries are the convex decomposition (deck, walls,
+    /// pillars as separate hulls) and must be preferred over the base hull when present.
+    /// </summary>
+    [TestMethod]
+    public void Build_PrefersConvexDecompositionPieces_OverTheBaseHull()
+    {
+        var hullSource = new Dictionary<string, byte[]>
+        {
+            ["bridge.cache"] = BoxCache(),
+            ["bridge-p1.cache"] = BoxCache(),
+            ["bridge-p2.cache"] = BoxCache(),
+            ["bridge-p3.cache"] = BoxCache(),
+            ["bridge_part01.cache"] = BoxCache(), // destruction piece — must NOT load
+        };
+        var builder = new MapCollisionWorldBuilder(
+            cbid => "bridge",
+            hullSource.Keys,
+            name => hullSource.TryGetValue(name, out var b) ? b : null);
+
+        var world = builder.Build(new[] { Placement(1, 0f, 0f) });
+
+        Assert.AreEqual(3, world.InstanceCount,
+            "one instance per -pN decomposition piece; base hull and _part destruction pieces excluded");
+    }
+
     [TestMethod]
     public void Build_BadHullBytes_SkipSilentlyAndKeepOthers()
     {

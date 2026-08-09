@@ -17,7 +17,7 @@ public sealed class MapCollisionWorldBuilder
     private readonly Func<int, string> _physicsNameByCbid;
     private readonly Dictionary<string, string> _cacheEntryIndex;
     private readonly Func<string, byte[]> _hullBytesByName;
-    private readonly Dictionary<string, ConvexHull> _hullCache = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, ConvexHull[]> _hullCache = new(StringComparer.OrdinalIgnoreCase);
 
     public MapCollisionWorldBuilder(
         Func<int, string> physicsNameByCbid,
@@ -52,18 +52,22 @@ public sealed class MapCollisionWorldBuilder
             if (template is not GraphicsObjectTemplate graphics || template.CBID <= 0)
                 continue;
 
-            var hull = ResolveHull(template.CBID);
-            if (hull == null)
+            var hulls = ResolveHulls(template.CBID);
+            if (hulls == null || hulls.Length == 0)
             {
                 skippedNoHull++;
                 continue;
             }
 
-            world.Add(
-                hull,
-                new Vector3(graphics.Location.X, graphics.Location.Y, graphics.Location.Z),
-                graphics.Rotation,
-                graphics.Scale);
+            foreach (var hull in hulls)
+            {
+                world.Add(
+                    hull,
+                    new Vector3(graphics.Location.X, graphics.Location.Y, graphics.Location.Z),
+                    graphics.Rotation,
+                    graphics.Scale);
+            }
+
             resolved++;
         }
 
@@ -73,7 +77,14 @@ public sealed class MapCollisionWorldBuilder
         return world;
     }
 
-    private ConvexHull ResolveHull(int cbid)
+    /// <summary>
+    /// Resolves an object's collision hulls. Convex decomposition pieces ("Name-pN.cache") are
+    /// preferred over the base "Name.cache": the base is ONE convex hull, and for concave
+    /// objects (bridges: deck + side walls) that is a solid box to wall-top height — no walls,
+    /// deck at parapet level (live 2026-08-09: clone veered through bridge walls). "_partNN"
+    /// destruction chunks are never loaded.
+    /// </summary>
+    private ConvexHull[] ResolveHulls(int cbid)
     {
         var physicsName = _physicsNameByCbid(cbid);
         if (string.IsNullOrWhiteSpace(physicsName))
@@ -82,23 +93,47 @@ public sealed class MapCollisionWorldBuilder
         if (_hullCache.TryGetValue(physicsName, out var cached))
             return cached;
 
-        ConvexHull hull = null;
-        if (_cacheEntryIndex.TryGetValue(physicsName + ".cache", out var entryName))
+        var pieces = new List<ConvexHull>();
+        for (var n = 1; ; n++)
         {
-            try
+            if (!_cacheEntryIndex.TryGetValue($"{physicsName}-p{n}.cache", out var pieceEntry))
             {
-                var bytes = _hullBytesByName(entryName);
-                if (bytes != null)
-                    hull = CacheHullParser.Parse(bytes);
+                // Retail decompositions may start at -p2 (observed: sportscar husk -p2..-p11).
+                if (n == 1)
+                    continue;
+                break;
             }
-            catch (Exception ex) when (ex is InvalidDataException or EndOfStreamException)
-            {
-                Logger.WriteLog(LogType.Error,
-                    $"MapCollisionWorldBuilder: malformed hull '{entryName}' — object gets no collision: {ex.Message}");
-            }
+
+            var piece = TryParse(pieceEntry);
+            if (piece != null)
+                pieces.Add(piece);
         }
 
-        _hullCache[physicsName] = hull; // negative results cached too
-        return hull;
+        if (pieces.Count == 0
+            && _cacheEntryIndex.TryGetValue(physicsName + ".cache", out var baseEntry))
+        {
+            var baseHull = TryParse(baseEntry);
+            if (baseHull != null)
+                pieces.Add(baseHull);
+        }
+
+        var result = pieces.Count > 0 ? pieces.ToArray() : null;
+        _hullCache[physicsName] = result; // negative results cached too
+        return result;
+    }
+
+    private ConvexHull TryParse(string entryName)
+    {
+        try
+        {
+            var bytes = _hullBytesByName(entryName);
+            return bytes == null ? null : CacheHullParser.Parse(bytes);
+        }
+        catch (Exception ex) when (ex is InvalidDataException or EndOfStreamException)
+        {
+            Logger.WriteLog(LogType.Error,
+                $"MapCollisionWorldBuilder: malformed hull '{entryName}' — piece skipped: {ex.Message}");
+            return null;
+        }
     }
 }

@@ -13,8 +13,13 @@ namespace AutoCore.Sim.Collision;
 /// </summary>
 public static class CompositeGround
 {
-    /// <summary>Maximum ledge the vehicle can drive up onto (m).</summary>
-    public const float StepUpHeight = 1.5f;
+    /// <summary>
+    /// Maximum ledge the vehicle can drive up onto (m). Was 1.5 — that made 1.2 m props
+    /// "climbable ground," blinding avoidance and the hard block to anything below it
+    /// (live 2026-08-09: avoidance/unstuck got worse). Real bridge decks are reached by
+    /// ramps, not vertical steps, so kerb height is enough.
+    /// </summary>
+    public const float StepUpHeight = 0.6f;
 
     public static TerrainContactPlane.HeightSample Wrap(
         TerrainContactPlane.HeightSample terrain,
