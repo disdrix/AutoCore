@@ -51,6 +51,49 @@ public class ObstacleAvoidanceTests
             $"clone must get past the wall to the player; ended at {brain.Car.Position}");
     }
 
+    /// <summary>
+    /// Live 2026-08-09: with a clear road ahead, the clone weaved left/right constantly —
+    /// 41 m feelers at ±25° were triggering hard avoidance on roadside props well off the
+    /// path, and the proportional-only steering overshot into oscillation.
+    /// </summary>
+    [TestMethod]
+    public void RoadsideProps_ClearPathAhead_DrivesStraightWithoutWeaving()
+    {
+        var box = CacheHullParser.Parse(File.ReadAllBytes(
+            Path.Combine(AppContext.BaseDirectory, "Fixtures", "hulls", "box.cache")));
+        var world = new StaticCollisionWorld();
+        // Lamp-post-ish props lining the road at x=±6 every 15 m — none on the path.
+        for (var z = 15f; z <= 300f; z += 15f)
+        {
+            world.Add(box, new Vector3(-6f, 0f, z), new Quaternion(0f, 0f, 0f, 1f), scale: 2f);
+            world.Add(box, new Vector3(6f, 0f, z), new Quaternion(0f, 0f, 0f, 1f), scale: 2f);
+        }
+        world.Build();
+
+        var brain = new CloneDriveBrain(Params(), new CloneAiTuning()) { Obstacles = world };
+        brain.Reset(new Vector3(0f, 0f, 0f), yaw: 0f);
+
+        var steerFlips = 0;
+        var prevSteerSign = 0;
+        var maxAbsX = 0f;
+        var playerZ = 30f;
+        for (var i = 0; i < 400; i++) // 20 s cruise down the corridor
+        {
+            playerZ += 12f * 0.05f;
+            brain.Step(new Vector3(0f, 0f, playerZ), new Vector3(0f, 0f, 12f), 0f, Flat, dt: 0.05f);
+
+            maxAbsX = MathF.Max(maxAbsX, MathF.Abs(brain.Car.Position.X));
+            var sign = brain.LastInputs.Steering > 0.15f ? 1 : brain.LastInputs.Steering < -0.15f ? -1 : 0;
+            if (sign != 0 && prevSteerSign != 0 && sign != prevSteerSign)
+                steerFlips++;
+            if (sign != 0)
+                prevSteerSign = sign;
+        }
+
+        Assert.IsTrue(maxAbsX < 3f, $"clone wandered {maxAbsX} m off a clear straight road");
+        Assert.IsTrue(steerFlips <= 4, $"steering flip-flopped {steerFlips} times on a clear road");
+    }
+
     [TestMethod]
     public void HardBlock_NeverPenetratesEvenWhenAimedStraightIn()
     {

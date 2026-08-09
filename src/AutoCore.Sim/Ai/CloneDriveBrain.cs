@@ -21,6 +21,7 @@ public sealed class CloneDriveBrain
     private float _recoverSteer;
     private float _orbitDirection = 1f; // +1 = clockwise when viewed from above (persistent)
     private float _avoidSign; // committed detour direction while feelers report obstacles
+    private float _avoidClearTime; // seconds since the feelers last reported anything
 
     public CloneDriveBrain(SimVehicleParams parameters, CloneAiTuning tuning)
     {
@@ -169,19 +170,25 @@ public sealed class CloneDriveBrain
             return inputs;
 
         var speed = MathF.Sqrt(_car.Velocity.X * _car.Velocity.X + _car.Velocity.Z * _car.Velocity.Z);
-        var feelerLength = speed * 1.2f + 5f;
+        // Live 2026-08-09: speed·1.2+5 (≈41 m at cruise) at ±25° swept ±17 m of roadside and
+        // caused constant phantom avoidance. Short center feeler, shorter side feelers,
+        // narrow cone — react to what is actually in the driving corridor.
+        var feelerLength = MathF.Min(speed * 0.8f + 4f, 20f);
+        var sideLength = feelerLength * 0.6f;
         var origin = new Vector3(_car.Position.X, _car.Position.Y + 0.6f, _car.Position.Z);
 
         var steer = inputs.Steering;
         var throttle = inputs.Throttle;
-        const float feelerAngle = 25f * MathF.PI / 180f;
+        const float feelerAngle = 15f * MathF.PI / 180f;
 
         var centerHit = Feel(world, origin, _car.Position.Y, _car.Yaw, feelerLength, out var centerDist);
-        var leftHit = Feel(world, origin, _car.Position.Y, _car.Yaw - feelerAngle, feelerLength, out var leftDist);
-        var rightHit = Feel(world, origin, _car.Position.Y, _car.Yaw + feelerAngle, feelerLength, out var rightDist);
+        var leftHit = Feel(world, origin, _car.Position.Y, _car.Yaw - feelerAngle, sideLength, out var leftDist);
+        var rightHit = Feel(world, origin, _car.Position.Y, _car.Yaw + feelerAngle, sideLength, out var rightDist);
 
         if (leftHit || rightHit || centerHit)
         {
+            _avoidClearTime = 0f;
+
             // Commit to one detour side and KEEP it until the path clears — re-choosing every
             // tick flip-flopped between sides and stalled the clone nose-in against walls.
             if (_avoidSign == 0f)
@@ -196,8 +203,13 @@ public sealed class CloneDriveBrain
                     _avoidSign = steer >= 0f ? 1f : -1f;
             }
 
-            var urgency = 1f - MathF.Min(centerHit ? centerDist : MathF.Min(leftDist, rightDist), feelerLength) / feelerLength;
-            steer = Math.Clamp(steer + _avoidSign * (0.7f + 0.9f * urgency), -1f, 1f);
+            // Strength scales with urgency² — a distant side graze nudges, a close wall
+            // shoves. The old constant 0.7 floor slammed the wheel for anything the feelers
+            // grazed, which read as violent weaving on open roads.
+            var nearest = centerHit ? centerDist : MathF.Min(leftDist, rightDist);
+            var urgency = 1f - MathF.Min(nearest, feelerLength) / feelerLength;
+            var strength = centerHit ? 0.35f + 0.85f * urgency * urgency : 0.5f * urgency * urgency;
+            steer = Math.Clamp(steer + _avoidSign * strength, -1f, 1f);
 
             if (centerHit)
             {
@@ -214,7 +226,11 @@ public sealed class CloneDriveBrain
         }
         else
         {
-            _avoidSign = 0f;
+            // Release the committed side only after a short clear spell — instant release
+            // re-armed the opposite feeler next tick and ping-ponged the wheel.
+            _avoidClearTime += RaycastCar.SubstepDt * 3f; // ~tick scale; exactness irrelevant
+            if (_avoidClearTime > 0.5f)
+                _avoidSign = 0f;
         }
 
         return new DriveInputs(throttle, steer, inputs.Handbrake);
@@ -298,7 +314,11 @@ public sealed class CloneDriveBrain
         var error = headingToAim - _car.Yaw;
         if (error > MathF.PI) error -= 2f * MathF.PI;
         if (error < -MathF.PI) error += 2f * MathF.PI;
-        return Math.Clamp(error / _car.Params.SteeringMaxAngleRad, -1f, 1f);
+
+        // PD: the yaw-rate term damps the proportional-only overshoot that had the clone
+        // weaving around the pursuit line on open ground (live 2026-08-09).
+        const float YawRateDamping = 0.35f;
+        return Math.Clamp((error - YawRateDamping * _car.YawRate) / _car.Params.SteeringMaxAngleRad, -1f, 1f);
     }
 
     private float SpeedControl(float targetSpeed)

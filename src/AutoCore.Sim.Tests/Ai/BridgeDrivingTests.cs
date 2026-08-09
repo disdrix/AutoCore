@@ -81,12 +81,22 @@ public class BridgeDrivingTests
 
         var brain = new CloneDriveBrain(Params(), new CloneAiTuning()) { Obstacles = world };
         brain.Reset(new Vector3(0f, 0f, 0f), yaw: 0f);
-        var player = new Vector3(0f, 2f, 60f);
+        // Player keeps moving straight ahead so the clone stays in Follow — a stationary
+        // player would legitimately pull it into an orbit circle and fail the straightness
+        // assert for the wrong reason.
+        var playerZ = 60f;
+        var playerVel = new Vector3(0f, 0f, 8f);
 
+        var maxAbsX = 0f;
         for (var i = 0; i < 200; i++)
-            brain.Step(player, new Vector3(0f, 0f, 0.01f), 0f, FlatZero, dt: 0.05f);
+        {
+            playerZ += playerVel.Z * 0.05f;
+            brain.Step(new Vector3(0f, 2f, playerZ), playerVel, 0f, FlatZero, dt: 0.05f);
+            maxAbsX = MathF.Max(maxAbsX, MathF.Abs(brain.Car.Position.X));
+        }
 
-        Assert.IsTrue(MathF.Abs(brain.Car.Position.X) < 3f,
-            $"a drivable ramp must not trigger avoidance swerve; drifted to X={brain.Car.Position.X}");
+        Assert.IsTrue(maxAbsX < 3f,
+            $"a drivable ramp must not trigger avoidance swerve; drifted to |X|={maxAbsX}");
+        Assert.IsTrue(brain.Car.Position.Z > 40f, "clone must actually cross the ramp while following");
     }
 }
