@@ -18,6 +18,10 @@ public readonly record struct DriveInputs(float Throttle, float Steering, bool H
 /// - forward-speed-only aero drag (0.6-aerodynamics.md), ballistic when airborne.
 /// State is x/y/z + yaw with terrain-aligned pitch/roll for presentation; a full 6-DOF body is
 /// deliberately out of scope for this tier.
+///
+/// Cornering status (live session 2026-08-09): with wheelset-data friction the turning was
+/// judged "much better — good enough for now"; further parity work (per-axle grip split,
+/// retail circle-projection LUT, steering ramp shape) is DEFERRED until the user asks.
 /// </summary>
 public sealed class RaycastCar
 {
