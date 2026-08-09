@@ -43,6 +43,17 @@ npcVehiclePhysics:
   # Defaults off â€” terrain-only until opted in. Residual gaps in IMPLEMENTATION-GAPS.md.
   # compositeWheelCollisionEnabled: false
 
+# AutoCore.Sim — the new server-side vehicle simulation (RaycastCar physics, static-hull and
+# vehicle-vs-vehicle avoidance; also powers /clone).
+sim:
+  # Drive ALL NPC vehicle movement (path patrols) with AutoCore.Sim instead of the legacy
+  # movers above. Vehicles only — creatures/bipeds/animals keep the legacy foot movers.
+  # Default ON; set false to fall back to npcVehiclePhysics.controllerTier behaviour.
+  npcVehicles: true
+
+  # Per-vehicle sim debug telemetry (CloneDiag / CloneAI / NpcSimDiag lines). Default off.
+  debugLogs: false
+
 # Inventory system (grab/drop/mass-move, cargo/locker).
 inventory:
   # Verbose packet logs: raw hex + parsed fields + operation result lines (HandleInventory*).

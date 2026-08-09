@@ -97,6 +97,9 @@ public partial class SectorServer : BaseServer, ILoopable
 
         RegisterSectorLoopControl();
 
+        // /clone routes through AutoCore.Game's CloneCommandControl seam into AutoCore.Sim.
+        AutoCore.Sim.SimHost.InstallCommandHook();
+
         Logger.WriteLog(LogType.Initialize, "The Sector server has been setup!");
     }
 
@@ -152,6 +155,12 @@ public partial class SectorServer : BaseServer, ILoopable
                 var pathPoseDirty = 0;
                 Guard.Run("sector tick: ForcePathVehiclePoseDirty",
                     () => pathPoseDirty = MapManager.Instance.ForcePathVehiclePoseDirty());
+
+                // Simulated clone vehicles (AutoCore.Sim): lifecycle checks and, in later phases,
+                // physics-driven movement. Must run before Interface.Pulse for the same
+                // dirty-mask-then-pack ordering reason as TickNpcs.
+                Guard.Run("sector tick: SimHost.Tick",
+                    () => AutoCore.Sim.SimHost.Instance.Tick(Environment.TickCount64, delta / 1000f));
 
                 // Player pose dead reckoning between C2S VehicleMoved: keep-dirty rebroadcasts an
                 // advancing pose so remote observers do not hard-snap to a frozen server position

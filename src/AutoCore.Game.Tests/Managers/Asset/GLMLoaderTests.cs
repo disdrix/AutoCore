@@ -128,6 +128,20 @@ public class GLMLoaderTests
     }
 
     [TestMethod]
+    public void EnumerateFileNames_ListsEntriesAcrossPacks()
+    {
+        // Needed by AutoCore.Sim's hull cache: physics.glm entry names differ in CASE from
+        // clonebase PhysicsName, so consumers build their own case-insensitive index.
+        WriteMinimalGlm(Path.Combine(_tempDir, "packa.glm"), "Obj_Thing.cache", new byte[] { 1 });
+
+        var loader = new GLMLoader();
+        Assert.IsTrue(loader.Load(_tempDir));
+
+        var names = loader.EnumerateFileNames().ToList();
+        CollectionAssert.Contains(names, "Obj_Thing.cache");
+    }
+
+    [TestMethod]
     public void Load_ValidMinimalGlm_CanReadPayload()
     {
         WriteMinimalGlm(Path.Combine(_tempDir, "pack.glm"), "note.txt", Encoding.UTF8.GetBytes("hello"));

@@ -79,6 +79,14 @@ public static class ChatAdminGate
         // Accounts / server
         "/addplayer", "/newaccount", "/player",
         "/sectorTick", "/sectortick", "/sector.tick",
+        "/clone", "/unclone",
+        "/clonetrim", "/cloneTrim",
+        "/clonefollowdist", "/cloneFollowDist",
+        "/clonestop", "/cloneStop",
+        "/clonefollow", "/cloneFollow",
+        "/cloneteleport", "/cloneTeleport", "/clonetp",
+        "/clonestartpath", "/cloneStartPath",
+        "/clonepathspeed", "/clonePathSpeed",
 
         // Moderation
         "/kick",

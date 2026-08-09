@@ -168,11 +168,21 @@ public static class VehicleMapPropRam
             // A few meters in front of the vehicle so loot is not under the body.
             prop.DeathLootOverridePosition = ResolveRamLootPosition(vehicle);
             prop.SetMurderer(vehicle);
-            prop.OnDeath(DeathType.Silent);
+            prop.OnDeath(ResolveRamDeathType(vehicle));
         }
 
         return 1;
     }
+
+    /// <summary>
+    /// Player rams die Silent — the ramming CLIENT plays the collision destruction locally and
+    /// broadcasting FX would double it. Server-driven vehicles (NPCs, /clone) have no client
+    /// predicting anything, so their kills must be Violent for the visible
+    /// InitCreateObject-DoDeath broadcast (live 2026-08-09: clone-smashed props stayed standing
+    /// on clients).
+    /// </summary>
+    public static DeathType ResolveRamDeathType(Vehicle vehicle)
+        => Map.MapNpcIdentity.IsMapNpcIdentity(vehicle.ObjectId) ? DeathType.Violent : DeathType.Silent;
 
     /// <summary>
     /// Loot spawn for ram kills: vehicle pose + <see cref="LootForwardOffsetMeters"/> along
@@ -247,6 +257,26 @@ public static class VehicleMapPropRam
             return false;
 
         return IsCollidable(cb);
+    }
+
+    /// <summary>
+    /// Clonebase-only soft-destructible check (no live entity needed) — used by AutoCore.Sim
+    /// to keep drive-through props out of the clone's hard collision world. Mirrors
+    /// <see cref="IsSoftDestructible"/>'s clonebase branch.
+    /// </summary>
+    public static bool IsSoftDestructibleCloneBase(CloneBases.CloneBaseObject cb)
+    {
+        if (cb == null)
+            return false;
+
+        if (cb.SimpleObjectSpecific.MinHitPoints >= SoftMinHitPointsExclusive)
+            return false;
+
+        var type = (CloneBaseObjectType)cb.CloneBaseSpecific.Type;
+        return type == CloneBaseObjectType.ObjectGraphicsPhysics
+               || type == CloneBaseObjectType.Creature
+               || type == CloneBaseObjectType.Object
+               || type == CloneBaseObjectType.QuestObject;
     }
 
     public static bool IsSoftDestructible(GraphicsObject prop)

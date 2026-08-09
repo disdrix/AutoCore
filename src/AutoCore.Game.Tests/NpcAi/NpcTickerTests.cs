@@ -187,13 +187,13 @@ public class NpcTickerTests
     public void SnapToTerrain_UsesMapHeightfieldWhenPresent()
     {
         var map = CreateMap();
-        // 2x2 cells, grid 10: cell (0,0) height16=256 → world Y = 4.
+        // 2x2 cells, grid 10: cell (0,0) height16=256 → world Y = 256·1000/65280.
         using var tga = MapTerrainHeightfieldTests.BuildHeightTga(2, 2, new ushort[] { 256, 0, 0, 0 });
         Assert.IsTrue(MapTerrainHeightfield.TryLoad(tga, 2, 2, 10f, out var field, out var err), err);
         map.MapData.SetHeightfield(field);
 
         var snapped = NpcTicker.SnapToTerrain(map, new Vector3(0f, 99f, 0f));
-        Assert.AreEqual(4f, snapped.Y, 0.001f, "Y must come from the TGA heightfield, not the path pose Y");
+        Assert.AreEqual(256f * (1000f / 65280f), snapped.Y, 0.001f, "Y must come from the TGA heightfield, not the path pose Y");
         Assert.AreEqual(0f, snapped.X, 0.001f);
         Assert.AreEqual(0f, snapped.Z, 0.001f);
     }
@@ -216,8 +216,8 @@ public class NpcTickerTests
         map.MapData.SetHeightfield(field);
 
         var snapped = NpcTicker.SnapToTerrain(map, new Vector3(0f, 99f, 0f));
-        Assert.AreEqual(4f, snapped.Y, 0.001f);
-        Assert.AreNotEqual(4f + SpawnPoint.CreaturePhysicsFootOffset, snapped.Y, 0.001f);
+        Assert.AreEqual(256f * (1000f / 65280f), snapped.Y, 0.001f);
+        Assert.AreNotEqual(256f * (1000f / 65280f) + SpawnPoint.CreaturePhysicsFootOffset, snapped.Y, 0.001f);
     }
 
     /// <summary>

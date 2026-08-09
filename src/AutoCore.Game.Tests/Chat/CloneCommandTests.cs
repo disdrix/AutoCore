@@ -1,0 +1,164 @@
+using AutoCore.Game.Chat;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace AutoCore.Game.Tests.Chat;
+
+[TestClass]
+public class CloneCommandTests
+{
+    [TestCleanup]
+    public void Cleanup()
+    {
+        CloneCommandControl.TryToggleClone = null;
+        CloneCommandControl.TryTrimClone = null;
+        CloneCommandControl.TrySetFollowDistance = null;
+        CloneCommandControl.TrySetHold = null;
+        CloneCommandControl.TryTeleportClone = null;
+        CloneCommandControl.TryStartPath = null;
+        CloneCommandControl.TrySetPathSpeed = null;
+    }
+
+    [TestMethod]
+    public void Clone_NoHookInstalled_ReportsUnavailable()
+    {
+        CloneCommandControl.TryToggleClone = null;
+
+        var result = ChatCommandService.Instance.Execute(null, "/clone");
+
+        Assert.IsTrue(result.Handled);
+        StringAssert.Contains(result.Message.ToLowerInvariant(), "unavailable");
+    }
+
+    [TestMethod]
+    public void Clone_HookInstalled_ReturnsHookMessage()
+    {
+        CloneCommandControl.TryToggleClone = (_, _) => "Clone spawned.";
+
+        var result = ChatCommandService.Instance.Execute(null, "/clone");
+
+        Assert.IsTrue(result.Handled);
+        Assert.AreEqual("Clone spawned.", result.Message);
+    }
+
+    [TestMethod]
+    public void Clone_PassesCountAndSpacingArgumentsToHook()
+    {
+        string seen = "unset";
+        CloneCommandControl.TryToggleClone = (_, arg) => { seen = arg; return "ok"; };
+
+        ChatCommandService.Instance.Execute(null, "/clone 10 5");
+
+        Assert.AreEqual("10 5", seen, "/clone must forward every argument to the Sim hook");
+    }
+
+    [TestMethod]
+    public void Unclone_RoutesToSameToggleHook()
+    {
+        var calls = 0;
+        CloneCommandControl.TryToggleClone = (_, _) => { calls++; return "toggled"; };
+
+        var clone = ChatCommandService.Instance.Execute(null, "/clone");
+        var unclone = ChatCommandService.Instance.Execute(null, "/unclone");
+
+        Assert.IsTrue(clone.Handled);
+        Assert.IsTrue(unclone.Handled);
+        Assert.AreEqual(2, calls);
+    }
+
+    [TestMethod]
+    public void CloneCommands_AreGmGated()
+    {
+        Assert.IsTrue(ChatAdminGate.IsMutatingCommand("/clone"));
+        Assert.IsTrue(ChatAdminGate.IsMutatingCommand("/unclone"));
+        Assert.IsTrue(ChatAdminGate.IsMutatingCommand("/clonetrim"));
+        Assert.IsTrue(ChatAdminGate.IsMutatingCommand("/clonefollowdist"));
+        Assert.IsTrue(ChatAdminGate.IsMutatingCommand("/clonestop"));
+        Assert.IsTrue(ChatAdminGate.IsMutatingCommand("/clonefollow"));
+        Assert.IsTrue(ChatAdminGate.IsMutatingCommand("/cloneteleport"));
+        Assert.IsTrue(ChatAdminGate.IsMutatingCommand("/clonetp"));
+        Assert.IsTrue(ChatAdminGate.IsMutatingCommand("/clonestartpath"));
+        Assert.IsTrue(ChatAdminGate.IsMutatingCommand("/clonepathspeed"));
+    }
+
+    [TestMethod]
+    public void ClonePathSpeed_RoutesArgumentToHook()
+    {
+        string seen = null;
+        CloneCommandControl.TrySetPathSpeed = (_, arg) => { seen = arg; return "speed set"; };
+
+        var result = ChatCommandService.Instance.Execute(null, "/clonepathspeed 20");
+
+        Assert.AreEqual("speed set", result.Message);
+        Assert.AreEqual("20", seen);
+        CloneCommandControl.TrySetPathSpeed = null;
+    }
+
+    [TestMethod]
+    public void CloneStartPath_RoutesToHook()
+    {
+        CloneCommandControl.TryStartPath = _ => "pathing";
+
+        var result = ChatCommandService.Instance.Execute(null, "/clonestartpath");
+
+        Assert.AreEqual("pathing", result.Message);
+        CloneCommandControl.TryStartPath = null;
+    }
+
+    [TestMethod]
+    public void CloneTeleport_RoutesToHook()
+    {
+        var calls = 0;
+        CloneCommandControl.TryTeleportClone = _ => { calls++; return "tp"; };
+
+        var result = ChatCommandService.Instance.Execute(null, "/cloneteleport");
+        var alias = ChatCommandService.Instance.Execute(null, "/clonetp");
+
+        Assert.AreEqual("tp", result.Message);
+        Assert.AreEqual("tp", alias.Message);
+        Assert.AreEqual(2, calls);
+        CloneCommandControl.TryTeleportClone = null;
+    }
+
+    [TestMethod]
+    public void CloneStopAndFollow_RouteHoldFlagToHook()
+    {
+        var holds = new List<bool>();
+        CloneCommandControl.TrySetHold = (_, hold) => { holds.Add(hold); return "ok"; };
+
+        ChatCommandService.Instance.Execute(null, "/clonestop");
+        ChatCommandService.Instance.Execute(null, "/clonefollow");
+
+        CollectionAssert.AreEqual(new[] { true, false }, holds);
+    }
+
+    [TestMethod]
+    public void CloneFollowDist_RoutesArgumentToHook()
+    {
+        string seen = null;
+        CloneCommandControl.TrySetFollowDistance = (_, arg) => { seen = arg; return "dist set"; };
+
+        var result = ChatCommandService.Instance.Execute(null, "/clonefollowdist 40");
+
+        Assert.IsTrue(result.Handled);
+        Assert.AreEqual("dist set", result.Message);
+        Assert.AreEqual("40", seen);
+        CloneCommandControl.TrySetFollowDistance = null;
+    }
+
+    [TestMethod]
+    public void CloneTrim_RoutesArgumentToHook()
+    {
+        string seen = null;
+        CloneCommandControl.TryTrimClone = (_, arg) => { seen = arg; return "trim set"; };
+
+        var result = ChatCommandService.Instance.Execute(null, "/clonetrim -0.35");
+
+        Assert.IsTrue(result.Handled);
+        Assert.AreEqual("trim set", result.Message);
+        Assert.AreEqual("-0.35", seen);
+
+        CloneCommandControl.TryTrimClone = null;
+        var unavailable = ChatCommandService.Instance.Execute(null, "/clonetrim 0.1");
+        StringAssert.Contains(unavailable.Message.ToLowerInvariant(), "unavailable");
+    }
+}

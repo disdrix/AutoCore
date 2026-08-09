@@ -75,6 +75,20 @@ public class GLMLoader
 
     public BinaryReader GetReader(string fileName) => new(GetStream(fileName), Encoding.UTF8, false);
 
+    /// <summary>
+    /// Every entry name across all loaded packs (duplicates possible between packs). Lets
+    /// consumers build their own indexes — e.g. AutoCore.Sim's case-insensitive hull lookup,
+    /// since physics.glm entry casing differs from clonebase PhysicsName casing.
+    /// </summary>
+    public IEnumerable<string> EnumerateFileNames()
+    {
+        foreach (var glmEntry in GLMEntries.Values)
+        {
+            foreach (var name in glmEntry.FileEntries.Keys)
+                yield return name;
+        }
+    }
+
     public bool CanGetReader(string fileName)
     {
         if (GLMEntries.TryGetValue(MiscGLM, out var miscGlmEntry))

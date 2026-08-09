@@ -423,6 +423,7 @@ public class AssetManager : Singleton<AssetManager>
     public BinaryReader GetFileReaderFromGLMs(string fileName) => GLMLoader.GetReader(fileName);
     public MemoryStream GetFileStreamFromGLMs(string fileName) => GLMLoader.GetStream(fileName);
     public bool HasFileInGLMs(string fileName) => GLMLoader.CanGetReader(fileName);
+    public IEnumerable<string> EnumerateGLMFileNames() => GLMLoader.EnumerateFileNames();
     #endregion
 
     #region WorldDB

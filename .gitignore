@@ -187,6 +187,8 @@ _pkginfo.txt
 # Visual Studio cache files
 # files ending in .cache can be ignored
 *.[Cc]ache
+# Sim hull-parser test fixtures are real .cache assets and must ship with the tests.
+!src/AutoCore.Sim.Tests/Fixtures/hulls/**
 # but keep track of directories ending in .cache
 !*.[Cc]ache/
 
