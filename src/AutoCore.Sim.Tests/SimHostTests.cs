@@ -55,6 +55,18 @@ public class SimHostTests
     }
 
     [TestMethod]
+    public void SetHold_WithoutClone_SaysNoCloneActive()
+    {
+        var message = SimHost.Instance.SetCloneHold(null, hold: true);
+        StringAssert.Contains(message, "No character");
+
+        var character = new AutoCore.Game.Entities.Character();
+        character.SetCoid(9901, true);
+        var noClone = SimHost.Instance.SetCloneHold(character, hold: true);
+        StringAssert.Contains(noClone.ToLowerInvariant(), "no clone");
+    }
+
+    [TestMethod]
     public void TrimClone_ParsesSetsAndReports()
     {
         try

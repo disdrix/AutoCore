@@ -32,6 +32,18 @@ public sealed class CloneManager
     internal Ai.CloneDriveBrain BrainForTests(Character owner)
         => _clones.TryGetValue(owner.ObjectId.Coid, out var handle) ? handle.Brain : null;
 
+    /// <summary>/clonestop / /clonefollow: park the caller's clone in place or resume the AI.</summary>
+    public string SetHold(Character character, bool hold)
+    {
+        if (character == null)
+            return "No character loaded.";
+        if (!_clones.TryGetValue(character.ObjectId.Coid, out var handle))
+            return "No clone active — use /clone first.";
+
+        handle.Brain.Hold = hold;
+        return hold ? "Clone holding position." : "Clone resuming follow.";
+    }
+
     public string Toggle(Character character)
     {
         if (character == null)

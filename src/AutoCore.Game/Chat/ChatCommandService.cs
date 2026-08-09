@@ -77,6 +77,14 @@ public sealed class ChatCommandService
             case "/cloneFollowDist":
                 return CloneFollowDist(character, parts.Length > 1 ? parts[1] : null);
 
+            case "/clonestop":
+            case "/cloneStop":
+                return CloneHold(character, hold: true);
+
+            case "/clonefollow":
+            case "/cloneFollow":
+                return CloneHold(character, hold: false);
+
             case "/showMissions":
             case "/showmissions":
                 return ShowMissions(character);
@@ -264,6 +272,16 @@ public sealed class ChatCommandService
             return new ChatCommandExecutionResult(true, "Clone simulation is unavailable on this server.");
 
         return new ChatCommandExecutionResult(true, trim(character, arg));
+    }
+
+    /// <summary>/clonestop and /clonefollow — park / resume the caller's clone.</summary>
+    private static ChatCommandExecutionResult CloneHold(Character character, bool hold)
+    {
+        var setter = CloneCommandControl.TrySetHold;
+        if (setter == null)
+            return new ChatCommandExecutionResult(true, "Clone simulation is unavailable on this server.");
+
+        return new ChatCommandExecutionResult(true, setter(character, hold));
     }
 
     /// <summary>/clonefollowdist &lt;metres|default&gt; — live clone follow distance.</summary>

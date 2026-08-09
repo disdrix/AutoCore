@@ -90,11 +90,15 @@ public sealed class SimHost
         return $"Clone follow distance set to {metres:0.#} m.";
     }
 
+    /// <summary>/clonestop (hold=true) and /clonefollow (hold=false).</summary>
+    public string SetCloneHold(Character character, bool hold) => _cloneManager.SetHold(character, hold);
+
     /// <summary>Routes the /clone* commands through AutoCore.Game's hook seam to this host.</summary>
     public static void InstallCommandHook()
     {
         CloneCommandControl.TryToggleClone = Instance.ToggleClone;
         CloneCommandControl.TryTrimClone = Instance.TrimClone;
         CloneCommandControl.TrySetFollowDistance = Instance.SetFollowDistance;
+        CloneCommandControl.TrySetHold = Instance.SetCloneHold;
     }
 }

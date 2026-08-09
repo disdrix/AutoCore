@@ -196,6 +196,34 @@ public class CloneDriveBrainClosedLoopTests
     }
 
     [TestMethod]
+    public void Hold_StopsAndStaysPut_EvenBeyondCatchUpRange()
+    {
+        var brain = new CloneDriveBrain(Params(), new CloneAiTuning());
+        brain.Reset(new Vector3(0f, 0.5f, 0f), yaw: 0f);
+        brain.Car.SetVelocityForTests(new Vector3(0f, 0f, 15f));
+        brain.Hold = true;
+
+        var player = new Vector3(0f, 0f, 30f);
+        for (var i = 0; i < 200; i++) // 10 s; player ends up 1 km away
+        {
+            player = new Vector3(player.X, player.Y, player.Z + 5f);
+            brain.Step(player, new Vector3(0f, 0f, 20f), 0f, Flat, dt: 0.05f);
+        }
+
+        var speed = MathF.Sqrt(
+            brain.Car.Velocity.X * brain.Car.Velocity.X + brain.Car.Velocity.Z * brain.Car.Velocity.Z);
+        Assert.IsTrue(speed < 0.5f, $"held clone must brake to a stop, speed={speed}");
+        Assert.IsTrue(brain.Car.Position.Z < 40f, $"held clone must stay put, z={brain.Car.Position.Z}");
+        Assert.IsFalse(brain.TeleportedThisStep, "hold must suppress catch-up teleports");
+
+        brain.Hold = false;
+        for (var i = 0; i < 40; i++)
+            brain.Step(player, default, 0f, Flat, dt: 0.05f);
+        Assert.IsTrue(brain.TeleportedThisStep || brain.Car.Position.Z > 45f,
+            "releasing hold must resume following (teleport at this range)");
+    }
+
+    [TestMethod]
     public void HugeSeparation_TriggersCatchUpTeleport()
     {
         var brain = new CloneDriveBrain(Params(), new CloneAiTuning());

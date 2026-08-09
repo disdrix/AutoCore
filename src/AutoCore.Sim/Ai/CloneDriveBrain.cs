@@ -36,6 +36,12 @@ public sealed class CloneDriveBrain
     /// <summary>Static hull world for feeler avoidance + hard blocking; null = terrain only.</summary>
     public StaticCollisionWorld Obstacles { get; set; }
 
+    /// <summary>
+    /// /clonestop: brake to a halt and stay put — no follow, no orbit, and no catch-up
+    /// teleport no matter how far the owner drives. /clonefollow clears it.
+    /// </summary>
+    public bool Hold { get; set; }
+
     /// <summary>Set when the last Step teleported the car (entity must publish via SetPosition).</summary>
     public bool TeleportedThisStep { get; private set; }
 
@@ -57,6 +63,18 @@ public sealed class CloneDriveBrain
         float dt)
     {
         TeleportedThisStep = false;
+
+        if (Hold)
+        {
+            var holdSpeed = MathF.Sqrt(
+                _car.Velocity.X * _car.Velocity.X + _car.Velocity.Z * _car.Velocity.Z);
+            var holdInputs = holdSpeed > 0.4f
+                ? new DriveInputs(-0.8f, 0f, false)
+                : new DriveInputs(0f, 0f, false);
+            LastInputs = holdInputs;
+            _car.Advance(dt, holdInputs, ground);
+            return;
+        }
 
         var toPlayerX = playerPosition.X - _car.Position.X;
         var toPlayerZ = playerPosition.Z - _car.Position.Z;

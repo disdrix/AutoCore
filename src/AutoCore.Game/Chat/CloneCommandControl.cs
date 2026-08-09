@@ -23,4 +23,7 @@ public static class CloneCommandControl
 
     /// <summary>/clonefollowdist: live follow-distance tuning (metres, or "default" to reset).</summary>
     public static Func<Character, string, string> TrySetFollowDistance { get; set; }
+
+    /// <summary>/clonestop (true) / /clonefollow (false): park or resume the caller's clone.</summary>
+    public static Func<Character, bool, string> TrySetHold { get; set; }
 }
