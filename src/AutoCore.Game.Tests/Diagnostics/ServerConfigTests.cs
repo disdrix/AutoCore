@@ -25,6 +25,25 @@ public class ServerConfigTests
     }
 
     [TestMethod]
+    public void SimSection_Defaults_NpcVehiclesOnDebugLogsOff()
+    {
+        Assert.IsTrue(ServerConfig.SimNpcVehiclesEnabled,
+            "AutoCore.Sim drives NPC vehicles by default");
+        Assert.IsFalse(ServerConfig.SimDebugLogs, "sim debug logs default off");
+    }
+
+    [TestMethod]
+    public void SimSection_ParsesFromYaml()
+    {
+        var yaml = string.Join('\n', "sim:", "  npcVehicles: false", "  debugLogs: true");
+        var ok = ServerConfig.ApplyFromYaml(yaml, out var error);
+
+        Assert.IsTrue(ok, error);
+        Assert.IsFalse(ServerConfig.SimNpcVehiclesEnabled);
+        Assert.IsTrue(ServerConfig.SimDebugLogs);
+    }
+
+    [TestMethod]
     public void Defaults_AreRetailSafe()
     {
         Assert.IsFalse(ServerConfig.NpcVehiclePhysicsEnabled);

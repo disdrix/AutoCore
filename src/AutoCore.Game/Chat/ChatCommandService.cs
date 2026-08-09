@@ -65,6 +65,39 @@ public sealed class ChatCommandService
             case "/sector.tick":
                 return SectorTick(parts);
 
+            case "/clone":
+            case "/unclone":
+                return ToggleClone(character, parts.Length > 1 ? string.Join(' ', parts.Skip(1)) : null);
+
+            case "/clonetrim":
+            case "/cloneTrim":
+                return TrimClone(character, parts.Length > 1 ? parts[1] : null);
+
+            case "/clonefollowdist":
+            case "/cloneFollowDist":
+                return CloneFollowDist(character, parts.Length > 1 ? parts[1] : null);
+
+            case "/clonestop":
+            case "/cloneStop":
+                return CloneHold(character, hold: true);
+
+            case "/clonefollow":
+            case "/cloneFollow":
+                return CloneHold(character, hold: false);
+
+            case "/cloneteleport":
+            case "/cloneTeleport":
+            case "/clonetp":
+                return CloneTeleport(character);
+
+            case "/clonestartpath":
+            case "/cloneStartPath":
+                return CloneStartPath(character);
+
+            case "/clonepathspeed":
+            case "/clonePathSpeed":
+                return ClonePathSpeed(character, parts.Length > 1 ? parts[1] : null);
+
             case "/showMissions":
             case "/showmissions":
                 return ShowMissions(character);
@@ -229,6 +262,79 @@ public sealed class ChatCommandService
             return new ChatCommandExecutionResult(true, message);
 
         return new ChatCommandExecutionResult(true, message);
+    }
+
+    /// <summary>
+    /// Toggle a simulated clone of the character's vehicle. The actual behavior lives in
+    /// AutoCore.Sim; the Sector host wires <see cref="CloneCommandControl.TryToggleClone"/>.
+    /// </summary>
+    private static ChatCommandExecutionResult ToggleClone(Character character, string countArg)
+    {
+        var toggle = CloneCommandControl.TryToggleClone;
+        if (toggle == null)
+            return new ChatCommandExecutionResult(true, "Clone simulation is unavailable on this server.");
+
+        return new ChatCommandExecutionResult(true, toggle(character, countArg));
+    }
+
+    /// <summary>/clonetrim &lt;metres&gt; — live clone height trim; see CloneCommandControl.</summary>
+    private static ChatCommandExecutionResult TrimClone(Character character, string arg)
+    {
+        var trim = CloneCommandControl.TryTrimClone;
+        if (trim == null)
+            return new ChatCommandExecutionResult(true, "Clone simulation is unavailable on this server.");
+
+        return new ChatCommandExecutionResult(true, trim(character, arg));
+    }
+
+    /// <summary>/clonepathspeed &lt;m/s|default&gt; — live path cruise speed.</summary>
+    private static ChatCommandExecutionResult ClonePathSpeed(Character character, string arg)
+    {
+        var setter = CloneCommandControl.TrySetPathSpeed;
+        if (setter == null)
+            return new ChatCommandExecutionResult(true, "Clone simulation is unavailable on this server.");
+
+        return new ChatCommandExecutionResult(true, setter(character, arg));
+    }
+
+    /// <summary>/clonestartpath — clone navigates the nearest map path.</summary>
+    private static ChatCommandExecutionResult CloneStartPath(Character character)
+    {
+        var startPath = CloneCommandControl.TryStartPath;
+        if (startPath == null)
+            return new ChatCommandExecutionResult(true, "Clone simulation is unavailable on this server.");
+
+        return new ChatCommandExecutionResult(true, startPath(character));
+    }
+
+    /// <summary>/cloneteleport — jump the caller's clone to them.</summary>
+    private static ChatCommandExecutionResult CloneTeleport(Character character)
+    {
+        var teleport = CloneCommandControl.TryTeleportClone;
+        if (teleport == null)
+            return new ChatCommandExecutionResult(true, "Clone simulation is unavailable on this server.");
+
+        return new ChatCommandExecutionResult(true, teleport(character));
+    }
+
+    /// <summary>/clonestop and /clonefollow — park / resume the caller's clone.</summary>
+    private static ChatCommandExecutionResult CloneHold(Character character, bool hold)
+    {
+        var setter = CloneCommandControl.TrySetHold;
+        if (setter == null)
+            return new ChatCommandExecutionResult(true, "Clone simulation is unavailable on this server.");
+
+        return new ChatCommandExecutionResult(true, setter(character, hold));
+    }
+
+    /// <summary>/clonefollowdist &lt;metres|default&gt; — live clone follow distance.</summary>
+    private static ChatCommandExecutionResult CloneFollowDist(Character character, string arg)
+    {
+        var setter = CloneCommandControl.TrySetFollowDistance;
+        if (setter == null)
+            return new ChatCommandExecutionResult(true, "Clone simulation is unavailable on this server.");
+
+        return new ChatCommandExecutionResult(true, setter(character, arg));
     }
 
     private static ChatCommandExecutionResult Skills(Character character, string[] parts)

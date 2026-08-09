@@ -5,46 +5,62 @@ namespace AutoCore.Game.Tests.Map;
 using AutoCore.Game.Map;
 
 /// <summary>
-/// Map heightfield from retail map TGA (CVOGTerrain::LoadMapImage encoding used by the level viewer):
-/// 32bpp BGRA, height16 = (A&lt;&lt;8)|B, world Y = height16 * HeightScale / 256.
+/// Map heightfield from retail map TGA: 32bpp BGRA, height16 = (A&lt;&lt;8)|B, world Y =
+/// height16 · 1000 / 65280 (A-channel /255 × 1000 max world height, B = sub-precision).
+/// The old ×4/256 decode (level-viewer inference) ran 2% high — live calibration on
+/// 2026-08-09 matched this formula to 1–2 cm on two independent maps
+/// (h16 8126 → 124.48 obs 124.49; h16 8641 → 132.37 obs 132.35).
 /// </summary>
 [TestClass]
 public class MapTerrainHeightfieldTests
 {
     private const float Tol = 0.001f;
 
+    /// <summary>worldY per height16 unit: 1000 / 65280.</summary>
+    private const float Scale = 1000f / 65280f;
+
     [TestMethod]
     public void TryLoad_Parses16BitHeightFromBgraAndSamplesCorners()
     {
-        // 2x2 grid, gridSize 10:
-        // (0,0) h16=256 → y=4; (1,0) h16=512 → y=8; (0,1) h16=0 → y=0; (1,1) h16=768 → y=12
+        // 2x2 grid, gridSize 10.
         using var stream = BuildHeightTga(2, 2, new ushort[] { 256, 512, 0, 768 });
 
         Assert.IsTrue(MapTerrainHeightfield.TryLoad(stream, expectedWidth: 2, expectedHeight: 2, gridSize: 10f, out var field, out var error), error);
         Assert.IsNotNull(field);
 
         Assert.IsTrue(field.TrySample(0f, 0f, out var y00));
-        Assert.AreEqual(4f, y00, Tol);
+        Assert.AreEqual(256f * Scale, y00, Tol);
 
         Assert.IsTrue(field.TrySample(10f, 0f, out var y10));
-        Assert.AreEqual(8f, y10, Tol);
+        Assert.AreEqual(512f * Scale, y10, Tol);
 
         Assert.IsTrue(field.TrySample(0f, 10f, out var y01));
         Assert.AreEqual(0f, y01, Tol);
 
         Assert.IsTrue(field.TrySample(10f, 10f, out var y11));
-        Assert.AreEqual(12f, y11, Tol);
+        Assert.AreEqual(768f * Scale, y11, Tol);
+    }
+
+    [TestMethod]
+    public void FullScaleAlphaChannel_IsExactlyOneThousandWorldUnits()
+    {
+        // A=255, B=0 → h16=0xFF00=65280 → 1000.0: the anchor the live calibration pinned.
+        using var stream = BuildHeightTga(2, 2, new ushort[] { 65280, 65280, 65280, 65280 });
+        Assert.IsTrue(MapTerrainHeightfield.TryLoad(stream, 2, 2, 10f, out var field, out _));
+
+        Assert.IsTrue(field.TrySample(5f, 5f, out var y));
+        Assert.AreEqual(1000f, y, Tol);
     }
 
     [TestMethod]
     public void TrySample_BilinearInterpolatesBetweenCells()
     {
-        // Same 2x2 as above; midpoint between (0,0)=4 and (1,0)=8 at z=0 is y=6.
+        // Midpoint between h16 256 and 512 at z=0 is 384·Scale.
         using var stream = BuildHeightTga(2, 2, new ushort[] { 256, 512, 0, 768 });
         Assert.IsTrue(MapTerrainHeightfield.TryLoad(stream, 2, 2, 10f, out var field, out _));
 
         Assert.IsTrue(field.TrySample(5f, 0f, out var y));
-        Assert.AreEqual(6f, y, Tol);
+        Assert.AreEqual(384f * Scale, y, Tol);
     }
 
     [TestMethod]
@@ -62,9 +78,9 @@ public class MapTerrainHeightfieldTests
         using var stream = BuildHeightTga(2, 2, new ushort[] { 256, 512, 0, 768 });
         Assert.IsTrue(MapTerrainHeightfield.TryLoad(stream, 2, 2, 10f, out var field, out _));
 
-        // Outside world extent — clamp to last cell (1,1) → y=12.
+        // Outside world extent — clamp to last cell (1,1) h16=768.
         Assert.IsTrue(field.TrySample(1000f, 1000f, out var y));
-        Assert.AreEqual(12f, y, Tol);
+        Assert.AreEqual(768f * Scale, y, Tol);
     }
 
     /// <summary>

@@ -14,6 +14,7 @@
     <ProjectReference Include="..\AutoCore.Communicator\AutoCore.Communicator.csproj" />
     <ProjectReference Include="..\AutoCore.Database\AutoCore.Database.csproj" />
     <ProjectReference Include="..\AutoCore.Game\AutoCore.Game.csproj" />
+    <ProjectReference Include="..\AutoCore.Sim\AutoCore.Sim.csproj" />
     <ProjectReference Include="..\AutoCore.Utils\AutoCore.Utils.csproj" />
   </ItemGroup>
 

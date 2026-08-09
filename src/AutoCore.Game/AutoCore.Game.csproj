@@ -9,6 +9,8 @@
     <InternalsVisibleTo Include="AutoCore.Game.Tests" />
     <InternalsVisibleTo Include="AutoCore.Sector.Tests" />
     <InternalsVisibleTo Include="AutoCore.Launcher.Tests" />
+    <InternalsVisibleTo Include="AutoCore.Sim" />
+    <InternalsVisibleTo Include="AutoCore.Sim.Tests" />
   </ItemGroup>
 
   <ItemGroup>
