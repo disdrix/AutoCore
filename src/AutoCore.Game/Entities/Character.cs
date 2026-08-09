@@ -426,6 +426,7 @@ public partial class Character : Creature
 
         Ghost = new GhostCharacter();
         Ghost.SetParent(this);
+        FlushPendingGhostMasks();
     }
 
     public override void WriteToPacket(CreateSimpleObjectPacket packet)

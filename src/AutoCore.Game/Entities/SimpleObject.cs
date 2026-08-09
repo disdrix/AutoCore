@@ -51,7 +51,8 @@ public class SimpleObject : GraphicsObject
 
     public override int TakeDamage(int damage)
     {
-        if (IsInvincible || IsCorpse)
+        // damage <= 0 guard matches GraphicsObject/Vehicle — negative damage must not heal.
+        if (IsInvincible || IsCorpse || damage <= 0)
             return 0;
 
         var actualDamage = Math.Min(damage, HP);
@@ -74,13 +75,37 @@ public class SimpleObject : GraphicsObject
     /// </summary>
     public const int MaxWireHP = (1 << 18) - 1; // 262143
 
+    // SS-34: health dirty bits raised before the ghost exists latch here and flush on CreateGhost.
+    private ulong _pendingGhostMasks;
+
+    /// <summary>Test seam: masks latched while no ghost existed (SS-34).</summary>
+    internal ulong PendingGhostMasksForTests => _pendingGhostMasks;
+
     /// <summary>
     /// Dirties health-related ghost bits. Vehicles override to use
     /// <see cref="Vehicle.EnsureGhostMaskDelivery"/> so bits are not dropped without a GhostInfo ref.
+    /// SS-34: with no ghost yet (creature scoped in later), the bits latch instead of being lost.
     /// </summary>
     protected virtual void DirtyHealthMasks(ulong mask)
     {
-        Ghost?.SetMaskBits(mask);
+        if (Ghost == null)
+        {
+            _pendingGhostMasks |= mask;
+            return;
+        }
+
+        Ghost.SetMaskBits(mask);
+    }
+
+    /// <summary>Delivers masks latched before the ghost existed. Call after ghost creation.</summary>
+    protected void FlushPendingGhostMasks()
+    {
+        var pending = _pendingGhostMasks;
+        if (pending == 0 || Ghost == null)
+            return;
+
+        _pendingGhostMasks = 0;
+        Ghost.SetMaskBits(pending);
     }
 
     /// <summary>
@@ -230,6 +255,7 @@ public class SimpleObject : GraphicsObject
         Ghost = new GhostObject();
         Ghost.SetParent(this);
         GhostObjectDiag.RecordEntity("CreateGhost", this, extra: "source=SimpleObject");
+        FlushPendingGhostMasks();
     }
 
     public override void WriteToPacket(CreateSimpleObjectPacket packet)

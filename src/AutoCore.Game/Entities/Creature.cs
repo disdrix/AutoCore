@@ -113,6 +113,7 @@ public class Creature : SimpleObject
 
         Ghost = new GhostCreature();
         Ghost.SetParent(this);
+        FlushPendingGhostMasks();
     }
 
     public override void OnDeath(DeathType deathType)

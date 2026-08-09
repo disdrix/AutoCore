@@ -72,8 +72,11 @@ public static class ServerConfig
     public const bool DefaultLogHitChanceRolls = true;
     /// <summary>Server debug log: NPC-vs-NPC weapon fire lines. Default off (avoids world combat spam).</summary>
     public const bool DefaultLogNpcToNpc = false;
+    /// <summary>0x2023 DamagePacket flood window per (attacker, victim) pair, in ms. 0 disables.</summary>
+    public const int DefaultDamagePacketThrottleMs = 100;
 
     private static int _substepHz = DefaultSubstepHz;
+    private static int _damagePacketThrottleMs = DefaultDamagePacketThrottleMs;
 
     /// <summary>Master switch for the retail Havok physics simulation.</summary>
     public static bool NpcVehiclePhysicsEnabled { get; set; } = DefaultNpcVehiclePhysicsEnabled;
@@ -157,6 +160,17 @@ public static class ServerConfig
     /// </summary>
     public static bool LogNpcToNpc { get; set; } = DefaultLogNpcToNpc;
 
+    /// <summary>
+    /// Flood window for 0x2023 DamagePacket floaters, per (attacker, victim) pair, in ms.
+    /// 0 disables the throttle. Default <b>100</b>. Authoritative HP always ships via ghost masks;
+    /// this only coalesces the visible combat text.
+    /// </summary>
+    public static int DamagePacketThrottleMs
+    {
+        get => _damagePacketThrottleMs;
+        set => _damagePacketThrottleMs = Math.Max(0, value);
+    }
+
     /// <summary>Reset every setting to retail-safe defaults (tests + startup before load).</summary>
     public static void ResetToDefaults()
     {
@@ -175,6 +189,7 @@ public static class ServerConfig
         LogDamageToNpcs = DefaultLogDamageToNpcs;
         LogHitChanceRolls = DefaultLogHitChanceRolls;
         LogNpcToNpc = DefaultLogNpcToNpc;
+        DamagePacketThrottleMs = DefaultDamagePacketThrottleMs;
     }
 
     /// <summary>
@@ -315,6 +330,8 @@ public static class ServerConfig
                 LogHitChanceRolls = combat.LogHitChanceRolls.Value;
             if (combat.LogNpcToNpc.HasValue)
                 LogNpcToNpc = combat.LogNpcToNpc.Value;
+            if (combat.DamagePacketThrottleMs.HasValue)
+                DamagePacketThrottleMs = combat.DamagePacketThrottleMs.Value;
         }
 
         return true;
@@ -378,5 +395,6 @@ public static class ServerConfig
         public bool? LogDamageToNpcs { get; set; }
         public bool? LogHitChanceRolls { get; set; }
         public bool? LogNpcToNpc { get; set; }
+        public int? DamagePacketThrottleMs { get; set; }
     }
 }

@@ -441,20 +441,32 @@ public partial class TNLConnection
         }
     }
 
-    private void HandleCreatureMovedPacket(BinaryReader reader)
+    internal void HandleCreatureMovedPacket(BinaryReader reader)
     {
+        // SS-32: movement can arrive before the character is bound (zone-in race) — drop, don't
+        // NRE into the dispatch catch as a NET-002 "malformed packet".
+        var character = CurrentCharacter;
+        if (character == null)
+            return;
+
         var packet = new CreatureMovedPacket();
         packet.Read(reader);
 
-        CurrentCharacter.HandleMovement(packet);
+        character.HandleMovement(packet);
     }
 
-    private void HandleVehicleMovedPacket(BinaryReader reader)
+    internal void HandleVehicleMovedPacket(BinaryReader reader)
     {
+        // SS-32: same zone-in race as CreatureMoved — an NRE here used to eat the entire
+        // move+fire+target update for the packet.
+        var vehicle = CurrentCharacter?.CurrentVehicle;
+        if (vehicle == null)
+            return;
+
         var packet = new VehicleMovedPacket();
         packet.Read(reader);
 
-        CurrentCharacter.CurrentVehicle.HandleMovement(packet);
+        vehicle.HandleMovement(packet);
     }
 
     private void HandleUseObjectPacket(BinaryReader reader)
@@ -585,7 +597,8 @@ public partial class TNLConnection
         if (tfid == null || tfid.Coid <= 0 || CurrentCharacter?.Map == null)
             return;
 
-        var obj = CurrentCharacter.Map.GetObjectByCoid(tfid.Coid);
+        // Full TFID is in hand — exact lookup avoids serving the wrong same-COID entity (SS-31).
+        var obj = Combat.CombatTargetResolver.Resolve(CurrentCharacter.Map, tfid);
         if (obj == null)
         {
             Logger.WriteLog(LogType.Debug,
@@ -676,9 +689,8 @@ public partial class TNLConnection
                 var target = reader.ReadTFID();
                 if (target.Coid > 0)
                 {
-                    var targetObj = vehicle.Map.GetObjectByCoid(target.Coid)
-                        ?? vehicle.Map.GetObject(target.Coid)
-                        ?? ObjectManager.Instance?.GetObject(target);
+                    // TFID-exact — COID-only resolution latches the wrong entity on collision (SS-31).
+                    var targetObj = Combat.CombatTargetResolver.Resolve(vehicle.Map, target);
                     vehicle.SetTargetObject(targetObj);
                 }
                 else

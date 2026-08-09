@@ -21,8 +21,8 @@ public class WeaponFireTargetAcquisitionTests
 
     private static WeaponFireTargetAcquisition.Candidate Cand(
         long coid, float x, float z, int faction = 2, bool corpse = false, bool inv = false, bool dmg = true,
-        bool combatant = true, bool ignoresHostility = false) =>
-        new(coid, new Vector3(x, 0f, z), faction, corpse, inv, dmg, combatant, ignoresHostility);
+        bool combatant = true, bool ignoresHostility = false, bool global = false) =>
+        new(coid, new Vector3(x, 0f, z), faction, corpse, inv, dmg, combatant, ignoresHostility, global);
 
     [TestMethod]
     public void Acquire_HardTargetFirst_WhenInArc()
@@ -119,7 +119,7 @@ public class WeaponFireTargetAcquisitionTests
         var primary = Cand(1, 0, 10);
         var splashNear = Cand(2, 3, 10, faction: 2);
         var splashFar = Cand(3, 50, 10, faction: 2);
-        var already = new HashSet<long> { 1 };
+        var already = new HashSet<(long, bool)> { (1L, false) };
         var hits = WeaponFireTargetAcquisition.AcquireExplosion(
             impact: primary.Position,
             explosionRadius: 8f,
@@ -138,7 +138,7 @@ public class WeaponFireTargetAcquisitionTests
     {
         var hits = WeaponFireTargetAcquisition.AcquireExplosion(
             new Vector3(0, 0, 0), 0f, 1, 1, null,
-            new[] { Cand(1, 0, 1) }, new HashSet<long>());
+            new[] { Cand(1, 0, 1) }, new HashSet<(long, bool)>());
         Assert.AreEqual(0, hits.Count);
     }
 
@@ -207,7 +207,7 @@ public class WeaponFireTargetAcquisitionTests
         var friend = Cand(2, 1, 10, faction: 1); // same faction as shooter
         var hits = WeaponFireTargetAcquisition.AcquireExplosion(
             new Vector3(0, 0, 10), 5f, shooterFaction: 1, shooterCoid: 99, ownerCoid: null,
-            new[] { friend }, new HashSet<long>());
+            new[] { friend }, new HashSet<(long, bool)>());
         Assert.AreEqual(0, hits.Count);
     }
 
@@ -218,7 +218,7 @@ public class WeaponFireTargetAcquisitionTests
         var near = Cand(3, 1, 10, faction: 2);
         var hits = WeaponFireTargetAcquisition.AcquireExplosion(
             new Vector3(0, 0, 10), 10f, 1, 99, null,
-            new[] { far, near }, new HashSet<long>());
+            new[] { far, near }, new HashSet<(long, bool)>());
         Assert.AreEqual(2, hits.Count);
         Assert.AreEqual(3, hits[0].Coid);
         Assert.IsTrue(hits[0].DistanceFromShooter < hits[1].DistanceFromShooter);
@@ -406,9 +406,91 @@ public class WeaponFireTargetAcquisitionTests
         var fence = Cand(73, 1, 10, faction: 1, combatant: false, ignoresHostility: true);
         var hits = WeaponFireTargetAcquisition.AcquireExplosion(
             impact, explosionRadius: 5f, shooterFaction: 1, shooterCoid: 1, ownerCoid: null,
-            new[] { fence }, alreadyHit: new HashSet<long>());
+            new[] { fence }, alreadyHit: new HashSet<(long, bool)>());
 
         Assert.AreEqual(1, hits.Count);
         Assert.AreEqual(73, hits[0].Coid);
+    }
+
+    // --- SS-31: post-wipe COID collisions (global player vehicle vs authored local map object) ---
+
+    [TestMethod]
+    public void Acquire_HardLock_CoidCollision_BindsCandidateWithMatchingGlobalFlag()
+    {
+        var aim = TacArcGeometry.AimFromYaw(0f);
+        // Local authored prop listed first — a COID-only hard-lock scan bound it instead of the vehicle.
+        var localProp = Cand(2, 0, 10, combatant: false, ignoresHostility: true);
+        var globalVehicle = Cand(2, 0, 20, global: true);
+
+        var hits = WeaponFireTargetAcquisition.Acquire(
+            new Vector3(0, 0, 0), aim, shooterFaction: 1, shooterCoid: 1, ownerCoid: null,
+            NarrowWeapon(0x01, 3),
+            new[] { localProp, globalVehicle },
+            hardTargetCoid: 2,
+            includeHardTarget: true,
+            hardTargetGlobal: true);
+
+        Assert.IsTrue(hits.Count >= 1);
+        Assert.IsTrue(hits[0].IsPrimary);
+        Assert.IsTrue(hits[0].Global, "hard lock must bind the global vehicle, not the same-COID local prop");
+        Assert.AreEqual(20f, hits[0].Position.Z);
+    }
+
+    [TestMethod]
+    public void Acquire_CoidCollision_SoftCandidateNotDedupedAgainstHardTarget()
+    {
+        var aim = TacArcGeometry.AimFromYaw(0f);
+        var globalVehicle = Cand(2, 0, 20, global: true);
+        var localProp = Cand(2, 0, 10, combatant: false, ignoresHostility: true);
+
+        var hits = WeaponFireTargetAcquisition.Acquire(
+            new Vector3(0, 0, 0), aim, shooterFaction: 1, shooterCoid: 1, ownerCoid: null,
+            NarrowWeapon(0x01, 3),
+            new[] { globalVehicle, localProp },
+            hardTargetCoid: 2,
+            includeHardTarget: true,
+            hardTargetGlobal: true);
+
+        Assert.AreEqual(2, hits.Count,
+            "the same-COID local prop must not be suppressed by the global hard target");
+        Assert.IsTrue(hits[0].Global);
+        Assert.IsFalse(hits[1].Global);
+    }
+
+    [TestMethod]
+    public void Acquire_SelfExclusion_HonorsGlobalFlag()
+    {
+        // Shooter is the post-wipe global vehicle (coid 2); an authored local prop sharing the
+        // COID must remain shootable — COID-only self-exclusion made it permanently unhittable.
+        var aim = TacArcGeometry.AimFromYaw(0f);
+        var localProp = Cand(2, 0, 10, combatant: false, ignoresHostility: true);
+
+        var hits = WeaponFireTargetAcquisition.Acquire(
+            new Vector3(0, 0, 0), aim, shooterFaction: 1, shooterCoid: 2, ownerCoid: null,
+            NarrowWeapon(0x01, 3),
+            new[] { localProp },
+            hardTargetCoid: null,
+            includeHardTarget: false,
+            shooterGlobal: true);
+
+        Assert.AreEqual(1, hits.Count, "local prop sharing the shooter's COID must still be targetable");
+    }
+
+    [TestMethod]
+    public void AcquireExplosion_CoidCollision_AlreadyHitKeyedByCoidAndGlobal()
+    {
+        // Primary already hit the LOCAL prop (2, local); splash must still reach the GLOBAL
+        // vehicle (2, global) instead of treating it as already-hit.
+        var impact = new Vector3(0, 0, 10);
+        var globalVehicle = Cand(2, 3, 10, global: true);
+
+        var hits = WeaponFireTargetAcquisition.AcquireExplosion(
+            impact, explosionRadius: 5f, shooterFaction: 1, shooterCoid: 1, ownerCoid: null,
+            new[] { globalVehicle },
+            alreadyHit: new HashSet<(long, bool)> { (2L, false) });
+
+        Assert.AreEqual(1, hits.Count,
+            "splash dedupe must key on (COID, Global), not bare COID");
+        Assert.IsTrue(hits[0].Global);
     }
 }

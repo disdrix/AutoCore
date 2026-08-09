@@ -499,16 +499,30 @@ public class Vehicle : SimpleObject
     internal void SetShieldRegenRateForTests(int rate) => ShieldRegenRate = Math.Max(0, rate);
 
     // Server-side combat state (very lightweight)
-    private long _lastFireMsFront;
-    private long _lastFireMsTurret;
-    private long _lastFireMsRear;
+    private long _nextFireAtMsFront;
+    private long _nextFireAtMsTurret;
+    private long _nextFireAtMsRear;
+
+    // Persistent combat RNG. Per-cycle new Random(nowMs ^ Coid) correlated every slot's first
+    // roll within a tick and repeated whole sequences for same-millisecond cycles.
+    private Random _combatRng;
+
+    /// <summary>Per-vehicle hit/crit roll source (seeded once, independent across vehicles).</summary>
+    internal Random CombatRng => _combatRng ??= new Random(Random.Shared.Next());
 
     // Retail floating numbers use EMSG_Sector_Damage (0x2023) → combat-event list (game+0xAA8).
     // Broadcast freeform floaters use a different list (game+0xAC0) and do not reliably render.
-    private static readonly Dictionary<long, long> _lastCombatMsgByAttackerMs = new();
+    // SS-33: keyed per (attacker, victim) TFID pair — attacker-only keying ate the floaters for
+    // every OTHER target hit inside the window. ConcurrentDictionary because this is mutated from
+    // both the sector tick and packet-handler paths.
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<
+        (long AttackerCoid, bool AttackerGlobal, long VictimCoid, bool VictimGlobal), long>
+        _lastCombatMsgByAttackerVictimMs = new();
 
-    /// <summary>Clears the per-attacker damage-packet throttle so tests don't leak state across runs.</summary>
-    internal static void ClearCombatThrottleForTests() => _lastCombatMsgByAttackerMs.Clear();
+    private const int CombatThrottlePruneThreshold = 4096;
+
+    /// <summary>Clears the damage-packet throttle so tests don't leak state across runs.</summary>
+    internal static void ClearCombatThrottleForTests() => _lastCombatMsgByAttackerVictimMs.Clear();
 
     // NPC attackers have no OwningConnection, so a victim-only send is required for the hit to be
     // visible to the player being shot. Deliver to both the attacker's and the victim's connections
@@ -559,12 +573,40 @@ public class Vehicle : SimpleObject
                 return;
 
             var now = Environment.TickCount64;
-            var key = source?.Coid ?? 0;
-            if (key != 0)
+            var windowMs = Diagnostics.ServerConfig.DamagePacketThrottleMs;
+            if (windowMs > 0 && source is { Coid: > 0 })
             {
-                if (_lastCombatMsgByAttackerMs.TryGetValue(key, out var last) && now - last < 100)
+                // Send if ANY victim pair is outside its window; stamp every pair we ship.
+                var anyFresh = victims == null || victims.Count == 0;
+                var pairs = new List<(long, bool, long, bool)>(victims?.Count ?? 0);
+                if (victims != null)
+                {
+                    foreach (var victim in victims)
+                    {
+                        if (victim?.ObjectId == null)
+                            continue;
+                        var pair = (source.Coid, source.Global, victim.ObjectId.Coid, victim.ObjectId.Global);
+                        pairs.Add(pair);
+                        if (!_lastCombatMsgByAttackerVictimMs.TryGetValue(pair, out var last) || now - last >= windowMs)
+                            anyFresh = true;
+                    }
+                }
+
+                if (!anyFresh)
                     return;
-                _lastCombatMsgByAttackerMs[key] = now;
+
+                foreach (var pair in pairs)
+                    _lastCombatMsgByAttackerVictimMs[pair] = now;
+
+                // Bounded state: prune stale pairs so a long-lived sector cannot grow unboundedly.
+                if (_lastCombatMsgByAttackerVictimMs.Count > CombatThrottlePruneThreshold)
+                {
+                    foreach (var kvp in _lastCombatMsgByAttackerVictimMs)
+                    {
+                        if (now - kvp.Value >= windowMs * 10L)
+                            _lastCombatMsgByAttackerVictimMs.TryRemove(kvp.Key, out _);
+                    }
+                }
             }
 
             // SS-24: isolate per connection. One bad connection used to abort the send for every
@@ -1589,6 +1631,7 @@ public class Vehicle : SimpleObject
 
         Ghost = new GhostVehicle();
         Ghost.SetParent(this);
+        FlushPendingGhostMasks();
     }
 
     /// <summary>
@@ -1968,35 +2011,16 @@ public class Vehicle : SimpleObject
             }
             else if (packet.Target != Target.ObjectId)
             {
-                // Try map first (handles local objects like NPCs/creatures)
-                if (Map != null)
-                    Target = Map.GetObject(packet.Target.Coid);
-                
-                // Fallback to ObjectManager (for global objects like players)
-                if (Target == null)
-                    Target = ObjectManager.Instance.GetObject(packet.Target);
+                // TFID-exact hard-target latch — COID-only lookups bind the wrong entity when a
+                // global player COID collides with an authored local map COID (SS-31).
+                Target = Combat.CombatTargetResolver.Resolve(Map, packet.Target);
 
                 Ghost.SetMaskBits(GhostObject.TargetMask);
             }
         }
         else if (packet.Target.Coid != -1)
         {
-
-            // Try map first (handles local objects like NPCs/creatures)
-            // Use GetObjectByCoid which searches by COID regardless of Global flag
-            if (Map != null)
-            {
-                Target = Map.GetObjectByCoid(packet.Target.Coid);
-                
-                // If not found, try the standard GetObject method
-                if (Target == null)
-                    Target = Map.GetObject(packet.Target.Coid);
-            }
-            
-            // Fallback to ObjectManager (for global objects like players)
-            if (Target == null)
-                Target = ObjectManager.Instance.GetObject(packet.Target);
-
+            Target = Combat.CombatTargetResolver.Resolve(Map, packet.Target);
 
             Ghost.SetMaskBits(GhostObject.TargetMask);
         }
@@ -2050,19 +2074,19 @@ public class Vehicle : SimpleObject
         var hardLock = Target is Character hardChar && hardChar.CurrentVehicle != null
             ? hardChar.CurrentVehicle
             : Target;
-        var hardCoid = hardLock is { IsCorpse: false, IsInvincible: false }
-            && IsWeaponCombatantTarget(hardLock)
-            ? hardLock.ObjectId.Coid
-            : (long?)null;
+        var hardEligible = hardLock is { IsCorpse: false, IsInvincible: false }
+            && IsWeaponCombatantTarget(hardLock);
+        var hardCoid = hardEligible ? hardLock.ObjectId.Coid : (long?)null;
+        var hardGlobal = hardEligible && hardLock.ObjectId.Global;
 
         var packet = new DamagePacket { Source = ObjectId };
         var victimsHit = new List<ClonedObjectBase>();
-        var rng = new Random(unchecked((int)(nowMs ^ ObjectId.Coid)));
+        var rng = CombatRng;
 
         // Independent slots: front / turret / rear (not exclusive if/else-if).
-        TryFireSlot(0x01, WeaponFront, vehicleYaw + 0f, includeHardTarget: false, ref _lastFireMsFront);
-        TryFireSlot(0x02, WeaponTurret, vehicleYaw + WantedTurretDirection, includeHardTarget: true, ref _lastFireMsTurret);
-        TryFireSlot(0x04, WeaponRear, vehicleYaw + MathF.PI, includeHardTarget: false, ref _lastFireMsRear);
+        TryFireSlot(0x01, WeaponFront, vehicleYaw + 0f, includeHardTarget: false, ref _nextFireAtMsFront);
+        TryFireSlot(0x02, WeaponTurret, vehicleYaw + WantedTurretDirection, includeHardTarget: true, ref _nextFireAtMsTurret);
+        TryFireSlot(0x04, WeaponRear, vehicleYaw + MathF.PI, includeHardTarget: false, ref _nextFireAtMsRear);
 
         if (packet.Entries.Count > 0)
             TrySendDamagePacketMulti(attackerChar, packet, ObjectId, victimsHit);
@@ -2072,16 +2096,17 @@ public class Vehicle : SimpleObject
             if ((Firing & bit) == 0 || weapon?.CloneBaseWeapon == null)
                 return;
 
-            var weaponSpec = weapon.CloneBaseWeapon.WeaponSpecific;
-            var cooldownMs = weaponSpec.RechargeTime > 0 ? weaponSpec.RechargeTime : 500;
-            if (nowMs - lastFireMs < cooldownMs)
-                return;
-
-            // Re-check heat: earlier slots may have added heat this tick.
+            // Re-check heat BEFORE the schedule advance: earlier slots may have added heat this
+            // tick, and a heat block must not consume a scheduled shot.
             if (MaxHeat > 0 && CurrentHeat >= MaxHeat)
                 return;
 
-            lastFireMs = nowMs;
+            var weaponSpec = weapon.CloneBaseWeapon.WeaponSpecific;
+            var cooldownMs = weaponSpec.RechargeTime > 0 ? weaponSpec.RechargeTime : 500;
+            // Schedule-based refire: the 50 ms tick is a latency floor, not a rate error.
+            if (!Combat.WeaponRefireSchedule.TryFire(ref lastFireMs, nowMs, cooldownMs))
+                return;
+
             if (weaponSpec.Heat > 0)
                 AddHeat(weaponSpec.Heat);
 
@@ -2095,18 +2120,21 @@ public class Vehicle : SimpleObject
                 weaponSpec,
                 candidates,
                 hardCoid,
-                includeHardTarget);
+                includeHardTarget,
+                hardTargetGlobal: hardGlobal,
+                shooterGlobal: ObjectId.Global,
+                ownerGlobal: Owner?.ObjectId.Global ?? false);
 
             if (hits.Count == 0)
                 return;
 
             Vector3? primaryPos = hits[0].Position;
-            var alreadyHit = new HashSet<long>();
+            var alreadyHit = new HashSet<(long Coid, bool Global)>();
 
             for (var i = 0; i < hits.Count; i++)
             {
                 var hit = hits[i];
-                if (!TryResolveTarget(hit.Coid, out var tgt))
+                if (!TryResolveTarget(new TFID(hit.Coid, hit.Global), out var tgt))
                     continue;
 
                 var isSpray = i > 0;
@@ -2115,7 +2143,7 @@ public class Vehicle : SimpleObject
                     : 0f;
                 ApplyWeaponHit(tgt, weaponSpec, attackerLevel, attackerClass, combat, theory, atkPerception,
                     attackerChar, rng, isSpray, falloffDist, packet, victimsHit);
-                alreadyHit.Add(hit.Coid);
+                alreadyHit.Add((hit.Coid, hit.Global));
             }
 
             // Explosion splash (omnidirectional around primary impact).
@@ -2128,11 +2156,13 @@ public class Vehicle : SimpleObject
                     ObjectId.Coid,
                     ownerCoid,
                     candidates,
-                    alreadyHit);
+                    alreadyHit,
+                    shooterGlobal: ObjectId.Global,
+                    ownerGlobal: Owner?.ObjectId.Global ?? false);
 
                 foreach (var s in splash)
                 {
-                    if (!TryResolveTarget(s.Coid, out var splashTgt))
+                    if (!TryResolveTarget(new TFID(s.Coid, s.Global), out var splashTgt))
                         continue;
                     ApplyWeaponHit(splashTgt, weaponSpec, attackerLevel, attackerClass, combat, theory, atkPerception,
                         attackerChar, rng, isSprayTarget: true, distFromPrimary: s.DistanceFromShooter,
@@ -2213,7 +2243,8 @@ public class Vehicle : SimpleObject
                     obj.IsInvincible,
                     isDamageable: obj.GetCurrentHP() > 0,
                     isCombatant: true,
-                    ignoresHostility: false));
+                    ignoresHostility: false,
+                    global: obj.ObjectId.Global));
                 continue;
             }
 
@@ -2229,7 +2260,8 @@ public class Vehicle : SimpleObject
                     obj.IsInvincible,
                     isDamageable: true,
                     isCombatant: false,
-                    ignoresHostility: true));
+                    ignoresHostility: true,
+                    global: obj.ObjectId.Global));
             }
         }
 
@@ -2240,7 +2272,7 @@ public class Vehicle : SimpleObject
             : Target;
         if (hardEntity is { IsCorpse: false } hard &&
             IsWeaponCombatantTarget(hard) &&
-            list.TrueForAll(c => c.Coid != hard.ObjectId.Coid))
+            list.TrueForAll(c => c.Coid != hard.ObjectId.Coid || c.Global != hard.ObjectId.Global))
         {
             list.Add(new WeaponFireTargetAcquisition.Candidate(
                 hard.ObjectId.Coid,
@@ -2250,17 +2282,16 @@ public class Vehicle : SimpleObject
                 hard.IsInvincible,
                 hard.GetCurrentHP() > 0,
                 isCombatant: true,
-                ignoresHostility: false));
+                ignoresHostility: false,
+                global: hard.ObjectId.Global));
         }
 
         return list;
     }
 
-    private bool TryResolveTarget(long coid, out ClonedObjectBase target)
+    internal bool TryResolveTarget(TFID id, out ClonedObjectBase target)
     {
-        target = Map?.GetObjectByCoid(coid)
-            ?? Map?.GetObject(coid)
-            ?? ObjectManager.Instance?.GetObject(new TFID(coid, false));
+        target = Combat.CombatTargetResolver.Resolve(Map, id);
         return target != null;
     }
 

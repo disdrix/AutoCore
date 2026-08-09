@@ -64,6 +64,16 @@ public static class NpcCombatAi
         if (npcAi == null)
             return;
 
+        // SS-35: combat pools (heat cool / shield regen) are driven per player CONNECTION in
+        // SectorServer, so NPC vehicles never cooled — once at MaxHeat their weapons were
+        // silently blocked forever. Advance pools from the AI tick (owner null: no power/HUD).
+        if (entity is Vehicle pooledVehicle)
+            Combat.VehicleCombatPool.Advance(
+                pooledVehicle,
+                owner: null,
+                deltaMs: (int)(dt * 1000f),
+                weaponsFiring: pooledVehicle.Firing != 0);
+
         // Resolve this tick's leash/return anchor once (nearest path point for a path NPC, else spawn)
         // so TryLeash / TickIdle / TickFlee all steer to the same target without re-querying the map.
         var (anchor, isPath) = ResolveReturnAnchor(map, entity, npcAi);

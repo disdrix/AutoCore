@@ -85,7 +85,10 @@ public static class ReactionObjectStateEffects
 
         foreach (var objectCoid in template.Objects)
         {
-            var obj = map.GetObjectByCoid(objectCoid);
+            // Authored reaction targets are LOCAL map objects; an exact lookup keeps a colliding
+            // global player COID from stealing the reaction (SS-31). COID-only scan as fallback.
+            var obj = map.GetObjectByTfid(new Structures.TFID(objectCoid, false))
+                ?? map.GetObjectByCoid(objectCoid);
             if (obj != null)
                 yield return obj;
             else

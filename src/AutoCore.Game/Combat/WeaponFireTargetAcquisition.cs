@@ -20,7 +20,8 @@ public static class WeaponFireTargetAcquisition
             bool isInvincible,
             bool isDamageable,
             bool isCombatant = false,
-            bool ignoresHostility = false)
+            bool ignoresHostility = false,
+            bool global = false)
         {
             Coid = coid;
             Position = position;
@@ -30,9 +31,13 @@ public static class WeaponFireTargetAcquisition
             IsDamageable = isDamageable;
             IsCombatant = isCombatant;
             IgnoresHostility = ignoresHostility;
+            Global = global;
         }
 
         public long Coid { get; }
+
+        /// <summary>TFID Global flag — COIDs alone are ambiguous after a character-DB wipe (SS-31).</summary>
+        public bool Global { get; }
         public Vector3 Position { get; }
         public int Faction { get; }
         public bool IsCorpse { get; }
@@ -53,15 +58,19 @@ public static class WeaponFireTargetAcquisition
 
     public readonly struct HitTarget
     {
-        public HitTarget(long coid, Vector3 position, float distanceFromShooter, bool isPrimary)
+        public HitTarget(long coid, Vector3 position, float distanceFromShooter, bool isPrimary, bool global = false)
         {
             Coid = coid;
             Position = position;
             DistanceFromShooter = distanceFromShooter;
             IsPrimary = isPrimary;
+            Global = global;
         }
 
         public long Coid { get; }
+
+        /// <summary>TFID Global flag of the acquired candidate (SS-31).</summary>
+        public bool Global { get; }
         public Vector3 Position { get; }
         public float DistanceFromShooter { get; }
         public bool IsPrimary { get; }
@@ -80,21 +89,26 @@ public static class WeaponFireTargetAcquisition
         WeaponSpecific weaponSpec,
         IReadOnlyList<Candidate> candidates,
         long? hardTargetCoid,
-        bool includeHardTarget)
+        bool includeHardTarget,
+        bool hardTargetGlobal = false,
+        bool shooterGlobal = false,
+        bool ownerGlobal = false)
     {
         var maxTargets = WeaponFireTargetLimits.GetMaxTargets(weaponSpec.Flags, weaponSpec.SprayTargets);
         var result = new List<HitTarget>(maxTargets);
-        HashSet<long> taken = new();
+        // Identity is (COID, Global) — bare COIDs collide after a character-DB wipe (SS-31).
+        HashSet<(long Coid, bool Global)> taken = new();
 
         if (includeHardTarget && hardTargetCoid is long hardCoid)
         {
-            var hard = FindByCoid(candidates, hardCoid);
+            var hard = FindByKey(candidates, hardCoid, hardTargetGlobal);
             if (hard.HasValue &&
-                IsEligible(hard.Value, shooterFaction, shooterCoid, ownerCoid, excludeCoid: null) &&
+                IsEligible(hard.Value, shooterFaction, shooterCoid, ownerCoid, excludeCoid: null,
+                    shooterGlobal: shooterGlobal, ownerGlobal: ownerGlobal) &&
                 TryMeasure(shooterPos, aimUnit, weaponSpec, hard.Value, out var hardDist))
             {
-                result.Add(new HitTarget(hard.Value.Coid, hard.Value.Position, hardDist, isPrimary: true));
-                taken.Add(hard.Value.Coid);
+                result.Add(new HitTarget(hard.Value.Coid, hard.Value.Position, hardDist, isPrimary: true, hard.Value.Global));
+                taken.Add((hard.Value.Coid, hard.Value.Global));
             }
         }
 
@@ -105,9 +119,10 @@ public static class WeaponFireTargetAcquisition
         var soft = new List<(Candidate c, float dist)>();
         foreach (var c in candidates)
         {
-            if (taken.Contains(c.Coid))
+            if (taken.Contains((c.Coid, c.Global)))
                 continue;
-            if (!IsEligible(c, shooterFaction, shooterCoid, ownerCoid, excludeCoid: null))
+            if (!IsEligible(c, shooterFaction, shooterCoid, ownerCoid, excludeCoid: null,
+                    shooterGlobal: shooterGlobal, ownerGlobal: ownerGlobal))
                 continue;
             if (!TryMeasure(shooterPos, aimUnit, weaponSpec, c, out var dist))
                 continue;
@@ -123,8 +138,8 @@ public static class WeaponFireTargetAcquisition
             if (result.Count >= maxTargets)
                 break;
             var isPrimary = result.Count == 0;
-            result.Add(new HitTarget(c.Coid, c.Position, dist, isPrimary));
-            taken.Add(c.Coid);
+            result.Add(new HitTarget(c.Coid, c.Position, dist, isPrimary, c.Global));
+            taken.Add((c.Coid, c.Global));
         }
 
         return result;
@@ -141,7 +156,9 @@ public static class WeaponFireTargetAcquisition
         long shooterCoid,
         long? ownerCoid,
         IReadOnlyList<Candidate> candidates,
-        IReadOnlyCollection<long> alreadyHit)
+        IReadOnlyCollection<(long Coid, bool Global)> alreadyHit,
+        bool shooterGlobal = false,
+        bool ownerGlobal = false)
     {
         var result = new List<HitTarget>();
         if (explosionRadius <= 0f)
@@ -150,9 +167,10 @@ public static class WeaponFireTargetAcquisition
         var r2 = explosionRadius * explosionRadius;
         foreach (var c in candidates)
         {
-            if (alreadyHit.Contains(c.Coid))
+            if (alreadyHit.Contains((c.Coid, c.Global)))
                 continue;
-            if (!IsEligible(c, shooterFaction, shooterCoid, ownerCoid, excludeCoid: null))
+            if (!IsEligible(c, shooterFaction, shooterCoid, ownerCoid, excludeCoid: null,
+                    shooterGlobal: shooterGlobal, ownerGlobal: ownerGlobal))
                 continue;
 
             var distSq = c.Position.DistSq(impact);
@@ -160,7 +178,7 @@ public static class WeaponFireTargetAcquisition
                 continue;
 
             var dist = MathF.Sqrt(distSq);
-            result.Add(new HitTarget(c.Coid, c.Position, dist, isPrimary: false));
+            result.Add(new HitTarget(c.Coid, c.Position, dist, isPrimary: false, c.Global));
         }
 
         result.Sort((a, b) => a.DistanceFromShooter.CompareTo(b.DistanceFromShooter));
@@ -172,13 +190,17 @@ public static class WeaponFireTargetAcquisition
         int shooterFaction,
         long shooterCoid,
         long? ownerCoid,
-        long? excludeCoid)
+        long? excludeCoid,
+        bool shooterGlobal = false,
+        bool ownerGlobal = false,
+        bool excludeGlobal = false)
     {
-        if (c.Coid == shooterCoid)
+        // Exclusions key on (COID, Global) — a local prop sharing the shooter's COID is not "self".
+        if (c.Coid == shooterCoid && c.Global == shooterGlobal)
             return false;
-        if (ownerCoid.HasValue && c.Coid == ownerCoid.Value)
+        if (ownerCoid.HasValue && c.Coid == ownerCoid.Value && c.Global == ownerGlobal)
             return false;
-        if (excludeCoid.HasValue && c.Coid == excludeCoid.Value)
+        if (excludeCoid.HasValue && c.Coid == excludeCoid.Value && c.Global == excludeGlobal)
             return false;
         if (c.IsCorpse || c.IsInvincible || !c.IsDamageable)
             return false;
@@ -208,11 +230,11 @@ public static class WeaponFireTargetAcquisition
         return true;
     }
 
-    private static Candidate? FindByCoid(IReadOnlyList<Candidate> candidates, long coid)
+    private static Candidate? FindByKey(IReadOnlyList<Candidate> candidates, long coid, bool global)
     {
         for (var i = 0; i < candidates.Count; i++)
         {
-            if (candidates[i].Coid == coid)
+            if (candidates[i].Coid == coid && candidates[i].Global == global)
                 return candidates[i];
         }
         return null;

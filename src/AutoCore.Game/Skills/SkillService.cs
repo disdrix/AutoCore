@@ -1,6 +1,7 @@
 namespace AutoCore.Game.Skills;
 
 using System.Collections.Concurrent;
+using AutoCore.Game.Combat;
 using AutoCore.Game.Constants;
 using AutoCore.Game.Entities;
 using AutoCore.Game.Managers;
@@ -382,6 +383,15 @@ public static class SkillService
         return true;
     }
 
+    /// <summary>Test seam for target resolution (SS-31 COID-collision coverage).</summary>
+    internal static ClonedObjectBase ResolveTargetForTests(
+        ClonedObjectBase caster,
+        Skill skill,
+        TFID targetId,
+        bool hasDamage,
+        bool hasHeal)
+        => ResolveTarget(null, caster, skill, targetId, hasDamage, hasHeal);
+
     private static ClonedObjectBase ResolveTarget(
         Character character,
         ClonedObjectBase caster,
@@ -390,18 +400,12 @@ public static class SkillService
         bool hasDamage,
         bool hasHeal)
     {
-        ClonedObjectBase resolved = null;
-        if (targetId != null && targetId.Coid > 0)
-        {
-            var map = caster.Map;
-            resolved = map?.GetObjectByCoid(targetId.Coid)
-                ?? map?.GetObject(targetId.Coid)
-                ?? ObjectManager.Instance?.GetObject(targetId);
+        // TFID-exact resolution — COID-only lookups hit the wrong entity after a DB wipe (SS-31).
+        var resolved = CombatTargetResolver.Resolve(caster.Map, targetId);
 
-            // Character TFID → combat body is the vehicle.
-            if (resolved is Character targetChar && targetChar.CurrentVehicle != null)
-                resolved = targetChar.CurrentVehicle;
-        }
+        // Character TFID → combat body is the vehicle.
+        if (resolved is Character targetChar && targetChar.CurrentVehicle != null)
+            resolved = targetChar.CurrentVehicle;
 
         if (resolved != null)
             return resolved;
