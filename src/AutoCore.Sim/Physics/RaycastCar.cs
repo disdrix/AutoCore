@@ -113,6 +113,11 @@ public sealed class RaycastCar
             // above rest pulls DOWN (terrain adhesion). Without the down-pull the body surfed a
             // RestCompression-sized gap on every descent (live 2026-08-09, mean 0.5 m on a 12%
             // grade). Down-pull is capped at 2 g so cresting a jump still goes ballistic.
+            // TODO(live 2026-08-09, deferred by user): cresting a climb still looks "low
+            // gravity" — the body lags coming back down onto level ground after an ascent.
+            // Likely fix: raise the down-pull cap (or scale it with forward speed) when the
+            // contact gap opened from below (crest) rather than from terrain dropping away
+            // (jump), so crests reseat fast while jumps stay ballistic.
             var compression = _params.RestCompression - heightAboveGround;
             var closing = -Velocity.Y; // positive when compressing
             var damp = closing >= 0f ? _params.SuspensionDampCompression : _params.SuspensionDampExtension;
